@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מדידת מסה — לומדה | תכנית 720 | סיין 4</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ============ מסך 1 — מסך מעבר: ו..אנחנו מתקדמים! ============ -->
+  <section class="screen active" data-screen="0" id="s0">
+    <button class="flag-btn" aria-label="מצאתם בעיה?" title="מצאתם בעיה?">
+      <span class="flag-btn-icon" aria-hidden="true">
+        <img class="flag-btn-icon-default" src="assets/images/btn-flag-default.png" alt="">
+        <img class="flag-btn-icon-hover" src="assets/images/btn-flag-hover.png" alt="">
+      </span>
+      <span class="flag-btn-label">מצאתם בעיה?</span>
+    </button>
+
+    <div class="s1-content">
+    <div class="transition-content">
+      <div class="transition-title-block">
+        <h2 class="transition-title">
+  זמן לשאלה מתקדמת
+        </h2>
+        <p class="transition-sub">
+   (זה אומר שעלינו רמה)
+        </p>
+      </div>
+      <div class="transition-avatar-wrap">
+        <img alt="דמות מלווה" class="transition-avatar" id="s0-avatar-img">
+      </div>
+    </div>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="bottom-bar-inner">
+        <div class="bar-actions">
+          <button class="btn-continue" dir="rtl" onclick="s0Continue()">המשך</button>
+        </div>
+        <div class="bar-back">
+          <button class="btn-back" dir="rtl" onclick="s0Back()">חזרה</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ מסך 2 — תרגול מתקדם: שתי טבלאות (עם גלילה) ============ -->
+  <section class="screen" data-screen="1" id="s1">
+    <button class="flag-btn" aria-label="מצאתם בעיה?" title="מצאתם בעיה?">
+      <span class="flag-btn-icon" aria-hidden="true">
+        <img class="flag-btn-icon-default" src="assets/images/btn-flag-default.png" alt="">
+        <img class="flag-btn-icon-hover" src="assets/images/btn-flag-hover.png" alt="">
+      </span>
+      <span class="flag-btn-label">מצאתם בעיה?</span>
+    </button>
+
+    <div class="tbl-content" id="tbl-scroll-area" tabindex="0">
+
+      <!-- ===== טבלה אחת רציפה — טרולי (5 שורות, שקף 122) + מכולה (6 שורות, שקף 123/125/128/130),
+           גלילה רגילה (לא מחולקת ל"עמודים"/מסכים נפרדים) ===== -->
+      <section class="tbl-page">
+        <div class="tbl-page-header">
+          <p class="tbl-question">השלימו את כל התאים החסרים בטבלה (מספרים, יחידות מסה או סוגי מסה):</p>
+<br/>
+        </div>
+        <table class="tbl-table" dir="rtl">
+          <thead>
+            <tr>
+              <th class="tbl-th">פריט</th>
+              <th class="tbl-th">מסה</th>
+              <th class="tbl-th">יחידת מסה</th>
+              <th class="tbl-th">מושג מסה</th>
+            </tr>
+          </thead>
+          <tbody>
+          <!-- שורה 1: שקית חטיפים מלאה — מושג מסה חסר -->
+            <tr>
+              <td class="tbl-td tbl-item-name">שקית חטיפים מלאה</td>
+              <td class="tbl-td">80</td>
+              <td class="tbl-td">גרם</td>
+              <td class="tbl-td tbl-input-cell">
+                <div class="tbl-dd-wrap" id="tblA-dd-1">
+                  <button class="tbl-dd-btn" type="button" id="tblA-dd-1-btn" onclick="tblDdToggle('tblA-dd-1')" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="tbl-dd-val" id="tblA-dd-1-val"></span>
+                    <span class="tbl-dd-arrow" aria-hidden="true"></span>
+                  </button>
+                  <ul class="tbl-dd-opts" id="tblA-dd-1-opts" hidden role="listbox">
+                    <li class="tbl-dd-opt" role="option" onclick="tblDdSelect('tblA-dd-1','ברוטו')">ברוטו</li>
+                    <li class="tbl-dd-opt" role="option" onclick="tblDdSelect('tblA-dd-1','נטו')">נטו</li>
+                    <li class="tbl-dd-opt" role="option" onclick="tblDdSelect('tblA-dd-1','טרה')">טרה</li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+            <!-- שורה 3: טרולי מלא לטיסה — יחידת מסה חסרה -->
+            <tr>
+              <td class="tbl-td tbl-item-name">טרולי מלא לטיסה</td>
+              <td class="tbl-td">12</td>
+              <td class="tbl-td tbl-input-cell">
+                <div class="tbl-dd-wrap" id="tblA-dd-2">
+                  <button class="tbl-dd-btn" type="button" id="tblA-dd-2-btn" onclick="tblDdToggle('tblA-dd-2')" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="tbl-dd-val" id="tblA-dd-2-val"></span>
+                    <span class="tbl-dd-arrow" aria-hidden="true"></span>
+                  </button>
+                  <ul class="tbl-dd-opts" id="tblA-dd-2-opts" hidden role="listbox">
+                    <li class="tbl-dd-opt" role="option" onclick="tblDdSelect('tblA-dd-2','מיליגרם')">מיליגרם</li>
+                    <li class="tbl-dd-opt" role="option" onclick="tblDdSelect('tblA-dd-2','גרם')">גרם</li>
+                    <li class="tbl-dd-opt" role="option" onclick="tblDdSelect('tblA-dd-2','קילוגרם')">קילוגרם</li>
+                    <li class="tbl-dd-opt" role="option" onclick="tblDdSelect('tblA-dd-2','טון')">טון</li>
+                  </ul>
+                </div>
+              </td>
+              <td class="tbl-td">ברוטו</td>
+            </tr>
+            <!-- שורה 4: הבגדים שבתוך הטרולי — מושג מסה חסר -->
+            <tr>
+              <td class="tbl-td tbl-item-name">הבגדים שבתוך הטרולי</td>
+              <td class="tbl-td">10</td>
+              <td class="tbl-td">קילוגרם</td>
+              <td class="tbl-td tbl-input-cell">
+                <div class="tbl-dd-wrap" id="tblA-dd-3">
+                  <button class="tbl-dd-btn" type="button" id="tblA-dd-3-btn" onclick="tblDdToggle('tblA-dd-3')" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="tbl-dd-val" id="tblA-dd-3-val"></span>
+                    <span class="tbl-dd-arrow" aria-hidden="true"></span>
+                  </button>
+                  <ul class="tbl-dd-opts" id="tblA-dd-3-opts" hidden role="listbox">
+                    <li class="tbl-dd-opt" role="option" onclick="tblDdSelect('tblA-dd-3','ברוטו')">ברוטו</li>
+                    <li class="tbl-dd-opt" role="option" onclick="tblDdSelect('tblA-dd-3','נטו')">נטו</li>
+                    <li class="tbl-dd-opt" role="option" onclick="tblDdSelect('tblA-dd-3','טרה')">טרה</li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+            <!-- שורה 5: מזוודת הטרולי הריקה — מסה חסרה -->
+            <tr>
+              <td class="tbl-td tbl-item-name">מזוודת הטרולי הריקה
+                <button class="tbl-info-btn" type="button" onclick="tblOpenRowHint('חשבו לפי הטרולי המלא והבגדים')" aria-label="רמז נוסף">?</button>
+              </td>
+              <td class="tbl-td tbl-input-cell">
+                <input class="tbl-input" id="tblA-input-2" type="number" min="0" oninput="tblOnInput()" dir="ltr">
+                <span class="tbl-unit">ק"ג</span>
+              </td>
+              <td class="tbl-td">קילוגרם</td>
+              <td class="tbl-td">טרה</td>
+            </tr>
+          <!-- שורה 6: מכולה ימית מלאה בברווזי פלסטיק — מושג מסה חסר -->
+            <tr>
+              <td class="tbl-td tbl-item-name">מכולה ימית מלאה בברווזי פלסטיק</td>
+              <td class="tbl-td">30</td>
+              <td class="tbl-td">טון</td>
+              <td class="tbl-td tbl-input-cell">
+                <div class="tbl-dd-wrap" id="tblB-dd-1">
+                  <button class="tbl-dd-btn" type="button" id="tblB-dd-1-btn" onclick="tblDdToggle('tblB-dd-1')" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="tbl-dd-val" id="tblB-dd-1-val"></span>
+                    <span class="tbl-dd-arrow" aria-hidden="true"></span>
+                  </button>
+                  <ul class="tbl-dd-opts" id="tblB-dd-1-opts" hidden role="listbox">
+                    <li class="tbl-dd-opt" role="option" onclick="tblDdSelect('tblB-dd-1','ברוטו')">ברוטו</li>
+                    <li class="tbl-dd-opt" role="option" onclick="tblDdSelect('tblB-dd-1','נטו')">נטו</li>
+                    <li class="tbl-dd-opt" role="option" onclick="tblDdSelect('tblB-dd-1','טרה')">טרה</li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+            <!-- שורה 7: מכולה ימית ריקה — יחידת מסה חסרה -->
+            <tr>
+              <td class="tbl-td tbl-item-name">מכולה ימית ריקה</td>
+              <td class="tbl-td">4</td>
+              <td class="tbl-td tbl-input-cell">
+                <div class="tbl-dd-wrap" id="tblB-dd-2">
+                  <button class="tbl-dd-btn" type="button" id="tblB-dd-2-btn" onclick="tblDdToggle('tblB-dd-2')" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="tbl-dd-val" id="tblB-dd-2-val"></span>
+                    <span class="tbl-dd-arrow" aria-hidden="true"></span>
+                  </button>
+                  <ul class="tbl-dd-opts" id="tblB-dd-2-opts" hidden role="listbox">
+                    <li class="tbl-dd-opt" role="option" onclick="tblDdSelect('tblB-dd-2','מיליגרם')">מיליגרם</li>
+                    <li class="tbl-dd-opt" role="option" onclick="tblDdSelect('tblB-dd-2','גרם')">גרם</li>
+                    <li class="tbl-dd-opt" role="option" onclick="tblDdSelect('tblB-dd-2','קילוגרם')">קילוגרם</li>
+                    <li class="tbl-dd-opt" role="option" onclick="tblDdSelect('tblB-dd-2','טון')">טון</li>
+                  </ul>
+                </div>
+              </td>
+              <td class="tbl-td">טרה</td>
+            </tr>
+            <!-- שורה 8: ברווזי הפלסטיק בלבד — מסה חסרה -->
+            <tr>
+              <td class="tbl-td tbl-item-name">ברווזי הפלסטיק בלבד
+                <button class="tbl-info-btn" type="button" onclick="tblOpenRowHint('חשבו לפי המכולה')" aria-label="רמז נוסף">?</button>
+              </td>
+              <td class="tbl-td tbl-input-cell">
+                <input class="tbl-input" id="tblB-input-1" type="number" min="0" oninput="tblOnInput()" dir="ltr">
+                <span class="tbl-unit">טון</span>
+              </td>
+              <td class="tbl-td">טון</td>
+              <td class="tbl-td">נטו</td>
+            </tr>
+            <!-- שורה 9: בקבוק שתיה מלא — מושג מסה חסר -->
+            <tr>
+              <td class="tbl-td tbl-item-name">בקבוק שתיה מלא</td>
+              <td class="tbl-td">1500</td>
+              <td class="tbl-td">גרם</td>
+              <td class="tbl-td tbl-input-cell">
+                <div class="tbl-dd-wrap" id="tblB-dd-3">
+                  <button class="tbl-dd-btn" type="button" id="tblB-dd-3-btn" onclick="tblDdToggle('tblB-dd-3')" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="tbl-dd-val" id="tblB-dd-3-val"></span>
+                    <span class="tbl-dd-arrow" aria-hidden="true"></span>
+                  </button>
+                  <ul class="tbl-dd-opts" id="tblB-dd-3-opts" hidden role="listbox">
+                    <li class="tbl-dd-opt" role="option" onclick="tblDdSelect('tblB-dd-3','ברוטו')">ברוטו</li>
+                    <li class="tbl-dd-opt" role="option" onclick="tblDdSelect('tblB-dd-3','נטו')">נטו</li>
+                    <li class="tbl-dd-opt" role="option" onclick="tblDdSelect('tblB-dd-3','טרה')">טרה</li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+            <!-- שורה 10: המשקה בלבד — יחידת מסה חסרה -->
+            <tr>
+              <td class="tbl-td tbl-item-name">המשקה בלבד</td>
+              <td class="tbl-td">1450</td>
+              <td class="tbl-td tbl-input-cell">
+                <div class="tbl-dd-wrap" id="tblB-dd-4">
+                  <button class="tbl-dd-btn" type="button" id="tblB-dd-4-btn" onclick="tblDdToggle('tblB-dd-4')" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="tbl-dd-val" id="tblB-dd-4-val"></span>
+                    <span class="tbl-dd-arrow" aria-hidden="true"></span>
+                  </button>
+                  <ul class="tbl-dd-opts" id="tblB-dd-4-opts" hidden role="listbox">
+                    <li class="tbl-dd-opt" role="option" onclick="tblDdSelect('tblB-dd-4','מיליגרם')">מיליגרם</li>
+                    <li class="tbl-dd-opt" role="option" onclick="tblDdSelect('tblB-dd-4','גרם')">גרם</li>
+                    <li class="tbl-dd-opt" role="option" onclick="tblDdSelect('tblB-dd-4','קילוגרם')">קילוגרם</li>
+                    <li class="tbl-dd-opt" role="option" onclick="tblDdSelect('tblB-dd-4','טון')">טון</li>
+                  </ul>
+                </div>
+              </td>
+              <td class="tbl-td">נטו</td>
+            </tr>
+            <!-- שורה 11: כלוב פלדה לנשיאת נמר — מושג מסה חסר -->
+            <tr>
+              <td class="tbl-td tbl-item-name">כלוב פלדה לנשיאת נמר</td>
+              <td class="tbl-td">250</td>
+              <td class="tbl-td">קילוגרם</td>
+              <td class="tbl-td tbl-input-cell">
+                <div class="tbl-dd-wrap" id="tblB-dd-5">
+                  <button class="tbl-dd-btn" type="button" id="tblB-dd-5-btn" onclick="tblDdToggle('tblB-dd-5')" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="tbl-dd-val" id="tblB-dd-5-val"></span>
+                    <span class="tbl-dd-arrow" aria-hidden="true"></span>
+                  </button>
+                  <ul class="tbl-dd-opts" id="tblB-dd-5-opts" hidden role="listbox">
+                    <li class="tbl-dd-opt" role="option" onclick="tblDdSelect('tblB-dd-5','ברוטו')">ברוטו</li>
+                    <li class="tbl-dd-opt" role="option" onclick="tblDdSelect('tblB-dd-5','נטו')">נטו</li>
+                    <li class="tbl-dd-opt" role="option" onclick="tblDdSelect('tblB-dd-5','טרה')">טרה</li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <br/><br/><br/><br/><br/><br/>
+      </section><!-- /.tbl-page -->
+
+    </div><!-- /.tbl-content -->
+
+    <div id="tbl-feedbox" class="scq-fb-box">
+      <div class="scq-fb-title">
+        <span class="scq-fb-title-text"></span>
+        <button class="scq-fb-close" type="button" onclick="scqFbClose('tbl-feedbox')" aria-label="סגירת משוב">✕</button>
+      </div>
+      <p class="scq-fb-body"></p>
+      <button id="tbl-reveal-btn" class="scq-fb-reveal-btn" type="button" onclick="tblReveal()" hidden>התשובה הנכונה</button>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="bottom-bar-inner">
+        <div class="bar-actions">
+          <button id="tbl-check" class="btn-continue" dir="rtl" onclick="tblCheck()" disabled>צדקתי?</button>
+          <button id="tbl-hint" class="btn-hint" dir="rtl" onclick="tblOpenHint()" hidden>
+            <img class="hint-icon" src="assets/images/icon-hint-blue.svg" alt="">
+            אפשר רמז?
+          </button>
+        </div>
+        <div class="bar-back">
+          <button class="btn-back" dir="rtl" onclick="goTo(0)">חזרה</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ פופ-אפ רמז מסך 2 — מחוץ ל-.screen, ישירות ב-#app ============ -->
+  <div id="tbl-hint-overlay" class="scq-hint-overlay" hidden>
+    <div class="scq-hint-popup" role="dialog" aria-modal="true" aria-label="רמז">
+      <div class="scq-hint-title-row">
+        <p class="scq-hint-title">רמז</p>
+      </div>
+      <p class="scq-hint-body">כדי להשלים את הטבלה, בדקו בכל שורה:<br>האם הפריט הוא <strong>התכולה בלבד</strong>, <strong>האריזה בלבד</strong> או <strong>הכל ביחד?</strong><br>מהי <strong>יחידת המסה</strong> המתאימה ביותר לפריט המתואר.</p>
+      <button class="scq-hint-close" onclick="tblCloseHint()">חזרה לשאלה</button>
+    </div>
+  </div>
+
+  <!-- ============ פופ-אפ רמז קטן לשורה בטבלה (אייקון "?" ליד שם הפריט) — מחוץ ל-.screen, ישירות ב-#app ============ -->
+  <div id="tbl-row-hint-overlay" class="scq-hint-overlay" hidden>
+    <div class="scq-hint-popup tbl-row-hint-popup" role="dialog" aria-modal="true" aria-label="רמז">
+      <button class="scq-hint-close tbl-row-hint-close" onclick="tblCloseRowHint()" aria-label="סגירה">✕</button>
+      <p class="scq-hint-body" id="tbl-row-hint-body"></p>
+    </div>
+  </div>
+
+</div>
+<script src="script.js"></script>
+</body>
+</html>

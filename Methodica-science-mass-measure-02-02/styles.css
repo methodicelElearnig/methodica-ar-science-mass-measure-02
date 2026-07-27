@@ -1,0 +1,1256 @@
+/* =========================================================
+   מדידת מסה — לומדה | 720 | סיין 2
+   ========================================================= */
+
+/* ---------- Fonts (עותק מקומי לסין זה, ב-assets/fonts) ---------- */
+@font-face {
+  font-family: 'Assistant';
+  src: url('assets/fonts/assistant-hebrew.woff2') format('woff2');
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F;
+}
+@font-face {
+  font-family: 'Assistant';
+  src: url('assets/fonts/assistant-latin.woff2') format('woff2');
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+                 U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215;
+}
+
+/* ---------- Reset ---------- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  direction: rtl;
+  font-family: 'Assistant', 'Segoe UI', Arial, sans-serif;
+   background: #ffffff;
+}
+button {
+  font-family: inherit;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: inherit;
+}
+button:disabled { cursor: default; }
+img { display: block; max-width: none; }
+
+/* ---------- Canvas & viewport scaling ---------- */
+#app {
+  width: 1280px;
+  height: 710px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+  background: #fff;
+  overflow: hidden;
+}
+
+.screen {
+  position: absolute;
+  inset: 0;
+  display: none;
+}
+.screen.active { display: block; }
+
+/* transitions removed on purpose — Figma states change instantly */
+* { transition: none !important; }
+
+/* ════════════════════════════════════════════════════════
+   GLOBAL — Bottom bar (74px, per Figma)
+   ════════════════════════════════════════════════════════ */
+.bottom-bar {
+  position: absolute;
+  bottom: -3px;           /* -3px hides the bottom border line */
+  left: 0;
+  right: 0;
+  height: 74px;
+  background: #ffffff;
+  border-top: 0.4px solid #AEAEAE;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bottom-bar-inner {
+  width: 1232px;
+  padding: 0 10px;
+  display: flex;
+  direction: ltr;          /* Force LTR so action buttons stay physical-LEFT */
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* === Continue button (gradient blue pill) === */
+.btn-continue {
+  background: linear-gradient(180deg, #005FBE 9%, #003971 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 1000px;
+  font-family: 'Assistant', sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  padding: 12px 40px;
+  width: 140px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn-continue:disabled {
+  background: #AEAEAE;
+  color: #303030;
+  cursor: not-allowed;
+}
+.btn-continue:not(:disabled):hover { opacity: 0.88; }
+.btn-continue:focus-visible {
+  outline: 3px solid #019DE5;
+  outline-offset: 2px;
+}
+
+/* === Hint button (אפשר רמז?) — בסיין הזה גלוי ומופעל מההתחלה בכל
+   מסכי השאלות (2-6), לפי בקשה מפורשת — לא "נחשף אחרי ניסיון ראשון" === */
+.btn-hint {
+  background: #ffffff;
+  color: #019de5;
+  border: 1.5px solid #019de5;
+  border-radius: 1000px;
+  font-family: 'Assistant', sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  padding: 10px 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.btn-hint[hidden] { display: none; }
+.btn-hint .scq-hint-icon { flex-shrink: 0; width: 26px; height: 24px; }
+.btn-hint:disabled {
+  color: #aeaeae;
+  border-color: #aeaeae;
+  cursor: not-allowed;
+}
+.btn-hint:not(:disabled):hover { background: #f0f8ff; }
+.btn-hint:focus-visible {
+  outline: 3px solid #019de5;
+  outline-offset: 2px;
+}
+
+/* === Back button (חזרה) === */
+.btn-back {
+  background: #ffffff;
+  color: #007ac6;
+  border: 1.5px solid #007ac6;
+  border-radius: 1000px;
+  font-family: 'Assistant', sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  padding: 12px 40px;
+  width: 140px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn-back:hover { background: #f0f8ff; }
+.btn-back:focus-visible {
+  outline: 3px solid #007ac6;
+  outline-offset: 2px;
+}
+
+.bar-actions {
+  display: flex;
+  direction: ltr;
+  align-items: center;
+  gap: 16px;
+}
+.bar-back {
+  display: flex;
+  align-items: center;
+}
+
+/* =========================================================
+   SingleChoiceQuestion / MultipleChoiceQuestion — רכיבים גלובליים
+   קנבס מקור: 1280x710 (זהה לקנבס העבודה — ללא סקייל)
+   ========================================================= */
+
+.scq-question {
+  position: absolute;
+  top: 139px;
+  left: 40px;
+  right: 40px;
+  display: flex;
+  flex-direction: row;
+  direction: ltr;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.scq-img {
+  flex-shrink: 0;
+  width: 380px;
+  height: 380px;
+  padding: 8px;
+}
+.scq-img-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border: 1px solid rgba(174, 174, 174, 0.5);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #fff;
+}
+.scq-img-inner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  cursor: zoom-in;
+}
+
+/* מסגרת תמונה שעדיין לא הוטמעה בפועל — placeholder זמני */
+.scq-img-inner.scq-img-placeholder {
+  background: #f8f8f8;
+  border: 1px dashed rgba(174, 174, 174, 0.8);
+  cursor: default;
+}
+.scq-img-placeholder-label {
+  font-family: 'Assistant', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: #aeaeae;
+  text-align: center;
+  padding: 0 16px;
+}
+
+/* --- Image zoom v2 (720-templates _global-components.md spec) ---
+   One shared #img-zoom-modal lives once near the end of index.html,
+   outside all .screen sections, directly in #app. */
+.img-zoom-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: #fff;
+  border: 2px solid #019de5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  z-index: 2;
+}
+.img-zoom-btn:hover { background: #019de5; }
+.img-zoom-btn__icon { width: 20px; height: 20px; stroke: #019de5; }
+.img-zoom-btn:hover .img-zoom-btn__icon { stroke: #fff; }
+.img-zoom-btn:focus-visible { outline: 2px solid #019de5; outline-offset: 2px; }
+
+.img-zoom-modal {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.78);
+  z-index: 1000;
+}
+.img-zoom-modal.hidden { display: none; }
+
+.img-zoom-modal__panel {
+  position: relative;
+  width: 660px;
+  height: 660px;
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.img-zoom-modal__stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.img-zoom-close {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: #fff;
+  border: 2px solid #019de5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  z-index: 2;
+}
+.img-zoom-close:hover { background: #019de5; }
+.img-zoom-close__icon { width: 15px; height: 15px; stroke: #019de5; }
+.img-zoom-close:hover .img-zoom-close__icon { stroke: #fff; }
+.img-zoom-close:focus-visible { outline: 2px solid #019de5; outline-offset: 2px; }
+
+.scq-content {
+  direction: rtl;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* RTL column: flex-start = physical right */
+  gap: 24px;
+  flex: 1;
+}
+
+.scq-qtext {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* RTL column: flex-start = physical right */
+  gap: 16px;
+  width: 792px;
+  max-width: 100%;
+}
+.scq-qtitle {
+  font-weight: 700;
+  font-size: 24px;
+  color: #019de5;
+  text-align: right;
+  width: 100%;
+}
+.scq-qtext-body {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.scq-qbody {
+  font-weight: 400;
+  font-size: 24px;
+  color: #303030;
+  text-align: right;
+}
+
+.scq-answers {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* RTL column: flex-start = physical right */
+  gap: 12px;
+  width: 604px;
+  max-width: 100%;
+}
+
+.scq-opt {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  border: 2px solid #019de5;
+  border-radius: 999px;
+  cursor: pointer;
+  background: #fff;
+}
+.scq-opt-text {
+  flex: 1;
+  font-weight: 400;
+  font-size: 22px;
+  color: #222;
+  text-align: right;
+}
+.scq-radio {
+  order: -1;
+  position: relative;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border: 2px solid #019de5;
+  border-radius: 999px;
+  background: #fff;
+}
+.scq-radio::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+/* MultipleChoiceQuestion — תיבת סימון מרובעת (לא עיגול) */
+.scq-radio.scq-radio-square { border-radius: 3px; }
+
+.scq-opt.selected .scq-radio { background: #019de5; }
+
+.scq-opt.correct {
+  border-width: 1.5px;
+  border-color: #609e12;
+  background: #edf8ed;
+}
+.scq-opt.correct .scq-radio {
+  border-color: #609e12;
+  background: #609e12;
+}
+.scq-opt.correct .scq-radio::after {
+  background-image: url('assets/images/icon-check-white.png');
+  background-size: 12px 9px;
+}
+
+.scq-opt.wrong {
+  border-width: 1.5px;
+  border-color: #b20010;
+  background: #fff0f4;
+}
+.scq-opt.wrong .scq-radio {
+  border-color: #b20010;
+  background: #b20010;
+}
+.scq-opt.wrong .scq-radio::after {
+  background-image: url('assets/images/icon-x-white.png');
+  background-size: 10px 10px;
+}
+
+.scq-opt.disabled { cursor: default; }
+
+/* --- Image zoom (הגדלת תמונת תוכן) --- */
+.methodica-zoom-trigger {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  width: 40px;
+  height: 39px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: zoom-in;
+  z-index: 2;
+}
+.methodica-zoom-trigger-icon { position: relative; display: block; width: 100%; height: 100%; }
+.methodica-zoom-trigger-default,
+.methodica-zoom-trigger-hover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.methodica-zoom-trigger-hover { opacity: 0; }
+.methodica-zoom-trigger:hover .methodica-zoom-trigger-default,
+.methodica-zoom-trigger:focus-visible .methodica-zoom-trigger-default { opacity: 0; }
+.methodica-zoom-trigger:hover .methodica-zoom-trigger-hover,
+.methodica-zoom-trigger:focus-visible .methodica-zoom-trigger-hover { opacity: 1; }
+
+.methodica-zoom-popup {
+  position: fixed;
+  z-index: 2147483647;
+  display: none;
+  background: #fff;
+  border: 1px solid rgba(174, 174, 174, 0.5);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+.methodica-zoom-popup.is-open { display: block; }
+.methodica-zoom-popup-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.methodica-zoom-close {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: 1px solid #303030;
+  background: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  z-index: 1;
+}
+.methodica-zoom-close img { width: 16px; height: 16px; }
+
+/* --- Feedback panel (bottom-left) --- */
+.scq-fb-box {
+  display: none;
+  position: absolute;
+  left: 16px;
+  bottom: 87px;
+  width: 426px;
+  max-width: calc(100% - 32px);
+  border: 0.3px solid #aeaeae;
+  border-radius: 12px;
+  padding: 24px;
+  flex-direction: column;
+  gap: 24px;
+  background: #fff;
+  z-index: 5;
+  cursor: grab;
+  user-select: none;
+}
+.scq-fb-box.visible { display: flex; }
+.scq-fb-box.is-correct { background: #edf8ed; }
+.scq-fb-box.is-wrong { background: #ffdbdc; }
+.scq-fb-box.is-dragging { cursor: grabbing; }
+
+.scq-fb-title {
+  display: flex;
+  direction: rtl;
+  align-items: center;
+  gap: 32px;
+}
+.scq-fb-toggle {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #303030;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 100px;
+  background: #fff;
+}
+.scq-fb-toggle img { width: 16px; height: 16px; }
+.scq-fb-title-text {
+  flex: 1;
+  font-weight: 700;
+  font-size: 20px;
+  color: #222;
+  text-align: right;
+}
+.scq-fb-body {
+  font-weight: 400;
+  font-size: 20px;
+  color: #222;
+  text-align: right;
+  white-space: pre-line;
+}
+
+/* --- כפתור "התשובה הנכונה" בתוך תיבת המשוב — מוצג במקום חשיפה אוטומטית
+   של הפתרון אחרי הניסיון השני השגוי, עד שהלומד לוחץ עליו במפורש --- */
+.scq-fb-reveal-btn {
+  align-self: flex-start;
+  background: #ffffff;
+  color: #019de5;
+  border: 1.5px solid #019de5;
+  border-radius: 1000px;
+  font-family: 'Assistant', sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  padding: 10px 24px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.scq-fb-reveal-btn[hidden] { display: none; }
+.scq-fb-reveal-btn:hover { background: #f0f8ff; }
+.scq-fb-reveal-btn:focus-visible {
+  outline: 3px solid #019de5;
+  outline-offset: 2px;
+}
+
+/* --- Hint popup (outside .screen, direct child of #app) --- */
+.scq-hint-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 32, 96, 0.35);
+}
+.scq-hint-overlay[hidden] { display: none; }
+
+.scq-hint-popup {
+  position: relative;
+  width: 542px;
+  max-width: calc(100% - 64px);
+  background: #019de5;
+  border-radius: 48px;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* RTL column: flex-start = physical right */
+  gap: 24px;
+  direction: rtl;
+}
+.scq-hint-title-row {
+  width: 100%;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+}
+.scq-hint-title {
+  flex: 1;
+  font-weight: 700;
+  font-size: 32px;
+  color: #fff;
+  text-align: right;
+}
+.scq-hint-bulb { width: 40px; height: 34px; flex-shrink: 0; }
+.scq-hint-body {
+  font-weight: 400;
+  font-size: 24px;
+  color: #fff;
+  text-align: right;
+}
+.scq-hint-close {
+  align-self: center;
+  width: 196px;
+  padding: 16px 40px;
+  border-radius: 999px;
+  background: #fff;
+  color: #303030;
+  font-size: 24px;
+  text-align: center;
+}
+
+/* =========================================================
+   מסך 1 — מסך מעבר: דמות + בועית דיבור (Transition)
+   זהה לעיצוב מסך 15 בסיין 1 (Figma node 196:3276 למבנה,
+   2113:10964/2113:10917 לבועית/לדמות)
+   ========================================================= */
+
+.transition-content {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 74px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 80px 56px 50px;
+}
+
+.transition-title-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 810px;
+  direction: rtl;
+}
+
+.transition-title {
+  font-family: 'Assistant', sans-serif;
+  font-size: 40px;
+  font-weight: 700;
+  color: #303030;
+  text-align: center;
+}
+
+.transition-sub {
+  font-family: 'Assistant', sans-serif;
+  font-size: 28px;
+  font-weight: 400;
+  color: #303030;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.transition-avatar-wrap {
+  position: relative;
+  width: 304px;
+  flex-shrink: 0;
+}
+
+.transition-avatar {
+  width: 304px;
+  aspect-ratio: 304 / 293;
+  object-fit: cover;
+  display: block;
+  border-radius: 16px;
+}
+
+.transition-bubble {
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 11px);
+  transform: translateY(-50%);
+  width: 300px;
+  background: #ffffff;
+  border: 1.5px solid #019de5;
+  border-radius: 20px;
+  padding: 16px 20px;
+  font-family: 'Assistant', sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  color: #000000;
+  text-align: center;
+  line-height: 1.5;
+  direction: rtl;
+}
+
+.transition-bubble::before {
+  content: '';
+  position: absolute;
+  right: -13px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 6px solid transparent;
+  border-left: 7px solid #019de5;
+}
+
+.transition-bubble::after {
+  content: '';
+  position: absolute;
+  right: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 5px solid transparent;
+  border-left: 6px solid #ffffff;
+  z-index: 1;
+}
+
+/* מסך 7 (s6) בלבד — קלאסים ייעודיים (לא .transition-avatar-wrap/.transition-bubble
+   המשותפים) כדי שהיישור לקו הפה של avatar-orange-clapping-hands לא ישפיע על
+   מסך 1 (s0), שמשתמש בתמונת דמות אחרת ובבועית הכללית. */
+.s6-avatar-wrap {
+  position: relative;
+  width: 304px;
+  flex-shrink: 0;
+}
+
+.s6-bubble {
+  position: absolute;
+  top: calc(50% - 40px);
+  right: calc(100% + 11px);
+  transform: translateY(-50%);
+  width: 300px;
+  background: #ffffff;
+  border: 1.5px solid #019de5;
+  border-radius: 20px;
+  padding: 16px 20px;
+  font-family: 'Assistant', sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  color: #000000;
+  text-align: center;
+  line-height: 1.5;
+  direction: rtl;
+}
+
+.s6-bubble::before {
+  content: '';
+  position: absolute;
+  right: -13px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 6px solid transparent;
+  border-left: 7px solid #019de5;
+}
+
+.s6-bubble::after {
+  content: '';
+  position: absolute;
+  right: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 5px solid transparent;
+  border-left: 6px solid #ffffff;
+  z-index: 1;
+}
+
+/* =========================================================
+   סרגל התקדמות (qnav) — משותף למסכים 2-6 בסיין הזה
+   ========================================================= */
+
+.qnav {
+  position: absolute;
+  top: 48px;
+  left: 0;
+  right: 0;
+  display: flex;
+  direction: ltr;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.qnav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 43px;
+}
+
+.qnav-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qnav-icon.qnav-future { border: 1.5px solid #ececec; background: #fff; }
+.qnav-icon.qnav-future::after {
+  content: '';
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ececec;
+  display: block;
+}
+.qnav-icon.qnav-current { border: 2px solid #019de5; background: #fff; }
+.qnav-icon.qnav-current::after {
+  content: '';
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #019de5;
+  display: block;
+}
+.qnav-icon.qnav-success { background: #019de5; border: 2px solid #019de5; }
+.qnav-icon.qnav-success::after {
+  content: '✓';
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  display: block;
+  line-height: 1;
+}
+.qnav-icon.qnav-fail { background: #019de5; border: 2px solid #019de5; }
+.qnav-icon.qnav-fail::after {
+  content: '✕';
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  display: block;
+  line-height: 1;
+}
+
+.qnav-label {
+  font-family: 'Assistant', sans-serif;
+  font-size: 15px;
+  color: #ececec;
+  text-align: center;
+  white-space: nowrap;
+}
+.qnav-label.qnav-label-active { color: #222; }
+
+.qnav-line {
+  width: 64px;
+  height: 1.5px;
+  background: #ececec;
+  margin-top: 11.5px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.qnav-line.line-done { background: rgba(0, 0, 0, 0.6); }
+
+/* =========================================================
+   מסך 5 — TrueFalseQuestion: נכון / לא נכון (4 טענות)
+   ========================================================= */
+
+.tf-question {
+  position: absolute;
+  top: 139px;
+  left: 40px;
+  right: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  direction: rtl;
+}
+
+.tf-text-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tf-qtitle {
+  font-weight: 700;
+  font-size: 24px;
+  color: #019de5;
+  text-align: right;
+}
+
+.tf-instruction {
+  font-weight: 400;
+  font-size: 24px;
+  color: #303030;
+  text-align: right;
+  line-height: 1.5;
+}
+
+.tf-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.tf-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.tf-row.row-locked { pointer-events: none; }
+
+.tf-stmt {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+.tf-num {
+  font-weight: 700;
+  font-size: 24px;
+  color: #019de5;
+  flex-shrink: 0;
+}
+.tf-text {
+  font-size: 24px;
+  color: #303030;
+  line-height: 1.4;
+}
+
+.tf-btns {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.tf-btn {
+  font-family: 'Assistant', sans-serif;
+  font-size: 22px;
+  font-weight: 400;
+  color: #222;
+  background: #fff;
+  border: 2px solid #019de5;
+  border-radius: 1000px;
+  padding: 5px 24px;
+  min-width: 104px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.tf-btn.selected {
+  background: #eaf6ff;
+  border: 3px solid #019de5;
+}
+.tf-btn.btn-correct {
+  background: #edf8ed;
+  border: 1.5px solid #609e12;
+}
+.tf-btn.btn-wrong {
+  background: #fff0f4;
+  border: 1.5px solid #b20010;
+}
+.tf-btn:disabled { cursor: default; }
+
+/* =========================================================
+   מסך 8 — השלמת מושגים (Dropdown per row)
+   ========================================================= */
+
+.dd-question {
+  position: absolute;
+  top: 139px;
+  right: 40px;
+  width: 792px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  direction: rtl;
+}
+
+.dd-text-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dd-title {
+  font-family: 'Assistant', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #019de5;
+  text-align: right;
+}
+
+.dd-instruction {
+  font-family: 'Assistant', sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  color: #303030;
+  text-align: right;
+  line-height: 1.5;
+}
+
+.dd-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dd-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dd-label {
+  font-family: 'Assistant', sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  color: #303030;
+  text-align: right;
+}
+
+.dd-wrap { position: relative; flex-shrink: 0; }
+
+.dd-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 180px;
+  height: 42px;
+  padding: 0 17px;
+  border: 1px solid rgba(174, 174, 174, 0.5);
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+  box-sizing: border-box;
+  gap: 8px;
+  font-family: 'Assistant', sans-serif;
+}
+.dd-btn:disabled { cursor: default; opacity: 0.7; pointer-events: none; }
+.dd-btn.wrong { border: 1.5px solid #b20010 !important; opacity: 0.8; }
+.dd-btn.correct { border: 1.5px solid #609e12 !important; opacity: 0.8; }
+
+.dd-val {
+  font-family: 'Assistant', sans-serif;
+  font-size: 22px;
+  font-weight: 400;
+  color: #303030;
+  flex: 1;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.dd-arrow {
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 7px solid #666;
+  flex-shrink: 0;
+}
+.dd-btn[aria-expanded="true"] .dd-arrow { transform: rotate(180deg); }
+.dd-btn.wrong .dd-arrow,
+.dd-btn.correct .dd-arrow { display: none; }
+.dd-btn.wrong::after { content: '✕'; color: #b20010; font-size: 15px; font-weight: 700; flex-shrink: 0; }
+.dd-btn.correct::after { content: '✓'; color: #609e12; font-size: 15px; font-weight: 700; flex-shrink: 0; }
+
+.dd-opts {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  width: 180px;
+  background: #fff;
+  border: 1px solid rgba(174, 174, 174, 0.5);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  z-index: 200;
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  overflow: hidden;
+}
+
+.dd-opt {
+  font-family: 'Assistant', sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  color: #303030;
+  padding: 8px 17px;
+  cursor: pointer;
+  text-align: right;
+}
+.dd-opt:hover { background: #f0f7ff; }
+
+/* =========================================================
+   מסך 9 — השלמת יחידות מסה (Drag & Drop)
+   ========================================================= */
+
+.drag-question {
+  position: absolute;
+  top: 118px;
+  left: 0;
+  right: 0;
+  bottom: 74px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  padding: 86px 32px 8px;
+}
+
+.drag-text-group {
+  position: absolute;
+  top: 21px;
+  right: 40px;
+  width: 792px;
+  direction: rtl;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.drag-title {
+  font-family: 'Assistant', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #019de5;
+  text-align: right;
+}
+
+.drag-sub {
+  font-family: 'Assistant', sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  color: #303030;
+  text-align: right;
+  line-height: 1.5;
+}
+
+.drag-source-bank {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+  flex-shrink: 0;
+  min-height: 160px;
+  padding: 10px 16px;
+  background: rgba(201, 206, 216, 0.08);
+  border-radius: 14px;
+  width: 100%;
+}
+
+.drag-item {
+  background: #ffffff;
+  border: 2px solid rgba(201, 206, 216, 0.5);
+  border-radius: 10px;
+  padding: 0;
+  cursor: grab;
+  user-select: none;
+  flex-shrink: 0;
+  width: 155px;
+  height: 140px;
+  overflow: hidden;
+}
+.drag-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
+}
+.drag-item:hover { border-color: #019de5; box-shadow: 0 2px 8px rgba(1, 157, 229, 0.2); }
+.drag-item.drag-dragging { opacity: 0.35; cursor: grabbing; }
+
+/* פריט בתוך אזור גרירה — קטן יותר */
+.drag-zone .drag-item { width: 120px; height: 110px; }
+
+.drag-zones-row {
+  display: flex;
+  gap: 12px;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: flex-start;
+  direction: rtl;
+  width: 100%;
+}
+
+.drag-zone-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+.drag-zone {
+  width: 100%;
+  min-height: 140px;
+  background: #f8f8f8;
+  border: 2px dashed #bdbdbd;
+  border-radius: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 6px;
+  padding: 8px;
+}
+.drag-zone.drag-over { border-color: #019de5; background: #eaf6ff; }
+.drag-zone.correct { border-color: #4caf50; background: #edf8ed; border-style: solid; }
+.drag-zone.wrong { border-color: #e53935; background: #ffe5e5; border-style: solid; }
+
+.drag-zone-label {
+  font-family: 'Assistant', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #303030;
+  text-align: center;
+}
+
+/* =========================================================
+   רכיבים גלובליים
+   ========================================================= */
+
+.flag-btn {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 4px;
+  width: 88px;
+}
+.flag-btn-icon { position: relative; display: block; width: 38px; height: 38px; }
+.flag-btn-icon-default,
+.flag-btn-icon-hover {
+  position: absolute;
+  inset: 0;
+  width: 38px;
+  height: 38px;
+}
+.flag-btn-icon-hover { opacity: 0; }
+.flag-btn-label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #019de5;
+  text-align: center;
+  width: 80px;
+  opacity: 0;
+}
+.flag-btn:hover .flag-btn-icon-default,
+.flag-btn:focus-visible .flag-btn-icon-default { opacity: 0; }
+.flag-btn:hover .flag-btn-icon-hover,
+.flag-btn:focus-visible .flag-btn-icon-hover { opacity: 1; }
+.flag-btn:hover .flag-btn-label,
+.flag-btn:focus-visible .flag-btn-label { opacity: 1; }

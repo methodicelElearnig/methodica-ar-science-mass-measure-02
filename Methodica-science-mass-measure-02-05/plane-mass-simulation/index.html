@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>סימולציית מסת מטוס</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="simulation">
+
+    <!-- Single scene: one background, all elements overlaid -->
+    <div class="plane-scene">
+
+      <!-- Background: airport tarmac + digital scale. Sets natural height.
+           Cropped from the original photo — removed a 300px band of plain
+           empty floor between the cards area and the scale (the original
+           had ~64% of its height as featureless floor, which is why the
+           whole composition read as "thin"/narrow no matter how wide the
+           embedding box was). Original untouched at original-plane-empty.png. -->
+      <img class="scene-bg" src="assets/images/original-plane-empty-cropped.png" alt="" />
+
+      <!-- Airplane: changes with state, absolutely positioned over background -->
+      <img class="plane-image" src="assets/images/plane-empty.png" alt="מטוס" />
+
+      <!-- Active-item icons: appear on the plane once an item is loaded;
+           clicking one removes that item (animates back to its card,
+           reduces the weight) — an alternative to re-dragging the card. -->
+      <div class="active-icons-row">
+        <button type="button" class="active-icon" data-item="fuel" hidden onclick="onActiveIconClick('fuel')">
+          <img src="assets/images/fuel-card-cropped.png" alt="הסרת מיכל דלק" />
+        </button>
+        <button type="button" class="active-icon" data-item="passengers" hidden onclick="onActiveIconClick('passengers')">
+          <img src="assets/images/passengers-card-cropped.png" alt="הסרת נוסעים" />
+        </button>
+        <button type="button" class="active-icon" data-item="luggage" hidden onclick="onActiveIconClick('luggage')">
+          <img src="assets/images/luggage-card-cropped.png" alt="הסרת כבודה" />
+        </button>
+      </div>
+
+      <!-- Cards section: drag header + three item cards -->
+      <div class="cards-section">
+        <div class="drag-header">
+          <span>
+          גררו את הפריטים למטוס
+          </span>
+        </div>
+        <div class="cards-area">
+          <div class="card" data-item="fuel">
+            <img src="assets/images/fuel-card-cropped.png" alt="מיכל דלק" />
+            <span>מיכל דלק</span>
+          </div>
+          <div class="card" data-item="passengers">
+            <img src="assets/images/passengers-card-cropped.png" alt="נוסעים" />
+            <span>נוסעים</span>
+          </div>
+          <div class="card" data-item="luggage">
+            <img src="assets/images/luggage-card-cropped.png" alt="כבודה" />
+            <span>כבודה</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Weight display: overlaid on the digital scale LCD area -->
+      <div class="weight-display">
+        <span class="weight-label">מסה כוללת</span>
+        <span dir="rtl" class="weight-value" id="weight-value">41 טון</span>
+      </div>
+
+      <!-- Reset button: inside the scene, matches Figma position -->
+      <div class="reset-area">
+        <button class="reset-btn" id="reset-btn">
+          <img src="assets/images/restart-button.png" alt="איפוס" />
+        </button>
+      </div>
+
+    </div><!-- /.plane-scene -->
+
+  </div><!-- /.simulation -->
+
+  <script src="script.js"></script>
+</body>
+</html>

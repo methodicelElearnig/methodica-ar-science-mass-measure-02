@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מדידת מסה — לומדה | תכנית 720 | סיין 3</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ============ מסך 1 — מסך מעבר: השלמת בהצלחה את התרגול ============ -->
+  <section class="screen active" data-screen="0" id="s0">
+    <button class="flag-btn" aria-label="מצאתם בעיה?" title="מצאתם בעיה?">
+      <span class="flag-btn-icon" aria-hidden="true">
+        <img class="flag-btn-icon-default" src="assets/images/btn-flag-default.png" alt="">
+        <img class="flag-btn-icon-hover" src="assets/images/btn-flag-hover.png" alt="">
+      </span>
+      <span class="flag-btn-label">מצאתם בעיה?</span>
+    </button>
+
+    <div class="s1-content">
+    <div class="transition-content">
+      <div class="transition-title-block">
+        <p class="transition-sub">
+         השלמת בהצלחה את התרגול – כל הכבוד!</p>
+        <h2 class="transition-title">
+      זמן טוב ללמוד גם בצורה אחרת, 
+        </h2>
+        <p class="transition-sub">
+         כי למידה מתרחשת בכל מיני צורות.
+        </p>
+      </div>
+      <div class="transition-avatar-wrap">
+        <img alt="דמות מלווה" class="transition-avatar" id="s0-avatar-img">
+      </div>
+    </div>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="bottom-bar-inner">
+        <div class="bar-actions">
+          <button class="btn-continue" dir="rtl" onclick="s0Continue()">המשך</button>
+        </div>
+        <div class="bar-back">
+          <button class="btn-back" dir="rtl" onclick="s0Back()">חזרה</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ מסך 2 — משימת כיתה (עותק של מסך 30 בלומדה המקורית) ============ -->
+  <section class="screen" data-screen="1" id="s1">
+    <button class="flag-btn" aria-label="מצאתם בעיה?" title="מצאתם בעיה?">
+      <span class="flag-btn-icon" aria-hidden="true">
+        <img class="flag-btn-icon-default" src="assets/images/btn-flag-default.png" alt="">
+        <img class="flag-btn-icon-hover" src="assets/images/btn-flag-hover.png" alt="">
+      </span>
+      <span class="flag-btn-label">מצאתם בעיה?</span>
+    </button>
+
+    <div class="s2-content">
+      <h1 class="s2-title">משימת כיתה</h1>
+
+      <div class="s2-body">
+        <ol class="s2-steps">
+          <li>הצטיידו בבקבוק מים, מיכל או ברז מים ומאזניים.</li>
+          <li>הגדירו: מהו הטרה, ברוטו ונטו?</li>
+          <li>
+            מלאו את הבקבוק בכמות מים חלקית, חשבו כל אחד ממרכיבי המסה ורשמו על דף:
+            <div class="s2-fill">
+              <div class="s2-fill-row">
+                <span class="s2-fill-label">ברוטו:</span>
+                <span class="s2-fill-line"></span>
+              </div>
+              <div class="s2-fill-row">
+                <span class="s2-fill-label">נטו:</span>
+                <span class="s2-fill-line"></span>
+              </div>
+              <div class="s2-fill-row">
+                <span class="s2-fill-label">טרה:</span>
+                <span class="s2-fill-line"></span>
+              </div>
+            </div>
+          </li>
+          <li>הסבירו בקצרה כיצד מצאתם כל אחד מהערכים.</li>
+          <li>ניתן למצוא את ערכי הברוטו, הנטו והטרה ביותר מדרך אחת.</li>
+        </ol>
+
+        <div class="s2-memory">
+          <p class="s2-section-bold">לפעמים קל להתבלבל בין המושגים השונים.<br>כדי לעזור לעצמכם לזכור אותם, השתמשו בדמיון וצרו סימן זיכרון משלכם.</p>
+          <p class="s2-section-body">תוכלו ליצור: שיר, סיפור קצר, משפטים בחרוזים, ציור, קומיקס או כל רעיון יצירתי אחר שיעזור לכם לזכור: מה ההבדל בין ברוטו, נטו וטרה, מהן יחידות המסה השונות ומתי משתמשים בהן.</p>
+        </div>
+      </div><!-- /.s2-body -->
+    </div><!-- /.s2-content -->
+
+    <div class="bottom-bar">
+      <div class="bottom-bar-inner">
+        <div class="bar-actions">
+          <button class="btn-continue s2-btn-continue-wide" dir="rtl" onclick="s1Continue()">חזרתי, אפשר להמשיך</button>
+        </div>
+        <div class="bar-back">
+          <button class="btn-back" dir="rtl" onclick="goTo(0)">חזרה</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,1726 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מדידת מסה — לומדה | תכנית 720</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ============ מסך 1 — בחירת דמות (TwoOptionSelection) ============ -->
+  <section class="screen active" data-screen="0" id="s0">
+
+    <!-- אזור תוכן מרכזי — flex column, gap 24px, per Figma node 196:3219 -->
+    <div class="screen1-content">
+
+      <!-- קבוצת טקסט עליונה — p-10, gap-8 פנימי -->
+      <div class="screen1-text-group">
+        <h1 class="screen1-title">מי תלווה אותנו בלמידה?</h1>
+        <p class="screen1-subtitle">בחרו דמות</p>
+      </div>
+
+      <!-- שתי קלפי דמות — gap 24px, per Figma "imga" node -->
+      <div class="options-row" role="radiogroup" aria-label="בחרו דמות">
+        <!-- דמות ירוקה -->
+        <div class="option-card"
+             data-value="green"
+             role="radio"
+             aria-checked="false"
+             tabindex="0"
+             onclick="selectOption(this)"
+             onkeydown="handleCardKey(event, this)">
+          <div class="option-card-frame">
+            <div class="option-card-img">
+              <img src="assets/images/avatar-green-selected.png" alt="דמות ירוקה" draggable="false">
+            </div>
+          </div>
+        </div>
+
+        <!-- דמות כתומה -->
+        <div class="option-card"
+             data-value="orange"
+             role="radio"
+             aria-checked="false"
+             tabindex="0"
+             onclick="selectOption(this)"
+             onkeydown="handleCardKey(event, this)">
+          <div class="option-card-frame">
+            <div class="option-card-img">
+              <img src="assets/images/avatar-orange-selected.png" alt="דמות כתומה" draggable="false">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom bar — "בחרתי" בלבד, אין כפתור חזרה במסך ראשון -->
+    <div class="bottom-bar">
+      <div class="bottom-bar-inner s0-bar">
+        <button class="btn-continue"
+                id="s0-continue"
+                disabled
+                onclick="advanceFromS0()">בחרתי</button>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============ מסך 2 — שאלת בחירה יחידה (SingleChoiceQuestion) ============ -->
+  <section class="screen" data-screen="1" id="s1">
+    <div class="scq-question">
+      <div class="scq-img"><div class="scq-img-inner no-zoom">
+        <button class="img-zoom-btn" type="button" aria-label="הגדלת התמונה"
+                data-zoom-src="assets/images/תמונה למסך שני - שאלה.png" data-zoom-alt="שתי תיבות — אחת עם אוצר, אחת ריקה">
+          <svg class="img-zoom-btn__icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="8.5" cy="8.5" r="6" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M13 13L17.5 17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <img id="scq-img" src="assets/images/תמונה למסך שני - שאלה.png" alt="שתי תיבות — אחת עם אוצר, אחת ריקה"></div></div>
+      <div class="scq-content">
+        <div class="scq-qtext">
+        
+          <div class="scq-qtext-body">
+         <p class="scq-qtitle">מצאו את האוצר!</p>
+            <p class="scq-qbody">
+              לפניכם שתי תיבות.<br>
+              המסה של כל אחת מהן היא 10 ק"ג.<br>
+              באחת מהן מסתתר אוצר, והשנייה ריקה. <br>
+איזה מידע נוסף יעזור לכם לגלות באיזו תיבה נמצא האוצר?
+
+            </p>
+          </div>
+        </div>
+        <div class="scq-answers" role="radiogroup" aria-label="אפשרויות תשובה">
+          <div class="scq-opt" role="radio" aria-checked="false" tabindex="0" data-id="a" onclick="scqSelect('a')">
+            <span class="scq-opt-text">מסת התיבה בלבד</span>
+            <span class="scq-radio"></span>
+          </div>
+          <div class="scq-opt" role="radio" aria-checked="false" tabindex="0" data-id="b" onclick="scqSelect('b')">
+            <span class="scq-opt-text">מסת האוצר בלבד</span>
+            <span class="scq-radio"></span>
+          </div>
+          <div class="scq-opt" role="radio" aria-checked="false" tabindex="0" data-id="c" onclick="scqSelect('c')">
+            <span class="scq-opt-text">נפח התיבה</span>
+            <span class="scq-radio"></span>
+          </div>
+          <div class="scq-opt" role="radio" aria-checked="false" tabindex="0" data-id="d" onclick="scqSelect('d')">
+            <span class="scq-opt-text">גודל התיבה</span>
+            <span class="scq-radio"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="scq-feedbox" class="scq-fb-box">
+      <div class="scq-fb-title">
+        <span class="scq-fb-title-text"></span>
+        <button class="scq-fb-toggle" onclick="scqToggleFeedbox()" aria-label="סגירת משוב">
+          <img src="assets/images/icon-fb-close.png" alt="">
+        </button>
+      </div>
+      <p class="scq-fb-body"></p>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="bottom-bar-inner">
+        <!-- Physical LEFT — צדקתי? + אפשר רמז? -->
+        <div class="bar-actions">
+          <button id="scq-check" class="btn-continue" dir="rtl" onclick="scqCheck()" disabled>צדקתי?</button>
+          <button id="scq-hint" class="btn-hint" dir="rtl" onclick="scqOpenHint()">
+            <img class="scq-hint-icon" id="scq-hint-icon" src="assets/images/icon-hint-blue.svg" alt="">
+            אפשר רמז?
+          </button>
+        </div>
+        <!-- Physical RIGHT — חזרה -->
+        <div class="bar-back">
+          <button id="scq-back" class="btn-back" dir="rtl" onclick="goTo(0)">חזרה</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ מסך 3 — כרטיסיות מתהפכות (FlipCardsReveal) ============ -->
+  <section class="screen" data-screen="2" id="s2">
+    <div class="s3-content">
+
+      <div class="s3-text-group">
+        <h2 class="s3-title">למה חשוב להבחין בין מסת התכולה 
+          <br/>
+          למסה כוללת?</h2>
+        <p class="s3-instruction">לחצו על התמונות</p>
+      </div>
+
+      <div class="s3-cards-row">
+
+        <!-- קלף ימין — צנצנת חמוצים -->
+        <div class="flip-card"
+             id="flip-card-right"
+             role="button"
+             tabindex="0"
+             aria-label="כרטיס צנצנת חמוצים — לחצו להפיכה"
+             onclick="scr3FlipCard('flip-card-right')"
+             onkeydown="scr3CardKey(event, 'flip-card-right')">
+          <div class="flip-card-inner">
+            <div class="flip-card-face flip-card-front">
+              <img src="assets/images/screen3_cucumber_jar.png" alt="צנצנת חמוצים" class="flip-card-img">
+            </div>
+            <div class="flip-card-face flip-card-back-s3">
+              <p>כשקונים צנצנת חמוצים, חשוב לדעת כמה מלפפונים באמת יש בצנצנת, ולא מה מסת הצנצנת ביחד עם החמוצים.</p>
+              <p class="flip-card-term">המסה של התכולה בלבד נקראת <strong>נטו</strong>.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- קלף שמאל — מזוודה -->
+        <div class="flip-card"
+             id="flip-card-left"
+             role="button"
+             tabindex="0"
+             aria-label="כרטיס מזוודה — לחצו להפיכה"
+             onclick="scr3FlipCard('flip-card-left')"
+             onkeydown="scr3CardKey(event, 'flip-card-left')">
+          <div class="flip-card-inner">
+            <div class="flip-card-face flip-card-front">
+              <img src="assets/images/screen3_travel_bag.png" alt="מזוודה" class="flip-card-img">
+            </div>
+            <div class="flip-card-face flip-card-back-s3">
+              <p>בטיסה, חשוב לדעת מה מסת המזוודה כולל מה שבתוכה. כך חברת התעופה יכולה לבדוק אם המזוודה עומדת במגבלת המסה המותרת.</p>
+              <p class="flip-card-term">המסה הכוללת של התכולה והאריזה יחד נקראת <strong>ברוטו</strong>.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="bottom-bar-inner">
+        <div class="bar-actions">
+          <button class="btn-continue" id="btn-s3-continue" dir="rtl" disabled onclick="scr3Continue()">המשך</button>
+        </div>
+        <div class="bar-back">
+          <button class="btn-back" dir="rtl" onclick="goTo(1)">חזרה</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ מסך 4 — שאלת בחירה יחידה (SingleChoiceQuestion) ============ -->
+  <section class="screen" data-screen="3" id="s3">
+    <div class="scq-question">
+      <div class="scq-img"><div class="scq-img-inner no-zoom">
+        <button class="img-zoom-btn" type="button" aria-label="הגדלת התמונה"
+                data-zoom-src="assets/images/screen3_cucumber_jar.png" data-zoom-alt="צנצנת חמוצים">
+          <svg class="img-zoom-btn__icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="8.5" cy="8.5" r="6" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M13 13L17.5 17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <img id="scq4-img" src="assets/images/screen3_cucumber_jar.png" alt="צנצנת חמוצים"></div></div>
+      <div class="scq-content">
+        <div class="scq-qtext">
+          
+          <div class="scq-qtext-body">
+            <p class="scq-qtitle">מהו החלק החסר?</p>
+            <p class="scq-qbody">מסת צנצנת עם חמוצים היא 1400 גרם (ברוטו).<br>מסת החמוצים בלבד היא 900 גרם (נטו).<br>
+              <b>
+              מהי מסת הצנצנת?
+            </b>
+            </p>
+          </div>
+        </div>
+        <div class="scq-answers" role="radiogroup" aria-label="אפשרויות תשובה">
+          <div class="scq-opt" role="radio" aria-checked="false" tabindex="0" data-id="a" onclick="scq4Select('a')">
+            <span class="scq-opt-text">1400</span>
+            <span class="scq-radio"></span>
+          </div>
+          <div class="scq-opt" role="radio" aria-checked="false" tabindex="0" data-id="b" onclick="scq4Select('b')">
+            <span class="scq-opt-text">900</span>
+            <span class="scq-radio"></span>
+          </div>
+          <div class="scq-opt" role="radio" aria-checked="false" tabindex="0" data-id="c" onclick="scq4Select('c')">
+            <span class="scq-opt-text">500</span>
+            <span class="scq-radio"></span>
+          </div>
+          <div class="scq-opt" role="radio" aria-checked="false" tabindex="0" data-id="d" onclick="scq4Select('d')">
+            <span class="scq-opt-text">לא ניתן לדעת</span>
+            <span class="scq-radio"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="scq4-feedbox" class="scq-fb-box">
+      <div class="scq-fb-title">
+        <span class="scq-fb-title-text"></span>
+        <button class="scq-fb-toggle" onclick="scq4ToggleFeedbox()" aria-label="סגירת משוב">
+          <img src="assets/images/icon-fb-close.png" alt="">
+        </button>
+      </div>
+      <div class="s4-monster-area">
+        <div class="s4-monster-wrap">
+          <img alt="דמות מלווה" class="s4-monster-img" id="s4-avatar-img">
+        </div>
+        <div class="s4-speech-bubble">
+          <p class="s4-speech-text">
+           גם למשקל של הצנצנת בלבד יש <br> שם מגניב! קראו את המשוב וגלו אותו.
+          
+          </p>
+        </div>
+      </div>
+      <p class="scq-fb-body"></p>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="bottom-bar-inner">
+        <!-- Physical LEFT — צדקתי? + אפשר רמז? -->
+        <div class="bar-actions">
+          <button id="scq4-check" class="btn-continue" dir="rtl" onclick="scq4Check()" disabled>צדקתי?</button>
+          <button id="scq4-hint" class="btn-hint" dir="rtl" onclick="scq4OpenHint()" hidden>
+            <img class="scq-hint-icon" id="scq4-hint-icon" src="assets/images/icon-hint-blue.svg" alt="">
+            אפשר רמז?
+          </button>
+        </div>
+        <!-- Physical RIGHT — חזרה -->
+        <div class="bar-back">
+          <button id="scq4-back" class="btn-back" dir="rtl" onclick="goTo(2)">חזרה</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ מסך 5 — Drag & Drop: ברוטו / נטו / טרה ============ -->
+  <section class="screen" data-screen="4" id="s4">
+    <div class="s5-content">
+
+      <div class="s5-text-group">
+        <h2 class="s5-title">ברוטו, נטו או טרה?</h2>
+        <p class="s5-sub">
+           סדרו את הבלגן! <br/>
+          עזרו למיין את הפריטים וגררו אותם למשבצת המתאימה: ברוטו, נטו או טרה.
+        </p>
+      </div>
+
+      <!-- מאגר פריטים לגרירה (source bank) -->
+      <div class="s5-source-bank" id="s5-source-bank" ondragover="s5DragOver(event)" ondrop="s5DropToSource(event)">
+
+        <div class="s5-drag-item" id="s5i1" draggable="true" data-correct="bruto"
+             ondragstart="s5DragStart(event,'s5i1')" ondragend="s5DragEnd('s5i1')" onclick="s5ItemClick('s5i1')">
+          <img src="assets/images/screen5_full_cucumber_jar.png" alt="צנצנת חמוצים מלאה" draggable="false">
+        </div>
+
+        <div class="s5-drag-item" id="s5i2" draggable="true" data-correct="neto"
+             ondragstart="s5DragStart(event,'s5i2')" ondragend="s5DragEnd('s5i2')" onclick="s5ItemClick('s5i2')">
+          <img src="assets/images/screen5_cucumber.png" alt="חמוצים בלבד" draggable="false">
+        </div>
+
+        <div class="s5-drag-item" id="s5i3" draggable="true" data-correct="tara"
+             ondragstart="s5DragStart(event,'s5i3')" ondragend="s5DragEnd('s5i3')" onclick="s5ItemClick('s5i3')">
+          <img src="assets/images/screen5_empty_cucumber_jar.png" alt="צנצנת ריקה" draggable="false">
+        </div>
+
+        <div class="s5-drag-item" id="s5i4" draggable="true" data-correct="bruto"
+             ondragstart="s5DragStart(event,'s5i4')" ondragend="s5DragEnd('s5i4')" onclick="s5ItemClick('s5i4')">
+          <img src="assets/images/screen5_full_cookies_box.png" alt="קופסת עוגיות מלאה" draggable="false">
+        </div>
+
+        <div class="s5-drag-item" id="s5i5" draggable="true" data-correct="neto"
+             ondragstart="s5DragStart(event,'s5i5')" ondragend="s5DragEnd('s5i5')" onclick="s5ItemClick('s5i5')">
+          <img src="assets/images/screen5_cookies.png" alt="עוגיות בלבד" draggable="false">
+        </div>
+
+        <div class="s5-drag-item" id="s5i6" draggable="true" data-correct="tara"
+             ondragstart="s5DragStart(event,'s5i6')" ondragend="s5DragEnd('s5i6')" onclick="s5ItemClick('s5i6')">
+          <img src="assets/images/screen5_empty_cookies_box.png" alt="קופסת עוגיות ריקה" draggable="false">
+        </div>
+
+        <div class="s5-drag-item" id="s5i7" draggable="true" data-correct="bruto"
+             ondragstart="s5DragStart(event,'s5i7')" ondragend="s5DragEnd('s5i7')" onclick="s5ItemClick('s5i7')">
+          <img src="assets/images/screen5_full_travel_bag.png" alt="מזוודה ארוזה" draggable="false">
+        </div>
+
+        <div class="s5-drag-item" id="s5i8" draggable="true" data-correct="neto"
+             ondragstart="s5DragStart(event,'s5i8')" ondragend="s5DragEnd('s5i8')" onclick="s5ItemClick('s5i8')">
+          <img src="assets/images/screen5_travel_clothes.png" alt="בגדים בלבד" draggable="false">
+        </div>
+
+        <div class="s5-drag-item" id="s5i9" draggable="true" data-correct="tara"
+             ondragstart="s5DragStart(event,'s5i9')" ondragend="s5DragEnd('s5i9')" onclick="s5ItemClick('s5i9')">
+          <img src="assets/images/screen5_empty_travel_bag.png" alt="מזוודה ריקה" draggable="false">
+        </div>
+      </div><!-- /.s5-source-bank -->
+
+      <!-- אזורי גרירה — RTL: ברוטו | נטו | טרה -->
+      <div class="s5-zones-row">
+        <div class="s5-zone-wrap">
+          <div class="s5-zone" id="s5-zone-bruto"
+               ondragover="s5DragOver(event)"
+               ondragenter="s5DragEnter(event,'s5-zone-bruto')"
+               ondragleave="s5DragLeave(event,'s5-zone-bruto')"
+               ondrop="s5Drop(event,'bruto')"></div>
+          <p class="s5-zone-label">ברוטו</p>
+        </div>
+        <div class="s5-zone-wrap">
+          <div class="s5-zone" id="s5-zone-neto"
+               ondragover="s5DragOver(event)"
+               ondragenter="s5DragEnter(event,'s5-zone-neto')"
+               ondragleave="s5DragLeave(event,'s5-zone-neto')"
+               ondrop="s5Drop(event,'neto')"></div>
+          <p class="s5-zone-label">נטו</p>
+        </div>
+        <div class="s5-zone-wrap">
+          <div class="s5-zone" id="s5-zone-tara"
+               ondragover="s5DragOver(event)"
+               ondragenter="s5DragEnter(event,'s5-zone-tara')"
+               ondragleave="s5DragLeave(event,'s5-zone-tara')"
+               ondrop="s5Drop(event,'tara')"></div>
+          <p class="s5-zone-label">טרה</p>
+        </div>
+      </div><!-- /.s5-zones-row -->
+
+      <!-- תיבת משוב — אותה מחלקה גלובלית כמו מסכים 2/4 -->
+      <div id="s5-feedbox" class="scq-fb-box">
+        <div class="scq-fb-title">
+          <span class="scq-fb-title-text"></span>
+          <button class="scq-fb-toggle" onclick="s5ToggleFeedbox()" aria-label="סגירת משוב">
+            <img src="assets/images/icon-fb-close.png" alt="">
+          </button>
+        </div>
+        <p class="scq-fb-body"></p>
+        <button id="s5-reveal-btn" class="scq-fb-reveal-btn" type="button" onclick="s5Reveal()" hidden>התשובה הנכונה</button>
+      </div>
+
+    </div><!-- /.s5-content -->
+
+    <div class="bottom-bar">
+      <div class="bottom-bar-inner">
+        <div class="bar-actions">
+          <button id="s5-check" class="btn-continue" dir="rtl" onclick="s5Check()" disabled>צדקתי?</button>
+        </div>
+        <div class="bar-back">
+          <button id="s5-back" class="btn-back" dir="rtl" onclick="goTo(3)">חזרה</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ מסך 6 — מסך מעבר: דמות מלווה ============ -->
+  <section class="screen" data-screen="5" id="s5">
+    <div class="s6-content">
+      <p class="s6-message">עד עכשיו למדנו להבחין בין ברוטו, נטו וטרה.</p>
+      <P class="s6-instructions">
+              אבל זה לא מספיק...<br>בואו נעבור לנושא הבא.
+  
+      </p>
+      <img alt="דמות מלווה" class="s6-avatar" id="s6-avatar-img">
+    </div>
+
+    <div class="bottom-bar">
+      <div class="bottom-bar-inner">
+        <div class="bar-actions">
+          <button class="btn-continue" dir="rtl" onclick="s6Continue()">המשך</button>
+        </div>
+        <div class="bar-back">
+          <button class="btn-back" dir="rtl" onclick="goTo(4)">חזרה</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ מסך 7 — קלף מתהפך (FlipCardsReveal) ============ -->
+  <section class="screen" data-screen="6" id="s6">
+    <div class="s7-content">
+
+      <div class="s7-text-group">
+        <h2 class="s7-title">מה משותף ל...</h2>
+        <p class="s7-question">קטר, צב ענק, תפוח וגרגר מלח גס?</p>
+        <p class="s7-instruction">לחצו על התמונה כדי לחשוף את התשובה.</p>
+      </div>
+
+      <div class="s7-card-row">
+        <div class="s7-card-area">
+          <div class="flip-card"
+               id="s7-flip-card"
+               role="button"
+               tabindex="0"
+               aria-label="קלף — לחצו להפיכה"
+               onclick="s7FlipCard()"
+               onkeydown="s7CardKey(event)">
+            <div class="flip-card-inner">
+              <div class="flip-card-face flip-card-front">
+                <img src="assets/images/screen7-turtle_apple_and_more.png" alt="קטר, צב ענק, תפוח וגרגר מלח גס" class="flip-card-img">
+              </div>
+              <div class="flip-card-face flip-card-back">
+                <p class="s7-answer">המסה של כולם היא 150!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- דמות + בועית — absolute בתחתית s7-content, כמו במקור (מוסתרת עד הפיכה) -->
+      <div class="s7-avatar-area" id="s7-avatar-area" hidden>
+        <img src="assets/images/avatar-orange-questioning.png" alt="דמות מלווה" class="s7-avatar-img" id="s7-avatar-img">
+        <div class="s7-speech-bubble">רגע... משהו כאן
+          <br/>
+          לא מסתדר לי</div>
+      </div>
+
+    </div><!-- /.s7-content -->
+
+    <div class="bottom-bar">
+      <div class="bottom-bar-inner">
+        <div class="bar-actions">
+          <button class="btn-continue" id="s7-btn-continue" dir="rtl" disabled onclick="s7Continue()">המשך</button>
+        </div>
+        <div class="bar-back">
+          <button class="btn-back" dir="rtl" onclick="goTo(5)">חזרה</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ מסך 8 — שאלת בחירה יחידה, עם תמונה (SingleChoiceQuestion) ============ -->
+  <section class="screen" data-screen="7" id="s7">
+    <div class="scq-question">
+      <div class="scq-img">
+   
+
+<div class="scq-img-inner no-zoom" id="scq8-img-slot">
+  <button class="img-zoom-btn" type="button" aria-label="הגדלת התמונה"
+          data-zoom-src="assets/images/screen7-turtle_apple_and_more.png" data-zoom-alt="קטר, צב ענק, תפוח וגרגר מלח גס">
+    <svg class="img-zoom-btn__icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="8.5" cy="8.5" r="6" stroke="currentColor" stroke-width="1.6"/>
+      <path d="M13 13L17.5 17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+  </button>
+  <img id="scq-img" src="assets/images/screen7-turtle_apple_and_more.png" alt="קטר, צב ענק, תפוח וגרגר מלח גס">
+        </div>
+      </div>
+      <div class="scq-content">
+        <div class="scq-qtext">
+           <p class="scq-qbody">
+            נאמר לנו שהמסה של כולם היא 150.
+          <br/>
+          <b>
+            מה הבעיה במידע שקיבלתם?</b></p>
+        </div>
+        <div class="scq-answers" role="radiogroup" aria-label="אפשרויות תשובה">
+          <div class="scq-opt" role="radio" aria-checked="false" tabindex="0" data-id="a" onclick="scq8Select('a')">
+            <span class="scq-opt-text">לכל החפצים יש אותה מסה.</span>
+            <span class="scq-radio"></span>
+          </div>
+          <div class="scq-opt" role="radio" aria-checked="false" tabindex="0" data-id="b" onclick="scq8Select('b')">
+            <span class="scq-opt-text">מסת קטר לא יכולה להיות 150.</span>
+            <span class="scq-radio"></span>
+          </div>
+          <div class="scq-opt" role="radio" aria-checked="false" tabindex="0" data-id="c" onclick="scq8Select('c')">
+            <span class="scq-opt-text">חסר מידע על יחידת המידה.</span>
+            <span class="scq-radio"></span>
+          </div>
+          <div class="scq-opt" role="radio" aria-checked="false" tabindex="0" data-id="d" onclick="scq8Select('d')">
+            <span class="scq-opt-text">לא ניתן למדוד גרגר מלח אחד.</span>
+            <span class="scq-radio"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="scq8-feedbox" class="scq-fb-box">
+      <div class="scq-fb-title">
+        <span class="scq-fb-title-text"></span>
+        <button class="scq-fb-toggle" onclick="scq8ToggleFeedbox()" aria-label="סגירת משוב">
+          <img src="assets/images/icon-fb-close.png" alt="">
+        </button>
+      </div>
+      <p class="scq-fb-body"></p>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="bottom-bar-inner">
+        <div class="bar-actions">
+          <button id="scq8-check" class="btn-continue" dir="rtl" onclick="scq8Check()" disabled>צדקתי?</button>
+          <button id="scq8-hint" class="btn-hint" dir="rtl" onclick="scq8OpenHint()" hidden>
+            <img class="scq-hint-icon" id="scq8-hint-icon" src="assets/images/icon-hint-blue.svg" alt="">
+            אפשר רמז?
+          </button>
+        </div>
+        <div class="bar-back">
+          <button id="scq8-back" class="btn-back" dir="rtl" onclick="goTo(6)">חזרה</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ מסך 9 — Drag & Drop: יחידות מידה ============ -->
+  <section class="screen" data-screen="8" id="s8">
+    <div class="s9-content">
+
+      <div class="s9-text-group">
+        <h2 class="s9-title">איזו יחידת מידה מתאימה?</h2>
+        <p class="s9-instruction">גררו כל גוף ליחידת המידה המתאימה לו.</p>
+      </div>
+
+      <!-- דמות + בועית דיבור (LTR: דמות שמאל, בועית ימין) -->
+      <div class="s9-avatar-row">
+        <img alt="דמות מלווה" class="s9-avatar-img" id="s9-avatar-img">
+        <div class="s9-speech-bubble">150 מה???</div>
+      </div>
+
+      <!-- מאגר פריטים לגרירה -->
+      <div class="s9-source-bank" id="s9-source-bank" ondragover="s9DragOver(event)" ondrop="s9DropToSource(event)">
+
+        <div class="s9-drag-item" id="s9-turtle" draggable="true" data-correct="kg"
+             ondragstart="s9DragStart(event,'s9-turtle')" ondragend="s9DragEnd('s9-turtle')" onclick="s9ItemClick('s9-turtle')">
+          <img src="assets/images/screen9_big_turtle.png" alt="צב ענק" draggable="false">
+        </div>
+
+        <div class="s9-drag-item" id="s9-train" draggable="true" data-correct="ton"
+             ondragstart="s9DragStart(event,'s9-train')" ondragend="s9DragEnd('s9-train')" onclick="s9ItemClick('s9-train')">
+          <img src="assets/images/screen9_train_head.png" alt="קטר" draggable="false">
+        </div>
+
+        <div class="s9-drag-item" id="s9-salt" draggable="true" data-correct="mg"
+             ondragstart="s9DragStart(event,'s9-salt')" ondragend="s9DragEnd('s9-salt')" onclick="s9ItemClick('s9-salt')">
+          <img src="assets/images/screen9_salt.png" alt="גרגר מלח גס" draggable="false">
+        </div>
+
+        <div class="s9-drag-item" id="s9-apple" draggable="true" data-correct="gram"
+             ondragstart="s9DragStart(event,'s9-apple')" ondragend="s9DragEnd('s9-apple')" onclick="s9ItemClick('s9-apple')">
+          <img src="assets/images/screen9_apple.png" alt="תפוח" draggable="false">
+        </div>
+
+      </div><!-- /.s9-source-bank -->
+
+      <!-- אזורי שחרור — RTL: טון ימין, מיליגרם שמאל -->
+      <div class="s9-zones-row">
+        <div class="s9-zone-wrap">
+          <div class="s9-zone" id="s9-zone-ton"
+               ondragover="s9DragOver(event)"
+               ondragenter="s9DragEnter(event,'s9-zone-ton')"
+               ondragleave="s9DragLeave(event,'s9-zone-ton')"
+               ondrop="s9Drop(event,'ton')"></div>
+          <p class="s9-zone-label">טון</p>
+        </div>
+        <div class="s9-zone-wrap">
+          <div class="s9-zone" id="s9-zone-kg"
+               ondragover="s9DragOver(event)"
+               ondragenter="s9DragEnter(event,'s9-zone-kg')"
+               ondragleave="s9DragLeave(event,'s9-zone-kg')"
+               ondrop="s9Drop(event,'kg')"></div>
+          <p class="s9-zone-label">קילוגרם</p>
+        </div>
+        <div class="s9-zone-wrap">
+          <div class="s9-zone" id="s9-zone-gram"
+               ondragover="s9DragOver(event)"
+               ondragenter="s9DragEnter(event,'s9-zone-gram')"
+               ondragleave="s9DragLeave(event,'s9-zone-gram')"
+               ondrop="s9Drop(event,'gram')"></div>
+          <p class="s9-zone-label">גרם</p>
+        </div>
+        <div class="s9-zone-wrap">
+          <div class="s9-zone" id="s9-zone-mg"
+               ondragover="s9DragOver(event)"
+               ondragenter="s9DragEnter(event,'s9-zone-mg')"
+               ondragleave="s9DragLeave(event,'s9-zone-mg')"
+               ondrop="s9Drop(event,'mg')"></div>
+          <p class="s9-zone-label">מיליגרם</p>
+        </div>
+      </div><!-- /.s9-zones-row -->
+
+      <!-- תיבת משוב — אותה מחלקה גלובלית כמו מסכים 2/4/5 -->
+      <div id="s9-feedbox" class="scq-fb-box">
+        <div class="scq-fb-title">
+          <span class="scq-fb-title-text"></span>
+          <button class="scq-fb-toggle" onclick="s9ToggleFeedbox()" aria-label="סגירת משוב">
+            <img src="assets/images/icon-fb-close.png" alt="">
+          </button>
+        </div>
+        <p class="scq-fb-body"></p>
+      </div>
+
+    </div><!-- /.s9-content -->
+
+    <div class="bottom-bar">
+      <div class="bottom-bar-inner">
+        <div class="bar-actions">
+          <button id="s9-check" class="btn-continue" dir="rtl" onclick="s9Check()" disabled>צדקתי?</button>
+          <button id="s9-hint" class="btn-hint" dir="rtl" onclick="s9OpenHint()" hidden>
+            <img class="scq-hint-icon" id="s9-hint-icon" src="assets/images/icon-hint-blue.svg" alt="">
+            אפשר רמז?
+          </button>
+        </div>
+        <div class="bar-back">
+          <button id="s9-back" class="btn-back" dir="rtl" onclick="goTo(7)">חזרה</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ מסך 10 — שאלת בחירה יחידה עם תמונה (SingleChoiceQuestion) ============ -->
+  <section class="screen" data-screen="9" id="s9">
+    <div class="scq-question">
+      <div class="scq-img"><div class="scq-img-inner no-zoom">
+        <button class="img-zoom-btn" type="button" aria-label="הגדלת התמונה"
+                data-zoom-src="assets/images/screen10-train.png" data-zoom-alt="קטר רכבת">
+          <svg class="img-zoom-btn__icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="8.5" cy="8.5" r="6" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M13 13L17.5 17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <img id="scq10-img" src="assets/images/screen10-train.png" alt="קטר רכבת"></div></div>
+      <div class="scq-content">
+        <div class="scq-qtext">
+         
+          <div class="scq-qtext-body">
+             <p class="scq-qtitle">למה לא להשתמש באותה יחידת מידה לכולם?</p>
+             <br/>
+            <p class="scq-qbody">קטר רכבת נמדד בדרך כלל בטונות.<br>צב ענק נמדד בדרך כלל בקילוגרמים.<br>
+              <b>
+              למה לדעתכם משתמשים ביחידות שונות?
+            </b>
+            </p>
+          </div>
+        </div>
+        <div class="scq-answers" role="radiogroup" aria-label="אפשרויות תשובה">
+          <div class="scq-opt" role="radio" aria-checked="false" tabindex="0" data-id="a" onclick="scq10Select('a')">
+            <span class="scq-opt-text">כי לכל גוף יש יחידת מידה קבועה משלו.</span>
+            <span class="scq-radio"></span>
+          </div>
+          <div class="scq-opt" role="radio" aria-checked="false" tabindex="0" data-id="b" onclick="scq10Select('b')">
+            <span class="scq-opt-text">כי יחידות שונות הופכות את המדידה לנוחה וברורה יותר.</span>
+            <span class="scq-radio"></span>
+          </div>
+          <div class="scq-opt" role="radio" aria-checked="false" tabindex="0" data-id="c" onclick="scq10Select('c')">
+            <span class="scq-opt-text">כי קטרים וצבים עשויים מחומרים שונים.</span>
+            <span class="scq-radio"></span>
+          </div>
+          <div class="scq-opt" role="radio" aria-checked="false" tabindex="0" data-id="d" onclick="scq10Select('d')">
+            <span class="scq-opt-text">זה תלוי באיזה כלי מודדים.</span>
+            <span class="scq-radio"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="scq10-feedbox" class="scq-fb-box">
+      <div class="scq-fb-title">
+        <span class="scq-fb-title-text"></span>
+        <button class="scq-fb-toggle" onclick="scq10ToggleFeedbox()" aria-label="סגירת משוב">
+          <img src="assets/images/icon-fb-close.png" alt="">
+        </button>
+      </div>
+      <p class="scq-fb-body"></p>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="bottom-bar-inner">
+        <div class="bar-actions">
+          <button id="scq10-check" class="btn-continue" dir="rtl" onclick="scq10Check()" disabled>צדקתי?</button>
+          <button id="scq10-hint" class="btn-hint" dir="rtl" onclick="scq10OpenHint()" hidden>
+            <img class="scq-hint-icon" id="scq10-hint-icon" src="assets/images/icon-hint-blue.svg" alt="">
+            אפשר רמז?
+          </button>
+        </div>
+        <div class="bar-back">
+          <button id="scq10-back" class="btn-back" dir="rtl" onclick="goTo(8)">חזרה</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ מסך 11 — משחק זיכרון (Memory Game) ============ -->
+  <section class="screen" data-screen="10" id="s10">
+
+    <!-- ═══ תצוגת משחק ═══ -->
+    <div class="s11-view" id="s11-game-view">
+      <div class="s11-game-content">
+
+        <div class="s11-text-group">
+          <h2 class="s11-title">גלו את הקשר בין היחידות</h2>
+          <p class="s11-instruction">לפניכם קלפים המכילים יחידות מסה וערכים השווים להן.<br>
+            הפכו את הקלפים ומצאו את הזוגות המתאימים.<br>
+            זכרו: כל זוג מייצג אותה מסה בדיוק, רק ביחידות מידה שונות.</p>
+        </div>
+
+        <div class="s11-board" id="s11-board" role="list" aria-label="לוח קלפי זיכרון">
+          <!-- מוזרק דינמית ע"י s11RenderBoard() -->
+        </div>
+
+      </div><!-- /.s11-game-content -->
+
+      <div class="bottom-bar">
+        <div class="bottom-bar-inner">
+          <div class="bar-actions">
+            <button class="btn-continue" id="s11-btn-continue" dir="rtl" disabled onclick="s11Continue()">המשך</button>
+          </div>
+        </div>
+      </div>
+    </div><!-- /#s11-game-view -->
+
+    <!-- ═══ תצוגת סיכום ═══ -->
+    <div class="s11-view" id="s11-summary-view" hidden>
+      <div class="s11-sum-content">
+
+        <div class="s11-sum-text-group">
+          <h2 class="s11-sum-title">כל הכבוד!</h2>
+          <p class="s11-sum-subtitle">בין כל שתי יחידות מסה סמוכות יש קשר קבוע: פי 1000</p>
+        </div>
+
+        <div class="s11-sum-pairs">
+
+          <div class="s11-sum-pair" data-pair="0">
+            <div class="s11-sum-card">
+              <img class="s11-sum-card-img" src="assets/images/SCREEN11_TRAIN_1TON.png" alt="">
+              <span>1 טון</span>
+            </div>
+            <div class="s11-sum-eq">=</div>
+            <div class="s11-sum-card">1000 קילוגרם</div>
+          </div>
+
+          <div class="s11-sum-pair" data-pair="1">
+            <div class="s11-sum-card">
+              <img class="s11-sum-card-img" src="assets/images/SCREEN11_TURTLE_1KILO.png" alt="">
+              <span>1 קילוגרם</span>
+            </div>
+            <div class="s11-sum-eq">=</div>
+            <div class="s11-sum-card">1000 גרם</div>
+          </div>
+
+          <div class="s11-sum-pair" data-pair="2">
+            <div class="s11-sum-card">
+              <img class="s11-sum-card-img" src="assets/images/screen11_apple_1gram.png" alt="">
+              <span>1 גרם</span>
+            </div>
+            <div class="s11-sum-eq">=</div>
+            <div class="s11-sum-card">1000 מיליגרם</div>
+          </div>
+
+        </div><!-- /.s11-sum-pairs -->
+      </div><!-- /.s11-sum-content -->
+
+      <div class="bottom-bar">
+        <div class="bottom-bar-inner">
+          <div class="bar-actions">
+            <button class="btn-continue" id="s11-sum-btn-continue" dir="rtl" onclick="s11SumContinue()">המשך</button>
+          </div>
+          <div class="bar-back">
+            <button class="btn-back" dir="rtl" onclick="s11SumBack()">חזרה</button>
+          </div>
+        </div>
+      </div>
+    </div><!-- /#s11-summary-view -->
+
+  </section>
+
+  <!-- ============ מסך 12 — מסך מעבר: דמות מלווה ============ -->
+  <section class="screen" data-screen="11" id="s11">
+    <div class="s6-content">
+      <p class="s6-message">מה נשאר לנו בראש?</p>
+       <P class="s6-instructions">
+        שתי שאלות קלילות לחימום לפני שנתקדם.
+      </p>
+      <img class="s6-avatar" id="s12-avatar-img" alt="דמות מלווה">
+    </div>
+    <div class="bottom-bar">
+      <div class="bottom-bar-inner">
+        <div class="bar-actions">
+          <button class="btn-continue" id="s12-continue-btn" dir="rtl" onclick="s12Continue()">קחו אותי לשאלות</button>
+        </div>
+        <div class="bar-back">
+          <button class="btn-back" dir="rtl" onclick="goTo(10)">חזרה</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ מסך 13 — שאלת בחירה יחידה עם תמונה (SingleChoiceQuestion) ============ -->
+  <section class="screen" data-screen="12" id="s12">
+    <div class="scq-question">
+      <div class="scq-img"><div class="scq-img-inner no-zoom">
+        <button class="img-zoom-btn" type="button" aria-label="הגדלת התמונה"
+                data-zoom-src="assets/images/screen13-water-bottle.png" data-zoom-alt="בקבוק מים">
+          <svg class="img-zoom-btn__icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="8.5" cy="8.5" r="6" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M13 13L17.5 17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <img id="scq13-img" src="assets/images/screen13-water-bottle.png" alt="בקבוק מים"></div></div>
+      <div class="scq-content">
+        <div class="scq-qtext">
+          <div class="scq-qtext-body">
+            <p class="scq-qtitle">זהו את סוג המסה</p>
+            <p class="scq-qbody">התבוננו בתמונה שלפניכם וענו על השאלה הבאה:<br>
+              <b>
+              מהו הנטו?
+              </b>
+            </p>
+          </div>
+        </div>
+        <div class="scq-answers" role="radiogroup" aria-label="אפשרויות תשובה">
+          <div class="scq-opt" role="radio" aria-checked="false" tabindex="0" data-id="a" onclick="scq13Select('a')">
+            <span class="scq-opt-text">הבקבוק</span>
+            <span class="scq-radio"></span>
+          </div>
+          <div class="scq-opt" role="radio" aria-checked="false" tabindex="0" data-id="b" onclick="scq13Select('b')">
+            <span class="scq-opt-text">המים שבבקבוק</span>
+            <span class="scq-radio"></span>
+          </div>
+          <div class="scq-opt" role="radio" aria-checked="false" tabindex="0" data-id="c" onclick="scq13Select('c')">
+            <span class="scq-opt-text">הבקבוק עם המים</span>
+            <span class="scq-radio"></span>
+          </div>
+          <div class="scq-opt" role="radio" aria-checked="false" tabindex="0" data-id="d" onclick="scq13Select('d')">
+            <span class="scq-opt-text">לא ניתן לדעת</span>
+            <span class="scq-radio"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="scq13-feedbox" class="scq-fb-box">
+      <div class="scq-fb-title">
+        <span class="scq-fb-title-text"></span>
+        <button class="scq-fb-toggle" onclick="scq13ToggleFeedbox()" aria-label="סגירת משוב">
+          <img src="assets/images/icon-fb-close.png" alt="">
+        </button>
+      </div>
+      <p class="scq-fb-body"></p>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="bottom-bar-inner">
+        <div class="bar-actions">
+          <button id="scq13-check" class="btn-continue" dir="rtl" onclick="scq13Check()" disabled>צדקתי?</button>
+          <button id="scq13-hint" class="btn-hint" dir="rtl" onclick="scq13OpenHint()" hidden>
+            <img class="scq-hint-icon" id="scq13-hint-icon" src="assets/images/icon-hint-blue.svg" alt="">
+            אפשר רמז?
+          </button>
+        </div>
+        <div class="bar-back">
+          <button id="scq13-back" class="btn-back" dir="rtl" onclick="goTo(11)">חזרה</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ מסך 14 — שאלת רב-ברירה (MultipleChoiceQuestion) ============ -->
+  <section class="screen" data-screen="13" id="s13">
+    <div class="scq-question">
+      <div class="scq-img"><div class="scq-img-inner no-zoom">
+        <button class="img-zoom-btn" type="button" aria-label="הגדלת התמונה"
+                data-zoom-src="assets/images/קופסה ובכית.png" data-zoom-alt="קופסת קרטון עם משחק ופחית שתייה">
+          <svg class="img-zoom-btn__icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="8.5" cy="8.5" r="6" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M13 13L17.5 17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <img id="scq14-img" src="assets/images/קופסה ובכית.png" alt="קופסת קרטון עם משחק ופחית שתייה"></div></div>
+      <div class="scq-content">
+        <div class="scq-qtext">
+          <div class="scq-qtext-body">
+            <p class="scq-qtitle">מהי טרה?</p>
+            <p class="scq-qbody">טרה היא המסה של האריזה או המיכל בלבד.<br>
+            <b>  
+              סמנו את שני הפריטים שהם טרה:</b>
+            </p>
+          </div>
+        </div>
+        <div class="scq-answers" role="group" aria-label="בחרו את כל התשובות הנכונות">
+          <div class="scq-opt" role="checkbox" aria-checked="false" tabindex="0" data-id="a" onclick="scq14Toggle('a')">
+            <span class="scq-opt-text">קופסת הקרטון הריקה של המשחק</span>
+            <span class="scq-radio scq-radio-square"></span>
+          </div>
+          <div class="scq-opt" role="checkbox" aria-checked="false" tabindex="0" data-id="b" onclick="scq14Toggle('b')">
+            <span class="scq-opt-text">פחית השתייה הריקה</span>
+            <span class="scq-radio scq-radio-square"></span>
+          </div>
+          <div class="scq-opt" role="checkbox" aria-checked="false" tabindex="0" data-id="c" onclick="scq14Toggle('c')">
+            <span class="scq-opt-text">המשחק שבתוך הקופסה</span>
+            <span class="scq-radio scq-radio-square"></span>
+          </div>
+          <div class="scq-opt" role="checkbox" aria-checked="false" tabindex="0" data-id="d" onclick="scq14Toggle('d')">
+            <span class="scq-opt-text">פחית השתייה המלאה</span>
+            <span class="scq-radio scq-radio-square"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="scq14-feedbox" class="scq-fb-box">
+      <div class="scq-fb-title">
+        <span class="scq-fb-title-text"></span>
+        <button class="scq-fb-toggle" onclick="scq14ToggleFeedbox()" aria-label="סגירת משוב">
+          <img src="assets/images/icon-fb-close.png" alt="">
+        </button>
+      </div>
+      <p class="scq-fb-body"></p>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="bottom-bar-inner">
+        <div class="bar-actions">
+          <button id="scq14-check" class="btn-continue" dir="rtl" onclick="scq14Check()" disabled>צדקתי?</button>
+          <button id="scq14-hint" class="btn-hint" dir="rtl" onclick="scq14OpenHint()" hidden>
+            <img class="scq-hint-icon" id="scq14-hint-icon" src="assets/images/icon-hint-blue.svg" alt="">
+            אפשר רמז?
+          </button>
+        </div>
+        <div class="bar-back">
+          <button id="scq14-back" class="btn-back" dir="rtl" onclick="goTo(12)">חזרה</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ מסך 15 — מסך מעבר: דמות + בועית (Transition) ============ -->
+  <section class="screen" data-screen="14" id="s14">
+    <div class="transition-content">
+      <div class="transition-title-block">
+                <p class="transition-sub">
+                סיימנו את שלב הלימוד, נעבור לתרגול ונענה על
+                  </p>
+
+        <h2 class="transition-title">5 שאלות</h2>
+        <p class="transition-sub">
+<b>
+  צריך לענות נכון על 4 שאלות (80%) לפחות. 
+</b>
+        </p>
+      </div>
+      <div class="transition-avatar-wrap">
+        <img alt="דמות מלווה" class="transition-avatar" id="s15-avatar-img">
+        <div class="transition-bubble">לא הכל ברור? אפשר לפנות אל הצ'אט או אל המורה לחיזוק!</div>
+      </div>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="bottom-bar-inner">
+        <div class="bar-actions">
+          <button class="btn-continue" dir="rtl" onclick="s15Continue()">המשך</button>
+        </div>
+        <div class="bar-back">
+          <button class="btn-back" dir="rtl" onclick="goTo(13)">חזרה</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ מסך 16 — שאלה 1/5: שאלת בחירה יחידה עם תמונה + סרגל התקדמות ============ -->
+  <section class="screen" data-screen="15" id="s15">
+    <div class="qnav" id="s16-qnav">
+      <div class="qnav-item">
+        <div class="qnav-icon qnav-future" id="s16-qnav-icon-5"></div>
+        <span class="qnav-label" id="s16-qnav-label-5">שאלה 5</span>
+      </div>
+      <div class="qnav-line" id="s16-qnav-line-4"></div>
+      <div class="qnav-item">
+        <div class="qnav-icon qnav-future" id="s16-qnav-icon-4"></div>
+        <span class="qnav-label" id="s16-qnav-label-4">שאלה 4</span>
+      </div>
+      <div class="qnav-line" id="s16-qnav-line-3"></div>
+      <div class="qnav-item">
+        <div class="qnav-icon qnav-future" id="s16-qnav-icon-3"></div>
+        <span class="qnav-label" id="s16-qnav-label-3">שאלה 3</span>
+      </div>
+      <div class="qnav-line" id="s16-qnav-line-2"></div>
+      <div class="qnav-item">
+        <div class="qnav-icon qnav-future" id="s16-qnav-icon-2"></div>
+        <span class="qnav-label" id="s16-qnav-label-2">שאלה 2</span>
+      </div>
+      <div class="qnav-line" id="s16-qnav-line-1"></div>
+      <div class="qnav-item">
+        <div class="qnav-icon qnav-future" id="s16-qnav-icon-1"></div>
+        <span class="qnav-label" id="s16-qnav-label-1">שאלה 1</span>
+      </div>
+    </div>
+
+    <div class="scq-question">
+      <div class="scq-img"><div class="scq-img-inner no-zoom">
+        <button class="img-zoom-btn" type="button" aria-label="הגדלת התמונה"
+                data-zoom-src="assets/images/screen16_gift_box.png" data-zoom-alt="קופסת מתנה">
+          <svg class="img-zoom-btn__icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="8.5" cy="8.5" r="6" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M13 13L17.5 17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <img id="scq16-img" src="assets/images/screen16_gift_box.png" alt="קופסת מתנה"></div></div>
+      <div class="scq-content">
+        <div class="scq-qtext">
+          <div class="scq-qtext-body">
+            <p class="scq-qtitle">זהו את סוג המסה</p>
+            <p class="scq-qbody">התבוננו בתמונה שלפניכם וענו על השאלה הבאה:<br>
+              <b>
+              מהו הברוטו?</b></p>
+          </div>
+        </div>
+        <div class="scq-answers" role="radiogroup" aria-label="אפשרויות תשובה">
+          <div class="scq-opt" role="radio" aria-checked="false" tabindex="0" data-id="a" onclick="scq16Select('a')">
+            <span class="scq-opt-text">המתנה עצמה</span>
+            <span class="scq-radio"></span>
+          </div>
+          <div class="scq-opt" role="radio" aria-checked="false" tabindex="0" data-id="b" onclick="scq16Select('b')">
+            <span class="scq-opt-text">האריזה של המתנה</span>
+            <span class="scq-radio"></span>
+          </div>
+          <div class="scq-opt" role="radio" aria-checked="false" tabindex="0" data-id="c" onclick="scq16Select('c')">
+            <span class="scq-opt-text">האריזה והמתנה ביחד</span>
+            <span class="scq-radio"></span>
+          </div>
+          <div class="scq-opt" role="radio" aria-checked="false" tabindex="0" data-id="d" onclick="scq16Select('d')">
+            <span class="scq-opt-text">לא ניתן לדעת</span>
+            <span class="scq-radio"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="scq16-feedbox" class="scq-fb-box">
+      <div class="scq-fb-title">
+        <span class="scq-fb-title-text"></span>
+        <button class="scq-fb-toggle" onclick="scq16ToggleFeedbox()" aria-label="סגירת משוב">
+          <img src="assets/images/icon-fb-close.png" alt="">
+        </button>
+      </div>
+      <p class="scq-fb-body"></p>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="bottom-bar-inner">
+        <div class="bar-actions">
+          <button id="scq16-check" class="btn-continue" dir="rtl" onclick="scq16Check()" disabled>צדקתי?</button>
+          <button id="scq16-hint" class="btn-hint" dir="rtl" onclick="scq16OpenHint()" hidden>
+            <img class="scq-hint-icon" id="scq16-hint-icon" src="assets/images/icon-hint-blue.svg" alt="">
+            אפשר רמז?
+          </button>
+        </div>
+        <div class="bar-back">
+          <button id="scq16-back" class="btn-back" dir="rtl" onclick="goTo(14)">חזרה</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ מסך 17 — שאלה 2/5: שאלת בחירה יחידה עם תמונה + סרגל התקדמות ============ -->
+  <section class="screen" data-screen="16" id="s16">
+    <div class="qnav" id="s17-qnav">
+      <div class="qnav-item">
+        <div class="qnav-icon qnav-future" id="s17-qnav-icon-5"></div>
+        <span class="qnav-label" id="s17-qnav-label-5">שאלה 5</span>
+      </div>
+      <div class="qnav-line" id="s17-qnav-line-4"></div>
+      <div class="qnav-item">
+        <div class="qnav-icon qnav-future" id="s17-qnav-icon-4"></div>
+        <span class="qnav-label" id="s17-qnav-label-4">שאלה 4</span>
+      </div>
+      <div class="qnav-line" id="s17-qnav-line-3"></div>
+      <div class="qnav-item">
+        <div class="qnav-icon qnav-future" id="s17-qnav-icon-3"></div>
+        <span class="qnav-label" id="s17-qnav-label-3">שאלה 3</span>
+      </div>
+      <div class="qnav-line" id="s17-qnav-line-2"></div>
+      <div class="qnav-item">
+        <div class="qnav-icon qnav-future" id="s17-qnav-icon-2"></div>
+        <span class="qnav-label" id="s17-qnav-label-2">שאלה 2</span>
+      </div>
+      <div class="qnav-line" id="s17-qnav-line-1"></div>
+      <div class="qnav-item">
+        <div class="qnav-icon qnav-future" id="s17-qnav-icon-1"></div>
+        <span class="qnav-label" id="s17-qnav-label-1">שאלה 1</span>
+      </div>
+    </div>
+
+    <div class="scq-question">
+      <div class="scq-img"><div class="scq-img-inner no-zoom">
+        <button class="img-zoom-btn" type="button" aria-label="הגדלת התמונה"
+                data-zoom-src="assets/images/screen17_fruit_basket.png" data-zoom-alt="סלסילת פירות">
+          <svg class="img-zoom-btn__icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="8.5" cy="8.5" r="6" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M13 13L17.5 17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <img id="scq17-img" src="assets/images/screen17_fruit_basket.png" alt="סלסילת פירות"></div></div>
+      <div class="scq-content">
+        <div class="scq-qtext">
+          <div class="scq-qtext-body">
+            <p class="scq-qtitle">זהו את סוג המסה</p>
+            <p class="scq-qbody">התבוננו בתמונה שלפניכם וענו על השאלה הבאה:<br>
+              <b>
+              מהי הטרה?</b></p>
+          </div>
+        </div>
+        <div class="scq-answers" role="radiogroup" aria-label="אפשרויות תשובה">
+          <div class="scq-opt" role="radio" aria-checked="false" tabindex="0" data-id="a" onclick="scq17Select('a')">
+            <span class="scq-opt-text">הסל</span>
+            <span class="scq-radio"></span>
+          </div>
+          <div class="scq-opt" role="radio" aria-checked="false" tabindex="0" data-id="b" onclick="scq17Select('b')">
+            <span class="scq-opt-text">הפירות</span>
+            <span class="scq-radio"></span>
+          </div>
+          <div class="scq-opt" role="radio" aria-checked="false" tabindex="0" data-id="c" onclick="scq17Select('c')">
+            <span class="scq-opt-text">הפירות עם הסל</span>
+            <span class="scq-radio"></span>
+          </div>
+          <div class="scq-opt" role="radio" aria-checked="false" tabindex="0" data-id="d" onclick="scq17Select('d')">
+            <span class="scq-opt-text">לא ניתן לדעת</span>
+            <span class="scq-radio"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="scq17-feedbox" class="scq-fb-box">
+      <div class="scq-fb-title">
+        <span class="scq-fb-title-text"></span>
+        <button class="scq-fb-toggle" onclick="scq17ToggleFeedbox()" aria-label="סגירת משוב">
+          <img src="assets/images/icon-fb-close.png" alt="">
+        </button>
+      </div>
+      <p class="scq-fb-body"></p>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="bottom-bar-inner">
+        <div class="bar-actions">
+          <button id="scq17-check" class="btn-continue" dir="rtl" onclick="scq17Check()" disabled>צדקתי?</button>
+          <button id="scq17-hint" class="btn-hint" dir="rtl" onclick="scq17OpenHint()" hidden>
+            <img class="scq-hint-icon" id="scq17-hint-icon" src="assets/images/icon-hint-blue.svg" alt="">
+            אפשר רמז?
+          </button>
+        </div>
+        <div class="bar-back">
+          <button id="scq17-back" class="btn-back" dir="rtl" onclick="goTo(15)">חזרה</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ מסך 18 — שאלה 3/5: טבלת השלמה עם אינפוטים + סרגל התקדמות ============ -->
+  <section class="screen" data-screen="17" id="s17">
+    <div class="qnav" id="s18-qnav">
+      <div class="qnav-item">
+        <div class="qnav-icon qnav-future" id="s18-qnav-icon-5"></div>
+        <span class="qnav-label" id="s18-qnav-label-5">שאלה 5</span>
+      </div>
+      <div class="qnav-line" id="s18-qnav-line-4"></div>
+      <div class="qnav-item">
+        <div class="qnav-icon qnav-future" id="s18-qnav-icon-4"></div>
+        <span class="qnav-label" id="s18-qnav-label-4">שאלה 4</span>
+      </div>
+      <div class="qnav-line" id="s18-qnav-line-3"></div>
+      <div class="qnav-item">
+        <div class="qnav-icon qnav-future" id="s18-qnav-icon-3"></div>
+        <span class="qnav-label" id="s18-qnav-label-3">שאלה 3</span>
+      </div>
+      <div class="qnav-line" id="s18-qnav-line-2"></div>
+      <div class="qnav-item">
+        <div class="qnav-icon qnav-future" id="s18-qnav-icon-2"></div>
+        <span class="qnav-label" id="s18-qnav-label-2">שאלה 2</span>
+      </div>
+      <div class="qnav-line" id="s18-qnav-line-1"></div>
+      <div class="qnav-item">
+        <div class="qnav-icon qnav-future" id="s18-qnav-icon-1"></div>
+        <span class="qnav-label" id="s18-qnav-label-1">שאלה 1</span>
+      </div>
+    </div>
+
+    <div class="s18-content">
+      <div class="s18-text-group">
+        <h2 class="s18-title">חשבו את המסה</h2>
+        <p class="s18-question">לפניכם טבלה המציגה את נתוני המסה של חפצים שונים. בכל שורה חסר נתון אחד. השתמשו בקשר שבין המושגים (נטו + טרה = ברוטו) כדי לחשב ולהשלים את המספרים החסרים בטבלה.</p>
+      </div>
+      <br><br>
+
+      <table class="s18-table" dir="rtl">
+        <thead>
+          <tr>
+            <th class="s18-th">פריט</th>
+            <th class="s18-th">מסת הברוטו<br>(הכל ביחד)</th>
+            <th class="s18-th">מסת הנטו<br>(התוכן)</th>
+            <th class="s18-th">מסת הטרה<br>(האריזה/המיכל)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="s18-td s18-item-name">צנצנת מלפפונים חמוצים</td>
+            <td class="s18-td s18-input-cell"><input class="s18-input" id="s18-input-1" type="number" min="0" oninput="s18OnInput()" dir="ltr"> גרם</td>
+            <td class="s18-td">400 גרם</td>
+            <td class="s18-td">350 גרם</td>
+          </tr>
+          <tr>
+            <td class="s18-td s18-item-name">בקבוק משקה</td>
+            <td class="s18-td">1550 גרם</td>
+            <td class="s18-td">1500 גרם</td>
+            <td class="s18-td s18-input-cell"><input class="s18-input" id="s18-input-2" type="number" min="0" oninput="s18OnInput()" dir="ltr"> גרם</td>
+          </tr>
+          <tr>
+            <td class="s18-td s18-item-name">מזוודת טרולי</td>
+            <td class="s18-td">8.5 קילוגרם</td>
+            <td class="s18-td s18-input-cell"><input class="s18-input" id="s18-input-3" type="number" min="0" step="0.1" oninput="s18OnInput()" dir="ltr"> קילוגרם</td>
+            <td class="s18-td">2.5 קילוגרם</td>
+          </tr>
+          <tr>
+            <td class="s18-td s18-item-name">בלון גומי מלא באוויר</td>
+            <td class="s18-td s18-input-cell"><input class="s18-input" id="s18-input-4" type="number" min="0" oninput="s18OnInput()" dir="ltr"> גרם</td>
+            <td class="s18-td">1 גרם</td>
+            <td class="s18-td">3 גרם</td>
+          </tr>
+        </tbody>
+      </table>
+    </div><!-- /.s18-content -->
+
+    <div id="s18-feedbox" class="scq-fb-box">
+      <div class="scq-fb-title">
+        <span class="scq-fb-title-text"></span>
+        <button class="scq-fb-toggle" onclick="s18ToggleFeedbox()" aria-label="סגירת משוב">
+          <img src="assets/images/icon-fb-close.png" alt="">
+        </button>
+      </div>
+      <p class="scq-fb-body"></p>
+      <button id="s18-reveal-btn" class="scq-fb-reveal-btn" type="button" onclick="s18Reveal()" hidden>התשובה הנכונה</button>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="bottom-bar-inner">
+        <div class="bar-actions">
+          <button id="s18-check" class="btn-continue" dir="rtl" onclick="s18Check()" disabled>צדקתי?</button>
+          <button id="s18-hint" class="btn-hint" dir="rtl" onclick="s18OpenHint()" hidden>
+            <img class="scq-hint-icon" id="s18-hint-icon" src="assets/images/icon-hint-blue.svg" alt="">
+            אפשר רמז?
+          </button>
+        </div>
+        <div class="bar-back">
+          <button id="s18-back" class="btn-back" dir="rtl" onclick="goTo(16)">חזרה</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ מסך 19 — שאלה 4/5: תפריטים נפתחים + סרגל התקדמות ============ -->
+  <section class="screen" data-screen="18" id="s18">
+    <div class="qnav" id="s19-qnav">
+      <div class="qnav-item">
+        <div class="qnav-icon qnav-future" id="s19-qnav-icon-5"></div>
+        <span class="qnav-label" id="s19-qnav-label-5">שאלה 5</span>
+      </div>
+      <div class="qnav-line" id="s19-qnav-line-4"></div>
+      <div class="qnav-item">
+        <div class="qnav-icon qnav-future" id="s19-qnav-icon-4"></div>
+        <span class="qnav-label" id="s19-qnav-label-4">שאלה 4</span>
+      </div>
+      <div class="qnav-line" id="s19-qnav-line-3"></div>
+      <div class="qnav-item">
+        <div class="qnav-icon qnav-future" id="s19-qnav-icon-3"></div>
+        <span class="qnav-label" id="s19-qnav-label-3">שאלה 3</span>
+      </div>
+      <div class="qnav-line" id="s19-qnav-line-2"></div>
+      <div class="qnav-item">
+        <div class="qnav-icon qnav-future" id="s19-qnav-icon-2"></div>
+        <span class="qnav-label" id="s19-qnav-label-2">שאלה 2</span>
+      </div>
+      <div class="qnav-line" id="s19-qnav-line-1"></div>
+      <div class="qnav-item">
+        <div class="qnav-icon qnav-future" id="s19-qnav-icon-1"></div>
+        <span class="qnav-label" id="s19-qnav-label-1">שאלה 1</span>
+      </div>
+    </div>
+
+    <div class="s19-content">
+      <div class="s19-text-group">
+       <br/>
+        <p class="s19-question">לפניכם גופים שונים, בחרו מבין האפשרויות את יחידת המסה המתאימה ביותר:</p>
+      </div>
+
+      <div class="s19-dropdowns">
+
+        <div class="s19-row">
+          <img class="s19-icon" src="assets/images/human-icon.svg" alt="" aria-hidden="true">
+          <span class="s19-label">בן אדם</span>
+          <div class="s19-dd-wrap" id="s19-dd-1">
+            <button class="s19-dd-btn" type="button" id="s19-dd-1-btn" onclick="s19DdToggle('s19-dd-1')" aria-haspopup="listbox" aria-expanded="false">
+              <span class="s19-dd-val" id="s19-dd-1-val"></span>
+              <span class="s19-dd-arrow" aria-hidden="true"></span>
+            </button>
+            <ul class="s19-dd-opts" id="s19-dd-1-opts" hidden role="listbox">
+              <li class="s19-dd-opt" role="option" onclick="s19DdSelect('s19-dd-1','טון')">טון</li>
+              <li class="s19-dd-opt" role="option" onclick="s19DdSelect('s19-dd-1','קילוגרם')">קילוגרם</li>
+              <li class="s19-dd-opt" role="option" onclick="s19DdSelect('s19-dd-1','גרם')">גרם</li>
+              <li class="s19-dd-opt" role="option" onclick="s19DdSelect('s19-dd-1','מיליגרם')">מיליגרם</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="s19-row">
+          <img class="s19-icon" src="assets/images/ant-icon.svg" alt="" aria-hidden="true">
+          <span class="s19-label">נמלה</span>
+          <div class="s19-dd-wrap" id="s19-dd-2">
+            <button class="s19-dd-btn" type="button" id="s19-dd-2-btn" onclick="s19DdToggle('s19-dd-2')" aria-haspopup="listbox" aria-expanded="false">
+              <span class="s19-dd-val" id="s19-dd-2-val"></span>
+              <span class="s19-dd-arrow" aria-hidden="true"></span>
+            </button>
+            <ul class="s19-dd-opts" id="s19-dd-2-opts" hidden role="listbox">
+              <li class="s19-dd-opt" role="option" onclick="s19DdSelect('s19-dd-2','טון')">טון</li>
+              <li class="s19-dd-opt" role="option" onclick="s19DdSelect('s19-dd-2','קילוגרם')">קילוגרם</li>
+              <li class="s19-dd-opt" role="option" onclick="s19DdSelect('s19-dd-2','גרם')">גרם</li>
+              <li class="s19-dd-opt" role="option" onclick="s19DdSelect('s19-dd-2','מיליגרם')">מיליגרם</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="s19-row">
+          <img class="s19-icon" src="assets/images/truck-icon.svg" alt="" aria-hidden="true">
+          <span class="s19-label">משאית</span>
+          <div class="s19-dd-wrap" id="s19-dd-3">
+            <button class="s19-dd-btn" type="button" id="s19-dd-3-btn" onclick="s19DdToggle('s19-dd-3')" aria-haspopup="listbox" aria-expanded="false">
+              <span class="s19-dd-val" id="s19-dd-3-val"></span>
+              <span class="s19-dd-arrow" aria-hidden="true"></span>
+            </button>
+            <ul class="s19-dd-opts" id="s19-dd-3-opts" hidden role="listbox">
+              <li class="s19-dd-opt" role="option" onclick="s19DdSelect('s19-dd-3','טון')">טון</li>
+              <li class="s19-dd-opt" role="option" onclick="s19DdSelect('s19-dd-3','קילוגרם')">קילוגרם</li>
+              <li class="s19-dd-opt" role="option" onclick="s19DdSelect('s19-dd-3','גרם')">גרם</li>
+              <li class="s19-dd-opt" role="option" onclick="s19DdSelect('s19-dd-3','מיליגרם')">מיליגרם</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="s19-row">
+          <img class="s19-icon" src="assets/images/phone-icon.svg" alt="" aria-hidden="true">
+          <span class="s19-label">טלפון נייד</span>
+          <div class="s19-dd-wrap" id="s19-dd-4">
+            <button class="s19-dd-btn" type="button" id="s19-dd-4-btn" onclick="s19DdToggle('s19-dd-4')" aria-haspopup="listbox" aria-expanded="false">
+              <span class="s19-dd-val" id="s19-dd-4-val"></span>
+              <span class="s19-dd-arrow" aria-hidden="true"></span>
+            </button>
+            <ul class="s19-dd-opts" id="s19-dd-4-opts" hidden role="listbox">
+              <li class="s19-dd-opt" role="option" onclick="s19DdSelect('s19-dd-4','טון')">טון</li>
+              <li class="s19-dd-opt" role="option" onclick="s19DdSelect('s19-dd-4','קילוגרם')">קילוגרם</li>
+              <li class="s19-dd-opt" role="option" onclick="s19DdSelect('s19-dd-4','גרם')">גרם</li>
+              <li class="s19-dd-opt" role="option" onclick="s19DdSelect('s19-dd-4','מיליגרם')">מיליגרם</li>
+            </ul>
+          </div>
+        </div>
+
+      </div><!-- /.s19-dropdowns -->
+    </div><!-- /.s19-content -->
+
+    <div id="s19-feedbox" class="scq-fb-box">
+      <div class="scq-fb-title">
+        <span class="scq-fb-title-text"></span>
+        <button class="scq-fb-toggle" onclick="s19ToggleFeedbox()" aria-label="סגירת משוב">
+          <img src="assets/images/icon-fb-close.png" alt="">
+        </button>
+      </div>
+      <p class="scq-fb-body"></p>
+      <button id="s19-reveal-btn" class="scq-fb-reveal-btn" type="button" onclick="s19Reveal()" hidden>התשובה הנכונה</button>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="bottom-bar-inner">
+        <div class="bar-actions">
+          <button id="s19-check" class="btn-continue" dir="rtl" onclick="s19Check()" disabled>צדקתי?</button>
+          <button id="s19-hint" class="btn-hint" dir="rtl" onclick="s19OpenHint()" hidden>
+            <img class="scq-hint-icon" id="s19-hint-icon" src="assets/images/icon-hint-blue.svg" alt="">
+            אפשר רמז?
+          </button>
+        </div>
+        <div class="bar-back">
+          <button id="s19-back" class="btn-back" dir="rtl" onclick="goTo(17)">חזרה</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ מסך 20 — שאלה 5/5: גרירה והשמה + סרגל התקדמות ============ -->
+  <section class="screen" data-screen="19" id="s19">
+    <div class="qnav" id="s20-qnav">
+      <div class="qnav-item">
+        <div class="qnav-icon qnav-future" id="s20-qnav-icon-5"></div>
+        <span class="qnav-label" id="s20-qnav-label-5">שאלה 5</span>
+      </div>
+      <div class="qnav-line" id="s20-qnav-line-4"></div>
+      <div class="qnav-item">
+        <div class="qnav-icon qnav-future" id="s20-qnav-icon-4"></div>
+        <span class="qnav-label" id="s20-qnav-label-4">שאלה 4</span>
+      </div>
+      <div class="qnav-line" id="s20-qnav-line-3"></div>
+      <div class="qnav-item">
+        <div class="qnav-icon qnav-future" id="s20-qnav-icon-3"></div>
+        <span class="qnav-label" id="s20-qnav-label-3">שאלה 3</span>
+      </div>
+      <div class="qnav-line" id="s20-qnav-line-2"></div>
+      <div class="qnav-item">
+        <div class="qnav-icon qnav-future" id="s20-qnav-icon-2"></div>
+        <span class="qnav-label" id="s20-qnav-label-2">שאלה 2</span>
+      </div>
+      <div class="qnav-line" id="s20-qnav-line-1"></div>
+      <div class="qnav-item">
+        <div class="qnav-icon qnav-future" id="s20-qnav-icon-1"></div>
+        <span class="qnav-label" id="s20-qnav-label-1">שאלה 1</span>
+      </div>
+    </div>
+
+    <div class="s20-content">
+      <div class="s20-text-group">
+        <h2 class="s20-title">זיהוי מושגים</h2>
+        <p class="s20-sub">גררו כל פריט לסל המתאים: ברוטו, נטו או טרה</p>
+      </div>
+
+      <div class="s20-source-bank" id="s20-source-bank" ondragover="s20DragOver(event)" ondrop="s20DropToSource(event)">
+
+        <div class="s20-drag-item" id="s20i4" draggable="true" data-correct="bruto"
+             ondragstart="s20DragStart(event,'s20i4')" ondragend="s20DragEnd('s20i4')" onclick="s20ItemClick('s20i4')">
+          <img src="assets/images/screen20_healthy_snack.png" alt="חטיף בריאות באריזה" draggable="false">
+        </div>
+        <div class="s20-drag-item" id="s20i5" draggable="true" data-correct="tara"
+             ondragstart="s20DragStart(event,'s20i5')" ondragend="s20DragEnd('s20i5')" onclick="s20ItemClick('s20i5')">
+          <img src="assets/images/screen20_healthy_snack_cover.png" alt="אריזת חטיף בריאות ריקה" draggable="false">
+        </div>
+        <div class="s20-drag-item" id="s20i6" draggable="true" data-correct="neto"
+             ondragstart="s20DragStart(event,'s20i6')" ondragend="s20DragEnd('s20i6')" onclick="s20ItemClick('s20i6')">
+          <img src="assets/images/screen20_healthy_snack_without_cover.png" alt="חטיף בריאות ללא אריזה" draggable="false">
+        </div>
+        <div class="s20-drag-item" id="s20i7" draggable="true" data-correct="bruto"
+             ondragstart="s20DragStart(event,'s20i7')" ondragend="s20DragEnd('s20i7')" onclick="s20ItemClick('s20i7')">
+          <img src="assets/images/screen20_vitamins_full_box.png" alt="קופסת ויטמינים מלאה" draggable="false">
+        </div>
+        <div class="s20-drag-item" id="s20i8" draggable="true" data-correct="neto"
+             ondragstart="s20DragStart(event,'s20i8')" ondragend="s20DragEnd('s20i8')" onclick="s20ItemClick('s20i8')">
+          <img src="assets/images/screen20_vitamins.png" alt="כדורי ויטמינים בלבד" draggable="false">
+        </div>
+        <div class="s20-drag-item" id="s20i9" draggable="true" data-correct="tara"
+             ondragstart="s20DragStart(event,'s20i9')" ondragend="s20DragEnd('s20i9')" onclick="s20ItemClick('s20i9')">
+          <img src="assets/images/screen20_vitamins_empty_box.png" alt="קופסת ויטמינים ריקה" draggable="false">
+        </div>
+
+      </div><!-- /.s20-source-bank -->
+
+      <div class="s20-zones-row">
+        <div class="s20-zone-wrap">
+          <div class="s20-zone" id="s20-zone-bruto"
+               ondragover="s20DragOver(event)"
+               ondragenter="s20DragEnter(event,'s20-zone-bruto')"
+               ondragleave="s20DragLeave(event,'s20-zone-bruto')"
+               ondrop="s20Drop(event,'bruto')"></div>
+          <p class="s20-zone-label">ברוטו</p>
+        </div>
+        <div class="s20-zone-wrap">
+          <div class="s20-zone" id="s20-zone-neto"
+               ondragover="s20DragOver(event)"
+               ondragenter="s20DragEnter(event,'s20-zone-neto')"
+               ondragleave="s20DragLeave(event,'s20-zone-neto')"
+               ondrop="s20Drop(event,'neto')"></div>
+          <p class="s20-zone-label">נטו</p>
+        </div>
+        <div class="s20-zone-wrap">
+          <div class="s20-zone" id="s20-zone-tara"
+               ondragover="s20DragOver(event)"
+               ondragenter="s20DragEnter(event,'s20-zone-tara')"
+               ondragleave="s20DragLeave(event,'s20-zone-tara')"
+               ondrop="s20Drop(event,'tara')"></div>
+          <p class="s20-zone-label">טרה</p>
+        </div>
+      </div><!-- /.s20-zones-row -->
+    </div><!-- /.s20-content -->
+
+    <div id="s20-feedbox" class="scq-fb-box">
+      <div class="scq-fb-title">
+        <span class="scq-fb-title-text"></span>
+        <button class="scq-fb-toggle" onclick="s20ToggleFeedbox()" aria-label="סגירת משוב">
+          <img src="assets/images/icon-fb-close.png" alt="">
+        </button>
+      </div>
+      <p class="scq-fb-body"></p>
+      <button id="s20-reveal-btn" class="scq-fb-reveal-btn" type="button" onclick="s20Reveal()" hidden>התשובה הנכונה</button>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="bottom-bar-inner">
+        <div class="bar-actions">
+          <button id="s20-check" class="btn-continue" dir="rtl" onclick="s20Check()" disabled>צדקתי?</button>
+          <button id="s20-hint" class="btn-hint" dir="rtl" onclick="s20OpenHint()" hidden>
+            <img class="scq-hint-icon" id="s20-hint-icon" src="assets/images/icon-hint-blue.svg" alt="">
+            אפשר רמז?
+          </button>
+        </div>
+        <div class="bar-back">
+          <button id="s20-back" class="btn-back" dir="rtl" onclick="goTo(18)">חזרה</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- פופ-אפ רמז מסך 4 — מחוץ ל-.screen, ישירות ב-#app -->
+  <div id="scq4-hint-overlay" class="scq-hint-overlay" hidden>
+    <div class="scq-hint-popup" role="dialog" aria-modal="true" aria-label="רמז">
+      <div class="scq-hint-title-row">
+        <p class="scq-hint-title">רמז</p>
+        <img class="scq-hint-bulb" src="assets/images/icon-idea-white-lg.svg" alt="">
+      </div>
+      <p class="scq-hint-body">כדי לדעת את מסת הצנצנת בלבד, יש להחסיר את מסת החמוצים (הנטו) מהמסה הכללית (הברוטו).</p>
+      <button class="scq-hint-close" onclick="scq4CloseHint()">חזרה לשאלה</button>
+    </div>
+  </div>
+
+  <!-- פופ-אפ רמז — מחוץ ל-.screen, ישירות ב-#app -->
+  <div id="scq-hint-overlay" class="scq-hint-overlay" hidden>
+    <div class="scq-hint-popup" role="dialog" aria-modal="true" aria-label="רמז">
+      <div class="scq-hint-title-row">
+        <p class="scq-hint-title">רמז</p>
+        <img class="scq-hint-bulb" src="assets/images/icon-idea-white-lg.svg" alt="">
+      </div>
+      <p class="scq-hint-body">האם המסה של 10 ק"ג מתייחסת רק לתיבה, או גם לתיבה וגם למה שבתוכה?</p>
+      <button class="scq-hint-close" onclick="scqCloseHint()">חזרה לשאלה</button>
+    </div>
+  </div>
+
+  <!-- פופ-אפ רמז מסך 8 — מחוץ ל-.screen, ישירות ב-#app -->
+  <div id="scq8-hint-overlay" class="scq-hint-overlay" hidden>
+    <div class="scq-hint-popup" role="dialog" aria-modal="true" aria-label="רמז">
+      <div class="scq-hint-title-row">
+        <p class="scq-hint-title">רמז</p>
+        <img class="scq-hint-bulb" src="assets/images/icon-idea-white-lg.svg" alt="">
+      </div>
+      <p class="scq-hint-body">נסו לחשוב איזה נתון חסר ליד המספר, שיכול לספר לנו את כל הסיפור.</p>
+      <button class="scq-hint-close" onclick="scq8CloseHint()">חזרה לשאלה</button>
+    </div>
+  </div>
+
+  <!-- פופ-אפ רמז מסך 9 — מחוץ ל-.screen, ישירות ב-#app -->
+  <div id="s9-hint-overlay" class="scq-hint-overlay" hidden>
+    <div class="scq-hint-popup" role="dialog" aria-modal="true" aria-label="רמז">
+      <div class="scq-hint-title-row">
+        <p class="scq-hint-title">רמז</p>
+        <img class="scq-hint-bulb" src="assets/images/icon-idea-white-lg.svg" alt="">
+      </div>
+      <p class="scq-hint-body"><b>היחידות מסודרות מהגדולה ביותר לקטנה ביותר:</b><br>טון (הגדולה ביותר) ← קילוגרם ← גרם ← מיליגרם (הקטנה ביותר)<br><br>עכשיו חִשְׁבוּ בהגיון — מיהו הגוף הגדול ביותר ומי הקטן ביותר?</p>
+      <button class="scq-hint-close" onclick="s9CloseHint()">חזרה לשאלה</button>
+    </div>
+  </div>
+
+  <!-- פופ-אפ רמז מסך 10 — מחוץ ל-.screen, ישירות ב-#app -->
+  <div id="scq10-hint-overlay" class="scq-hint-overlay" hidden>
+    <div class="scq-hint-popup" role="dialog" aria-modal="true" aria-label="רמז">
+      <div class="scq-hint-title-row">
+        <p class="scq-hint-title">רמז</p>
+        <img class="scq-hint-bulb" src="assets/images/icon-idea-white-lg.svg" alt="">
+      </div>
+      <p class="scq-hint-body">מסת קטר היא 150 טון וגם 150,000,000 גרם.</p>
+      <button class="scq-hint-close" onclick="scq10CloseHint()">חזרה לשאלה</button>
+    </div>
+  </div>
+
+  <!-- פופ-אפ רמז מסך 13 — מחוץ ל-.screen, ישירות ב-#app -->
+  <div id="scq13-hint-overlay" class="scq-hint-overlay" hidden>
+    <div class="scq-hint-popup" role="dialog" aria-modal="true" aria-label="רמז">
+      <div class="scq-hint-title-row">
+        <p class="scq-hint-title">רמז</p>
+        <img class="scq-hint-bulb" src="assets/images/icon-idea-white-lg.svg" alt="">
+      </div>
+      <p class="scq-hint-body">אם הייתם קונים את המוצר הזה, מה באמת הייתם רוצים לקבל?</p>
+      <button class="scq-hint-close" onclick="scq13CloseHint()">חזרה לשאלה</button>
+    </div>
+  </div>
+
+  <!-- פופ-אפ רמז מסך 14 — מחוץ ל-.screen, ישירות ב-#app -->
+  <div id="scq14-hint-overlay" class="scq-hint-overlay" hidden>
+    <div class="scq-hint-popup" role="dialog" aria-modal="true" aria-label="רמז">
+      <div class="scq-hint-title-row">
+        <p class="scq-hint-title">רמז</p>
+        <img class="scq-hint-bulb" src="assets/images/icon-idea-white-lg.svg" alt="">
+      </div>
+      <p class="scq-hint-body">חפשו את הפריטים שמתארים את האריזה.</p>
+      <button class="scq-hint-close" onclick="scq14CloseHint()">חזרה לשאלה</button>
+    </div>
+  </div>
+
+  <!-- פופ-אפ רמז מסך 16 — מחוץ ל-.screen, ישירות ב-#app -->
+  <div id="scq16-hint-overlay" class="scq-hint-overlay" hidden>
+    <div class="scq-hint-popup" role="dialog" aria-modal="true" aria-label="רמז">
+      <div class="scq-hint-title-row">
+        <p class="scq-hint-title">רמז</p>
+        <img class="scq-hint-bulb" src="assets/images/icon-idea-white-lg.svg" alt="">
+      </div>
+      <p class="scq-hint-body">מה יראו המאזניים אם נמדוד את הפריט בדיוק כפי שהוא מופיע בתמונה?</p>
+      <button class="scq-hint-close" onclick="scq16CloseHint()">חזרה לשאלה</button>
+    </div>
+  </div>
+
+  <!-- פופ-אפ רמז מסך 17 — מחוץ ל-.screen, ישירות ב-#app -->
+  <div id="scq17-hint-overlay" class="scq-hint-overlay" hidden>
+    <div class="scq-hint-popup" role="dialog" aria-modal="true" aria-label="רמז">
+      <div class="scq-hint-title-row">
+        <p class="scq-hint-title">רמז</p>
+        <img class="scq-hint-bulb" src="assets/images/icon-idea-white-lg.svg" alt="">
+      </div>
+      <p class="scq-hint-body">מה יישאר אם נוציא את כל הפירות מהסלסילה?</p>
+      <button class="scq-hint-close" onclick="scq17CloseHint()">חזרה לשאלה</button>
+    </div>
+  </div>
+
+  <!-- פופ-אפ רמז מסך 18 — מחוץ ל-.screen, ישירות ב-#app -->
+  <div id="s18-hint-overlay" class="scq-hint-overlay" hidden>
+    <div class="scq-hint-popup" role="dialog" aria-modal="true" aria-label="רמז">
+      <div class="scq-hint-title-row">
+        <p class="scq-hint-title">רמז</p>
+        <img class="scq-hint-bulb" src="assets/images/icon-idea-white-lg.svg" alt="">
+      </div>
+      <p class="scq-hint-body">חשבו על הקשר בין התוכן, האריזה והכול יחד. איזה מהם מתקבל מחיבור? ואיזה מתקבל מחיסור?</p>
+      <button class="scq-hint-close" onclick="s18CloseHint()">חזרה לשאלה</button>
+    </div>
+  </div>
+
+  <!-- פופ-אפ רמז מסך 19 — מחוץ ל-.screen, ישירות ב-#app -->
+  <div id="s19-hint-overlay" class="scq-hint-overlay" hidden>
+    <div class="scq-hint-popup" role="dialog" aria-modal="true" aria-label="רמז">
+      <div class="scq-hint-title-row">
+        <p class="scq-hint-title">רמז</p>
+        <img class="scq-hint-bulb" src="assets/images/icon-idea-white-lg.svg" alt="">
+      </div>
+      <p class="scq-hint-body">קילוגרם משמעו פי 1000 גרם, ומיליגרם משמעו אלפית גרם.</p>
+      <button class="scq-hint-close" onclick="s19CloseHint()">חזרה לשאלה</button>
+    </div>
+  </div>
+
+  <!-- פופ-אפ רמז מסך 20 — מחוץ ל-.screen, ישירות ב-#app -->
+  <div id="s20-hint-overlay" class="scq-hint-overlay" hidden>
+    <div class="scq-hint-popup" role="dialog" aria-modal="true" aria-label="רמז">
+      <div class="scq-hint-title-row">
+        <p class="scq-hint-title">רמז</p>
+        <img class="scq-hint-bulb" src="assets/images/icon-idea-white-lg.svg" alt="">
+      </div>
+      <p class="scq-hint-body">ברוטו גדול מנטו, ומקור המילה טרה הוא מהשפה הערבית ומשמעו – "מה שזורקים".</p>
+      <button class="scq-hint-close" onclick="s20CloseHint()">חזרה לשאלה</button>
+    </div>
+  </div>
+
+  <!-- כפתור "מצאתם בעיה?" — רכיב גלובלי, מחוץ ל-.screen -->
+  <button class="flag-btn" type="button" aria-label="מצאתם בעיה?">
+    <span class="flag-btn-icon">
+      <img class="flag-btn-icon-default" src="assets/images/btn-flag-default.png" alt="">
+      <img class="flag-btn-icon-hover" src="assets/images/btn-flag-hover.png" alt="">
+    </span>
+    <span class="flag-btn-label">מצאתם בעיה?</span>
+  </button>
+
+  <!-- הגדלת תמונה v2 (img-zoom) — רכיב גלובלי משותף אחד, מחוץ ל-.screen,
+       ישירות ב-#app, לפי מפרט 720-templates _global-components.md -->
+  <div id="img-zoom-modal" class="img-zoom-modal hidden" aria-hidden="true" data-zoom-close="true">
+    <div class="img-zoom-modal__panel" role="dialog" aria-modal="true" aria-label="הגדלת תמונה">
+      <button class="img-zoom-close" type="button" data-zoom-close="true" aria-label="סגירת הגדלת תמונה">
+        <svg class="img-zoom-close__icon" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M1 1L14 14M14 1L1 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div class="img-zoom-modal__stage"></div>
+    </div>
+  </div>
+
+</div>
+<script src="script.js"></script>
+</body>
+</html>

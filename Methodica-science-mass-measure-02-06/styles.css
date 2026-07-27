@@ -1,0 +1,775 @@
+/* =========================================================
+   מדידת מסה — לומדה | 720 | סיין 6
+   ========================================================= */
+
+/* ---------- Fonts (עותק מקומי לסין זה, ב-assets/fonts) ---------- */
+@font-face {
+  font-family: 'Assistant';
+  src: url('assets/fonts/assistant-hebrew.woff2') format('woff2');
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F;
+}
+@font-face {
+  font-family: 'Assistant';
+  src: url('assets/fonts/assistant-latin.woff2') format('woff2');
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+                 U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215;
+}
+
+/* ---------- Reset ---------- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  direction: rtl;
+  font-family: 'Assistant', 'Segoe UI', Arial, sans-serif;
+  background: #ffffff;
+}
+.tf-qtitle {
+  font-weight: 700;
+  font-size: 24px;
+  color: #019de5;
+  text-align: right;
+}
+button {
+  font-family: inherit;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: inherit;
+}
+button:disabled { cursor: default; }
+img { display: block; max-width: none; }
+
+/* ---------- Canvas & viewport scaling ---------- */
+#app {
+  width: 1280px;
+  height: 710px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+  background: #fff;
+  overflow: hidden;
+}
+
+.screen {
+  position: absolute;
+  inset: 0;
+  display: none;
+}
+.screen.active { display: block; }
+
+/* transitions removed on purpose — Figma states change instantly */
+* { transition: none !important; }
+
+/* ════════════════════════════════════════════════════════
+   GLOBAL — Bottom bar (74px, per Figma)
+   ════════════════════════════════════════════════════════ */
+.bottom-bar {
+  position: absolute;
+  bottom: -3px;           /* -3px hides the bottom border line */
+  left: 0;
+  right: 0;
+  height: 74px;
+  background: #ffffff;
+  border-top: 0.4px solid #AEAEAE;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bottom-bar-inner {
+  width: 1232px;
+  padding: 0 10px;
+  display: flex;
+  direction: ltr;          /* Force LTR so action buttons stay physical-LEFT */
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* === Continue button (gradient blue pill) === */
+.btn-continue {
+  background: linear-gradient(180deg, #005FBE 9%, #003971 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 1000px;
+  font-family: 'Assistant', sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  padding: 12px 40px;
+  width: 140px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn-continue:disabled {
+  background: #AEAEAE;
+  color: #303030;
+  cursor: not-allowed;
+}
+.btn-continue:not(:disabled):hover { opacity: 0.88; }
+.btn-continue:focus-visible {
+  outline: 3px solid #019DE5;
+  outline-offset: 2px;
+}
+
+/* === Hint button (אפשר רמז?) — מוסתר (hidden) עד לניסיון שגוי ראשון,
+   נחשף (hidden=false) אחרי טעות ראשונה — כמו מסך 32 בלומדת המקור === */
+.btn-hint {
+  background: #ffffff;
+  color: #019de5;
+  border: 1.5px solid #019de5;
+  border-radius: 1000px;
+  font-family: 'Assistant', sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  padding: 10px 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.btn-hint[hidden] { display: none; }
+.btn-hint .hint-icon { flex-shrink: 0; width: 26px; height: 22px; }
+.btn-hint:hover { background: #f0f8ff; }
+.btn-hint:focus-visible {
+  outline: 3px solid #019de5;
+  outline-offset: 2px;
+}
+
+/* === Back button (חזרה) === */
+.btn-back {
+  background: #ffffff;
+  color: #007ac6;
+  border: 1.5px solid #007ac6;
+  border-radius: 1000px;
+  font-family: 'Assistant', sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  padding: 12px 40px;
+  width: 140px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn-back:hover { background: #f0f8ff; }
+.btn-back:focus-visible {
+  outline: 3px solid #007ac6;
+  outline-offset: 2px;
+}
+
+.dq-part-badge {
+  background: linear-gradient(to bottom, #005fbe 9%, #003971);
+  color: #fff; font-size: 24px; font-weight: 700;
+  height: 40px; padding: 0 20px; border-radius: 30px;
+  display: inline-flex; align-items: center; justify-content: center;
+  align-self: flex-start; flex-shrink: 0; white-space: nowrap;
+}
+
+.bar-actions {
+  display: flex;
+  direction: ltr;
+  align-items: center;
+  gap: 16px;
+}
+.bar-back {
+  display: flex;
+  align-items: center;
+}
+
+/* --- Feedback panel (bottom-left) --- */
+.scq-fb-box {
+  display: none;
+  position: absolute;
+  left: 16px;
+  bottom: 87px;
+  width: 426px;
+  max-width: calc(100% - 32px);
+  border: 0.3px solid #aeaeae;
+  border-radius: 12px;
+  padding: 24px;
+  flex-direction: column;
+  gap: 12px;
+  background: #fff;
+  z-index: 25;
+  cursor: grab;
+  user-select: none;
+}
+.scq-fb-box.visible { display: flex; }
+.scq-fb-box.is-correct { background: #edf8ed; }
+.scq-fb-box.is-wrong { background: #ffdbdc; }
+.scq-fb-box.is-dragging { cursor: grabbing; }
+
+.scq-fb-title {
+  display: flex;
+  direction: rtl;
+  align-items: center;
+  gap: 16px;
+}
+.scq-fb-toggle {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #303030;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 100px;
+  background: #fff;
+  font-size: 13px;
+}
+.scq-fb-close {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #303030;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 100px;
+  background: #fff;
+  font-size: 13px;
+  cursor: pointer;
+}
+.scq-fb-title-text {
+  flex: 1;
+  font-weight: 700;
+  font-size: 18px;
+  color: #222;
+  text-align: right;
+}
+.scq-fb-body {
+  font-weight: 400;
+  font-size: 18px;
+  color: #222;
+  text-align: right;
+  white-space: pre-line;
+}
+
+/* --- כפתור "התשובה הנכונה" בתוך תיבת המשוב — מוצג במקום חשיפה אוטומטית
+   של הפתרון אחרי הניסיון השני השגוי, עד שהלומד לוחץ עליו במפורש --- */
+.scq-fb-reveal-btn {
+  align-self: flex-start;
+  background: #ffffff;
+  color: #019de5;
+  border: 1.5px solid #019de5;
+  border-radius: 1000px;
+  font-family: 'Assistant', sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  padding: 10px 24px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.scq-fb-reveal-btn[hidden] { display: none; }
+.scq-fb-reveal-btn:hover { background: #f0f8ff; }
+.scq-fb-reveal-btn:focus-visible {
+  outline: 3px solid #019de5;
+  outline-offset: 2px;
+}
+
+/* --- Hint popup (outside .screen, direct child of #app) --- */
+.scq-hint-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 32, 96, 0.35);
+}
+.scq-hint-overlay[hidden] { display: none; }
+
+.scq-hint-popup {
+  position: relative;
+  width: 542px;
+  max-width: calc(100% - 64px);
+  background: #019de5;
+  border-radius: 48px;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+  direction: rtl;
+}
+.scq-hint-title-row {
+  width: 100%;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+}
+.scq-hint-title {
+  flex: 1;
+  font-weight: 700;
+  font-size: 32px;
+  color: #fff;
+  text-align: right;
+}
+.scq-hint-bulb { width: 40px; height: 34px; flex-shrink: 0; }
+.scq-hint-body {
+  font-weight: 400;
+  font-size: 22px;
+  color: #fff;
+  text-align: right;
+  line-height: 1.5;
+}
+.scq-hint-close {
+  align-self: center;
+  width: 196px;
+  padding: 16px 40px;
+  border-radius: 999px;
+  background: #fff;
+  color: #303030;
+  font-size: 24px;
+  text-align: center;
+}
+
+/* =========================================================
+   מסכי מעבר — דמות מלווה (בלי בועית דיבור)
+   ========================================================= */
+
+.transition-content {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 74px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 80px 56px 50px;
+}
+
+.transition-title-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 810px;
+  direction: rtl;
+}
+
+.transition-title {
+  font-family: 'Assistant', sans-serif;
+  font-size: 40px;
+  font-weight: 700;
+  color: #303030;
+  text-align: center;
+}
+
+.transition-sub {
+  font-family: 'Assistant', sans-serif;
+  font-size: 28px;
+  font-weight: 400;
+  color: #303030;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.transition-avatar-wrap {
+  position: relative;
+  width: 304px;
+  flex-shrink: 0;
+}
+
+.transition-avatar {
+  width: 304px;
+  aspect-ratio: 304 / 293;
+  object-fit: cover;
+  display: block;
+  border-radius: 16px;
+}
+
+.s1-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 74px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding: 32px 56px;
+}
+
+/* =========================================================
+   רכיבי כרטיס-גרירה משותפים ל-makeDragQuestion (מסכים 3-4) —
+   ה-factory המשותף מייצר את אלמנטי הגרירה עם class="dq-drag-card"
+   וה"מונחות" עם class="dq-placed-card" בקשיחות (לא cfg.prefix),
+   כמו בסיין 5 (dqA/dqB). חוסר הכלל הזה כאן היה גורם לאלמנטי הגרירה
+   להיראות ללא מסגרת/עיצוב כלל, כי הכלל היה קיים רק בקטע ה-dq-*
+   של סיין 5 בזמן הפיצול.
+   ========================================================= */
+
+.dq-placed-card {
+  font-size: 24px; font-weight: 400; color: #303030;
+  cursor: grab; user-select: none; white-space: nowrap; direction: rtl;
+  display: inline-flex; align-items: center; justify-content: flex-start;
+  gap: 6px; width: 100%; height: 100%; padding: 0 8px;
+}
+.dq-placed-card.locked { cursor: default; }
+
+.dq-drag-card {
+  background: #fff; border: 1px solid rgba(174,174,174,0.5); border-radius: 10px;
+  font-size: 24px; font-weight: 400; color: #303030;
+  cursor: grab; user-select: none; white-space: nowrap;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 180px; height: 42px; direction: rtl;
+}
+.dq-drag-card:hover:not(.ghost):not(.locked) { border-color: #019de5; box-shadow: 0 2px 6px rgba(1,157,229,0.2); }
+.dq-drag-card.dragging { opacity: 0.38; }
+.dq-drag-card.ghost { color: transparent; background: #f3f4f5; border: 1px solid rgba(174,174,174,0.3); pointer-events: none; }
+.dq-drag-card.locked { cursor: default; }
+
+/* =========================================================
+   מסך 2 — "הידעת?" (Frame - text with img, פיגמה node 2274:11729)
+   תמונה + כותרת + 2 פסקאות. ללא רמז/אינטראקציה.
+   ========================================================= */
+
+.s8-question {
+  position: absolute;
+  top: 139px; left: 40px; right: 40px;
+  display: flex; flex-direction: row; direction: ltr;
+  align-items: flex-start; gap: 16px;
+}
+.s8-img { flex-shrink: 0; width: 380px; height: 380px; padding: 8px; box-sizing: border-box; }
+.s8-img-inner {
+  position: relative;
+  width: 100%; height: 100%;
+  border: 1px solid rgba(174,174,174,0.5); border-radius: 16px;
+  background: #f9f9f9;
+  display: flex; align-items: center; justify-content: center;
+  color: #aeaeae; font-size: 16px; text-align: center;
+  overflow: hidden;
+}
+.s8-img-inner img { width: 100%; height: 100%; object-fit: cover; }
+.s8-content {
+  direction: rtl; display: flex; flex-direction: column; gap: 24px; flex: 1;
+}
+.s8-title { font-size: 24px; font-weight: 700; color:#303030; text-align: right; margin: 0; }
+.s8-body p { font-size: 24px; font-weight: 400; color: #303030; text-align: right; line-height: 1.5; margin: 0; }
+.s8-body p + p { margin-top: 24px; }
+
+/* =========================================================
+   מסך 3 — השלמת כותרות טבלה בגרירה (עותק מסך 34 בלומדת המקור)
+   ========================================================= */
+
+.tbl9-content {
+  position: absolute;
+  top: 118px; left: 0; right: 0; bottom: 74px;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 160px 60px 10px 60px; gap: 16px;
+  overflow-y: auto; direction: rtl;
+}
+.tbl9-text-group {
+  position: absolute; top: 21px; right: 40px; width: 792px;
+  direction: rtl; display: flex; flex-direction: column; gap: 6px;
+}
+.tbl9-instruction { font-size: 24px; font-weight: 400; color: #303030; text-align: right; line-height: 1.4; margin: 0; }
+
+.tbl9-table { width: 900px; max-width: 100%; border-collapse: collapse; direction: rtl; text-align: center; flex-shrink: 0; }
+.tbl9-th { background: #D4F3FF; border: 1px solid #D4D4D4; padding: 6px 10px; font-size: 21px; font-weight: 600; color: #303030; vertical-align: middle; height: 40px; }
+.tbl9-th-label { min-width: 140px; white-space: nowrap; }
+.tbl9-th-drop { padding: 5px 10px; min-width: 200px; }
+.tbl9-th-content { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 5px; direction: rtl; white-space: nowrap; }
+.tbl9-th-prefix, .tbl9-th-suffix { font-size: 20px; font-weight: 600; color: #303030; white-space: nowrap; }
+
+.tbl9-drop-zone {
+  border: 2px dashed #BDBDBD; border-radius: 8px;
+  min-width: 110px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  box-sizing: border-box; cursor: default;
+}
+.tbl9-drop-zone.drag-over { background: #eaf6ff; border: 2px solid #019de5; }
+.tbl9-drop-zone.occupied { border: 2px solid transparent; height: auto; min-width: auto; background: transparent; }
+.tbl9-drop-zone.correct { border: 2px solid #609e12 !important; border-radius: 8px; }
+.tbl9-drop-zone.wrong { border: 2px solid #B20010 !important; border-radius: 8px; }
+
+.tbl9-td { border: 1px solid #D4D4D4; padding: 6px 12px; font-size: 21px; color: #303030; vertical-align: middle; background: #fff; height: 44px; }
+.tbl9-table tbody tr:nth-child(even) .tbl9-td { background: #D4F3FF; }
+.tbl9-td-label { text-align: right; font-weight: 600; padding-right: 14px; white-space: nowrap; }
+
+.tbl9-word-bank {
+  display: flex; flex-wrap: wrap; flex-direction: row-reverse; gap: 7px;
+  width: 100%; max-width: 900px; direction: rtl; flex-shrink: 0;
+  padding: 10px 14px; background: #F5F7FA; border-radius: 10px; border: 1.5px solid #DCDFE6;
+  min-height: 52px; align-content: center;
+}
+.tbl9-source-slot { display: inline-flex; align-items: center; }
+.tbl9-drop-zone.correct .dq-placed-card { border-color: #609e12; }
+.tbl9-drop-zone.wrong .dq-placed-card { border-color: #B20010; }
+.tbl9-drop-zone.correct .dq-placed-card::after { content: '✓'; color: #609e12; font-size: 14px; font-weight: 700; flex-shrink: 0; }
+.tbl9-drop-zone.wrong .dq-placed-card::after { content: '✕'; color: #B20010; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+
+/* =========================================================
+   מסך 4 — השלמת משפטים בגרירה (עותק מסך 35 בלומדת המקור)
+   ========================================================= */
+
+.para10-content {
+  position: absolute;
+  top: 139px; left: 0; right: 0; bottom: 74px;
+  display: flex; flex-direction: column; align-items: flex-start;
+  padding: 0 40px 8px; gap: 8px;
+  overflow-y: auto; direction: rtl;
+}
+.para10-instruction { font-size: 24px; font-weight: 400; color: #303030; text-align: right; width: 100%; max-width: 792px; margin: 0; line-height: 1.4; flex-shrink: 0; }
+.para10-fill-sentences { display: flex; flex-direction: column; gap: 5px; width: 100%; max-width: 1100px; flex-shrink: 0; }
+.para10-sentence { direction: rtl; text-align: right; font-size: 24px; color: #303030; }
+.para10-snt-pre, .para10-snt-mid, .para10-snt-post { display: inline; vertical-align: middle; }
+.para10-snt-drop {
+  display: inline-flex; vertical-align: middle;
+  border: 1px solid rgba(174,174,174,0.5); border-radius: 10px;
+  min-width: 130px; height: 42px; align-items: center; justify-content: center;
+  box-sizing: border-box; margin: 0 3px; cursor: default; background: #fff;
+}
+.para10-snt-drop.drag-over { background: #eaf6ff; border: 1.5px solid #019de5; }
+.para10-snt-drop.occupied { border: 1.5px solid #019de5; background: #F3F4F5; }
+.para10-snt-drop.correct { border: 1px solid #609e12 !important; background: #fff !important; }
+.para10-snt-drop.wrong { border: 1px solid #B20010 !important; background: #fff !important; }
+.para10-snt-drop.correct .dq-placed-card::after { content: '✓'; color: #609e12; font-size: 15px; font-weight: 700; }
+.para10-snt-drop.wrong .dq-placed-card::after { content: '✕'; color: #B20010; font-size: 13px; font-weight: 700; }
+
+.para10-word-bank {
+  display: flex; flex-wrap: wrap; flex-direction: row; gap: 7px;
+  width: 100%; max-width: 1200px; direction: rtl; flex-shrink: 0;
+  padding: 8px 12px; background: #F5F7FA; border-radius: 10px; border: 1.5px solid #DCDFE6;
+  min-height: 52px; align-items: center;
+}
+.para10-source-slot { display: inline-flex; align-items: center; }
+
+/* =========================================================
+   מסך 5 — טבלה (עותק מסך 36) + שיח דמויות בהופעה מושהית
+   (עיצוב הדמויות בהשראת מסך 37, מותאם למסך עם טבלה)
+   ========================================================= */
+
+.s11-content {
+  position: absolute;
+  top: 118px; left: 0; right: 0; bottom: 74px;
+  display: flex; flex-direction: column; align-items: flex-start; /* container is display:flex — in RTL column flex, flex-start = physical right */
+  padding: 100px 40px 10px 40px; gap: 18px;
+  overflow-y: auto; direction: rtl;
+}
+.s11-text-group { position: absolute; top: 21px; right: 40px; width: 792px; direction: rtl; display: flex; flex-direction: column; gap: 6px; }
+.s11-title { font-size: 24px; font-weight: 700; color: #019de5; text-align: right; margin: 0; }
+.s11-question { font-size: 22px; font-weight: 400; color: #303030; text-align: right; line-height: 1.4; margin: 0; }
+
+.s11-table { width: 820px; max-width: 100%; border-collapse: collapse; direction: rtl; text-align: center; flex-shrink: 0; }
+.s11-th { background: #D4F3FF; border: 1px solid #D4D4D4; font-size: 20px; font-weight: 700; color: #303030; padding: 6px 18px; white-space: nowrap; }
+.s11-td { border: 1px solid #D4D4D4; font-size: 20px; font-weight: 400; color: #303030; padding: 6px 18px; white-space: nowrap; background: #fff; }
+.s11-td-label { text-align: right; font-weight: 500; white-space: normal; min-width: 200px; }
+.s11-table tbody tr:nth-child(even) .s11-td { background: #D4F3FF; }
+
+.s11-dialogue {
+  display: flex; flex-direction: column; gap: 6px; width: 100%; max-width: 1200px;
+  flex-shrink: 0;
+  opacity: 0; visibility: hidden;
+}
+.s11-dialogue.revealed { opacity: 1; visibility: visible; }
+.s11-char { display: flex; flex-direction: row; align-items: flex-start; justify-content: center; gap: 12px; direction: ltr; }
+.s11-avatar { flex-shrink: 0; width: 118px; height: 118px; display: flex; align-items: center; justify-content: center; }
+.s11-avatar-img { width: 100%; height: 100%; object-fit: contain; }
+.s11-bubble {
+  flex-shrink: 0; min-width: 450px; box-sizing: border-box;
+  background: #e8f7ff; border: 2px solid #019de5; border-radius: 16px;
+  padding: 10px 14px; direction: rtl; text-align: right; position: relative;
+}
+.s11-bubble-maya::after { content: ''; position: absolute; right: -14px; top: 50%; transform: translateY(-50%); border: 7px solid transparent; border-left: 7px solid #019de5; }
+.s11-bubble-adam::after { content: ''; position: absolute; left: -14px; top: 50%; transform: translateY(-50%); border: 7px solid transparent; border-right: 7px solid #019de5; }
+.s11-char-name { font-size: 20px; font-weight: 700; color: #019de5; margin: 0 0 4px 0; }
+.s11-char-text { font-size: 20px; font-weight: 400; color: #303030; margin: 0; line-height: 1.4; }
+
+/* ── מסך 6 — טבלה מוקטנת + שיח דמויות (פוצל ממסך 5, לפי שקף 155) ── */
+.s10b-content {
+  position: absolute;
+  top: 118px; left: 0; right: 0; bottom: 74px;
+  display: flex; flex-direction: column; align-items: flex-start; /* RTL column flex: flex-start = physical right */
+  padding: 12px 40px 8px 40px; gap: 10px;
+  overflow-y: auto; direction: rtl;
+}
+.s10b-text-group { width: 100%; direction: rtl; display: flex; flex-direction: column; gap: 4px; }
+.s10b-text { font-size: 24px; font-weight: 400; color: #303030; text-align: right; margin: 0; }
+.s10b-text-bold { font-weight: 700; }
+.s10b-table { width: 820px; max-width: 100%; border-collapse: collapse; direction: rtl; text-align: center; flex-shrink: 0; }
+
+/* =========================================================
+   מסך 7 — שאלת בחירה יחידה עם תמונה (עותק מסך 38)
+   + כפתור "הזכירו לי את הנתונים בטבלה" (במקום רמז גנרי)
+   ========================================================= */
+
+.s12-question-area {
+  position: absolute; top: 139px; right: 40px; left: 40px;
+  display: flex; flex-direction: row; direction: ltr; gap: 16px; align-items: flex-start;
+}
+.s12-img-col { flex-shrink: 0; width: 380px; height: 380px; padding: 8px; box-sizing: border-box; display: flex; align-items: stretch; }
+.scq-img-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border: 1px solid rgba(174, 174, 174, 0.5);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #fff;
+}
+.scq-img-inner img { width: 100%; height: 100%; object-fit: cover; }
+.s12-text-col { flex: 1; min-width: 0; direction: rtl; display: flex; flex-direction: column; gap: 10px; }
+.s12-question { font-size: 24px; font-weight: 700; color: #303030; margin: 0; text-align: right; line-height: 1.4; }
+.s12-answers { display: flex; flex-direction: column; gap: 12px; direction: rtl; }
+.s12-opt {
+  display: flex; flex-direction: row; align-items: center; gap: 12px;
+  background: #fff; border: 2px solid #019de5; border-radius: 1000px;
+  padding: 10px 20px 10px 16px; min-height: 50px; cursor: pointer;
+  direction: rtl; user-select: none;
+}
+.s12-opt:hover:not(.locked) { background: #f0faff; }
+.s12-opt.selected { background: #e8f7ff; border-color: #007ac6; }
+.s12-opt.correct { background: #edf8ed; border-color: #609e12; cursor: default; }
+.s12-opt.wrong { background: #fff0f4; border-color: #b20010; cursor: default; }
+.s12-opt.locked:not(.correct):not(.wrong) { border-color: #aeaeae; opacity: 0.6; cursor: default; }
+.s12-radio {
+  order: -1; flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
+  border: 2px solid #019de5; background: #fff;
+  display: flex; align-items: center; justify-content: center; position: relative;
+}
+.s12-opt.selected .s12-radio { border-color: #007ac6; background: #007ac6; }
+.s12-opt.selected .s12-radio::after { content: ''; width: 10px; height: 10px; border-radius: 50%; background: #fff; }
+.s12-opt.correct .s12-radio { border-color: #609e12; background: #609e12; }
+.s12-opt.correct .s12-radio::after { content: '✓'; color: #fff; font-size: 13px; font-weight: 700; line-height: 1; }
+.s12-opt.wrong .s12-radio { border-color: #b20010; background: #b20010; }
+.s12-opt.wrong .s12-radio::after { content: '✗'; color: #fff; font-size: 13px; font-weight: 700; line-height: 1; }
+.s12-opt-text { font-size: 20px; font-weight: 400; color: #222; text-align: right; line-height: 1.4; flex: 1; }
+
+/* פופ-אפ "הזכירו לי את הנתונים בטבלה" — מבנה זהה ל-scq-hint-overlay/popup */
+.s12-remind-table { width: 100%; border-collapse: collapse; margin-top: 8px; direction: rtl; text-align: center; }
+.s12-remind-table th, .s12-remind-table td { border: 1px solid rgba(255,255,255,0.4); padding: 6px 14px; font-size: 18px; color: #fff; }
+.s12-remind-table th { font-weight: 700; background: rgba(255,255,255,0.12); }
+.s12-remind-table td:first-child, .s12-remind-table th:first-child { text-align: right; font-weight: 600; }
+
+/* =========================================================
+   רכיבים גלובליים
+   ========================================================= */
+
+.flag-btn {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 4px;
+  width: 88px;
+}
+.flag-btn-icon { position: relative; display: block; width: 38px; height: 38px; }
+.flag-btn-icon-default,
+.flag-btn-icon-hover {
+  position: absolute;
+  inset: 0;
+  width: 38px;
+  height: 38px;
+}
+.flag-btn-icon-hover { opacity: 0; }
+.flag-btn-label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #019de5;
+  text-align: center;
+  width: 80px;
+  opacity: 0;
+}
+.flag-btn:hover .flag-btn-icon-default,
+.flag-btn:focus-visible .flag-btn-icon-default { opacity: 0; }
+.flag-btn:hover .flag-btn-icon-hover,
+.flag-btn:focus-visible .flag-btn-icon-hover { opacity: 1; }
+.flag-btn:hover .flag-btn-label,
+.flag-btn:focus-visible .flag-btn-label { opacity: 1; }
+
+/* --- Image zoom (720-templates _global-components.md spec) ---
+   Global component for enlarging content images. Used by both the
+   "הידעת?" photo (.s8-img-inner) and the s11 question image
+   (.scq-img-inner). One shared #img-zoom-modal lives once near the end
+   of index.html, outside all .screen sections, directly in #app. */
+.img-zoom-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: #fff;
+  border: 2px solid #019de5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  z-index: 2;
+}
+.img-zoom-btn:hover { background: #019de5; }
+.img-zoom-btn__icon { width: 20px; height: 20px; stroke: #019de5; }
+.img-zoom-btn:hover .img-zoom-btn__icon { stroke: #fff; }
+.img-zoom-btn:focus-visible { outline: 2px solid #019de5; outline-offset: 2px; }
+
+.img-zoom-modal {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.78);
+  z-index: 1000;
+}
+.img-zoom-modal.hidden { display: none; }
+
+.img-zoom-modal__panel {
+  position: relative;
+  width: 660px;
+  height: 660px;
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.img-zoom-modal__stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.img-zoom-close {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: #fff;
+  border: 2px solid #019de5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  z-index: 2;
+}
+.img-zoom-close:hover { background: #019de5; }
+.img-zoom-close__icon { width: 15px; height: 15px; stroke: #019de5; }
+.img-zoom-close:hover .img-zoom-close__icon { stroke: #fff; }
+.img-zoom-close:focus-visible { outline: 2px solid #019de5; outline-offset: 2px; }

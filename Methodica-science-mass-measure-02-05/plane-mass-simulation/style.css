@@ -1,0 +1,333 @@
+/* ─── Fonts ──────────────────────────────────────────────── */
+@font-face {
+  font-family: 'Assistant';
+  src: url('assets/fonts/assistant-hebrew.woff2') format('woff2');
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F;
+}
+@font-face {
+  font-family: 'Assistant';
+  src: url('assets/fonts/assistant-latin.woff2') format('woff2');
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+                 U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215;
+}
+
+/* ─── Reset ─────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ─── Base ───────────────────────────────────────────────── */
+/*
+  This app is designed to be embedded in an iframe of any size (as well as
+  viewed standalone) with zero scrollbars. The whole layout is a fixed-size
+  design canvas (DESIGN_WIDTH × DESIGN_HEIGHT in script.js) that JS scales
+  and centers to fit the current window via transform — the same
+  scale-to-fit pattern used by the 720 engine's scaleApp(). Do not
+  reintroduce vh/vw-relative sizing on .simulation or its children; it
+  would double-scale against the JS transform.
+*/
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+body {
+  background: #f0f0f0;
+  font-family: 'Assistant', Arial, sans-serif;
+  direction: rtl !important;
+}
+
+/* ─── Simulation wrapper ─────────────────────────────────── */
+/* Fixed design-pixel canvas; JS sets transform/left/top to scale-to-fit. */
+.simulation {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 650px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  transform-origin: top left;
+  overflow: hidden;
+}
+
+
+/* ─── Instructions ───────────────────────────────────────── */
+/* Figma: 708px wide, ~117px tall, font 28px Regular/Bold, RTL right-aligned. */
+.instructions {
+  flex-shrink: 0;
+  padding: 6px 10px;
+  font-size: 28px;
+  line-height: 1.45;
+  color: #000;
+  text-align: right;
+}
+
+.instructions strong {
+  font-weight: 700;
+}
+
+/* ─── Scene ──────────────────────────────────────────────── */
+/*
+  aspect-ratio: 963/1433 matches the CROPPED background image exactly
+  (was 708/1200 originally — removing a 200px band of empty floor
+  changed the image's own proportions, so every % overlay below had to
+  be recalculated against the new total. First attempt removed 300px,
+  which left almost no gap between the cards and the reset button —
+  200px leaves a comfortable margin while still meaningfully widening
+  the achievable embed size.)
+*/
+.plane-scene {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 963 / 1433;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+/* Fills the aspect-ratio-matched container exactly (no distortion). */
+.scene-bg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+}
+
+/* ─── Airplane overlay ───────────────────────────────────── */
+/*
+  Figma: top=2.25%, left=4.66%, w=95.34%, h=27.73%.
+  Enlarged per user request: full width (left=0, w=100%), height=37%.
+  object-fit: cover zooms the airplane to fill the larger box.
+  object-position: center 55% keeps the fuselage in frame.
+*/
+.plane-image {
+  position: absolute;
+  top: 2.57%;
+  left: 0;
+  width: 100%;
+  height: 42.17%;
+  object-fit: cover;
+  object-position: center 55%;
+  pointer-events: none;
+}
+
+/* ─── Active-item icons ──────────────────────────────────── */
+/*
+  One badge per loadable item, laid out along the top of the plane.
+  Hidden by default; shown once its item is loaded. Reuses the same
+  card artwork so the icon is instantly recognizable as "this item,
+  currently on the plane."
+*/
+.active-icons-row {
+  position: absolute;
+  top: 15.96%;
+  left: 10%;
+  width: 80%;
+  display: flex;
+  justify-content: space-between;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.active-icon {
+  pointer-events: auto;
+  width: 15%;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.active-icon:hover {
+  background: rgba(255, 255, 255, 0.6);
+  transform: scale(1.06);
+}
+
+.active-icon[hidden] { display: none; }
+
+/* width/height here are % of .active-icon's OWN box (its containing
+   block), not the row's — unlike padding-%, which resolves against the
+   parent's width and made the previous attempt collapse to nothing. */
+.active-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
+}
+
+/* ─── Cards section ──────────────────────────────────────── */
+/*
+  Figma:
+    top  = (560.21 − 117) / 1201 = 36.90%
+    left = 74 / 708               = 10.45%
+    w    = 561 / 708              = 79.24%
+*/
+.cards-section {
+  position: absolute;
+  top: 42.05%;
+  left: 10.45%;
+  width: 79.24%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ─── Drag header ────────────────────────────────────────── */
+/*
+  Figma: bg #023E7E, h=62px, border-radius 10px, text 30px SemiBold.
+  Proportional height via padding: target ~62px at 708px.
+*/
+.drag-header {
+  background: #023e7e;
+  border-radius: 10px;
+  padding: 12px 0;
+  text-align: center;
+}
+
+.drag-header span {
+  color: #fff;
+  font-size: 30px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ─── Cards row ──────────────────────────────────────────── */
+/*
+  Figma: 3 equal cards, each 172.346 × 138 px, gap 22px.
+  aspect-ratio preserves Figma proportions at any width.
+*/
+.cards-area {
+  display: flex;
+  gap: 22px;
+}
+
+.card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #d9d9d9;
+  border-radius: 15px;
+  aspect-ratio: 172.346 / 138;
+  overflow: hidden;
+  cursor: grab;
+  user-select: none;
+  padding: 4px 4px 2px;
+  transition: opacity 0.2s ease;
+}
+
+/* Item is already loaded on the plane — shown there via its active-icon
+   instead, so the warehouse card dims out and stops accepting drags to
+   avoid the item appearing to exist in both places at once. */
+.card.is-loaded {
+  opacity: 0.3;
+  pointer-events: none;
+  cursor: default;
+}
+
+.card img {
+  flex: 1;
+  width: 92%;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
+  min-height: 0;
+}
+
+/* Figma: SemiBold 24px */
+.card span {
+  flex-shrink: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #000;
+  text-align: center;
+  pointer-events: none;
+  line-height: 1.2;
+}
+
+/* ─── Weight display ─────────────────────────────────────── */
+/*
+  Figma: top = (1128 − 117) / 1201 = 84.18%
+         centered at left = 354.33 / 708 = 50.05%
+         text-box width = 190.653 / 708 = 26.93%
+  "מסה כוללת" label does not exist in the Figma design.
+*/
+.weight-display {
+  position: absolute;
+  top: 82.0%;
+  left: 50.05%;
+  transform: translateX(-50%);
+  width: 26.93%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.weight-label {
+  display: none;
+}
+
+/* משתמש בפונט הגלובלי (Assistant) של הלומדה, לא בפונט הדיגיטלי
+   שהיה בעיצוב המקורי ב-Figma ("Digital Numbers Regular 40px") */
+.weight-value {
+  font-family: 'Assistant', Arial, sans-serif;
+  font-size: 40px;
+  font-weight: 400;
+  color: #000;
+  direction: rtl;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+/* ─── Reset button ───────────────────────────────────────── */
+/*
+  Placed below the cards section (cards end at ~54% of scene).
+  Centered horizontally under the cards row.
+*/
+.reset-area {
+  /* top computed from cards-section's actual rendered bottom edge
+     (header + row of 3 cards, at fixed px sizes) plus a ~3% gap — not
+     just "wherever the crop seam landed", which is what put the reset
+     button right on top of the cards in a previous pass. */
+  position: absolute;
+  top: 65.3%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 23.87%;
+  display: flex;
+  justify-content: center;
+}
+
+.reset-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  width: 100%;
+}
+
+.reset-btn img {
+  width: 100%;
+  height: auto;
+  display: block;
+  pointer-events: none;
+}

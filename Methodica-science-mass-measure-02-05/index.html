@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מדידת מסה — לומדה | תכנית 720 | סיין 5</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ============ מסך 1 — מסך מעבר: כל הכבוד! (פתיח למועד א') ============ -->
+  <section class="screen active" data-screen="0" id="s0">
+    <button class="flag-btn" aria-label="מצאתם בעיה?" title="מצאתם בעיה?">
+      <span class="flag-btn-icon" aria-hidden="true">
+        <img class="flag-btn-icon-default" src="assets/images/btn-flag-default.png" alt="">
+        <img class="flag-btn-icon-hover" src="assets/images/btn-flag-hover.png" alt="">
+      </span>
+      <span class="flag-btn-label">מצאתם בעיה?</span>
+    </button>
+
+    <div class="s1-content">
+      <div class="transition-content">
+        <div class="transition-title-block">
+          <p class="transition-sub">
+     כל הכבוד!   <br/>
+הסתיים שלב התרגול. <br/>
+אם לא הצלחת לענות נכון על חלק מהשאלות, <br/>
+חשוב להבין מה עדיין לא ברור ולפנות לצ'אט או למורה להסבר נוסף.
+          </p>
+          <h2 class="transition-title">
+עכשיו מגיעה שאלת השיא
+          </h2>
+          <p class="transition-sub">
+      יש בה 3 סעיפים. עליכם להצליח בכולם.
+          </p>
+        </div>
+        <div class="transition-avatar-wrap">
+          <img alt="דמות מלווה" class="transition-avatar" id="s0-avatar-img">
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="bottom-bar-inner">
+        <div class="bar-actions">
+          <button class="btn-continue" dir="rtl" onclick="s0Continue()">המשך</button>
+        </div>
+        <div class="bar-back">
+          <button class="btn-back" dir="rtl" onclick="s0Back()">חזרה</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ מסך 2 — הקדמת יישומון: עזרו לטיסה להמריא ============ -->
+  <section class="screen" data-screen="1" id="s1">
+    <button class="flag-btn" aria-label="מצאתם בעיה?" title="מצאתם בעיה?">
+      <span class="flag-btn-icon" aria-hidden="true">
+        <img class="flag-btn-icon-default" src="assets/images/btn-flag-default.png" alt="">
+        <img class="flag-btn-icon-hover" src="assets/images/btn-flag-hover.png" alt="">
+      </span>
+      <span class="flag-btn-label">מצאתם בעיה?</span>
+    </button>
+
+    <!-- יישומון סימולציית מסת המטוס -->
+    <div class="s4-sim-placeholder">
+      <iframe class="sim-iframe" src="plane-mass-simulation/index.html" title="סימולציית מסת מטוס" scrolling="no"></iframe>
+    </div>
+
+    <div class="s4-text-col">
+      <h2 class="s4-title">עזרו לטיסה להמריא</h2>
+      <div class="s4-body">
+        <p>מהנדסי מטוסים, מכינים מטוס להמראה. ככל שמסת המטוס גדולה יותר, כך הוא צורך יותר דלק. לכן, חשוב לחשב במדויק את מסת המטוס הכוללת.
+      <br/><br/>
+
+גררו את הפריטים השונים אל המטוס וממנו, ושימו לב לשינוי במסה הכוללת.
+
+<br/>
+<b>שימו לב:</b>
+ המסה המופיעה על המשקל היא מסת המטוס כשהוא ריק.
+</p>
+      </div>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="bottom-bar-inner">
+        <div class="bar-actions">
+          <button class="btn-continue" dir="rtl" onclick="s1Continue()">המשך</button>
+        </div>
+        <div class="bar-back">
+          <button class="btn-back" dir="rtl" onclick="goTo(0)">חזרה</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ מסך 3 — שאלת גרירה: דוח מסות המטוס, חלק א' ============ -->
+  <section class="screen screen-5" data-screen="2" id="s2">
+    <button class="flag-btn" aria-label="מצאתם בעיה?" title="מצאתם בעיה?">
+      <span class="flag-btn-icon" aria-hidden="true">
+        <img class="flag-btn-icon-default" src="assets/images/btn-flag-default.png" alt="">
+        <img class="flag-btn-icon-hover" src="assets/images/btn-flag-hover.png" alt="">
+      </span>
+      <span class="flag-btn-label">מצאתם בעיה?</span>
+    </button>
+
+    <!-- יישומון סימולציית מסת המטוס -->
+    <div class="dq-sim-placeholder">
+      <iframe class="sim-iframe" src="plane-mass-simulation/index.html" title="סימולציית מסת מטוס" scrolling="no"></iframe>
+    </div>
+
+    <div class="dq-question-panel" id="dqA-question-panel">
+      <p class="tf-qtitle">חלק א</p>
+      <p class="dq-instruction-bold">השלימו את הטקסט באמצעות גרירת האלמנטים המתאימים אל המאזניים,
+        <br/>
+        ובחירת המילים הנכונות ממחסן המילים.</p>
+      <p class="dq-instruction">שימו לב: המסה המופיעה על המאזניים היא מסת המטוס כשהוא ריק.</p>
+
+      <div class="dq-fill-sentences">
+        <div class="dq-sentence">
+          <span class="dq-snt-pre">מסת מטוס ריק, ללא נוסעים, ללא מזוודות ובלי טיפת דלק, היא כ-</span>
+          <div class="dq-snt-drop" id="dqA-target-1" ondragover="dqADragOver(event,'dqA-target-1')" ondragenter="dqADragEnter(event,'dqA-target-1')" ondragleave="dqADragLeave(event,'dqA-target-1')" ondrop="dqADrop(event,'dqA-target-1')"></div>
+          <span class="dq-snt-mid"> טונות. המסה הזו מייצגת את המושג</span>
+          <div class="dq-snt-drop" id="dqA-target-2" ondragover="dqADragOver(event,'dqA-target-2')" ondragenter="dqADragEnter(event,'dqA-target-2')" ondragleave="dqADragLeave(event,'dqA-target-2')" ondrop="dqADrop(event,'dqA-target-2')"></div>
+          <span class="dq-snt-post"> של המטוס.</span>
+        </div>
+        <div class="dq-sentence">
+          <span class="dq-snt-pre">כדי שהטיסה תצא, מעלים למטוס את הנוסעים, המזוודות והדלק. המסה הכוללת של תוכן המטוס בלבד היא</span>
+          <div class="dq-snt-drop" id="dqA-target-3" ondragover="dqADragOver(event,'dqA-target-3')" ondragenter="dqADragEnter(event,'dqA-target-3')" ondragleave="dqADragLeave(event,'dqA-target-3')" ondrop="dqADrop(event,'dqA-target-3')"></div>
+          <span class="dq-snt-mid"> טונות, והיא מייצגת את המושג</span>
+          <div class="dq-snt-drop" id="dqA-target-4" ondragover="dqADragOver(event,'dqA-target-4')" ondragenter="dqADragEnter(event,'dqA-target-4')" ondragleave="dqADragLeave(event,'dqA-target-4')" ondrop="dqADrop(event,'dqA-target-4')"></div>
+          <span class="dq-snt-post">.</span>
+        </div>
+      </div>
+
+      <!-- מחסן מילים -->
+      <div class="dq-word-bank" id="dqA-word-bank" ondragover="event.preventDefault()" ondrop="dqADropToBank(event)">
+        <div class="dq-source-slot" id="slot-dqA-drag-41"></div>
+        <div class="dq-source-slot" id="slot-dqA-drag-38"></div>
+        <div class="dq-source-slot" id="slot-dqA-drag-neto"></div>
+        <div class="dq-source-slot" id="slot-dqA-drag-tara"></div>
+        <!-- מסיחים מטעים -->
+        <div class="dq-source-slot" id="slot-dqA-drag-bruto"></div>
+        <div class="dq-source-slot" id="slot-dqA-drag-53"></div>
+        <div class="dq-source-slot" id="slot-dqA-drag-78"></div>
+      </div>
+    </div>
+
+    <div id="dqA-feedbox" class="scq-fb-box dq-feedbox-pos">
+      <div class="scq-fb-title">
+        <span class="scq-fb-title-text"></span>
+        <button class="scq-fb-close" type="button" onclick="scqFbClose('dqA-feedbox')" aria-label="סגירת משוב">✕</button>
+      </div>
+      <p class="scq-fb-body"></p>
+      <button id="dqA-reveal-btn" class="scq-fb-reveal-btn" type="button" onclick="dqAReveal()" hidden>התשובה הנכונה</button>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="bottom-bar-inner">
+        <div class="bar-actions">
+          <button id="dqA-btn-check" class="btn-continue" dir="rtl" disabled><span dir="ltr">?צדקתי</span></button>
+          <button id="dqA-btn-hint" class="btn-hint" dir="rtl" onclick="dqAOpenHint()" hidden>
+            אפשר רמז?
+            <img class="hint-icon" src="assets/images/icon-hint-blue.svg" alt="">
+          </button>
+        </div>
+        <div class="bar-back">
+          <button class="btn-back" dir="rtl" onclick="goTo(1)">חזרה</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ מסך 4 — שאלת גרירה: דוח מסות המטוס, חלק ב' ============ -->
+  <section class="screen screen-6" data-screen="3" id="s3">
+    <button class="flag-btn" aria-label="מצאתם בעיה?" title="מצאתם בעיה?">
+      <span class="flag-btn-icon" aria-hidden="true">
+        <img class="flag-btn-icon-default" src="assets/images/btn-flag-default.png" alt="">
+        <img class="flag-btn-icon-hover" src="assets/images/btn-flag-hover.png" alt="">
+      </span>
+      <span class="flag-btn-label">מצאתם בעיה?</span>
+    </button>
+
+    <!-- יישומון סימולציית מסת המטוס -->
+    <div class="dq-sim-placeholder">
+      <iframe class="sim-iframe" src="plane-mass-simulation/index.html" title="סימולציית מסת מטוס" scrolling="no"></iframe>
+    </div>
+
+    <div class="dq-question-panel" id="dqB-question-panel">
+     <p class="tf-qtitle">
+   חלק ב
+    </p>
+      <p class="dq-instruction-bold"> גררו את הפריטים אל המטוס וממנו, והשלימו את הטקסט באמצעות גרירה ממחסן המילים.</p>
+
+      <div class="dq-fill-sentences">
+        <div class="dq-sentence">
+          <span class="dq-snt-pre">כאשר המטוס מוכן להמראה עם כל הנוסעים והדלק בתוכו, המסה שלו מגיעה לכ-</span>
+          <div class="dq-snt-drop" id="dqB-target-1" ondragover="dqBDragOver(event,'dqB-target-1')" ondragenter="dqBDragEnter(event,'dqB-target-1')" ondragleave="dqBDragLeave(event,'dqB-target-1')" ondrop="dqBDrop(event,'dqB-target-1')"></div>
+          <span class="dq-snt-mid"> טונות. מסה כוללת זו מייצגת את המושג</span>
+          <div class="dq-snt-drop" id="dqB-target-2" ondragover="dqBDragOver(event,'dqB-target-2')" ondragenter="dqBDragEnter(event,'dqB-target-2')" ondragleave="dqBDragLeave(event,'dqB-target-2')" ondrop="dqBDrop(event,'dqB-target-2')"></div>
+          <span class="dq-snt-post">.</span>
+        </div>
+        <div class="dq-sentence">
+          <span class="dq-snt-pre">בטיסה זו המטוס ישרוף כ-10</span>
+          <div class="dq-snt-drop" id="dqB-target-3" ondragover="dqBDragOver(event,'dqB-target-3')" ondragenter="dqBDragEnter(event,'dqB-target-3')" ondragleave="dqBDragLeave(event,'dqB-target-3')" ondrop="dqBDrop(event,'dqB-target-3')"></div>
+          <span class="dq-snt-post"> של דלק מטוסים.</span>
+        </div>
+        <div class="dq-sentence">
+          <span class="dq-snt-pre">לכן, מהנדסים מנסים לפתח מטוסים פחות מסיביים, כדי להקטין את מסת ה-</span>
+          <div class="dq-snt-drop" id="dqB-target-4" ondragover="dqBDragOver(event,'dqB-target-4')" ondragenter="dqBDragEnter(event,'dqB-target-4')" ondragleave="dqBDragLeave(event,'dqB-target-4')" ondrop="dqBDrop(event,'dqB-target-4')"></div>
+          <span class="dq-snt-post"> של המטוס, לחסוך בדלק ולהפחית את זיהום האוויר.</span>
+        </div>
+      </div>
+
+      <!-- מחסן מילים -->
+      <div class="dq-word-bank" id="dqB-word-bank" ondragover="event.preventDefault()" ondrop="dqBDropToBank(event)">
+        <div class="dq-source-slot" id="slot-dqB-drag-79"></div>
+        <div class="dq-source-slot" id="slot-dqB-drag-bruto"></div>
+        <div class="dq-source-slot" id="slot-dqB-drag-ton"></div>
+        <div class="dq-source-slot" id="slot-dqB-drag-tara"></div>
+        <!-- מסיחים מטעים -->
+        <div class="dq-source-slot" id="slot-dqB-drag-neto"></div>
+        <div class="dq-source-slot" id="slot-dqB-drag-53"></div>
+        <div class="dq-source-slot" id="slot-dqB-drag-41"></div>
+      </div>
+    </div>
+
+    <div id="dqB-feedbox" class="scq-fb-box dq-feedbox-pos">
+      <div class="scq-fb-title">
+        <span class="scq-fb-title-text"></span>
+        <button class="scq-fb-close" type="button" onclick="scqFbClose('dqB-feedbox')" aria-label="סגירת משוב">✕</button>
+      </div>
+      <p class="scq-fb-body"></p>
+      <button id="dqB-reveal-btn" class="scq-fb-reveal-btn" type="button" onclick="dqBReveal()" hidden>התשובה הנכונה</button>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="bottom-bar-inner">
+        <div class="bar-actions">
+          <button id="dqB-btn-check" class="btn-continue" dir="rtl" disabled><span dir="ltr">?צדקתי</span></button>
+          <button id="dqB-btn-hint" class="btn-hint" dir="rtl" onclick="dqBOpenHint()" hidden>
+            אפשר רמז?
+            <img class="hint-icon" src="assets/images/icon-hint-blue.svg" alt="">
+          </button>
+        </div>
+        <div class="bar-back">
+          <button class="btn-back" dir="rtl" onclick="goTo(2)">חזרה</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ מסך 5 — מסך מעבר: הצלחה (בלי בועית דיבור) — מוצג רק אם עברתם את שני חלקי משימת השיא בהצלחה מלאה בניסיון הראשון (מדלגים על סיין 6) ============ -->
+  <section class="screen" data-screen="4" id="s4">
+    <button class="flag-btn" aria-label="מצאתם בעיה?" title="מצאתם בעיה?">
+      <span class="flag-btn-icon" aria-hidden="true">
+        <img class="flag-btn-icon-default" src="assets/images/btn-flag-default.png" alt="">
+        <img class="flag-btn-icon-hover" src="assets/images/btn-flag-hover.png" alt="">
+      </span>
+      <span class="flag-btn-label">מצאתם בעיה?</span>
+    </button>
+
+    <div class="s1-content">
+      <div class="transition-content">
+        <div class="transition-title-block">
+          <h2 class="transition-title">כל הכבוד!<br>השלמת את היחידה בהצלחה!</h2>
+        </div>
+        <div class="transition-avatar-wrap">
+          <img alt="דמות מלווה" class="transition-avatar" id="s4t-avatar-img">
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="bottom-bar-inner">
+        <div class="bar-actions">
+          <button class="btn-continue" dir="rtl" onclick="s4Finish()">סיימתי</button>
+        </div>
+        <div class="bar-back">
+          <button class="btn-back" dir="rtl" onclick="goTo(3)">חזרה</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ פופ-אפי רמז מסכים 3-4 — מחוץ ל-.screen, ישירות ב-#app ============ -->
+  <div id="hint-popup-dqA" class="scq-hint-overlay" hidden>
+    <div class="scq-hint-popup" role="dialog" aria-modal="true" aria-label="רמז">
+      <div class="scq-hint-title-row">
+        <p class="scq-hint-title">רמז</p>
+      </div>
+      <p class="scq-hint-body">
+נסו לחשב מהי המסה הכוללת של כל הפריטים יחד פרט למטוס.
+      </p>
+      <button class="scq-hint-close" onclick="dqACloseHint()">חזרה לשאלה</button>
+    </div>
+  </div>
+
+  <div id="hint-popup-dqB" class="scq-hint-overlay" hidden>
+    <div class="scq-hint-popup" role="dialog" aria-modal="true" aria-label="רמז">
+      <div class="scq-hint-title-row">
+        <p class="scq-hint-title">רמז</p>
+      </div>
+      <p class="scq-hint-body">חשבו על זה כך: המטוס הוא האריזה, הנוסעים והכבודה הם התכולה.</p>
+      <button class="scq-hint-close" onclick="dqBCloseHint()">חזרה לשאלה</button>
+    </div>
+  </div>
+
+</div>
+<script src="script.js"></script>
+</body>
+</html>
