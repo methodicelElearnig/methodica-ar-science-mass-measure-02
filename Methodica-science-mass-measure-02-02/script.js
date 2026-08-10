@@ -274,7 +274,6 @@ document.getElementById('sq2-hint-overlay').addEventListener('click', function (
   if (e.target === this) sq2CloseHint();
 });
 
-function sq2ToggleFeedbox() { document.getElementById('sq2-feedbox').classList.remove('visible'); }
 
 function resetScreenState1() {
   if (sq2Done || sq2Attempts > 0 || sq2Selected.length > 0) return; // resume-state: שאלה שהתחילה/נענתה כבר לא מקבלת איפוס
@@ -434,7 +433,6 @@ document.getElementById('sq3-hint-overlay').addEventListener('click', function (
   if (e.target === this) sq3CloseHint();
 });
 
-function sq3ToggleFeedbox() { document.getElementById('sq3-feedbox').classList.remove('visible'); }
 
 function resetScreenState2() {
   if (sq3Done || sq3Attempts > 0 || sq3Selected.length > 0) return;
@@ -594,7 +592,6 @@ document.getElementById('sq4-hint-overlay').addEventListener('click', function (
   if (e.target === this) sq4CloseHint();
 });
 
-function sq4ToggleFeedbox() { document.getElementById('sq4-feedbox').classList.remove('visible'); }
 
 function resetScreenState3() {
   if (sq4Done || sq4Attempts > 0 || sq4Selected.length > 0) return;
@@ -629,6 +626,7 @@ const TF_SQ5 = {
       body: 'אפשר למדוד כל גוף בכל יחידת מסה, אך בוחרים את היחידה שנותנת מספר נוח לקריאה ולהשוואה.\nלמשל:\nגרגר מלח – במיליגרמים\nתפוח – בגרמים\nכלב – בקילוגרמים\nקטר – בטונות.'
     },
     wrong1: { title: 'התשובה אינה נכונה.', body: 'לא נורא, גם מטעויות לומדים. ננסה שוב?' },
+    wrongPending: { title: 'התשובה אינה נכונה.', body: 'רוצים לראות את הפתרון הנכון?' },
     wrong2: {
       title: 'התשובה אינה נכונה.',
       body: 'אפשר למדוד כל גוף בכל יחידת מסה, אך בוחרים את היחידה שנותנת מספר נוח לקריאה ולהשוואה.\nלמשל:\nגרגר מלח – במיליגרמים\nתפוח – בגרמים\nכלב – בקילוגרמים\nקטר – בטונות.'
@@ -640,6 +638,8 @@ let sq5Selected = { r1: null, r2: null, r3: null, r4: null };
 let sq5Attempts = 0;
 let sq5Done = false;
 let sq5Phase = 'before';
+let sq5LastAnswer = null;
+let sq5ShowingCorrect = false;
 
 function sq5AllSelected() {
   return sq5Selected.r1 !== null && sq5Selected.r2 !== null &&
@@ -705,6 +705,65 @@ function sq5LockRows(revealCorrect) {
   });
 }
 
+function sq5MarkOwnAnswer() {
+  ['r1', 'r2', 'r3', 'r4'].forEach(function (r, idx) {
+    const rowNum = idx + 1;
+    const row = document.getElementById('sq5-row-' + rowNum);
+    ['true', 'false'].forEach(function (v) {
+      const btn = document.getElementById('sq5-r' + rowNum + '-' + v);
+      if (btn) btn.classList.remove('btn-correct', 'btn-wrong');
+    });
+    if (row) row.classList.remove('row-wrong');
+    const selectedVal = sq5LastAnswer[r];
+    const selectedBtn = document.getElementById('sq5-r' + rowNum + '-' + selectedVal);
+    if (selectedVal === TF_SQ5_CORRECT[r]) {
+      if (selectedBtn) selectedBtn.classList.add('btn-correct');
+    } else {
+      if (row) row.classList.add('row-wrong');
+      if (selectedBtn) selectedBtn.classList.add('btn-wrong');
+    }
+  });
+}
+
+function sq5MarkRevealed() {
+  ['r1', 'r2', 'r3', 'r4'].forEach(function (r, idx) {
+    const rowNum = idx + 1;
+    const row = document.getElementById('sq5-row-' + rowNum);
+    ['true', 'false'].forEach(function (v) {
+      const btn = document.getElementById('sq5-r' + rowNum + '-' + v);
+      if (btn) btn.classList.remove('btn-correct', 'btn-wrong');
+    });
+    if (row) row.classList.remove('row-wrong');
+    const correctVal = TF_SQ5_CORRECT[r];
+    const selectedVal = sq5LastAnswer[r];
+    const correctBtn = document.getElementById('sq5-r' + rowNum + '-' + correctVal);
+    const wrongBtn = (selectedVal !== correctVal)
+      ? document.getElementById('sq5-r' + rowNum + '-' + selectedVal)
+      : null;
+    if (correctBtn) correctBtn.classList.add('btn-correct');
+    if (wrongBtn) wrongBtn.classList.add('btn-wrong');
+  });
+}
+
+function sq5ShowMyAnswer() {
+  sq5MarkOwnAnswer();
+  sq5ShowFeedback('wrongPending', false);
+}
+
+function sq5Reveal() {
+  const revealBtn = document.getElementById('sq5-reveal-btn');
+  if (sq5ShowingCorrect) {
+    sq5ShowMyAnswer();
+    sq5ShowingCorrect = false;
+    if (revealBtn) revealBtn.textContent = 'התשובה הנכונה';
+  } else {
+    sq5MarkRevealed();
+    sq5ShowFeedback('wrong2', false);
+    sq5ShowingCorrect = true;
+    if (revealBtn) revealBtn.textContent = 'התשובה שלי';
+  }
+}
+
 function sq5Check() {
   if (sq5Done || !sq5AllSelected()) return;
   sq5Attempts++;
@@ -746,8 +805,14 @@ function sq5Check() {
   } else {
     sq5Phase = 'wrong-final';
     sq5Done = true;
-    sq5LockRows(true);
-    sq5ShowFeedback('wrong2', false);
+    /* דריסה: הפתרון לא נחשף אוטומטית — רק בלחיצה על "התשובה הנכונה" */
+    sq5LastAnswer = Object.assign({}, sq5Selected);
+    sq5LockRows(false);
+    sq5MarkOwnAnswer();
+    sq5ShowingCorrect = false;
+    sq5ShowFeedback('wrongPending', false);
+    const revealBtn = document.getElementById('sq5-reveal-btn');
+    if (revealBtn) { revealBtn.hidden = false; revealBtn.textContent = 'התשובה הנכונה'; }
     stationProgress2.q5 = 'fail';
     updateQuestionNav2('sq5');
     const checkBtn = document.getElementById('sq5-check');
@@ -765,13 +830,14 @@ document.getElementById('sq5-hint-overlay').addEventListener('click', function (
   if (e.target === this) sq5CloseHint();
 });
 
-function sq5ToggleFeedbox() { document.getElementById('sq5-feedbox').classList.remove('visible'); }
 
 function resetScreenState4() {
   if (sq5Done || sq5Attempts > 0 || Object.values(sq5Selected).some(function (v) { return v != null; })) return;
   sq5Selected = { r1: null, r2: null, r3: null, r4: null };
   sq5Attempts = 0;
   sq5Phase = 'before';
+  sq5LastAnswer = null;
+  sq5ShowingCorrect = false;
   [1, 2, 3, 4].forEach(function (n) {
     const row = document.getElementById('sq5-row-' + n);
     if (row) row.className = 'tf-row';
@@ -786,6 +852,8 @@ function resetScreenState4() {
   checkBtn.disabled = true;
   checkBtn.onclick = sq5Check;
   document.getElementById('sq5-hint-overlay').hidden = true;
+  const revealBtn = document.getElementById('sq5-reveal-btn');
+  if (revealBtn) { revealBtn.hidden = true; revealBtn.textContent = 'התשובה הנכונה'; }
   updateQuestionNav2('sq5');
 }
 
@@ -928,7 +996,6 @@ document.getElementById('sq6-hint-overlay').addEventListener('click', function (
   if (e.target === this) sq6CloseHint();
 });
 
-function sq6ToggleFeedbox() { document.getElementById('sq6-feedbox').classList.remove('visible'); }
 
 function resetScreenState5() {
   if (sq6Done || sq6Attempts > 0 || sq6Selected.length > 0) return;
@@ -1014,11 +1081,14 @@ let dd8Values = { 'dd8-1': '', 'dd8-2': '', 'dd8-3': '', 'dd8-4': '', 'dd8-5': '
 const TEXTS_DD8 = {
   correct: { title: 'מצוין!', body: 'ברוטו = התוכן והאריזה יחד.\nנטו = התוכן בלבד.\nטרה = האריזה או המיכל בלבד.' },
   wrong1: { title: 'התשובה אינה נכונה.', body: 'לא נורא, גם מטעויות לומדים. ננסה שוב?' },
+  wrongPending: { title: 'התשובה אינה נכונה.', body: 'רוצים לראות את הפתרון הנכון?' },
   wrong2: { title: 'התשובה לא נכונה.', body: 'ברוטו = התוכן והאריזה יחד.\nנטו = התוכן בלבד.\nטרה = האריזה או המיכל בלבד.' }
 };
 
 let dd8Done = false;
 let dd8Attempts = 0;
+let dd8LastAnswer = null;
+let dd8ShowingCorrect = false;
 
 function dd8Toggle(ddId) {
   const opts = document.getElementById(ddId + '-opts');
@@ -1089,7 +1159,6 @@ function dd8ShowFeedback(kind, isCorrect) {
   box.classList.add('visible');
 }
 
-function dd8ToggleFeedbox() { document.getElementById('dd8-feedbox').classList.remove('visible'); }
 
 function dd8EnableHint() {
   document.getElementById('dd8-hint').hidden = false;
@@ -1100,6 +1169,31 @@ function dd8SetBarDone(handler) {
   checkBtn.textContent = 'המשך';
   checkBtn.disabled = false;
   checkBtn.onclick = handler;
+}
+
+function dd8ShowMyAnswer() {
+  DD8_IDS.forEach(function (id) {
+    dd8Values[id] = dd8LastAnswer[id];
+    const valEl = document.getElementById(id + '-val');
+    if (valEl) valEl.textContent = dd8LastAnswer[id];
+  });
+  dd8MarkDropdowns();
+  dd8ShowFeedback('wrongPending', false);
+}
+
+function dd8Reveal() {
+  const revealBtn = document.getElementById('dd8-reveal-btn');
+  if (dd8ShowingCorrect) {
+    dd8ShowMyAnswer();
+    dd8ShowingCorrect = false;
+    if (revealBtn) revealBtn.textContent = 'התשובה הנכונה';
+  } else {
+    dd8LockDropdowns(true);
+    dd8MarkDropdowns();
+    dd8ShowFeedback('wrong2', false);
+    dd8ShowingCorrect = true;
+    if (revealBtn) revealBtn.textContent = 'התשובה שלי';
+  }
 }
 
 function dd8Check() {
@@ -1123,9 +1217,14 @@ function dd8Check() {
     dd8EnableHint();
   } else {
     dd8Done = true;
-    dd8LockDropdowns(true);
+    /* דריסה: הפתרון לא נחשף אוטומטית — רק בלחיצה על "התשובה הנכונה" */
+    dd8LastAnswer = Object.assign({}, dd8Values);
+    dd8LockDropdowns(false);
     dd8MarkDropdowns();
-    dd8ShowFeedback('wrong2', false);
+    dd8ShowingCorrect = false;
+    dd8ShowFeedback('wrongPending', false);
+    const revealBtn = document.getElementById('dd8-reveal-btn');
+    if (revealBtn) { revealBtn.hidden = false; revealBtn.textContent = 'התשובה הנכונה'; }
     stationProgress3.q8 = 'fail';
     updateQuestionNav3('dd8');
     dd8SetBarDone(dd8Continue);
@@ -1147,6 +1246,8 @@ function resetScreenState7() {
   updateQuestionNav3('dd8');
   if (dd8Done || dd8Attempts > 0 || Object.values(dd8Values).some(function (v) { return v !== ''; })) return;
   dd8Attempts = 0;
+  dd8LastAnswer = null;
+  dd8ShowingCorrect = false;
   DD8_IDS.forEach(function (id) {
     dd8Values[id] = '';
     const btn = document.getElementById(id + '-btn');
@@ -1163,6 +1264,8 @@ function resetScreenState7() {
   checkBtn.onclick = dd8Check;
   document.getElementById('dd8-hint').hidden = true;
   document.getElementById('dd8-hint-overlay').hidden = true;
+  const revealBtn = document.getElementById('dd8-reveal-btn');
+  if (revealBtn) { revealBtn.hidden = true; revealBtn.textContent = 'התשובה הנכונה'; }
 }
 
 /* =========================================================
@@ -1200,6 +1303,10 @@ function drag9UpdateCheckBtn() {
 function drag9ClearZoneStates() {
   DRAG9_ZONES.forEach(function (z) {
     document.getElementById('drag9-zone-' + z).classList.remove('correct', 'wrong', 'drag-over');
+  });
+  DRAG9_ITEM_IDS.forEach(function (id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('drag-item-correct', 'drag-item-wrong');
   });
 }
 
@@ -1289,7 +1396,6 @@ function drag9ShowFeedback(kind, isCorrect) {
   box.classList.add('visible');
 }
 
-function drag9ToggleFeedbox() { document.getElementById('drag9-feedbox').classList.remove('visible'); }
 
 function drag9ShowMyAnswer() {
   DRAG9_ITEM_IDS.forEach(function (id) {
@@ -1305,7 +1411,12 @@ function drag9ShowMyAnswer() {
     const zoneEl = document.getElementById('drag9-zone-' + zoneId);
     const items = zoneEl.querySelectorAll('.drag-item');
     let zoneOk = items.length > 0;
-    items.forEach(function (item) { if (item.dataset.correct !== zoneId) zoneOk = false; });
+    items.forEach(function (item) {
+      const itemOk = item.dataset.correct === zoneId;
+      if (!itemOk) zoneOk = false;
+      item.classList.remove('drag-item-correct', 'drag-item-wrong');
+      item.classList.add(itemOk ? 'drag-item-correct' : 'drag-item-wrong');
+    });
     zoneEl.classList.remove('wrong', 'correct', 'drag-over');
     zoneEl.classList.add(zoneOk ? 'correct' : 'wrong');
   });
@@ -1336,6 +1447,8 @@ function drag9RevealCorrect() {
     const zoneEl = document.getElementById('drag9-zone-' + item.dataset.correct);
     if (item.parentElement) item.parentElement.removeChild(item);
     zoneEl.appendChild(item);
+    item.classList.remove('drag-item-wrong');
+    item.classList.add('drag-item-correct');
   });
   DRAG9_ZONES.forEach(function (zoneId) {
     const zoneEl = document.getElementById('drag9-zone-' + zoneId);
@@ -1354,7 +1467,10 @@ function drag9Check() {
     const items = zoneEl.querySelectorAll('.drag-item');
     let zoneOk = items.length > 0;
     items.forEach(function (item) {
-      if (item.dataset.correct !== zoneId) zoneOk = false;
+      const itemOk = item.dataset.correct === zoneId;
+      if (!itemOk) zoneOk = false;
+      item.classList.remove('drag-item-correct', 'drag-item-wrong');
+      item.classList.add(itemOk ? 'drag-item-correct' : 'drag-item-wrong');
     });
     zoneEl.classList.toggle('correct', zoneOk);
     zoneEl.classList.toggle('wrong', !zoneOk);
@@ -1462,9 +1578,9 @@ document.addEventListener('keydown', function (e) {
 /* =========================================================
    מערכת פופ-אפ משוב גריר — לפי "Feedback popup system" (720-templates
    skill): גרירה מוגבלת לגבולות הקנבס, איפוס למיקום ברירת המחדל
-   בכל פתיחה. כפתור ה-.scq-fb-toggle הקיים (אייקון icon-fb-close)
-   שינה תפקיד: מכפל/הרחב לסגירה מלאה. מיושם על כל 7 תיבות המשוב
-   בסיין 2.
+   בכל פתיחה. אין כפתור סגירה/X — הפופ-אפ נעלם רק בניווט למסך אחר,
+   בניסיון חדש, או (בסיין עם כפתור חשיפה) בלחיצה על .scq-fb-reveal-btn.
+   מיושם על כל 7 תיבות המשוב בסיין 2.
    ========================================================= */
 
 function scqFbResetPosition(boxId) {
@@ -1483,7 +1599,7 @@ function scqFbMakeDraggable(boxId) {
   let startX = 0, startY = 0, startLeft = 0, startTop = 0;
 
   box.addEventListener('mousedown', function (e) {
-    if (e.target.closest('.scq-fb-toggle') || e.target.closest('.scq-fb-reveal-btn')) return;
+    if (e.target.closest('.scq-fb-reveal-btn')) return;
     const parent = box.offsetParent || box.parentElement;
     const boxRect = box.getBoundingClientRect();
     const parentRect = parent.getBoundingClientRect();

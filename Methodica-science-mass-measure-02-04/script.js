@@ -205,7 +205,6 @@ function tblShowFeedback(kind, isCorrect) {
   box.classList.add('visible');
 }
 function tblHideFeedback() { document.getElementById('tbl-feedbox').classList.remove('visible'); }
-function tblToggleFeedbox() { document.getElementById('tbl-feedbox').classList.remove('visible'); }
 
 function tblSetBtnCheck(label, enabled, mode) {
   const btn = document.getElementById('tbl-check');
@@ -400,8 +399,9 @@ document.addEventListener('keydown', function (e) {
 /* =========================================================
    מערכת פופ-אפ משוב גריר — לפי "Feedback popup system" (720-templates
    skill): גרירה מוגבלת לגבולות הקנבס, איפוס למיקום ברירת המחדל
-   בכל פתיחה, כפתור סגירה (X) שלא נוגע בסטייט התשובה. מיושם על תיבת
-   המשוב היחידה בסיין 4: tbl-feedbox.
+   בכל פתיחה. אין כפתור סגירה — הפופ-אפ נסגר רק במעבר מסך, בניסיון
+   חדש, או בלחיצה על כפתור המעבר "התשובה הנכונה"/"התשובה שלי".
+   מיושם על תיבת המשוב היחידה בסיין 4: tbl-feedbox.
    ========================================================= */
 
 function scqFbResetPosition(boxId) {
@@ -412,11 +412,6 @@ function scqFbResetPosition(boxId) {
   box.style.bottom = '';
 }
 
-function scqFbClose(boxId) {
-  const box = document.getElementById(boxId);
-  if (box) box.classList.remove('visible');
-}
-
 function scqFbMakeDraggable(boxId) {
   const box = document.getElementById(boxId);
   if (!box) return;
@@ -425,7 +420,7 @@ function scqFbMakeDraggable(boxId) {
   let startX = 0, startY = 0, startLeft = 0, startTop = 0;
 
   box.addEventListener('mousedown', function (e) {
-    if (e.target.closest('.scq-fb-close') || e.target.closest('.scq-fb-reveal-btn')) return;
+    if (e.target.closest('.scq-fb-reveal-btn')) return;
     const parent = box.offsetParent || box.parentElement;
     const boxRect = box.getBoundingClientRect();
     const parentRect = parent.getBoundingClientRect();

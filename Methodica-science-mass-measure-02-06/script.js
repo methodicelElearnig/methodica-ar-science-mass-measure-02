@@ -542,24 +542,12 @@ function resetScreenState4() { /* מסך סטטי — אין state לאפס */ }
 function s10Continue() { goTo(5); }
 
 /* =========================================================
-   מסך 6 — טבלה מוקטנת + שיח דמויות בהופעה מושהית (פוצל ממסך 5)
-   (השהיה חדשה — לא קיימת בלומדת המקור; המשך מופיע רק אחרי
-   שהדמויות+בועיות הדיבור נחשפות)
+   מסך 6 — טבלה מוקטנת + שיח דמויות (פוצל ממסך 5)
    ========================================================= */
 
-const S11_REVEAL_DELAY_MS = 2500;
-let s11RevealTimer = null;
-
 function resetScreenState5() {
-  const dlg = document.getElementById('s11-dialogue');
   const btn = document.getElementById('s10b-continue');
-  if (dlg) dlg.classList.remove('revealed');
-  if (btn) btn.hidden = true;
-  if (s11RevealTimer) clearTimeout(s11RevealTimer);
-  s11RevealTimer = setTimeout(function () {
-    if (dlg) dlg.classList.add('revealed');
-    if (btn) btn.hidden = false;
-  }, S11_REVEAL_DELAY_MS);
+  if (btn) btn.hidden = false;
 }
 
 function s10bContinue() { goTo(6); }
@@ -572,9 +560,9 @@ function s10bContinue() { goTo(6); }
 
 const S12_CORRECT_ID = 's12-opt-c';
 const TEXTS_S12 = {
-  correct: { title: 'נכון מאוד.', body: 'במקרה זה שני הטיעונים נכונים. מצד אחד יש יתרון לשימוש בפלסטיק (פחות מסה לשינוע ופחות פליטות CO2), ומצד שני, קיים גם חיסרון שהוא מייצר יותר פסולת בסביבה.' },
+  correct: { title: 'נכון מאוד.', body: 'במקרה זה שני הטיעונים נכונים. מצד אחד יש יתרון לשימוש בפלסטיק (פחות מסה לשינוע ופחות פליטות פחמן דו-חמצני), ומצד שני, קיים גם חיסרון שהוא מייצר יותר פסולת בסביבה.' },
   wrong1: { title: 'התשובה אינה נכונה.', body: 'ננסה שוב?' },
-  wrongFinal: { title: 'התשובה אינה נכונה.', body: 'במקרה זה שני הטיעונים נכונים. מצד אחד יש יתרון לשימוש בפלסטיק (פחות מסה לשינוע ופחות פליטות CO2), ומצד שני, קיים גם חיסרון שהוא מייצר יותר פסולת בסביבה.' }
+  wrongFinal: { title: 'התשובה אינה נכונה.', body: 'במקרה זה שני הטיעונים נכונים. מצד אחד יש יתרון לשימוש בפלסטיק (פחות מסה לשינוע ופחות פליטות פחמן דו-חמצני), ומצד שני, קיים גם חיסרון שהוא מייצר יותר פסולת בסביבה.' }
 };
 
 let s12Selected = null;
@@ -726,8 +714,10 @@ document.addEventListener('keydown', function (e) {
 /* =========================================================
    מערכת פופ-אפ משוב גריר — לפי "Feedback popup system" (720-templates
    skill): גרירה מוגבלת לגבולות הקנבס, איפוס למיקום ברירת המחדל
-   בכל פתיחה, כפתור סגירה (X) שלא נוגע בסטייט התשובה. מיושם על כל
-   תיבות המשוב בסיין 6: tbl9-feedbox, para10-feedbox, s12-feedbox.
+   בכל פתיחה. אין כפתור סגירה (X) — הפופ-אפ נעלם רק במעבר מסך,
+   בתחילת ניסיון חדש, או בלחיצה על כפתור החלפת מצב (scq-fb-reveal-btn),
+   בהתאם להחלטת מוצר. מיושם על כל תיבות המשוב בסיין 6:
+   tbl9-feedbox, para10-feedbox, s12-feedbox.
    ========================================================= */
 
 function scqFbResetPosition(boxId) {
@@ -738,11 +728,6 @@ function scqFbResetPosition(boxId) {
   box.style.bottom = '';
 }
 
-function scqFbClose(boxId) {
-  const box = document.getElementById(boxId);
-  if (box) box.classList.remove('visible');
-}
-
 function scqFbMakeDraggable(boxId) {
   const box = document.getElementById(boxId);
   if (!box) return;
@@ -751,7 +736,7 @@ function scqFbMakeDraggable(boxId) {
   let startX = 0, startY = 0, startLeft = 0, startTop = 0;
 
   box.addEventListener('mousedown', function (e) {
-    if (e.target.closest('.scq-fb-close') || e.target.closest('.scq-fb-reveal-btn')) return;
+    if (e.target.closest('.scq-fb-reveal-btn')) return;
     const parent = box.offsetParent || box.parentElement;
     const boxRect = box.getBoundingClientRect();
     const parentRect = parent.getBoundingClientRect();

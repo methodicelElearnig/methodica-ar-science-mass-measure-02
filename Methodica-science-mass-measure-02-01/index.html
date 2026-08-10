@@ -117,9 +117,6 @@
     <div id="scq-feedbox" class="scq-fb-box">
       <div class="scq-fb-title">
         <span class="scq-fb-title-text"></span>
-        <button class="scq-fb-toggle" onclick="scqToggleFeedbox()" aria-label="סגירת משוב">
-          <img src="assets/images/icon-fb-close.png" alt="">
-        </button>
       </div>
       <p class="scq-fb-body"></p>
     </div>
@@ -168,8 +165,10 @@
               <img src="assets/images/screen3_cucumber_jar.png" alt="צנצנת חמוצים" class="flip-card-img">
             </div>
             <div class="flip-card-face flip-card-back-s3">
-              <p>כשקונים צנצנת חמוצים, חשוב לדעת כמה מלפפונים באמת יש בצנצנת, ולא מה מסת הצנצנת ביחד עם החמוצים.</p>
-              <p class="flip-card-term">המסה של התכולה בלבד נקראת <strong>נטו</strong>.</p>
+              <p>
+             כשקונים צנצנת חמוצים, חשוב לדעת את מסת המלפפונים עצמם (התכולה), בניקוי מסת הצנצנת.
+                <br/>
+             המסה של התכולה בלבד נקראת <strong>נטו</strong>.</p>
             </div>
           </div>
         </div>
@@ -256,9 +255,6 @@
     <div id="scq4-feedbox" class="scq-fb-box">
       <div class="scq-fb-title">
         <span class="scq-fb-title-text"></span>
-        <button class="scq-fb-toggle" onclick="scq4ToggleFeedbox()" aria-label="סגירת משוב">
-          <img src="assets/images/icon-fb-close.png" alt="">
-        </button>
       </div>
       <div class="s4-monster-area">
         <div class="s4-monster-wrap">
@@ -385,9 +381,6 @@
       <div id="s5-feedbox" class="scq-fb-box">
         <div class="scq-fb-title">
           <span class="scq-fb-title-text"></span>
-          <button class="scq-fb-toggle" onclick="s5ToggleFeedbox()" aria-label="סגירת משוב">
-            <img src="assets/images/icon-fb-close.png" alt="">
-          </button>
         </div>
         <p class="scq-fb-body"></p>
         <button id="s5-reveal-btn" class="scq-fb-reveal-btn" type="button" onclick="s5Reveal()" hidden>התשובה הנכונה</button>
@@ -454,7 +447,9 @@
                 <img src="assets/images/screen7-turtle_apple_and_more.png" alt="קטר, צב ענק, תפוח וגרגר מלח גס" class="flip-card-img">
               </div>
               <div class="flip-card-face flip-card-back">
-                <p class="s7-answer">המסה של כולם היא 150!</p>
+                <p class="s7-answer">
+               המסה של כל אחד מהם היא 150!
+                </p>
               </div>
             </div>
           </div>
@@ -503,7 +498,7 @@
       <div class="scq-content">
         <div class="scq-qtext">
            <p class="scq-qbody">
-            נאמר לנו שהמסה של כולם היא 150.
+           נאמר לנו שהמסה של כל אחד מהם היא 150.
           <br/>
           <b>
             מה הבעיה במידע שקיבלתם?</b></p>
@@ -532,9 +527,6 @@
     <div id="scq8-feedbox" class="scq-fb-box">
       <div class="scq-fb-title">
         <span class="scq-fb-title-text"></span>
-        <button class="scq-fb-toggle" onclick="scq8ToggleFeedbox()" aria-label="סגירת משוב">
-          <img src="assets/images/icon-fb-close.png" alt="">
-        </button>
       </div>
       <p class="scq-fb-body"></p>
     </div>
@@ -635,11 +627,9 @@
       <div id="s9-feedbox" class="scq-fb-box">
         <div class="scq-fb-title">
           <span class="scq-fb-title-text"></span>
-          <button class="scq-fb-toggle" onclick="s9ToggleFeedbox()" aria-label="סגירת משוב">
-            <img src="assets/images/icon-fb-close.png" alt="">
-          </button>
         </div>
         <p class="scq-fb-body"></p>
+        <button id="s9-reveal-btn" class="scq-fb-reveal-btn" type="button" onclick="s9Reveal()" hidden>התשובה הנכונה</button>
       </div>
 
     </div><!-- /.s9-content -->
@@ -678,7 +668,11 @@
           <div class="scq-qtext-body">
              <p class="scq-qtitle">למה לא להשתמש באותה יחידת מידה לכולם?</p>
              <br/>
-            <p class="scq-qbody">קטר רכבת נמדד בדרך כלל בטונות.<br>צב ענק נמדד בדרך כלל בקילוגרמים.<br>
+            <p class="scq-qbody">
+מסתו של קטר רכבת נמדדת בדרך כלל בטונות.               
+              <br>
+            מסתו של צב ענק נמדדת בדרך כלל בקילוגרם
+              <br>
               <b>
               למה לדעתכם משתמשים ביחידות שונות?
             </b>
@@ -709,9 +703,6 @@
     <div id="scq10-feedbox" class="scq-fb-box">
       <div class="scq-fb-title">
         <span class="scq-fb-title-text"></span>
-        <button class="scq-fb-toggle" onclick="scq10ToggleFeedbox()" aria-label="סגירת משוב">
-          <img src="assets/images/icon-fb-close.png" alt="">
-        </button>
       </div>
       <p class="scq-fb-body"></p>
     </div>
@@ -750,6 +741,8 @@
           <!-- מוזרק דינמית ע"י s11RenderBoard() -->
         </div>
 
+        <p class="s11-pairs-counter" id="s11-pairs-counter">זוגות שנמצאו: 0 מתוך 3</p>
+
       </div><!-- /.s11-game-content -->
 
       <div class="bottom-bar">
@@ -772,31 +765,25 @@
 
         <div class="s11-sum-pairs">
 
-          <div class="s11-sum-pair" data-pair="0">
-            <div class="s11-sum-card">
-              <img class="s11-sum-card-img" src="assets/images/SCREEN11_TRAIN_1TON.png" alt="">
-              <span>1 טון</span>
-            </div>
-            <div class="s11-sum-eq">=</div>
-            <div class="s11-sum-card">1000 קילוגרם</div>
+          <div class="s11-sum-pair-row">
+            <span class="s11-sum-pair-num">1.</span>
+            <span class="s11-sum-pair-text">1 טון</span>
+            <span class="s11-sum-pair-eq">=</span>
+            <span class="s11-sum-pair-text">1000 קילוגרם</span>
           </div>
 
-          <div class="s11-sum-pair" data-pair="1">
-            <div class="s11-sum-card">
-              <img class="s11-sum-card-img" src="assets/images/SCREEN11_TURTLE_1KILO.png" alt="">
-              <span>1 קילוגרם</span>
-            </div>
-            <div class="s11-sum-eq">=</div>
-            <div class="s11-sum-card">1000 גרם</div>
+          <div class="s11-sum-pair-row">
+            <span class="s11-sum-pair-num">2.</span>
+            <span class="s11-sum-pair-text">1 קילוגרם</span>
+            <span class="s11-sum-pair-eq">=</span>
+            <span class="s11-sum-pair-text">1000 גרם</span>
           </div>
 
-          <div class="s11-sum-pair" data-pair="2">
-            <div class="s11-sum-card">
-              <img class="s11-sum-card-img" src="assets/images/screen11_apple_1gram.png" alt="">
-              <span>1 גרם</span>
-            </div>
-            <div class="s11-sum-eq">=</div>
-            <div class="s11-sum-card">1000 מיליגרם</div>
+          <div class="s11-sum-pair-row">
+            <span class="s11-sum-pair-num">3.</span>
+            <span class="s11-sum-pair-text">1 גרם</span>
+            <span class="s11-sum-pair-eq">=</span>
+            <span class="s11-sum-pair-text">1000 מיליגרם</span>
           </div>
 
         </div><!-- /.s11-sum-pairs -->
@@ -884,9 +871,6 @@
     <div id="scq13-feedbox" class="scq-fb-box">
       <div class="scq-fb-title">
         <span class="scq-fb-title-text"></span>
-        <button class="scq-fb-toggle" onclick="scq13ToggleFeedbox()" aria-label="סגירת משוב">
-          <img src="assets/images/icon-fb-close.png" alt="">
-        </button>
       </div>
       <p class="scq-fb-body"></p>
     </div>
@@ -953,9 +937,6 @@
     <div id="scq14-feedbox" class="scq-fb-box">
       <div class="scq-fb-title">
         <span class="scq-fb-title-text"></span>
-        <button class="scq-fb-toggle" onclick="scq14ToggleFeedbox()" aria-label="סגירת משוב">
-          <img src="assets/images/icon-fb-close.png" alt="">
-        </button>
       </div>
       <p class="scq-fb-body"></p>
     </div>
@@ -1081,9 +1062,6 @@
     <div id="scq16-feedbox" class="scq-fb-box">
       <div class="scq-fb-title">
         <span class="scq-fb-title-text"></span>
-        <button class="scq-fb-toggle" onclick="scq16ToggleFeedbox()" aria-label="סגירת משוב">
-          <img src="assets/images/icon-fb-close.png" alt="">
-        </button>
       </div>
       <p class="scq-fb-body"></p>
     </div>
@@ -1176,9 +1154,6 @@
     <div id="scq17-feedbox" class="scq-fb-box">
       <div class="scq-fb-title">
         <span class="scq-fb-title-text"></span>
-        <button class="scq-fb-toggle" onclick="scq17ToggleFeedbox()" aria-label="סגירת משוב">
-          <img src="assets/images/icon-fb-close.png" alt="">
-        </button>
       </div>
       <p class="scq-fb-body"></p>
     </div>
@@ -1276,9 +1251,6 @@
     <div id="s18-feedbox" class="scq-fb-box">
       <div class="scq-fb-title">
         <span class="scq-fb-title-text"></span>
-        <button class="scq-fb-toggle" onclick="s18ToggleFeedbox()" aria-label="סגירת משוב">
-          <img src="assets/images/icon-fb-close.png" alt="">
-        </button>
       </div>
       <p class="scq-fb-body"></p>
       <button id="s18-reveal-btn" class="scq-fb-reveal-btn" type="button" onclick="s18Reveal()" hidden>התשובה הנכונה</button>
@@ -1411,9 +1383,6 @@
     <div id="s19-feedbox" class="scq-fb-box">
       <div class="scq-fb-title">
         <span class="scq-fb-title-text"></span>
-        <button class="scq-fb-toggle" onclick="s19ToggleFeedbox()" aria-label="סגירת משוב">
-          <img src="assets/images/icon-fb-close.png" alt="">
-        </button>
       </div>
       <p class="scq-fb-body"></p>
       <button id="s19-reveal-btn" class="scq-fb-reveal-btn" type="button" onclick="s19Reveal()" hidden>התשובה הנכונה</button>
@@ -1530,9 +1499,6 @@
     <div id="s20-feedbox" class="scq-fb-box">
       <div class="scq-fb-title">
         <span class="scq-fb-title-text"></span>
-        <button class="scq-fb-toggle" onclick="s20ToggleFeedbox()" aria-label="סגירת משוב">
-          <img src="assets/images/icon-fb-close.png" alt="">
-        </button>
       </div>
       <p class="scq-fb-body"></p>
       <button id="s20-reveal-btn" class="scq-fb-reveal-btn" type="button" onclick="s20Reveal()" hidden>התשובה הנכונה</button>

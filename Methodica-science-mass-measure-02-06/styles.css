@@ -93,17 +93,22 @@ img { display: block; max-width: none; }
   justify-content: space-between;
 }
 
-/* === Continue button (gradient blue pill) === */
+/* === Continue button (gradient blue pill) — SELF-QA.md § 6 === */
 .btn-continue {
-  background: linear-gradient(180deg, #005FBE 9%, #003971 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 39px;
+  background: linear-gradient(180deg, #005FBE 9%, #0059B2 23.361%, #003971 100%);
   color: #ffffff;
   border: none;
   border-radius: 1000px;
   font-family: 'Assistant', sans-serif;
   font-size: 20px;
   font-weight: 400;
-  padding: 12px 40px;
-  width: 140px;
+  padding: 0 20px;
+  min-width: 140px;
+  box-sizing: border-box;
   cursor: pointer;
   white-space: nowrap;
 }
@@ -121,17 +126,21 @@ img { display: block; max-width: none; }
 /* === Hint button (אפשר רמז?) — מוסתר (hidden) עד לניסיון שגוי ראשון,
    נחשף (hidden=false) אחרי טעות ראשונה — כמו מסך 32 בלומדת המקור === */
 .btn-hint {
-  background: #ffffff;
-  color: #019de5;
-  border: 1.5px solid #019de5;
-  border-radius: 1000px;
-  font-family: 'Assistant', sans-serif;
-  font-size: 18px;
-  font-weight: 400;
-  padding: 10px 20px;
-  cursor: pointer;
   display: flex;
   align-items: center;
+  justify-content: center;
+  height: 39px;
+  background: #ffffff;
+  color: #007ac6;
+  border: 1px solid #007ac6;
+  border-radius: 1000px;
+  font-family: 'Assistant', sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  padding: 0 20px;
+  min-width: 140px;
+  box-sizing: border-box;
+  cursor: pointer;
   gap: 6px;
   white-space: nowrap;
 }
@@ -143,17 +152,22 @@ img { display: block; max-width: none; }
   outline-offset: 2px;
 }
 
-/* === Back button (חזרה) === */
+/* === Back button (חזרה) — SELF-QA.md § 6 === */
 .btn-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 39px;
   background: #ffffff;
   color: #007ac6;
-  border: 1.5px solid #007ac6;
+  border: 1px solid #007ac6;
   border-radius: 1000px;
   font-family: 'Assistant', sans-serif;
   font-size: 20px;
   font-weight: 400;
-  padding: 12px 40px;
-  width: 140px;
+  padding: 0 20px;
+  min-width: 140px;
+  box-sizing: border-box;
   cursor: pointer;
   white-space: nowrap;
 }
@@ -210,31 +224,6 @@ img { display: block; max-width: none; }
   direction: rtl;
   align-items: center;
   gap: 16px;
-}
-.scq-fb-toggle {
-  flex-shrink: 0;
-  width: 30px;
-  height: 30px;
-  border: 1px solid #303030;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 100px;
-  background: #fff;
-  font-size: 13px;
-}
-.scq-fb-close {
-  flex-shrink: 0;
-  width: 30px;
-  height: 30px;
-  border: 1px solid #303030;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 100px;
-  background: #fff;
-  font-size: 13px;
-  cursor: pointer;
 }
 .scq-fb-title-text {
   flex: 1;
@@ -332,6 +321,47 @@ img { display: block; max-width: none; }
   text-align: center;
 }
 
+/* --- Inline term-definition tooltip (720-templates _global-components.md
+   § "Inline tooltip icons in RTL Hebrew text") — used for "פחמן דו-חמצני" on מסכים 5/6/7 --- */
+.tooltip-word { position: relative; display: inline-flex; align-items: center; gap: 4px; direction: rtl; }
+.term-highlight {
+  font-weight: 400;
+  color: #019de5;
+}
+.term-info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  cursor: help;
+}
+.term-info-i { width: 15px; height: 15px; flex: 0 0 15px; display: block; }
+.term-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 220px;
+  background: #019de5;
+  color: #fff;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.3;
+  direction: rtl;
+  text-align: right;
+  white-space: normal;
+  z-index: 10;
+}
+.term-info:hover .term-tooltip,
+.term-info:focus .term-tooltip,
+.term-info:focus-within .term-tooltip { display: block; }
+
 /* =========================================================
    מסכי מעבר — דמות מלווה (בלי בועית דיבור)
    ========================================================= */
@@ -414,19 +444,19 @@ img { display: block; max-width: none; }
   font-size: 24px; font-weight: 400; color: #303030;
   cursor: grab; user-select: none; white-space: nowrap; direction: rtl;
   display: inline-flex; align-items: center; justify-content: flex-start;
-  gap: 6px; width: 100%; height: 100%; padding: 0 8px;
+  gap: 10px; width: 100%; height: 100%; padding: 0 8px;
 }
 .dq-placed-card.locked { cursor: default; }
 
 .dq-drag-card {
-  background: #fff; border: 1px solid rgba(174,174,174,0.5); border-radius: 10px;
+  background: #fff; border: 1.5px solid #ececec; border-radius: 10px;
   font-size: 24px; font-weight: 400; color: #303030;
   cursor: grab; user-select: none; white-space: nowrap;
   display: inline-flex; align-items: center; justify-content: center;
   width: 180px; height: 42px; direction: rtl;
 }
 .dq-drag-card:hover:not(.ghost):not(.locked) { border-color: #019de5; box-shadow: 0 2px 6px rgba(1,157,229,0.2); }
-.dq-drag-card.dragging { opacity: 0.38; }
+.dq-drag-card.dragging { opacity: 0.38; border: 1.5px solid #019de5; }
 .dq-drag-card.ghost { color: transparent; background: #f3f4f5; border: 1px solid rgba(174,174,174,0.3); pointer-events: none; }
 .dq-drag-card.locked { cursor: default; }
 
@@ -484,13 +514,14 @@ img { display: block; max-width: none; }
 .tbl9-th-prefix, .tbl9-th-suffix { font-size: 20px; font-weight: 600; color: #303030; white-space: nowrap; }
 
 .tbl9-drop-zone {
-  border: 2px dashed #BDBDBD; border-radius: 8px;
+  border: 2px dashed rgba(0,0,0,0.6); border-radius: 8px; background: #f3f4f5;
   min-width: 110px; height: 36px;
   display: flex; align-items: center; justify-content: center;
   box-sizing: border-box; cursor: default;
 }
-.tbl9-drop-zone.drag-over { background: #eaf6ff; border: 2px solid #019de5; }
+.tbl9-drop-zone.drag-over { background: #fff; border: 2px dashed #019de5; }
 .tbl9-drop-zone.occupied { border: 2px solid transparent; height: auto; min-width: auto; background: transparent; }
+.tbl9-drop-zone.occupied:not(.correct):not(.wrong) .dq-placed-card { font-size: 22px; color: #222; }
 .tbl9-drop-zone.correct { border: 2px solid #609e12 !important; border-radius: 8px; }
 .tbl9-drop-zone.wrong { border: 2px solid #B20010 !important; border-radius: 8px; }
 
@@ -505,10 +536,20 @@ img { display: block; max-width: none; }
   min-height: 52px; align-content: center;
 }
 .tbl9-source-slot { display: inline-flex; align-items: center; }
-.tbl9-drop-zone.correct .dq-placed-card { border-color: #609e12; }
-.tbl9-drop-zone.wrong .dq-placed-card { border-color: #B20010; }
-.tbl9-drop-zone.correct .dq-placed-card::after { content: '✓'; color: #609e12; font-size: 14px; font-weight: 700; flex-shrink: 0; }
-.tbl9-drop-zone.wrong .dq-placed-card::after { content: '✕'; color: #B20010; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+/* תג עגול אמיתי (V/X לבן על עיגול צבוע) — לא תו יוניקוד צבוע, לפי SELF-QA.md § 3.
+   order:-1 מזיז את התג לפני הטקסט בסדר ה-flex כדי שיופיע בקצה הימני הפיזי */
+.tbl9-drop-zone.correct .dq-placed-card::after {
+  content: ''; display: inline-block; width: 26px; height: 26px; flex-shrink: 0;
+  order: -1; border-radius: 50%; background-color: #609e12;
+  background-image: url('assets/images/icon-badge-check-white.svg');
+  background-repeat: no-repeat; background-position: center; background-size: 12px 9px;
+}
+.tbl9-drop-zone.wrong .dq-placed-card::after {
+  content: ''; display: inline-block; width: 26px; height: 26px; flex-shrink: 0;
+  order: -1; border-radius: 50%; background-color: #B20010;
+  background-image: url('assets/images/icon-badge-x-white.svg');
+  background-repeat: no-repeat; background-position: center; background-size: 12px 12px;
+}
 
 /* =========================================================
    מסך 4 — השלמת משפטים בגרירה (עותק מסך 35 בלומדת המקור)
@@ -527,16 +568,28 @@ img { display: block; max-width: none; }
 .para10-snt-pre, .para10-snt-mid, .para10-snt-post { display: inline; vertical-align: middle; }
 .para10-snt-drop {
   display: inline-flex; vertical-align: middle;
-  border: 1px solid rgba(174,174,174,0.5); border-radius: 10px;
+  border: 1px dashed rgba(0,0,0,0.6); border-radius: 10px;
   min-width: 130px; height: 42px; align-items: center; justify-content: center;
-  box-sizing: border-box; margin: 0 3px; cursor: default; background: #fff;
+  box-sizing: border-box; margin: 0 3px; cursor: default; background: #f3f4f5;
 }
-.para10-snt-drop.drag-over { background: #eaf6ff; border: 1.5px solid #019de5; }
-.para10-snt-drop.occupied { border: 1.5px solid #019de5; background: #F3F4F5; }
+.para10-snt-drop.drag-over { background: #fff; border: 1px dashed #019de5; }
+.para10-snt-drop.occupied { border: 1.5px solid #019de5; background: #d4f3ff; }
+.para10-snt-drop.occupied:not(.correct):not(.wrong) .dq-placed-card { font-size: 22px; color: #222; }
 .para10-snt-drop.correct { border: 1px solid #609e12 !important; background: #fff !important; }
 .para10-snt-drop.wrong { border: 1px solid #B20010 !important; background: #fff !important; }
-.para10-snt-drop.correct .dq-placed-card::after { content: '✓'; color: #609e12; font-size: 15px; font-weight: 700; }
-.para10-snt-drop.wrong .dq-placed-card::after { content: '✕'; color: #B20010; font-size: 13px; font-weight: 700; }
+/* תג עגול אמיתי (V/X לבן על עיגול צבוע) — לא תו יוניקוד צבוע, לפי SELF-QA.md § 3 */
+.para10-snt-drop.correct .dq-placed-card::after {
+  content: ''; display: inline-block; width: 26px; height: 26px; flex-shrink: 0;
+  order: -1; border-radius: 50%; background-color: #609e12;
+  background-image: url('assets/images/icon-badge-check-white.svg');
+  background-repeat: no-repeat; background-position: center; background-size: 12px 9px;
+}
+.para10-snt-drop.wrong .dq-placed-card::after {
+  content: ''; display: inline-block; width: 26px; height: 26px; flex-shrink: 0;
+  order: -1; border-radius: 50%; background-color: #B20010;
+  background-image: url('assets/images/icon-badge-x-white.svg');
+  background-repeat: no-repeat; background-position: center; background-size: 12px 12px;
+}
 
 .para10-word-bank {
   display: flex; flex-wrap: wrap; flex-direction: row; gap: 7px;
@@ -569,12 +622,10 @@ img { display: block; max-width: none; }
 .s11-table tbody tr:nth-child(even) .s11-td { background: #D4F3FF; }
 
 .s11-dialogue {
-  display: flex; flex-direction: column; gap: 6px; width: 100%; max-width: 1200px;
+  display: flex; flex-direction: column; gap: 6px; width: 820px; max-width: 100%;
   flex-shrink: 0;
-  opacity: 0; visibility: hidden;
 }
-.s11-dialogue.revealed { opacity: 1; visibility: visible; }
-.s11-char { display: flex; flex-direction: row; align-items: flex-start; justify-content: center; gap: 12px; direction: ltr; }
+.s11-char { display: flex; flex-direction: row; align-items: flex-start; justify-content: flex-start; gap: 12px; direction: ltr; }
 .s11-avatar { flex-shrink: 0; width: 118px; height: 118px; display: flex; align-items: center; justify-content: center; }
 .s11-avatar-img { width: 100%; height: 100%; object-fit: contain; }
 .s11-bubble {

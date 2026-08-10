@@ -291,10 +291,6 @@ document.addEventListener('keydown', function (e) {
   }
 });
 
-function scqToggleFeedbox() {
-  document.getElementById('scq-feedbox').classList.remove('visible');
-}
-
 function resetScreenState1() {
   if (scqDone || scqAttempts > 0 || scqSelected) return; // resume-state: שאלה שהתחילה (אפילו לא הסתיימה) לא נמחקת בחזרה למסך
   scqSelected = null;
@@ -537,10 +533,6 @@ document.addEventListener('keydown', function (e) {
   }
 });
 
-function scq4ToggleFeedbox() {
-  document.getElementById('scq4-feedbox').classList.remove('visible');
-}
-
 function resetScreenState3() {
   if (scq4Done || scq4Attempts > 0 || scq4Selected) return; // resume-state: שאלה שהתחילה (אפילו לא הסתיימה) לא נמחקת בחזרה למסך
   scq4Selected = null;
@@ -620,6 +612,10 @@ function s5UpdateCheckBtn() {
 function s5ClearZoneStates() {
   ['bruto', 'neto', 'tara'].forEach(function (z) {
     document.getElementById('s5-zone-' + z).classList.remove('correct', 'wrong', 's5-drag-over');
+  });
+  S5_ITEM_IDS.forEach(function (id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('s5-item-correct', 's5-item-wrong');
   });
 }
 
@@ -709,16 +705,14 @@ function s5ShowFeedback(kind, isCorrect) {
   box.classList.add('visible');
 }
 
-function s5ToggleFeedbox() {
-  document.getElementById('s5-feedbox').classList.remove('visible');
-}
-
 function s5RevealCorrect() {
   S5_ITEM_IDS.forEach(function (id) {
     const item = document.getElementById(id);
     const zoneEl = document.getElementById('s5-zone-' + item.dataset.correct);
     if (item.parentElement) item.parentElement.removeChild(item);
     zoneEl.appendChild(item);
+    item.classList.remove('s5-item-wrong');
+    item.classList.add('s5-item-correct');
   });
   ['bruto', 'neto', 'tara'].forEach(function (zoneId) {
     const zoneEl = document.getElementById('s5-zone-' + zoneId);
@@ -741,7 +735,12 @@ function s5ShowMyAnswer() {
     const zoneEl = document.getElementById('s5-zone-' + zoneId);
     const items = zoneEl.querySelectorAll('.s5-drag-item');
     let zoneOk = items.length > 0;
-    items.forEach(function (item) { if (item.dataset.correct !== zoneId) zoneOk = false; });
+    items.forEach(function (item) {
+      const itemOk = item.dataset.correct === zoneId;
+      if (!itemOk) zoneOk = false;
+      item.classList.remove('s5-item-correct', 's5-item-wrong');
+      item.classList.add(itemOk ? 's5-item-correct' : 's5-item-wrong');
+    });
     zoneEl.classList.remove('wrong', 'correct', 's5-drag-over');
     zoneEl.classList.add(zoneOk ? 'correct' : 'wrong');
   });
@@ -772,7 +771,10 @@ function s5Check() {
     const items = zoneEl.querySelectorAll('.s5-drag-item');
     let zoneOk = items.length > 0;
     items.forEach(function (item) {
-      if (item.dataset.correct !== zoneId) zoneOk = false;
+      const itemOk = item.dataset.correct === zoneId;
+      if (!itemOk) zoneOk = false;
+      item.classList.remove('s5-item-correct', 's5-item-wrong');
+      item.classList.add(itemOk ? 's5-item-correct' : 's5-item-wrong');
     });
     zoneEl.classList.toggle('correct', zoneOk);
     zoneEl.classList.toggle('wrong', !zoneOk);
@@ -1053,10 +1055,6 @@ document.getElementById('scq8-hint-overlay').addEventListener('click', function 
   if (e.target === this) scq8CloseHint();
 });
 
-function scq8ToggleFeedbox() {
-  document.getElementById('scq8-feedbox').classList.remove('visible');
-}
-
 function resetScreenState7() {
   if (scq8Done || scq8Attempts > 0 || scq8Selected) return; // resume-state: שאלה שהתחילה (אפילו לא הסתיימה) לא נמחקת בחזרה למסך
   scq8Selected = null;
@@ -1105,6 +1103,10 @@ const TEXTS9 = {
     title: 'התשובה אינה נכונה.',
     body: 'לא נורא, גם מטעויות לומדים.\nננסה שוב?'
   },
+  wrongPending: {
+    title: 'התשובה אינה נכונה.',
+    body: 'רוצים לראות את הפתרון הנכון?'
+  },
   wrong2: {
     title: 'התשובה אינה נכונה.',
     body: 'לגופים שונים מתאימות יחידות מידה שונות.\nגרגר מלח גס נמדד בדרך כלל במיליגרמים (מ"ג), תפוח נמדד בדרך כלל בגרמים (ג\'), צב ענק נמדד בדרך כלל בקילוגרמים (ק"ג) וקטר נמדד בדרך כלל בטונות.'
@@ -1115,6 +1117,8 @@ let s9Done = false;
 let s9Attempts = 0;
 let s9HintShown = false;
 let s9DragId = null;
+let s9LastAnswer = null;
+let s9ShowingCorrect = false;
 
 function s9AllPlaced() {
   const sourceBank = document.getElementById('s9-source-bank');
@@ -1132,6 +1136,10 @@ function s9UpdateCheckBtn() {
 function s9ClearZoneStates() {
   S9_ZONE_IDS.forEach(function (z) {
     document.getElementById('s9-zone-' + z).classList.remove('correct', 'wrong', 's9-drag-over');
+  });
+  S9_ITEM_IDS.forEach(function (id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('s9-item-correct', 's9-item-wrong');
   });
 }
 
@@ -1236,8 +1244,60 @@ function s9ShowFeedback(kind, isCorrect) {
   box.classList.add('visible');
 }
 
-function s9ToggleFeedbox() {
-  document.getElementById('s9-feedbox').classList.remove('visible');
+function s9RevealCorrect() {
+  S9_ITEM_IDS.forEach(function (id) {
+    const item = document.getElementById(id);
+    const zoneEl = document.getElementById('s9-zone-' + item.dataset.correct);
+    if (item.parentElement) item.parentElement.removeChild(item);
+    zoneEl.appendChild(item);
+    item.classList.remove('s9-item-wrong');
+    item.classList.add('s9-item-correct');
+  });
+  S9_ZONE_IDS.forEach(function (zoneId) {
+    const zoneEl = document.getElementById('s9-zone-' + zoneId);
+    zoneEl.classList.remove('wrong', 's9-drag-over');
+    zoneEl.classList.add('correct');
+  });
+}
+
+function s9ShowMyAnswer() {
+  S9_ITEM_IDS.forEach(function (id) {
+    const item = document.getElementById(id);
+    const dest = s9LastAnswer[id];
+    const destEl = (dest === 'source')
+      ? document.getElementById('s9-source-bank')
+      : document.getElementById('s9-zone-' + dest);
+    if (item.parentElement) item.parentElement.removeChild(item);
+    destEl.appendChild(item);
+  });
+  S9_ZONE_IDS.forEach(function (zoneId) {
+    const zoneEl = document.getElementById('s9-zone-' + zoneId);
+    const items = zoneEl.querySelectorAll('.s9-drag-item');
+    let zoneOk = items.length > 0;
+    items.forEach(function (item) {
+      const itemOk = item.dataset.correct === zoneId;
+      if (!itemOk) zoneOk = false;
+      item.classList.remove('s9-item-correct', 's9-item-wrong');
+      item.classList.add(itemOk ? 's9-item-correct' : 's9-item-wrong');
+    });
+    zoneEl.classList.remove('wrong', 'correct', 's9-drag-over');
+    zoneEl.classList.add(zoneOk ? 'correct' : 'wrong');
+  });
+  s9ShowFeedback('wrongPending', false);
+}
+
+function s9Reveal() {
+  const revealBtn = document.getElementById('s9-reveal-btn');
+  if (s9ShowingCorrect) {
+    s9ShowMyAnswer();
+    s9ShowingCorrect = false;
+    if (revealBtn) revealBtn.textContent = 'התשובה הנכונה';
+  } else {
+    s9RevealCorrect();
+    s9ShowFeedback('wrong2', false);
+    s9ShowingCorrect = true;
+    if (revealBtn) revealBtn.textContent = 'התשובה שלי';
+  }
 }
 
 function s9Check() {
@@ -1250,7 +1310,10 @@ function s9Check() {
     const items = zoneEl.querySelectorAll('.s9-drag-item');
     let zoneOk = items.length > 0;
     items.forEach(function (item) {
-      if (item.dataset.correct !== zoneId) zoneOk = false;
+      const itemOk = item.dataset.correct === zoneId;
+      if (!itemOk) zoneOk = false;
+      item.classList.remove('s9-item-correct', 's9-item-wrong');
+      item.classList.add(itemOk ? 's9-item-correct' : 's9-item-wrong');
     });
     zoneEl.classList.toggle('correct', zoneOk);
     zoneEl.classList.toggle('wrong', !zoneOk);
@@ -1268,13 +1331,27 @@ function s9Check() {
     checkBtn.textContent = 'המשך';
     checkBtn.disabled = false;
     checkBtn.onclick = s9Continue;
-  } else {
-    s9ShowFeedback(s9Attempts === 1 ? 'wrong' : 'wrong2', false);
+  } else if (s9Attempts < 2) {
+    s9ShowFeedback('wrong', false);
     checkBtn.disabled = true;
-    if (s9Attempts === 2) {
-      s9HintShown = true;
-      document.getElementById('s9-hint').hidden = false;
-    }
+    s9HintShown = true;
+    document.getElementById('s9-hint').hidden = false;
+  } else {
+    s9Done = true;
+    /* דריסה: הפתרון לא נחשף אוטומטית — רק בלחיצה על "התשובה הנכונה" */
+    s9LastAnswer = {};
+    S9_ITEM_IDS.forEach(function (id) {
+      const el = document.getElementById(id);
+      const parentId = el && el.parentElement ? el.parentElement.id : '';
+      s9LastAnswer[id] = parentId.indexOf('s9-zone-') === 0 ? parentId.replace('s9-zone-', '') : 'source';
+    });
+    s9ShowingCorrect = false;
+    s9ShowFeedback('wrongPending', false);
+    const revealBtn = document.getElementById('s9-reveal-btn');
+    if (revealBtn) { revealBtn.hidden = false; revealBtn.textContent = 'התשובה הנכונה'; }
+    checkBtn.textContent = 'המשך';
+    checkBtn.disabled = false;
+    checkBtn.onclick = s9Continue;
   }
 }
 
@@ -1314,6 +1391,8 @@ function resetScreenState8() {
   s9Attempts = 0;
   s9HintShown = false;
   s9DragId = null;
+  s9LastAnswer = null;
+  s9ShowingCorrect = false;
 
   const sourceBank = document.getElementById('s9-source-bank');
   S9_ITEM_IDS.forEach(function (id) {
@@ -1333,6 +1412,8 @@ function resetScreenState8() {
   checkBtn.disabled = true;
   checkBtn.onclick = s9Check;
   hintBtn.hidden = true;
+  const revealBtn = document.getElementById('s9-reveal-btn');
+  if (revealBtn) { revealBtn.hidden = true; revealBtn.textContent = 'התשובה הנכונה'; }
 }
 
 /* =========================================================
@@ -1345,7 +1426,7 @@ const SCQ10 = {
   feedback: {
     correct: {
       title: 'מצוין!',
-      body: 'אפשר למדוד כל גוף בכל יחידת מסה, אבל לא תמיד זה יהיה נוח.\nלדוגמה, במקום לומר שמסתו של קטר היא 150 טון, אפשר לומר שמסתו היא 150,000,000 גרם.\n\nשתי המדידות נכונות, אך הרבה יותר נוח להשתמש ביחידת המידה המתאימה לגודל הגוף.\nלכן, נשתמש ביחידות מסה שונות: מיליגרם, גרם, קילוגרם וטון.'
+      body: 'אפשר למדוד כל גוף בכל יחידת מסה, אבל לא תמיד זה יהיה נוח.\nלדוגמה, במקום לומר שמסתו של קטר היא 150 טון, אפשר לומר שמסתו היא 150,000,000 גרם.\n\nשתי המדידות נכונות, אך הרבה יותר נוח להשתמש ביחידת המידה המתאימה למסת הגוף.\nלכן, נשתמש ביחידות מסה שונות: מיליגרם, גרם, קילוגרם וטון.'
     },
     wrong1: {
       title: 'התשובה אינה נכונה.',
@@ -1353,7 +1434,7 @@ const SCQ10 = {
     },
     wrong2: {
       title: 'התשובה לא נכונה.',
-      body: 'אפשר למדוד כל גוף בכל יחידת מסה, אבל לא תמיד זה יהיה נוח.\nלדוגמה, במקום לומר שמסתו של קטר היא 150 טון, אפשר לומר שמסתו היא 150,000,000 גרם.\n\nשתי המדידות נכונות, אך הרבה יותר נוח להשתמש ביחידת המידה המתאימה לגודל הגוף.\nלכן, נשתמש ביחידות מסה שונות: מיליגרם, גרם, קילוגרם וטון.'
+      body: 'אפשר למדוד כל גוף בכל יחידת מסה, אבל לא תמיד זה יהיה נוח.\nלדוגמה, במקום לומר שמסתו של קטר היא 150 טון, אפשר לומר שמסתו היא 150,000,000 גרם.\n\nשתי המדידות נכונות, אך הרבה יותר נוח להשתמש ביחידת המידה המתאימה למסת הגוף.\nלכן, נשתמש ביחידות מסה שונות: מיליגרם, גרם, קילוגרם וטון.'
     }
   }
 };
@@ -1477,10 +1558,6 @@ document.getElementById('scq10-hint-overlay').addEventListener('click', function
   if (e.target === this) scq10CloseHint();
 });
 
-function scq10ToggleFeedbox() {
-  document.getElementById('scq10-feedbox').classList.remove('visible');
-}
-
 function resetScreenState9() {
   if (scq10Done || scq10Attempts > 0 || scq10Selected) return; // resume-state: שאלה שהתחילה (אפילו לא הסתיימה) לא נמחקת בחזרה למסך
   scq10Selected = null;
@@ -1523,18 +1600,18 @@ document.addEventListener('keydown', function (e) {
 
 /* =========================================================
    מסך 11 — משחק זיכרון (Memory Game)
+   עודכן לפי עיצוב Figma חדש (ר' הערת CSS למעלה) — קלפים ללא תמונות,
+   V/X מיובאים מ-Figma, ותג אות (א/ב/ג) בתום המשחק במקום צביעה לפי זוג.
+   ההשהיה אחרי התאמה נכונה קוצרה משמעותית לפי בקשת הלקוחה (מ-2 שניות
+   ל-600ms) כדי לאפשר ללומד להמשיך ללחוץ על הזוג הבא מהר יותר.
    ========================================================= */
 
+const S11_PAIR_LETTERS = ['א', 'ב', 'ג'];
+
 const S11_PAIRS = [
-  { pairId: 0, texts: ['1 טון', '1000 קילוגרם'],
-    imgs: ['assets/images/SCREEN11_TRAIN_1TON.png', null],
-    color: '#ffdcaa', border: '#ffdcaa' },
-  { pairId: 1, texts: ['1 קילוגרם', '1000 גרם'],
-    imgs: ['assets/images/SCREEN11_TURTLE_1KILO.png', null],
-    color: '#deacff', border: '#deacff' },
-  { pairId: 2, texts: ['1 גרם', '1000 מיליגרם'],
-    imgs: ['assets/images/screen11_apple_1gram.png', null],
-    color: '#b6cfef', border: 'rgba(182,207,239,0.4)' }
+  { pairId: 0, texts: ['1 טון', '1000 קילוגרם'] },
+  { pairId: 1, texts: ['1 קילוגרם', '1000 גרם'] },
+  { pairId: 2, texts: ['1 גרם', '1000 מיליגרם'] }
 ];
 
 let s11Cards = [];
@@ -1549,9 +1626,8 @@ function s11Init() {
 
   const all = [];
   S11_PAIRS.forEach(function (pair) {
-    pair.texts.forEach(function (txt, j) {
-      all.push({ pairId: pair.pairId, text: txt, imgSrc: pair.imgs[j] || null,
-                 color: pair.color, border: pair.border, matched: false });
+    pair.texts.forEach(function (txt) {
+      all.push({ pairId: pair.pairId, text: txt, matched: false });
     });
   });
 
@@ -1569,7 +1645,13 @@ function s11Init() {
   document.getElementById('s11-game-view').hidden = false;
   document.getElementById('s11-summary-view').hidden = true;
 
+  s11UpdatePairsCounter();
   s11RenderBoard();
+}
+
+function s11UpdatePairsCounter() {
+  const el = document.getElementById('s11-pairs-counter');
+  if (el) el.textContent = 'זוגות שנמצאו: ' + s11Matches + ' מתוך 3';
 }
 
 function s11RenderBoard() {
@@ -1578,11 +1660,6 @@ function s11RenderBoard() {
   board.innerHTML = '';
 
   s11Cards.forEach(function (card, idx) {
-    const imgHtml = card.imgSrc
-      ? '<img class="s11-card-img" src="' + card.imgSrc + '" alt="" draggable="false">'
-      : '';
-    const frontCls = card.imgSrc ? 's11-card-face s11-card-front s11-has-img' : 's11-card-face s11-card-front';
-
     const el = document.createElement('div');
     el.className = 's11-card';
     el.setAttribute('data-idx', String(idx));
@@ -1591,9 +1668,11 @@ function s11RenderBoard() {
     el.setAttribute('aria-label', 'קלף');
     el.innerHTML =
       '<div class="s11-card-inner">' +
-        '<div class="s11-card-face s11-card-back"><div class="s11-card-back-inner"></div></div>' +
-        '<div class="' + frontCls + '">' + imgHtml +
+        '<div class="s11-card-face s11-card-back"><span class="s11-card-qmark">?</span></div>' +
+        '<div class="s11-card-face s11-card-front">' +
           '<span class="s11-card-text">' + card.text + '</span>' +
+          '<span class="s11-badge" aria-hidden="true"></span>' +
+          '<span class="s11-pair-tag" aria-hidden="true">' + S11_PAIR_LETTERS[card.pairId] + '</span>' +
         '</div>' +
       '</div>';
 
@@ -1640,30 +1719,24 @@ function s11CardClick(idx) {
 
     setTimeout(function () {
       if (s11Cards[idx1].pairId === s11Cards[idx2].pairId) {
-        if (el1) el1.classList.add('s11-match-active');
-        if (el2) el2.classList.add('s11-match-active');
+        [el1, el2].forEach(function (e) { if (e) e.classList.add('s11-matched', 's11-match-flash'); });
+        s11Cards[idx1].matched = true;
+        s11Cards[idx2].matched = true;
+        s11Flipped = [];
+        s11Matches++;
+        s11UpdatePairsCounter();
 
+        if (s11Matches === 3) {
+          s11Done = true;
+          document.getElementById('s11-btn-continue').disabled = false;
+        }
+
+        // הבזק ירוק+וי קצר, ואז הזוג "מתיישב" למראה הסופי (לפי Figma) —
+        // per-pair מיד עם ההתאמה, לא מחכה שכל 3 הזוגות יימצאו
         setTimeout(function () {
-          const color = s11Cards[idx1].color;
-          const border = s11Cards[idx1].border;
-          [el1, el2].forEach(function (e) {
-            if (!e) return;
-            e.classList.add('s11-matched');
-            e.style.setProperty('--s11-pair-color', color);
-            e.style.setProperty('--s11-pair-border', border);
-            e.classList.remove('s11-match-active', 's11-flipped');
-          });
-          s11Cards[idx1].matched = true;
-          s11Cards[idx2].matched = true;
-          s11Flipped = [];
-          s11Matches++;
-
-          if (s11Matches === 3) {
-            s11Done = true;
-            document.getElementById('s11-btn-continue').disabled = false;
-          }
+          [el1, el2].forEach(function (e) { if (e) e.classList.remove('s11-match-flash'); });
           s11Locked = false;
-        }, 2000);
+        }, 600);
 
       } else {
         if (el1) el1.classList.add('s11-nomatch');
@@ -1684,16 +1757,6 @@ function s11Continue() {
   if (!s11Done) return;
   document.getElementById('s11-game-view').hidden = true;
   document.getElementById('s11-summary-view').hidden = false;
-  s11UpdateSumAvatar();
-}
-
-function s11UpdateSumAvatar() {
-  const img = document.getElementById('s11-sum-avatar-img');
-  if (img) {
-    img.src = (window.lomdaState.selectedCharacter === 'green')
-      ? 'assets/images/avatar-green-questioning.png'
-      : 'assets/images/avatar-orange-questioning.png';
-  }
 }
 
 function s11SumContinue() { goTo(11); }
@@ -1707,7 +1770,6 @@ function resetScreenState10() {
   if (s11Done) {
     document.getElementById('s11-game-view').hidden = true;
     document.getElementById('s11-summary-view').hidden = false;
-    s11UpdateSumAvatar();
     return;
   }
   if (s11Matches > 0) return; // resume-state: זיווג שבוצע כבר לא נמחק (לוח לא מתאתחל) בחזרה למסך
@@ -1875,10 +1937,6 @@ function scq13CloseHint() {
 document.getElementById('scq13-hint-overlay').addEventListener('click', function (e) {
   if (e.target === this) scq13CloseHint();
 });
-
-function scq13ToggleFeedbox() {
-  document.getElementById('scq13-feedbox').classList.remove('visible');
-}
 
 function resetScreenState12() {
   if (scq13Done || scq13Attempts > 0 || scq13Selected) return; // resume-state: שאלה שהתחילה (אפילו לא הסתיימה) לא נמחקת בחזרה למסך
@@ -2073,10 +2131,6 @@ function scq14CloseHint() {
 document.getElementById('scq14-hint-overlay').addEventListener('click', function (e) {
   if (e.target === this) scq14CloseHint();
 });
-
-function scq14ToggleFeedbox() {
-  document.getElementById('scq14-feedbox').classList.remove('visible');
-}
 
 function resetScreenState13() {
   if (scq14Done || scq14Attempts > 0 || scq14Selected.length > 0) return; // resume-state: שאלה שהתחילה (אפילו לא הסתיימה) לא נמחקת בחזרה למסך
@@ -2314,10 +2368,6 @@ document.getElementById('scq16-hint-overlay').addEventListener('click', function
   if (e.target === this) scq16CloseHint();
 });
 
-function scq16ToggleFeedbox() {
-  document.getElementById('scq16-feedbox').classList.remove('visible');
-}
-
 function resetScreenState15() {
   updateQuestionNav('s16');
   if (scq16Done || scq16Attempts > 0 || scq16Selected) return; // resume-state: שאלה שהתחילה (אפילו לא הסתיימה) לא נמחקת בחזרה למסך
@@ -2496,10 +2546,6 @@ document.getElementById('scq17-hint-overlay').addEventListener('click', function
   if (e.target === this) scq17CloseHint();
 });
 
-function scq17ToggleFeedbox() {
-  document.getElementById('scq17-feedbox').classList.remove('visible');
-}
-
 function resetScreenState16() {
   updateQuestionNav('s17');
   if (scq17Done || scq17Attempts > 0 || scq17Selected) return; // resume-state: שאלה שהתחילה (אפילו לא הסתיימה) לא נמחקת בחזרה למסך
@@ -2582,10 +2628,6 @@ function s18ShowFeedback(kind, isCorrect) {
   box.classList.add('visible');
 }
 
-function s18ToggleFeedbox() {
-  document.getElementById('s18-feedbox').classList.remove('visible');
-}
-
 function s18SetBarDone(label, handler) {
   const checkBtn = document.getElementById('s18-check');
   checkBtn.textContent = label;
@@ -2661,6 +2703,7 @@ function s18Check() {
   if (allCorrect) {
     s18Done = true;
     s18Phase = 'correct';
+    s18ClearInputStateClasses();
     s18LockInputs(false);
     s18MarkInputs();
     s18ShowFeedback('correct', true);
@@ -2685,6 +2728,7 @@ function s18Check() {
       const el = document.getElementById(id);
       s18LastAnswer[id] = el ? el.value : '';
     });
+    s18ClearInputStateClasses();
     s18LockInputs(false);
     s18MarkInputs();
     s18ShowingCorrect = false;
@@ -2756,7 +2800,7 @@ let s19DdValues = { 's19-dd-1': '', 's19-dd-2': '', 's19-dd-3': '', 's19-dd-4': 
 const TEXTS19 = {
   correct: {
     title: 'מצוין!',
-    body: 'כאשר מודדים מסה, חשוב לבחור יחידת מידה מתאימה:\nגופים קטנים מאוד נמדדים בדרך כלל ב<b>מיליגרמים</b>.\nגופים קטנים עד בינוניים נמדדים ב<b>גרמים</b>.\nבעלי חיים, אנשים וחפצים גדולים נמדדים בדרך כלל ב<b>קילוגרמים</b>.\nכלי רכב כבדים מאוד, כמו קטרים, נמדדים לעיתים ב<b>טונות</b>.'
+    body: 'כאשר מודדים מסה, חשוב לבחור יחידת מידה מתאימה:\nגופים קטנים מאוד נמדדים בדרך כלל ב<b>מיליגרמים</b>.\nגופים קטנים עד בינוניים נמדדים ב<b>גרמים</b>.\nבעלי חיים בינוניים-גדולים, אנשים וחפצים גדולים נמדדים בדרך כלל ב<b>קילוגרמים</b>.\nכלי רכב כבדים מאוד, כמו קטרים, נמדדים לעיתים ב<b>טונות</b>.'
   },
   wrong1: {
     title: 'התשובה אינה נכונה.',
@@ -2768,7 +2812,7 @@ const TEXTS19 = {
   },
   wrong2: {
     title: 'התשובה אינה נכונה.',
-    body: 'כאשר מודדים מסה, חשוב לבחור יחידת מידה מתאימה:\nגופים קטנים מאוד נמדדים בדרך כלל ב<b>מיליגרמים</b>.\nגופים קטנים עד בינוניים נמדדים ב<b>גרמים</b>.\nבעלי חיים, אנשים וחפצים גדולים נמדדים בדרך כלל ב<b>קילוגרמים</b>.\nכלי רכב כבדים מאוד, כמו קטרים, נמדדים לעיתים ב<b>טונות</b>.'
+    body: 'כאשר מודדים מסה, חשוב לבחור יחידת מידה מתאימה:\nגופים קטנים מאוד נמדדים בדרך כלל ב<b>מיליגרמים</b>.\nגופים קטנים עד בינוניים נמדדים ב<b>גרמים</b>.\nבעלי חיים בינוניים-גדולים, אנשים וחפצים גדולים נמדדים בדרך כלל ב<b>קילוגרמים</b>.\nכלי רכב כבדים מאוד, כמו קטרים, נמדדים לעיתים ב<b>טונות</b>.'
   }
 };
 
@@ -2817,10 +2861,6 @@ function s19ShowFeedback(kind, isCorrect) {
   box.classList.add(isCorrect ? 'is-correct' : 'is-wrong');
   scqFbResetPosition(box.id);
   box.classList.add('visible');
-}
-
-function s19ToggleFeedbox() {
-  document.getElementById('s19-feedbox').classList.remove('visible');
 }
 
 function s19SetBarDone(label, handler) {
@@ -3025,6 +3065,10 @@ function s20ClearZoneStates() {
   ['bruto', 'neto', 'tara'].forEach(function (z) {
     document.getElementById('s20-zone-' + z).classList.remove('correct', 'wrong', 's20-drag-over');
   });
+  S20_ITEM_IDS.forEach(function (id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('s20-item-correct', 's20-item-wrong');
+  });
 }
 
 function s20DragStart(event, itemId) {
@@ -3108,6 +3152,8 @@ function s20RevealCorrect() {
     const zoneEl = document.getElementById('s20-zone-' + item.dataset.correct);
     if (item.parentElement) item.parentElement.removeChild(item);
     zoneEl.appendChild(item);
+    item.classList.remove('s20-item-wrong');
+    item.classList.add('s20-item-correct');
   });
   ['bruto', 'neto', 'tara'].forEach(function (zoneId) {
     const zoneEl = document.getElementById('s20-zone-' + zoneId);
@@ -3127,10 +3173,6 @@ function s20ShowFeedback(kind, isCorrect) {
   box.classList.add('visible');
 }
 
-function s20ToggleFeedbox() {
-  document.getElementById('s20-feedbox').classList.remove('visible');
-}
-
 function s20ShowMyAnswer() {
   S20_ITEM_IDS.forEach(function (id) {
     const item = document.getElementById(id);
@@ -3145,7 +3187,12 @@ function s20ShowMyAnswer() {
     const zoneEl = document.getElementById('s20-zone-' + zoneId);
     const items = zoneEl.querySelectorAll('.s20-drag-item');
     let zoneOk = items.length > 0;
-    items.forEach(function (item) { if (item.dataset.correct !== zoneId) zoneOk = false; });
+    items.forEach(function (item) {
+      const itemOk = item.dataset.correct === zoneId;
+      if (!itemOk) zoneOk = false;
+      item.classList.remove('s20-item-correct', 's20-item-wrong');
+      item.classList.add(itemOk ? 's20-item-correct' : 's20-item-wrong');
+    });
     zoneEl.classList.remove('wrong', 'correct', 's20-drag-over');
     zoneEl.classList.add(zoneOk ? 'correct' : 'wrong');
   });
@@ -3176,7 +3223,10 @@ function s20Check() {
     const items = zoneEl.querySelectorAll('.s20-drag-item');
     let zoneOk = items.length > 0;
     items.forEach(function (item) {
-      if (item.dataset.correct !== zoneId) zoneOk = false;
+      const itemOk = item.dataset.correct === zoneId;
+      if (!itemOk) zoneOk = false;
+      item.classList.remove('s20-item-correct', 's20-item-wrong');
+      item.classList.add(itemOk ? 's20-item-correct' : 's20-item-wrong');
     });
     zoneEl.classList.toggle('correct', zoneOk);
     zoneEl.classList.toggle('wrong', !zoneOk);
@@ -3474,9 +3524,10 @@ document.addEventListener('keydown', function (e) {
 /* =========================================================
    מערכת פופ-אפ משוב גריר — לפי "Feedback popup system" (720-templates
    skill): גרירה מוגבלת לגבולות הקנבס, איפוס למיקום ברירת המחדל
-   בכל פתיחה. כפתור ה-.scq-fb-toggle הקיים (אייקון icon-fb-close)
-   שינה תפקיד: מכפל/הרחב לסגירה מלאה (ראו .classList.remove('visible')
-   ב-xxxToggleFeedbox לעיל). מיושם על כל 13 תיבות המשוב בסיין 1.
+   בכל פתיחה. אין כפתור סגירה (X) — החלטת מוצר מאושרת (2026-07-26):
+   הפופאפ נסגר רק בניווט למסך אחר, בפתיחת ניסיון חדש, או בכפתור
+   מעבר-מצב פנימי כמו .scq-fb-reveal-btn. מיושם על כל 13 תיבות
+   המשוב בסיין 1.
    ========================================================= */
 
 function scqFbResetPosition(boxId) {
@@ -3495,7 +3546,7 @@ function scqFbMakeDraggable(boxId) {
   let startX = 0, startY = 0, startLeft = 0, startTop = 0;
 
   box.addEventListener('mousedown', function (e) {
-    if (e.target.closest('.scq-fb-toggle') || e.target.closest('.scq-fb-reveal-btn')) return;
+    if (e.target.closest('.scq-fb-reveal-btn')) return;
     const parent = box.offsetParent || box.parentElement;
     const boxRect = box.getBoundingClientRect();
     const parentRect = parent.getBoundingClientRect();

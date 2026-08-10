@@ -87,17 +87,22 @@ img { display: block; max-width: none; }
   justify-content: space-between;
 }
 
-/* === Continue button (gradient blue pill) === */
+/* === Continue button (gradient blue pill) — SELF-QA.md § 6 === */
 .btn-continue {
-  background: linear-gradient(180deg, #005FBE 9%, #003971 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 39px;
+  background: linear-gradient(180deg, #005FBE 9%, #0059B2 23.361%, #003971 100%);
   color: #ffffff;
   border: none;
   border-radius: 1000px;
   font-family: 'Assistant', sans-serif;
   font-size: 20px;
   font-weight: 400;
-  padding: 12px 40px;
-  width: 140px;
+  padding: 0 20px;
+  min-width: 140px;
+  box-sizing: border-box;
   cursor: pointer;
   white-space: nowrap;
 }
@@ -112,17 +117,22 @@ img { display: block; max-width: none; }
   outline-offset: 2px;
 }
 
-/* === Back button (חזרה) === */
+/* === Back button (חזרה) — SELF-QA.md § 6 === */
 .btn-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 39px;
   background: #ffffff;
   color: #007ac6;
-  border: 1.5px solid #007ac6;
+  border: 1px solid #007ac6;
   border-radius: 1000px;
   font-family: 'Assistant', sans-serif;
   font-size: 20px;
   font-weight: 400;
-  padding: 12px 40px;
-  width: 140px;
+  padding: 0 20px;
+  min-width: 140px;
+  box-sizing: border-box;
   cursor: pointer;
   white-space: nowrap;
 }

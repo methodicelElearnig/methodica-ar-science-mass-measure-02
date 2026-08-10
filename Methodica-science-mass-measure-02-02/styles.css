@@ -87,19 +87,25 @@ img { display: block; max-width: none; }
   justify-content: space-between;
 }
 
-/* === Continue button (gradient blue pill) === */
+/* === Continue button (gradient blue pill) — Figma node 1126:16901.
+   height/padding/gradient/min-width מדויקים לפי הפיגמה: SOURCE OF TRUTH. === */
 .btn-continue {
-  background: linear-gradient(180deg, #005FBE 9%, #003971 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 39px;
+  background: linear-gradient(180deg, #005FBE 9%, #0059B2 23.361%, #003971 100%);
   color: #ffffff;
   border: none;
   border-radius: 1000px;
   font-family: 'Assistant', sans-serif;
   font-size: 20px;
   font-weight: 400;
-  padding: 12px 40px;
-  width: 140px;
+  padding: 0 20px;
+  min-width: 140px;
   cursor: pointer;
   white-space: nowrap;
+  box-sizing: border-box;
 }
 .btn-continue:disabled {
   background: #AEAEAE;
@@ -113,21 +119,27 @@ img { display: block; max-width: none; }
 }
 
 /* === Hint button (אפשר רמז?) — בסיין הזה גלוי ומופעל מההתחלה בכל
-   מסכי השאלות (2-6), לפי בקשה מפורשת — לא "נחשף אחרי ניסיון ראשון" === */
+   מסכי השאלות (2-6), לפי בקשה מפורשת — לא "נחשף אחרי ניסיון ראשון".
+   זה נשאר כפי שהוא (לא נוגעים בתזמון/hidden) — רק העיצוב תוקן לפי
+   Figma node 1126:16903/731:10387 (מצב "enabled": subject-700, לא subject-500). === */
 .btn-hint {
-  background: #ffffff;
-  color: #019de5;
-  border: 1.5px solid #019de5;
-  border-radius: 1000px;
-  font-family: 'Assistant', sans-serif;
-  font-size: 18px;
-  font-weight: 400;
-  padding: 10px 20px;
-  cursor: pointer;
   display: flex;
   align-items: center;
+  justify-content: center;
+  height: 39px;
+  background: #ffffff;
+  color: #007ac6;
+  border: 1px solid #007ac6;
+  border-radius: 1000px;
+  font-family: 'Assistant', sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  padding: 0 20px;
+  min-width: 140px;
+  cursor: pointer;
   gap: 6px;
   white-space: nowrap;
+  box-sizing: border-box;
 }
 .btn-hint[hidden] { display: none; }
 .btn-hint .scq-hint-icon { flex-shrink: 0; width: 26px; height: 24px; }
@@ -142,19 +154,24 @@ img { display: block; max-width: none; }
   outline-offset: 2px;
 }
 
-/* === Back button (חזרה) === */
+/* === Back button (חזרה) — Figma node 1126:16903. === */
 .btn-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 39px;
   background: #ffffff;
   color: #007ac6;
-  border: 1.5px solid #007ac6;
+  border: 1px solid #007ac6;
   border-radius: 1000px;
   font-family: 'Assistant', sans-serif;
   font-size: 20px;
   font-weight: 400;
-  padding: 12px 40px;
-  width: 140px;
+  padding: 0 20px;
+  min-width: 140px;
   cursor: pointer;
   white-space: nowrap;
+  box-sizing: border-box;
 }
 .btn-back:hover { background: #f0f8ff; }
 .btn-back:focus-visible {
@@ -402,7 +419,7 @@ img { display: block; max-width: none; }
   background: #609e12;
 }
 .scq-opt.correct .scq-radio::after {
-  background-image: url('assets/images/icon-check-white.png');
+  background-image: url('assets/images/icon-badge-check-white.svg');
   background-size: 12px 9px;
 }
 
@@ -416,7 +433,7 @@ img { display: block; max-width: none; }
   background: #b20010;
 }
 .scq-opt.wrong .scq-radio::after {
-  background-image: url('assets/images/icon-x-white.png');
+  background-image: url('assets/images/icon-badge-x-white.svg');
   background-size: 10px 10px;
 }
 
@@ -514,18 +531,6 @@ img { display: block; max-width: none; }
   align-items: center;
   gap: 32px;
 }
-.scq-fb-toggle {
-  flex-shrink: 0;
-  width: 30px;
-  height: 30px;
-  border: 1px solid #303030;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 100px;
-  background: #fff;
-}
-.scq-fb-toggle img { width: 16px; height: 16px; }
 .scq-fb-title-text {
   flex: 1;
   font-weight: 700;
@@ -1033,10 +1038,20 @@ img { display: block; max-width: none; }
   box-sizing: border-box;
   gap: 8px;
   font-family: 'Assistant', sans-serif;
+  /* דרופדאון סגור = 80% שקיפות תמיד (לא רק ב-disabled) — SELF-QA.md § 5, מאומת מול
+     Figma node 731:10387/415:8332 (DropdownQuestion/Multiple Blanks). */
+  opacity: 0.8;
 }
-.dd-btn:disabled { cursor: default; opacity: 0.7; pointer-events: none; }
-.dd-btn.wrong { border: 1.5px solid #b20010 !important; opacity: 0.8; }
-.dd-btn.correct { border: 1.5px solid #609e12 !important; opacity: 0.8; }
+/* פתוח = מצב "focus", border 1.5px subject-500 + שקיפות מלאה — היה חסר לגמרי
+   כאן (רק החץ הסתובב), לפי SELF-QA.md § 5. */
+.dd-btn[aria-expanded="true"] {
+  border: 1.5px solid #019de5;
+  opacity: 1;
+}
+.dd-btn:disabled { cursor: default; pointer-events: none; }
+/* 1px, לא 1.5px — לפי Figma State06. */
+.dd-btn.wrong { border: 1px solid #b20010 !important; }
+.dd-btn.correct { border: 1px solid #609e12 !important; }
 
 .dd-val {
   font-family: 'Assistant', sans-serif;
@@ -1047,6 +1062,17 @@ img { display: block; max-width: none; }
   text-align: right;
   white-space: nowrap;
   overflow: hidden;
+}
+/* מבטלים flex-grow ומזיזים את התג (::after) לפני הטקסט ב-order, אחרת ה-RTL flex
+   row דוחף אותו לקצה המנותק — SELF-QA.md § 5, אותה טכניקה כמו CLAUDE.md #3. */
+.dd-btn.wrong .dd-val,
+.dd-btn.correct .dd-val {
+  flex: 0 1 auto;
+}
+.dd-btn.wrong,
+.dd-btn.correct {
+  justify-content: flex-start;
+  gap: 10px;
 }
 
 .dd-arrow {
@@ -1060,8 +1086,22 @@ img { display: block; max-width: none; }
 .dd-btn[aria-expanded="true"] .dd-arrow { transform: rotate(180deg); }
 .dd-btn.wrong .dd-arrow,
 .dd-btn.correct .dd-arrow { display: none; }
-.dd-btn.wrong::after { content: '✕'; color: #b20010; font-size: 15px; font-weight: 700; flex-shrink: 0; }
-.dd-btn.correct::after { content: '✓'; color: #609e12; font-size: 15px; font-weight: 700; flex-shrink: 0; }
+/* וי ירוק / X אדום אמיתיים (SVG מיובא מ-Figma node 196:3401/196:3409, קובץ עצמאי
+   לפרויקט הזה) — לא תו יוניקוד צבוע. זה היה הבאג שהלקוח חשד בו במקור. */
+.dd-btn.wrong::after,
+.dd-btn.correct::after {
+  content: '';
+  display: block;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  order: -1;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+.dd-btn.wrong::after { background-image: url('assets/images/icon-answerbox-x-red.svg'); }
+.dd-btn.correct::after { background-image: url('assets/images/icon-answerbox-check-green.svg'); }
 
 .dd-opts {
   position: absolute;
@@ -1149,6 +1189,7 @@ img { display: block; max-width: none; }
 }
 
 .drag-item {
+  position: relative;
   background: #ffffff;
   border: 2px solid rgba(201, 206, 216, 0.5);
   border-radius: 10px;
@@ -1158,7 +1199,7 @@ img { display: block; max-width: none; }
   flex-shrink: 0;
   width: 155px;
   height: 140px;
-  overflow: hidden;
+  overflow: visible; /* כדי שתג ה-V/X בפינה יוכל לבלוט מעבר לגבול הפריט */
 }
 .drag-item img {
   width: 100%;
@@ -1172,6 +1213,35 @@ img { display: block; max-width: none; }
 
 /* פריט בתוך אזור גרירה — קטן יותר */
 .drag-zone .drag-item { width: 120px; height: 110px; }
+
+/* מצב תקין/שגוי לפי SELF-QA.md § 4 (DragAndDropQuestion — Image/"Classic"):
+   תג 22×22 בפינה הפנימית של הכרטיסייה (לא תג צף מחוץ לגבול). */
+.drag-item.drag-item-correct,
+.drag-item.drag-item-wrong { border-width: 2px; }
+.drag-item.drag-item-correct { border-color: #609e12; }
+.drag-item.drag-item-wrong { border-color: #b20010; }
+.drag-item.drag-item-correct::after,
+.drag-item.drag-item-wrong::after {
+  content: '';
+  position: absolute;
+  top: 4.5px;
+  right: 4.5px;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.drag-item.drag-item-correct::after {
+  background-color: #609e12;
+  background-image: url('assets/images/icon-badge-check-white.svg');
+  background-size: 11px 8px;
+}
+.drag-item.drag-item-wrong::after {
+  background-color: #b20010;
+  background-image: url('assets/images/icon-badge-x-white.svg');
+  background-size: 9px 9px;
+}
 
 .drag-zones-row {
   display: flex;
@@ -1204,8 +1274,9 @@ img { display: block; max-width: none; }
   padding: 8px;
 }
 .drag-zone.drag-over { border-color: #019de5; background: #eaf6ff; }
-.drag-zone.correct { border-color: #4caf50; background: #edf8ed; border-style: solid; }
-.drag-zone.wrong { border-color: #e53935; background: #ffe5e5; border-style: solid; }
+/* אין צביעת משבצת/רקע ברמת האזור על נכון/שגוי — נבדק ישירות מול Figma
+   (DragAndDropMatchingQuestion, כל 7 המצבים) ואינו מופיע שם; רק הכרטיסייה
+   עצמה (למעלה) והפופאפ המשוב משתנים בצבע. */
 
 .drag-zone-label {
   font-family: 'Assistant', sans-serif;

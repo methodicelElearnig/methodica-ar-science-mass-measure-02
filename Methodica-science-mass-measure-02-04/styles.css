@@ -87,17 +87,22 @@ img { display: block; max-width: none; }
   justify-content: space-between;
 }
 
-/* === Continue button (gradient blue pill) === */
+/* === Continue button (gradient blue pill) — SELF-QA.md § 6 === */
 .btn-continue {
-  background: linear-gradient(180deg, #005FBE 9%, #003971 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 39px;
+  background: linear-gradient(180deg, #005FBE 9%, #0059B2 23.361%, #003971 100%);
   color: #ffffff;
   border: none;
   border-radius: 1000px;
   font-family: 'Assistant', sans-serif;
   font-size: 20px;
   font-weight: 400;
-  padding: 12px 40px;
-  width: 140px;
+  padding: 0 20px;
+  min-width: 140px;
+  box-sizing: border-box;
   cursor: pointer;
   white-space: nowrap;
 }
@@ -115,17 +120,21 @@ img { display: block; max-width: none; }
 /* === Hint button (אפשר רמז?) — מוסתר (hidden) עד לניסיון שגוי ראשון,
    נחשף (hidden=false) אחרי טעות ראשונה — כמו מסך 32 בלומדת המקור === */
 .btn-hint {
-  background: #ffffff;
-  color: #019de5;
-  border: 1.5px solid #019de5;
-  border-radius: 1000px;
-  font-family: 'Assistant', sans-serif;
-  font-size: 18px;
-  font-weight: 400;
-  padding: 10px 20px;
-  cursor: pointer;
   display: flex;
   align-items: center;
+  justify-content: center;
+  height: 39px;
+  background: #ffffff;
+  color: #007ac6;
+  border: 1px solid #007ac6;
+  border-radius: 1000px;
+  font-family: 'Assistant', sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  padding: 0 20px;
+  min-width: 140px;
+  box-sizing: border-box;
+  cursor: pointer;
   gap: 6px;
   white-space: nowrap;
 }
@@ -137,17 +146,22 @@ img { display: block; max-width: none; }
   outline-offset: 2px;
 }
 
-/* === Back button (חזרה) === */
+/* === Back button (חזרה) — SELF-QA.md § 6 === */
 .btn-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 39px;
   background: #ffffff;
   color: #007ac6;
-  border: 1.5px solid #007ac6;
+  border: 1px solid #007ac6;
   border-radius: 1000px;
   font-family: 'Assistant', sans-serif;
   font-size: 20px;
   font-weight: 400;
-  padding: 12px 40px;
-  width: 140px;
+  padding: 0 20px;
+  min-width: 140px;
+  box-sizing: border-box;
   cursor: pointer;
   white-space: nowrap;
 }
@@ -196,31 +210,6 @@ img { display: block; max-width: none; }
   direction: rtl;
   align-items: center;
   gap: 16px;
-}
-.scq-fb-toggle {
-  flex-shrink: 0;
-  width: 30px;
-  height: 30px;
-  border: 1px solid #303030;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 100px;
-  background: #fff;
-  font-size: 13px;
-}
-.scq-fb-close {
-  flex-shrink: 0;
-  width: 30px;
-  height: 30px;
-  border: 1px solid #303030;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 100px;
-  background: #fff;
-  font-size: 13px;
-  cursor: pointer;
 }
 .scq-fb-title-text {
   flex: 1;
@@ -521,20 +510,44 @@ img { display: block; max-width: none; }
   width: 90px; height: 36px;
   border: 1px solid rgba(174,174,174,0.5); border-radius: 10px;
   font-size: 20px; text-align: center; padding: 0 6px;
-  background: #fff; direction: ltr;
+  background-color: #fff; background-repeat: no-repeat; background-position: right 16px center;
+  direction: ltr;
   font-family: 'Assistant', sans-serif;
 }
 .tbl-input:focus { outline: none; border: 1.5px solid #019DE5; }
-.tbl-input:disabled { background: #f5f5f5; cursor: default; }
-.tbl-input.tbl-input-correct {
+.tbl-input:disabled { background-color: #f5f5f5; cursor: default; }
+/* מולא אך לא בפוקוס (עדיין לא נבדק) — מצב שלישי נפרד מהאפור הבסיסי ומהכחול
+   פוקוס, לפי Figma node 1126:16897 (MixedAnswerQuestion/State05). placeholder=" "
+   על ה-input מפעיל את :placeholder-shown כדי לזהות "יש ערך" ב-CSS טהור. */
+.tbl-input:not(:focus):not(:placeholder-shown):not(.tbl-input-correct):not(.tbl-input-wrong):not(.tbl-input-revealed) {
+  border: 1.5px solid #ececec;
+}
+/* וי ירוק / X אדום אמיתיים (SVG מיובא מ-Figma node 196:3401/196:3409), לא data-URI מצויר ידנית.
+   padding-right שמור כדי שהערך לא ייכנס מתחת לאייקון, לפי SELF-QA.md § 1 */
+.tbl-input.tbl-input-correct,
+.tbl-input.tbl-input-revealed {
   border: 1px solid #609E12;
-  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2.5 8.5l3.5 3.5 7-8' stroke='%23609E12' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 5px center / 14px;
+  padding-right: 42px;
+  /* דורס את .tbl-input:disabled { background-color: #f5f5f5 } — לפי Figma
+     node 1126:17063 גם תיבה נכונה/שגויה (נעולה) היא bg-white, לא אפורה.
+     הבורדר והאיקון הם המחוון היחיד, לא צבע הרקע. */
+  background-color: #fff;
+  background-image: url('assets/images/icon-answerbox-check-green.svg');
+  background-size: 16px 16px;
 }
 .tbl-input.tbl-input-wrong {
   border: 1px solid #B20010;
-  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 4l8 8M12 4l-8 8' stroke='%23B20010' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 5px center / 14px;
+  padding-right: 42px;
+  background-color: #fff;
+  background-image: url('assets/images/icon-answerbox-x-red.svg');
+  background-size: 16px 16px;
 }
-.tbl-input.tbl-input-revealed { border: 1.5px solid #019DE5; background: #fff; }
+.tbl-input::-webkit-outer-spin-button,
+.tbl-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.tbl-input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 
 .tbl-unit { font-size: 18px; color: #555; margin-right: 4px; }
 
@@ -547,19 +560,73 @@ img { display: block; max-width: none; }
   background: #fff; cursor: pointer; flex-shrink: 0;
   font-size: 20px; font-family: 'Assistant', sans-serif;
   color: #303030; direction: rtl;
+  opacity: 0.8;
 }
 .tbl-dd-btn:disabled { cursor: default; pointer-events: none; }
-.tbl-dd-btn.wrong   { border: 1.5px solid #B20010 !important; }
-.tbl-dd-btn.correct { border: 1.5px solid #609E12 !important; }
-.tbl-dd-btn.tbl-dd-revealed { border: 1.5px solid #019DE5 !important; }
+/* פתוח (רשימת אפשרויות מוצגת) = מצב "focus" של ValueInputQuestion, לפי
+   Figma (DropdownQuestion/Multiple Blanks, node 415:8332) — border 1.5px
+   subject-500, אותו עיקרון בדיוק כמו tbl-input:focus. */
+.tbl-dd-btn[aria-expanded="true"] {
+  border: 1.5px solid #019DE5;
+  opacity: 1;
+}
+/* התפריט הנפתח מוצג ב-80% שקיפות בכל מצב סגור (ברירת מחדל, אחרי בחירה,
+   ואפילו נכון/שגוי בסוף) — ורק בפתיחה עולה ל-100%. הבדל אמיתי מ-tbl-input,
+   שאף פעם לא מקבל שקיפות. מאומת מול Figma node 1126:15739 עד 1126:17063
+   (MixedAnswerQuestion State01–State06) — השקיפות מופיעה בעקביות בכל 6 המצבים
+   על עטיפת ה-"question/textbox" של הדרופדאון, ולעולם לא על זו של ה-input. */
+/* 1px, לא 1.5px — נבדק ישירות מול Figma (DropdownQuestion/Multiple Blanks,
+   node 416:6162 שגוי / 731:10387 נכון): אותה תיבת "textbox" בדיוק כמו
+   ב-ValueInputQuestion (§1), עם border רגיל (1px) בכל המצבים אחרי בדיקה. */
+.tbl-dd-btn.wrong   { border: 1px solid #B20010 !important; }
+.tbl-dd-btn.correct { border: 1px solid #609E12 !important; }
+.tbl-dd-btn.tbl-dd-revealed { border: 1px solid #019DE5 !important; }
+/* תיקון: .tbl-dd-val הבסיסי הוא flex:1 (תופס את כל הרוחב, כדי שהערך יתמלא
+   בזמן שהתפריט סגור עם צ'בורון). ב-flex row עם direction:rtl, val (ראשון ב-DOM)
+   נדבק לימין ומתפשט שמאלה, ודוחף את התג (::after, אחרון ב-DOM) לקצה הרחוק
+   בשמאל — מנותק מהטקסט, בניגוד ל-tbl-input שבו האייקון תמיד צמוד לימין הטקסט
+   (ראו §5 ב-SELF-QA.md). כדי שהתג ייצמד לימין הקופסה בדיוק כמו ב-input,
+   מבטלים את ה-flex-grow ומזיזים את התג לפני הטקסט בסדר ה-flex (order: -1
+   למטה) — אותה טכניקה כמו ב-CLAUDE.md כלל #3. */
+.tbl-dd-btn.wrong .tbl-dd-val,
+.tbl-dd-btn.correct .tbl-dd-val,
+.tbl-dd-btn.tbl-dd-revealed .tbl-dd-val {
+  flex: 0 1 auto;
+}
+.tbl-dd-btn.wrong,
+.tbl-dd-btn.correct,
+.tbl-dd-btn.tbl-dd-revealed {
+  justify-content: flex-start;
+  gap: 10px;
+}
 .tbl-dd-val { font-size: 20px; font-weight: 400; color: #303030; flex: 1; text-align: right; direction: rtl; white-space: nowrap; overflow: hidden; }
 .tbl-dd-arrow { width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 6px solid #303030; flex-shrink: 0; }
 .tbl-dd-btn[aria-expanded="true"] .tbl-dd-arrow { transform: rotate(180deg); }
 .tbl-dd-btn.wrong .tbl-dd-arrow,
 .tbl-dd-btn.correct .tbl-dd-arrow,
 .tbl-dd-btn.tbl-dd-revealed .tbl-dd-arrow { display: none; }
-.tbl-dd-btn.wrong::after   { content: '✕'; color: #B20010; font-size: 13px; font-weight: 700; flex-shrink: 0; }
-.tbl-dd-btn.correct::after { content: '✓'; color: #609E12; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+/* אייקון תקין/שגוי אמיתי (SVG מיובא מ-Figma node 196:3401/196:3409) — לא תו
+   יוניקוד צבוע. אותם אייקונים בדיוק כמו ב-tbl-input באותו מסך. */
+.tbl-dd-btn.wrong::after,
+.tbl-dd-btn.correct::after,
+.tbl-dd-btn.tbl-dd-revealed::after {
+  content: '';
+  display: block;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  order: -1;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+.tbl-dd-btn.wrong::after {
+  background-image: url('assets/images/icon-answerbox-x-red.svg');
+}
+.tbl-dd-btn.correct::after,
+.tbl-dd-btn.tbl-dd-revealed::after {
+  background-image: url('assets/images/icon-answerbox-check-green.svg');
+}
 .tbl-dd-opts {
   position: absolute; top: calc(100% + 4px); right: 0;
   width: 148px; background: #fff;
