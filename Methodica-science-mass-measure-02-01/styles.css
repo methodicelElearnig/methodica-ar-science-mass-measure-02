@@ -159,11 +159,11 @@ img { display: block; max-width: none; }
 .option-card:hover .option-card-frame,
 .option-card:focus-visible .option-card-frame {
   border-color: #019DE5;
-  background: #EAF6FF;
+  background: #ffffFF;
 }
 .option-card.selected .option-card-frame {
   border-color: #019DE5;
-  background: #EAF6FF;
+  background: #ffffFF;
 }
 
 /* ─── תמונה בתוך המסגרת ───
@@ -173,7 +173,8 @@ img { display: block; max-width: none; }
   width: 100%;
   aspect-ratio: 296 / 278;
 }
-.option-card-img img {
+.option-card-img img,
+.option-card-img video {
   margin-bottom: -30px !important;
   width: 100%;
   height: 100%;
@@ -1299,8 +1300,7 @@ img { display: block; max-width: none; }
 
 .s7-avatar-img {
   width: 180px;
-  height: auto;
-  max-height: 260px;
+  aspect-ratio: 1 / 1;
   object-fit: contain;
   display: block;
   flex-shrink: 0;

@@ -28,11 +28,13 @@ window.lomdaState = {
 (function preloadCharacterAvatars() {
   const isGreen = window.lomdaState.selectedCharacter === 'green';
   const files = isGreen
-    ? ['avatar-green-come-in.png', 'avatar-green-clapping-hands.png']
-    : ['avatar-orange-come-in.png', 'avatar-orange-clapping-hands.png'];
+    ? ['avatar-green-come-in.mp4', 'avatar-green-clapping-hands.mp4']
+    : ['avatar-orange-come-in.mp4', 'avatar-orange-clapping-hands.mp4'];
   files.forEach(function (name) {
-    const img = new Image();
-    img.src = 'assets/images/' + name;
+    const video = document.createElement('video');
+    video.muted = true;
+    video.preload = 'auto';
+    video.src = 'assets/videos/' + name;
   });
 })();
 
@@ -82,11 +84,13 @@ function resetScreenState(n) {
    ========================================================= */
 
 function resetScreenState0() {
-  const img = document.getElementById('s0-avatar-img');
-  if (img) {
-    img.src = (window.lomdaState.selectedCharacter === 'green')
-      ? 'assets/images/avatar-green-come-in.png'
-      : 'assets/images/avatar-orange-come-in.png';
+  const video = document.getElementById('s0-avatar-img');
+  if (video) {
+    video.src = (window.lomdaState.selectedCharacter === 'green')
+      ? 'assets/videos/avatar-green-come-in.mp4'
+      : 'assets/videos/avatar-orange-come-in.mp4';
+    video.load();
+    video.play().catch(function () {});
   }
 }
 
@@ -1021,11 +1025,13 @@ function resetScreenState5() {
    ========================================================= */
 
 function resetScreenState6() {
-  const img = document.getElementById('s6-avatar-img');
-  if (img) {
-    img.src = (window.lomdaState.selectedCharacter === 'green')
-      ? 'assets/images/avatar-green-clapping-hands.png'
-      : 'assets/images/avatar-orange-clapping-hands.png';
+  const video = document.getElementById('s6-avatar-img');
+  if (video) {
+    video.src = (window.lomdaState.selectedCharacter === 'green')
+      ? 'assets/videos/avatar-green-clapping-hands.mp4'
+      : 'assets/videos/avatar-orange-clapping-hands.mp4';
+    video.load();
+    video.play().catch(function () {});
   }
 }
 

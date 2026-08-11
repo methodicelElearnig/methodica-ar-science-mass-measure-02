@@ -25,12 +25,19 @@ window.lomdaState = {
    של הדפדפן ותצויר מיידית — בלי רגע ריק/מהבהב בכניסה הראשונה למסך. */
 (function preloadCharacterAvatars() {
   const isGreen = window.lomdaState.selectedCharacter === 'green';
-  const files = isGreen
-    ? ['avatar-green-waving-v.jpg', 'avatar-green-thank-you.jpg', 'avatar-green-dancing.gif']
-    : ['avatar-orange-waving-v.jpg', 'avatar-orange-thank-you.jpg', 'avatar-orange-dancing.gif'];
-  files.forEach(function (name) {
+  const imageFiles = isGreen ? ['avatar-green-dancing.gif'] : ['avatar-orange-dancing.gif'];
+  const videoFiles = isGreen
+    ? ['avatar-green-waving-v.mp4', 'avatar-green-thank-you.mp4']
+    : ['avatar-orange-waving-v.mp4', 'avatar-orange-thank-you.mp4'];
+  imageFiles.forEach(function (name) {
     const img = new Image();
     img.src = 'assets/images/' + name;
+  });
+  videoFiles.forEach(function (name) {
+    const video = document.createElement('video');
+    video.muted = true;
+    video.preload = 'auto';
+    video.src = 'assets/Video/' + name;
   });
 })();
 
@@ -91,11 +98,13 @@ function moedBFullyPassed() {
    ========================================================= */
 
 function resetScreenState0() {
-  const img = document.getElementById('s6-avatar-img');
-  if (img) {
-    img.src = (window.lomdaState.selectedCharacter === 'green')
-      ? 'assets/images/avatar-green-waving-v.jpg'
-      : 'assets/images/avatar-orange-waving-v.jpg';
+  const video = document.getElementById('s6-avatar-img');
+  if (video) {
+    video.src = (window.lomdaState.selectedCharacter === 'green')
+      ? 'assets/Video/avatar-green-waving-v.mp4'
+      : 'assets/Video/avatar-orange-waving-v.mp4';
+    video.load();
+    video.play().catch(function () {});
   }
 }
 function s6Continue() { goTo(1); }
@@ -670,11 +679,13 @@ function resetScreenState6() {
    ========================================================= */
 
 function resetScreenState7() {
-  const img = document.getElementById('s12t-avatar-img');
-  if (img) {
-    img.src = (window.lomdaState.selectedCharacter === 'green')
-      ? 'assets/images/avatar-green-thank-you.jpg'
-      : 'assets/images/avatar-orange-thank-you.jpg';
+  const video = document.getElementById('s12t-avatar-img');
+  if (video) {
+    video.src = (window.lomdaState.selectedCharacter === 'green')
+      ? 'assets/Video/avatar-green-thank-you.mp4'
+      : 'assets/Video/avatar-orange-thank-you.mp4';
+    video.load();
+    video.play().catch(function () {});
   }
 }
 /* TODO: "סיימתי" — אין עדיין פעולה מוגדרת (סוף היקף הבנייה הנוכחי) */

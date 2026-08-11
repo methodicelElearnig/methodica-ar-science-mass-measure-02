@@ -15,20 +15,27 @@ window.lomdaState = {
   selectedCharacter: savedCharacter // 'green' | 'orange' — נקבע במסך 1, נצרך בכל מסך שמציג את הדמות הנבחרת
 };
 
-/* טוענים מראש (preload) את תמונות הדמות של הצבע הנבחר (אם כבר נשמר
-   מביקור קודם), כדי שבכל מסך שמציג את הדמות התמונה כבר תהיה בקאש של
-   הדפדפן ותצויר מיידית — בלי רגע ריק/מהבהב. במסך 1 עצמו (שם הבחירה
+/* טוענים מראש (preload) את מדיית הדמות של הצבע הנבחר (אם כבר נשמר
+   מביקור קודם), כדי שבכל מסך שמציג את הדמות המדיה כבר תהיה בקאש של
+   הדפדפן ותוצג מיידית — בלי רגע ריק/מהבהב. במסך 1 עצמו (שם הבחירה
    נקבעת בפעם הראשונה) אין עדיין ערך שמור, אז זה רלוונטי בעיקר לחזרות. */
 (function preloadCharacterAvatars() {
-  const isGreen = window.lomdaState.selectedCharacter === 'green';
-  const files = isGreen
-    ? ['avatar-green.png', 'avatar-green-come-in.png', 'screen9_avatar_green_asking.png',
-       'avatar-green-workout.gif', 'avatar-green-clapping-hands.png']
-    : ['avatar-orange.png', 'avatar-orange-come-in.png', 'screen9_avatar_orange_asking.png',
-       'avatar-orange-workout.gif', 'avatar-orange-clapping-hands.png'];
-  files.forEach(function (name) {
+  const color = (window.lomdaState.selectedCharacter === 'green') ? 'green' : 'orange';
+  const imageFiles = ['avatar-' + color + '.png', 'avatar-' + color + '-workout.gif'];
+  const videoFiles = [
+    'avatar-' + color + '-come-in.mp4',
+    'avatar-' + color + '-questioning.mp4',
+    'avatar-' + color + '-clapping-hands.mp4'
+  ];
+  imageFiles.forEach(function (name) {
     const img = new Image();
     img.src = 'assets/images/' + name;
+  });
+  videoFiles.forEach(function (name) {
+    const video = document.createElement('video');
+    video.muted = true;
+    video.preload = 'auto';
+    video.src = 'assets/videos/' + name;
   });
 })();
 
@@ -857,11 +864,13 @@ function resetScreenState4() {
    ========================================================= */
 
 function resetScreenState5() {
-  const img = document.getElementById('s6-avatar-img');
-  if (img) {
-    img.src = (window.lomdaState.selectedCharacter === 'green')
-      ? 'assets/images/avatar-green-come-in.png'
-      : 'assets/images/avatar-orange-come-in.png';
+  const video = document.getElementById('s6-avatar-img');
+  if (video) {
+    video.src = (window.lomdaState.selectedCharacter === 'green')
+      ? 'assets/videos/avatar-green-come-in.mp4'
+      : 'assets/videos/avatar-orange-come-in.mp4';
+    video.load();
+    video.play().catch(function () {});
   }
 }
 
@@ -884,11 +893,13 @@ function resetScreenState6() {
   if (avatarArea) avatarArea.hidden = true;
   const btn = document.getElementById('s7-btn-continue');
   if (btn) btn.disabled = true;
-  const img = document.getElementById('s7-avatar-img');
-  if (img) {
-    img.src = (window.lomdaState.selectedCharacter === 'green')
-      ? 'assets/images/avatar-green-questioning.png'
-      : 'assets/images/avatar-orange-questioning.png';
+  const video = document.getElementById('s7-avatar-img');
+  if (video) {
+    video.src = (window.lomdaState.selectedCharacter === 'green')
+      ? 'assets/videos/avatar-green-questioning.mp4'
+      : 'assets/videos/avatar-orange-questioning.mp4';
+    video.load();
+    video.play().catch(function () {});
   }
 }
 
@@ -1144,11 +1155,15 @@ function s9ClearZoneStates() {
 }
 
 function s9UpdateAvatar() {
-  const img = document.getElementById('s9-avatar-img');
-  if (img) {
-    img.src = (window.lomdaState.selectedCharacter === 'green')
-      ? 'assets/images/screen9_avatar_green_asking.png'
-      : 'assets/images/screen9_avatar_orange_asking.png';
+  // משתמש בווידאו ה-"questioning" (אין קליפ "asking" נפרד — הוחלט להשתמש
+  // באותה אנימציה גם למסך זה)
+  const video = document.getElementById('s9-avatar-img');
+  if (video) {
+    video.src = (window.lomdaState.selectedCharacter === 'green')
+      ? 'assets/videos/avatar-green-questioning.mp4'
+      : 'assets/videos/avatar-orange-questioning.mp4';
+    video.load();
+    video.play().catch(function () {});
   }
 }
 
@@ -2168,11 +2183,13 @@ document.querySelectorAll('#s13 .scq-opt').forEach(function (opt) {
    ========================================================= */
 
 function resetScreenState14() {
-  const img = document.getElementById('s15-avatar-img');
-  if (img) {
-    img.src = (window.lomdaState.selectedCharacter === 'green')
-      ? 'assets/images/avatar-green-clapping-hands.png'
-      : 'assets/images/avatar-orange-clapping-hands.png';
+  const video = document.getElementById('s15-avatar-img');
+  if (video) {
+    video.src = (window.lomdaState.selectedCharacter === 'green')
+      ? 'assets/videos/avatar-green-clapping-hands.mp4'
+      : 'assets/videos/avatar-orange-clapping-hands.mp4';
+    video.load();
+    video.play().catch(function () {});
   }
 }
 

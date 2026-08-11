@@ -25,12 +25,17 @@ window.lomdaState = {
    של הדפדפן ותצויר מיידית — בלי רגע ריק/מהבהב בכניסה הראשונה למסך. */
 (function preloadCharacterAvatars() {
   const isGreen = window.lomdaState.selectedCharacter === 'green';
-  const files = isGreen
-    ? ['avatar-green-warming-muscles.png', 'avatar-green-dancing.gif']
-    : ['avatar-orange-warming-muscles.jpg', 'avatar-orange-dancing.gif'];
-  files.forEach(function (name) {
+  const imageFiles = isGreen ? ['avatar-green-dancing.gif'] : ['avatar-orange-dancing.gif'];
+  const videoFiles = isGreen ? ['avatar-green-warming-muscles.mp4'] : ['avatar-orange-warming-muscles.mp4'];
+  imageFiles.forEach(function (name) {
     const img = new Image();
     img.src = 'assets/images/' + name;
+  });
+  videoFiles.forEach(function (name) {
+    const video = document.createElement('video');
+    video.muted = true;
+    video.preload = 'auto';
+    video.src = 'assets/video/' + name;
   });
 })();
 
@@ -83,11 +88,13 @@ function moedAFullyPassed() {
    ========================================================= */
 
 function resetScreenState0() {
-  const img = document.getElementById('s0-avatar-img');
-  if (img) {
-    img.src = (window.lomdaState.selectedCharacter === 'green')
-      ? 'assets/images/avatar-green-warming-muscles.png'
-      : 'assets/images/avatar-orange-warming-muscles.jpg';
+  const video = document.getElementById('s0-avatar-img');
+  if (video) {
+    video.src = (window.lomdaState.selectedCharacter === 'green')
+      ? 'assets/video/avatar-green-warming-muscles.mp4'
+      : 'assets/video/avatar-orange-warming-muscles.mp4';
+    video.load();
+    video.play().catch(function () {});
   }
 }
 
