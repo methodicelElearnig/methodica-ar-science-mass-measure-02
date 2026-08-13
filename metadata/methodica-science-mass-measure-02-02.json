@@ -1,0 +1,175 @@
+{
+  "id": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-02/",
+  "title": "תרגול בסיסי ותרגול סטנדרטי 2",
+  "learningUnitId": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02/",
+  "componentPurpose": "practice",
+  "isAssessment": false,
+  "manufacture": "methodica",
+  "recommendedAfterFail": [
+    "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-01/"
+  ],
+  "isRequired": false,
+  "relativeDifficulty": 2,
+  "masteryLevel": null,
+  "order": 2,
+  "depthLevel": "core-curriculum-basic",
+  "cognitiveLevel": "applying-a-model-or-procedure",
+  "languages": ["Hebrew"],
+  "skills": [],
+  "estimatedTimeInMinutes": 20,
+  "createdAt": "2026-08-12T00:00:00.000Z",
+  "updatedAt": "2026-08-12T00:00:00.000Z",
+  "subContent": [
+    {
+      "id": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-02/methodica-science-mass-measure-02-02-001/",
+      "title": "בסיסי 1: זיהוי ברוטו (חטיף/פסטה)",
+      "informationToBot": "מטרת הפריט: תרגול תגבור בסיסי בזיהוי ברוטו מתוך רשימת פריטים מתוארת. מה התלמיד אמור להבין/לתרגל: ברוטו = התוכן והאריזה יחד - חטיף באריזתו ואריזת פסטה מלאה הם שתי דוגמאות לברוטו. כיווני חשיבה ואסטרטגיות: חיפוש הפריטים שבהם רואים גם את התוכן וגם את האריזה יחד. טעויות נפוצות: בחירת פריט שמציג רק את התוכן או רק את האריזה. מידע נוסף: שאלת בחירה מרובה (2 תשובות נכונות). צילום מסך: לא צורף.",
+      "contentType": "practice",
+      "mediaFormat": "content-interactive",
+      "questions": [
+        {
+          "questionId": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-02/methodica-science-mass-measure-02-02-001/q1",
+          "questionType": "choice",
+          "questionText": "מהו ברוטו? ברוטו הוא המסה של התוכן והאריזה יחד (החטיף+האריזה). סמנו את שני הפריטים שהם ברוטו:",
+          "answers": ["חטיף באריזתו", "הפסטה שבתוך האריזה", "אריזת פסטה מלאה", "אריזת פסטה ריקה"],
+          "correctAnswers": ["חטיף באריזתו", "אריזת פסטה מלאה"]
+        }
+      ]
+    },
+    {
+      "id": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-02/methodica-science-mass-measure-02-02-002/",
+      "title": "בסיסי 2: זיהוי נטו (בקבוק/פיצה)",
+      "informationToBot": "מטרת הפריט: תרגול תגבור בסיסי בזיהוי נטו מתוך רשימת פריטים מתוארת. מה התלמיד אמור להבין/לתרגל: נטו = התוכן בלבד - המים שבתוך הבקבוק ומשולשי הפיצה שאוכלים הם שתי דוגמאות לנטו. כיווני חשיבה ואסטרטגיות: חיפוש הפריטים המתארים רק תוכן, בלי האריזה/המיכל. טעויות נפוצות: בחירת האריזה הריקה (בקבוק/קופסה) במקום התוכן. מידע נוסף: שאלת בחירה מרובה (2 תשובות נכונות). צילום מסך: לא צורף.",
+      "contentType": "practice",
+      "mediaFormat": "content-interactive",
+      "questions": [
+        {
+          "questionId": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-02/methodica-science-mass-measure-02-02-002/q1",
+          "questionType": "choice",
+          "questionText": "מהו נטו? נטו הוא המסה של התוכן בלבד (בלי המיכל או האריזה). סמנו את שני הפריטים שהם נטו:",
+          "answers": ["בקבוק פלסטיק ריק", "המים שבתוך הבקבוק", "קופסת קרטון של פיצה", "משולשי הפיצה שאוכלים"],
+          "correctAnswers": ["המים שבתוך הבקבוק", "משולשי הפיצה שאוכלים"]
+        }
+      ]
+    },
+    {
+      "id": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-02/methodica-science-mass-measure-02-02-003/",
+      "title": "בסיסי 3: יחידת מסה - גרם",
+      "informationToBot": "מטרת הפריט: תרגול תגבור בסיסי בזיהוי גופים שכדאי למדוד בגרמים. מה התלמיד אמור להבין/לתרגל: תפוח עץ וחטיף שוקולד הם גופים קטנים-בינוניים שנוח למדוד בגרמים, לעומת קטר רכבת (טונות) וכלב (קילוגרמים). כיווני חשיבה ואסטרטגיות: גרמים מתאימים בדרך כלל לדברים שאפשר להחזיק ביד. טעויות נפוצות: בחירת גוף גדול/כבד מדי (קטר, כלב) שנוח יותר במידה גדולה יותר. מידע נוסף: שאלת בחירה מרובה (2 תשובות נכונות). צילום מסך: לא צורף.",
+      "contentType": "practice",
+      "mediaFormat": "content-interactive",
+      "questions": [
+        {
+          "questionId": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-02/methodica-science-mass-measure-02-02-003/q1",
+          "questionType": "choice",
+          "questionText": "יחידות מסה (גרם): סמנו את שני הפריטים שכדאי למדוד בגרמים:",
+          "answers": ["תפוח עץ", "קטר רכבת", "חטיף שוקולד", "כלב"],
+          "correctAnswers": ["תפוח עץ", "חטיף שוקולד"]
+        }
+      ]
+    },
+    {
+      "id": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-02/methodica-science-mass-measure-02-02-004/",
+      "title": "בסיסי 4: נכון/לא נכון - למה יחידות שונות (4 סעיפים)",
+      "informationToBot": "מטרת הפריט: תרגול הבנה מושגית מעמיקה יותר - שכל גוף ניתן למדידה בכל יחידת מסה, אך בוחרים ביחידה שנותנת מספר נוח לשימוש. מה התלמיד אמור להבין/לתרגל: 4 טענות לבדיקת נכון/לא נכון: 1) מדידת תפוח בטונות אפשרית אך נותנת מספר קטן מאוד - נכון. 2) מדידת קטר במיליגרמים אפשרית אך נותנת מספר גדול מאוד - נכון. 3) בוחרים יחידה שנותנת מספר נוח - נכון. 4) לכל גוף יש יחידת מסה יחידה אפשרית - לא נכון (כל גוף ניתן למדידה בכל יחידה). כיווני חשיבה ואסטרטגיות: הבחנה בין 'אפשר למדוד בכל יחידה' (עקרון תקף) לבין 'נוח למדוד ביחידה מסוימת' (בחירה מעשית). טעויות נפוצות: קביעה שאי אפשר למדוד תפוח בטונות או קטר במיליגרמים (זה כן אפשרי, רק לא נוח). מידע נוסף: 4 היגדים נפרדים, כל אחד נכון/לא נכון. צילום מסך: לא צורף.",
+      "contentType": "practice",
+      "mediaFormat": "content-interactive",
+      "questions": [
+        {
+          "questionId": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-02/methodica-science-mass-measure-02-02-004/q1",
+          "questionType": "true-false",
+          "questionText": "מדוע משתמשים ביחידות מסה שונות? 1. אפשר למדוד תפוח בטונות, אבל המספר שיתקבל יהיה קטן מאוד.",
+          "answers": ["נכון", "לא נכון"],
+          "correctAnswers": ["נכון"]
+        },
+        {
+          "questionId": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-02/methodica-science-mass-measure-02-02-004/q2",
+          "questionType": "true-false",
+          "questionText": "2. אפשר למדוד קטר רכבת במיליגרמים, אבל המספר שיתקבל יהיה גדול מאוד.",
+          "answers": ["נכון", "לא נכון"],
+          "correctAnswers": ["נכון"]
+        },
+        {
+          "questionId": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-02/methodica-science-mass-measure-02-02-004/q3",
+          "questionType": "true-false",
+          "questionText": "3. בוחרים יחידת מסה כך שהמספר המתקבל יהיה נוח לשימוש.",
+          "answers": ["נכון", "לא נכון"],
+          "correctAnswers": ["נכון"]
+        },
+        {
+          "questionId": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-02/methodica-science-mass-measure-02-02-004/q4",
+          "questionType": "true-false",
+          "questionText": "4. לכל גוף יש יחידת מסה אחת שבה אפשר למדוד אותו.",
+          "answers": ["נכון", "לא נכון"],
+          "correctAnswers": ["לא נכון"]
+        }
+      ]
+    },
+    {
+      "id": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-02/methodica-science-mass-measure-02-02-005/",
+      "title": "בסיסי 5: יחידת מסה - קילוגרם",
+      "informationToBot": "מטרת הפריט: תרגול תגבור בסיסי בזיהוי גופים שכדאי למדוד בקילוגרמים. מה התלמיד אמור להבין/לתרגל: אופניים וכלב הם גופים בגודל בעלי-חיים/חפצים גדולים שנוח למדוד בקילוגרמים, לעומת כדור ויטמין קטן (מיליגרם) וגרגר מלח גס (מיליגרם). כיווני חשיבה ואסטרטגיות: קילוגרמים מתאימים בדרך כלל לבעלי חיים, אנשים וחפצים גדולים וכבדים יחסית. טעויות נפוצות: בחירת גוף זעיר מדי (כדור ויטמין, גרגר מלח) שמתאים ליחידה קטנה בהרבה. מידע נוסף: שאלת בחירה מרובה (2 תשובות נכונות). צילום מסך: לא צורף.",
+      "contentType": "practice",
+      "mediaFormat": "content-interactive",
+      "questions": [
+        {
+          "questionId": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-02/methodica-science-mass-measure-02-02-005/q1",
+          "questionType": "choice",
+          "questionText": "יחידות מסה (קילוגרם): סמנו את שני הפריטים שכדאי למדוד בקילוגרמים:",
+          "answers": ["כדור ויטמין קטן", "אופניים", "גרגר מלח גס", "כלב"],
+          "correctAnswers": ["אופניים", "כלב"]
+        }
+      ]
+    },
+    {
+      "id": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-02/methodica-science-mass-measure-02-02-006/",
+      "title": "סטנדרטי ב 1: השלמת מושגים (נעליים/דבש)",
+      "informationToBot": "מטרת הפריט: תרגול מסכם ברמת קושי מעט גבוהה יותר - השלמת סוג המסה (ברוטו/נטו/טרה) לשני תרחישים עצמאיים. מה התלמיד אמור להבין/לתרגל: תרחיש נעליים - קופסת נעליים ובתוכה נעליים=ברוטו, הנעליים בלבד=נטו, קופסת הנעליים הריקה=טרה. תרחיש דבש - צנצת דבש מלאה=ברוטו, הדבש בלבד=נטו, הצנצנת הריקה=טרה. כיווני חשיבה ואסטרטגיות: יישום עצמאי, ללא רמזים נוספים, על שני תרחישים מקבילים. טעויות נפוצות: בלבול בין הפריטים של שני התרחישים. מידע נוסף: פריט 'יופי של עבודה - נחזור ל-2 תרגילים ברמת קושי גבוהה יותר' פותח את שני הפריטים הבאים (006-007). צילום מסך: לא צורף.",
+      "contentType": "practice",
+      "mediaFormat": "content-interactive",
+      "questions": [
+        {
+          "questionId": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-02/methodica-science-mass-measure-02-02-006/q1",
+          "questionType": "matching",
+          "questionText": "השלמת מושגים: השלימו את סוג המסה המתאים לכל פריט - ברוטו, נטו או טרה: קופסת נעליים ובתוכה נעליים, הנעליים בלבד, קופסת הנעליים הריקה, צנצת דבש מלאה, הדבש בלבד, הצנצנת הריקה.",
+          "answers": {
+            "source": ["קופסת נעליים ובתוכה נעליים", "הנעליים בלבד", "קופסת הנעליים הריקה", "צנצת דבש מלאה", "הדבש בלבד", "הצנצנת הריקה"],
+            "target": ["ברוטו", "נטו", "טרה"]
+          },
+          "correctAnswers": [
+            {"source": "קופסת נעליים ובתוכה נעליים", "target": "ברוטו"},
+            {"source": "הנעליים בלבד", "target": "נטו"},
+            {"source": "קופסת הנעליים הריקה", "target": "טרה"},
+            {"source": "צנצת דבש מלאה", "target": "ברוטו"},
+            {"source": "הדבש בלבד", "target": "נטו"},
+            {"source": "הצנצנת הריקה", "target": "טרה"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-02/methodica-science-mass-measure-02-02-007/",
+      "title": "סטנדרטי ב 2: התאמת יחידות מסה",
+      "informationToBot": "מטרת הפריט: תרגול מסכם ברמת קושי מעט גבוהה יותר - התאמת 4 גופים ל-4 יחידות מסה שונות (כיסוי מלא של הסולם). מה התלמיד אמור להבין/לתרגל: טבליית ויטמין קטנה→מיליגרם, ספר לימוד→גרם, אופניים→קילוגרם, לוויתן כחול→טון. כיווני חשיבה ואסטרטגיות: ככל שהגוף בעל מסה גדולה יותר, כך נשתמש ביחידת מסה גדולה יותר. טעויות נפוצות: התאמה לא מדויקת בין גדלים קרובים (למשל ספר וטבליית ויטמין). מידע נוסף: מכסה את כל 4 יחידות המסה בפריט אחד. צילום מסך: לא צורף.",
+      "contentType": "practice",
+      "mediaFormat": "content-interactive",
+      "questions": [
+        {
+          "questionId": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-02/methodica-science-mass-measure-02-02-007/q1",
+          "questionType": "matching",
+          "questionText": "השלמת יחידות מסה: גררו את הפריטים הבאים ליחידות המסה המתאימות - מיליגרם, גרם, קילוגרם או טון: טבליית ויטמין קטנה, ספר לימוד, אופניים, לוויתן כחול.",
+          "answers": {
+            "source": ["טבליית ויטמין קטנה", "ספר לימוד", "אופניים", "לוויתן כחול"],
+            "target": ["מיליגרם", "גרם", "קילוגרם", "טון"]
+          },
+          "correctAnswers": [
+            {"source": "טבליית ויטמין קטנה", "target": "מיליגרם"},
+            {"source": "ספר לימוד", "target": "גרם"},
+            {"source": "אופניים", "target": "קילוגרם"},
+            {"source": "לוויתן כחול", "target": "טון"}
+          ]
+        }
+      ]
+    }
+  ]
+}

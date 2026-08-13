@@ -1,0 +1,20 @@
+# תלויות הרנס הבדיקה (ראו _test/README.md). לא אמור להופיע כאן בכלל —
+# התיקייה מסונכרנת ב-OneDrive ו-jsdom הוא כ-26MB. להתקין מחוץ לפרויקט
+# ולהצביע עם NODE_PATH.
+node_modules/
+
+# מפתח ה-API של Kata — המקום היחיד שבו מפתח חי מותר לשבת על הדיסק.
+# לעולם לא לקומיט. (רלוונטי כשייווספו send-metadata.ps1 / retrieve-metadata.ps1.)
+kata-api-key.txt
+
+# לוגים של סקריפטי המטא-דאטה
+send-metadata.log
+retrieve-metadata.log
+
+# תמונת מצב שנשלפת מהקטלוג לצורך diff מול metadata/ — לא מקור אמת
+metadata-from/
+
+# Windows / OneDrive
+Thumbs.db
+desktop.ini
+.DS_Store

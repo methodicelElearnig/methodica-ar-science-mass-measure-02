@@ -62,6 +62,12 @@ function goTo(n) {
   currentScreen = n;
   resetScreenState(n);
   target.classList.add('active');
+  /* xAPI: זוגות initialized/completed ברמת הפריט. מוצב **אחרון**, אחרי
+     ה-.active, כדי שקריאת רשת לא תעכב את ה-paint; ואחרי currentScreen = n,
+     שממנו submitReport והיומן קוראים. עטוף ב-try/catch — דיווח לעולם לא
+     יעצור ניווט. resetScreenState לפני ה-.active נשאר כפי שהיה: זה הכלל
+     שמונע הבהוב אווטאר (CLAUDE.md כלל 1). */
+  try { xapiOnScreen(n); } catch (e) {}
 }
 
 function resetScreenState(n) {
@@ -227,6 +233,7 @@ function scqCheck() {
   if (!scqSelected || scqDone) return;
   scqAttempts++;
   const optEl = scqOptEl(scqSelected);
+  xapiAnswered('001', 'q1', scqSelected === SCQ.correctId, scqSelected === SCQ.correctId || scqAttempts >= SCQ.maxAttempts, xapiAnswerText(optEl));
 
   if (scqSelected === SCQ.correctId) {
     optEl.classList.add('correct');
@@ -282,6 +289,10 @@ function advanceScreen() {
 
 function scqOpenHint() {
   if (scqDone) return;
+  /* xAPI: requested.1 — מוצב אחרי כל הגארדים ומיד לפני שהרמז
+     באמת נחשף, כדי לא לדווח בקשה שלא קרתה. הפונקציה פותחת בלבד
+     (hidden=false) ולא toggle, ולכן אין סיכון לדיווח כפול. */
+  xapiRequestedHint('001', 'q1');
   document.getElementById('scq-hint-overlay').hidden = false;
 }
 
@@ -468,6 +479,7 @@ function scq4Check() {
   if (!scq4Selected || scq4Done) return;
   scq4Attempts++;
   const optEl = scq4OptEl(scq4Selected);
+  xapiAnswered('002', 'q1', scq4Selected === SCQ4.correctId, scq4Selected === SCQ4.correctId || scq4Attempts >= SCQ4.maxAttempts, xapiAnswerText(optEl));
 
   if (scq4Selected === SCQ4.correctId) {
     optEl.classList.add('correct');
@@ -524,6 +536,10 @@ function scq4Continue() {
 
 function scq4OpenHint() {
   if (scq4Done) return;
+  /* xAPI: requested.1 — מוצב אחרי כל הגארדים ומיד לפני שהרמז
+     באמת נחשף, כדי לא לדווח בקשה שלא קרתה. הפונקציה פותחת בלבד
+     (hidden=false) ולא toggle, ולכן אין סיכון לדיווח כפול. */
+  xapiRequestedHint('002', 'q1');
   document.getElementById('scq4-hint-overlay').hidden = false;
 }
 
@@ -789,6 +805,8 @@ function s5Check() {
   });
 
   const checkBtn = document.getElementById('s5-check');
+  /* xAPI: מוצב אחרי לוח הגרירה, כי allCorrect סופי רק בסוף הלופ. */
+  xapiAnswered('003', 'q1', allCorrect, allCorrect || s5Attempts >= 2, xapiZoneAnswer('s5', ['bruto', 'neto', 'tara']));
   if (allCorrect) {
     s5Done = true;
     s5ShowFeedback('correct', true);
@@ -1000,6 +1018,7 @@ function scq8Check() {
   if (!scq8Selected || scq8Done) return;
   scq8Attempts++;
   const optEl = scq8OptEl(scq8Selected);
+  xapiAnswered('004', 'q1', scq8Selected === SCQ8.correctId, scq8Selected === SCQ8.correctId || scq8Attempts >= SCQ8.maxAttempts, xapiAnswerText(optEl));
 
   if (scq8Selected === SCQ8.correctId) {
     optEl.classList.add('correct');
@@ -1055,6 +1074,10 @@ function scq8Continue() {
 
 function scq8OpenHint() {
   if (scq8Done) return;
+  /* xAPI: requested.1 — מוצב אחרי כל הגארדים ומיד לפני שהרמז
+     באמת נחשף, כדי לא לדווח בקשה שלא קרתה. הפונקציה פותחת בלבד
+     (hidden=false) ולא toggle, ולכן אין סיכון לדיווח כפול. */
+  xapiRequestedHint('004', 'q1');
   document.getElementById('scq8-hint-overlay').hidden = false;
 }
 
@@ -1336,6 +1359,8 @@ function s9Check() {
   });
 
   const checkBtn = document.getElementById('s9-check');
+  /* xAPI: מוצב אחרי לוח הגרירה, כי allCorrect סופי רק בסוף הלופ. */
+  xapiAnswered('005', 'q1', allCorrect, allCorrect || s9Attempts >= 2, xapiZoneAnswer('s9', S9_ZONE_IDS));
   if (allCorrect) {
     s9Done = true;
     S9_ITEM_IDS.forEach(function (id) {
@@ -1371,6 +1396,10 @@ function s9Check() {
 }
 
 function s9OpenHint() {
+  /* xAPI: requested.1 — מוצב אחרי כל הגארדים ומיד לפני שהרמז
+     באמת נחשף, כדי לא לדווח בקשה שלא קרתה. הפונקציה פותחת בלבד
+     (hidden=false) ולא toggle, ולכן אין סיכון לדיווח כפול. */
+  xapiRequestedHint('005', 'q1');
   document.getElementById('s9-hint-overlay').hidden = false;
 }
 
@@ -1507,6 +1536,7 @@ function scq10Check() {
   if (!scq10Selected || scq10Done) return;
   scq10Attempts++;
   const optEl = scq10OptEl(scq10Selected);
+  xapiAnswered('006', 'q1', scq10Selected === SCQ10.correctId, scq10Selected === SCQ10.correctId || scq10Attempts >= SCQ10.maxAttempts, xapiAnswerText(optEl));
 
   if (scq10Selected === SCQ10.correctId) {
     optEl.classList.add('correct');
@@ -1562,6 +1592,10 @@ function scq10Continue() {
 
 function scq10OpenHint() {
   if (scq10Done) return;
+  /* xAPI: requested.1 — מוצב אחרי כל הגארדים ומיד לפני שהרמז
+     באמת נחשף, כדי לא לדווח בקשה שלא קרתה. הפונקציה פותחת בלבד
+     (hidden=false) ולא toggle, ולכן אין סיכון לדיווח כפול. */
+  xapiRequestedHint('006', 'q1');
   document.getElementById('scq10-hint-overlay').hidden = false;
 }
 
@@ -1887,6 +1921,7 @@ function scq13Check() {
   if (!scq13Selected || scq13Done) return;
   scq13Attempts++;
   const optEl = scq13OptEl(scq13Selected);
+  xapiAnswered('008', 'q1', scq13Selected === SCQ13.correctId, scq13Selected === SCQ13.correctId || scq13Attempts >= SCQ13.maxAttempts, xapiAnswerText(optEl));
 
   if (scq13Selected === SCQ13.correctId) {
     optEl.classList.add('correct');
@@ -1942,6 +1977,10 @@ function scq13Continue() {
 
 function scq13OpenHint() {
   if (scq13Done) return;
+  /* xAPI: requested.1 — מוצב אחרי כל הגארדים ומיד לפני שהרמז
+     באמת נחשף, כדי לא לדווח בקשה שלא קרתה. הפונקציה פותחת בלבד
+     (hidden=false) ולא toggle, ולכן אין סיכון לדיווח כפול. */
+  xapiRequestedHint('008', 'q1');
   document.getElementById('scq13-hint-overlay').hidden = false;
 }
 
@@ -2069,6 +2108,7 @@ function scq14Check() {
   const correct = MCQ14.correctIds;
   const isCorrect = correct.length === scq14Selected.length &&
     correct.every(function (cid) { return scq14Selected.indexOf(cid) >= 0; });
+  xapiAnswered('009', 'q1', isCorrect, isCorrect || scq14Attempts >= MCQ14.maxAttempts, xapiMultiAnswer(scq14Selected, scq14OptEl));
 
   if (isCorrect) {
     scq14Phase = 'correct';
@@ -2136,6 +2176,10 @@ function scq14Continue() {
 
 function scq14OpenHint() {
   if (scq14Done) return;
+  /* xAPI: requested.1 — מוצב אחרי כל הגארדים ומיד לפני שהרמז
+     באמת נחשף, כדי לא לדווח בקשה שלא קרתה. הפונקציה פותחת בלבד
+     (hidden=false) ולא toggle, ולכן אין סיכון לדיווח כפול. */
+  xapiRequestedHint('009', 'q1');
   document.getElementById('scq14-hint-overlay').hidden = false;
 }
 
@@ -2315,6 +2359,7 @@ function scq16Check() {
   if (!scq16Selected || scq16Done) return;
   scq16Attempts++;
   const optEl = scq16OptEl(scq16Selected);
+  xapiAnswered('010', 'q1', scq16Selected === SCQ16.correctId, scq16Selected === SCQ16.correctId || scq16Attempts >= SCQ16.maxAttempts, xapiAnswerText(optEl));
 
   if (scq16Selected === SCQ16.correctId) {
     optEl.classList.add('correct');
@@ -2374,6 +2419,10 @@ function scq16Continue() {
 
 function scq16OpenHint() {
   if (scq16Done) return;
+  /* xAPI: requested.1 — מוצב אחרי כל הגארדים ומיד לפני שהרמז
+     באמת נחשף, כדי לא לדווח בקשה שלא קרתה. הפונקציה פותחת בלבד
+     (hidden=false) ולא toggle, ולכן אין סיכון לדיווח כפול. */
+  xapiRequestedHint('010', 'q1');
   document.getElementById('scq16-hint-overlay').hidden = false;
 }
 
@@ -2493,6 +2542,7 @@ function scq17Check() {
   if (!scq17Selected || scq17Done) return;
   scq17Attempts++;
   const optEl = scq17OptEl(scq17Selected);
+  xapiAnswered('011', 'q1', scq17Selected === SCQ17.correctId, scq17Selected === SCQ17.correctId || scq17Attempts >= SCQ17.maxAttempts, xapiAnswerText(optEl));
 
   if (scq17Selected === SCQ17.correctId) {
     optEl.classList.add('correct');
@@ -2552,6 +2602,10 @@ function scq17Continue() {
 
 function scq17OpenHint() {
   if (scq17Done) return;
+  /* xAPI: requested.1 — מוצב אחרי כל הגארדים ומיד לפני שהרמז
+     באמת נחשף, כדי לא לדווח בקשה שלא קרתה. הפונקציה פותחת בלבד
+     (hidden=false) ולא toggle, ולכן אין סיכון לדיווח כפול. */
+  xapiRequestedHint('011', 'q1');
   document.getElementById('scq17-hint-overlay').hidden = false;
 }
 
@@ -2716,6 +2770,7 @@ function s18Check() {
     const el = document.getElementById(id);
     return el && parseFloat(el.value) === parseFloat(S18_ANSWERS[id]);
   });
+  xapiAnswered('012', 'q1', allCorrect, allCorrect || s18Attempts >= 2, xapiFieldsAnswer(S18_IDS));
 
   if (allCorrect) {
     s18Done = true;
@@ -2764,6 +2819,10 @@ function s18Continue() {
 
 function s18OpenHint() {
   if (s18Done) return;
+  /* xAPI: requested.1 — מוצב אחרי כל הגארדים ומיד לפני שהרמז
+     באמת נחשף, כדי לא לדווח בקשה שלא קרתה. הפונקציה פותחת בלבד
+     (hidden=false) ולא toggle, ולכן אין סיכון לדיווח כפול. */
+  xapiRequestedHint('012', 'q1');
   document.getElementById('s18-hint-overlay').hidden = false;
 }
 
@@ -2950,6 +3009,7 @@ function s19Check() {
   s19CloseAllDropdowns();
   s19Attempts++;
   const allCorrect = S19_IDS.every(function (id) { return s19DdValues[id] === S19_CORRECT[id]; });
+  xapiAnswered('013', 'q1', allCorrect, allCorrect || s19Attempts >= 2, xapiFieldsAnswer(S19_IDS, s19DdValues));
 
   if (allCorrect) {
     s19Done = true;
@@ -2991,6 +3051,10 @@ function s19Continue() {
 
 function s19OpenHint() {
   if (s19Done) return;
+  /* xAPI: requested.1 — מוצב אחרי כל הגארדים ומיד לפני שהרמז
+     באמת נחשף, כדי לא לדווח בקשה שלא קרתה. הפונקציה פותחת בלבד
+     (hidden=false) ולא toggle, ולכן אין סיכון לדיווח כפול. */
+  xapiRequestedHint('013', 'q1');
   document.getElementById('s19-hint-overlay').hidden = false;
 }
 
@@ -3251,6 +3315,8 @@ function s20Check() {
   });
 
   const checkBtn = document.getElementById('s20-check');
+  /* xAPI: מוצב אחרי לוח הגרירה, כי allCorrect סופי רק בסוף הלופ. */
+  xapiAnswered('014', 'q1', allCorrect, allCorrect || s20Attempts >= 2, xapiZoneAnswer('s20', ['bruto', 'neto', 'tara']));
   if (allCorrect) {
     s20Done = true;
     s20ShowFeedback('correct', true);
@@ -3291,12 +3357,64 @@ function s20Check() {
   }
 }
 
+/* ── ציון הרכיב ──
+   המכנה הוא מה שהלומד הובטח, לא מספר השאלות בקטלוג: חמש שאלות התרגול
+   הסטנדרטי (מסכים 15-19, אלה שנרשמות ב-stationProgress), וסף המעבר 4 מתוך 5
+   = 80%, בדיוק כפי שכתוב במסך 15 — "צריך לענות נכון על 4 שאלות (80%) לפחות".
+
+   שמונה השאלות שלפני שלב התרגול (ההוק, שתי הקנייה, שלושת התרגולים ושתי
+   שאלות החימום) מדווחות answered בנפרד ואינן נכנסות למכנה: הסף שהלומד ראה
+   מתייחס לחמש בלבד. ראו REPORT-XAPI.md §5 — "the denominator should be what
+   the learner was promised". */
+function getPracticeScore() {
+  return ['q16', 'q17', 'q18', 'q19', 'q20'].filter(function (k) {
+    return stationProgress[k] === 'success';
+  }).length;
+}
+
 function s20Continue() {
-  /* קישור בין סינים: מסך אחרון בסיין 1 -> מסך ראשון בסיין 2 */
-  window.location.href = '../Methodica-science-mass-measure-02-02/index.html';
+  /* xAPI: סוגר את הפריט הפתוח ומדווח את תוצאת הרכיב. התוצאה נשלחת במפורש
+     כי הצבירה של הספרייה היא AND של "כל התשובות נכונות", מה שהיה מדווח
+     success:false על 4 מתוך 5 — כלומר על מעבר. */
+  var _n = getPracticeScore();
+  xapiCompleteComponent({ success: _n >= 4, score: { scaled: _n / 5 } });
+
+  /* ── ניתוב מותנה לפי הסף שהובטח ללומד ──
+     מסך 15 מבטיח "צריך לענות נכון על 4 שאלות (80%) לפחות". מי שעמד בסף מדלג
+     על סין 02 — שהוא תרגול מחזק — ועובר ישר למשימת הכיתה בסין 03. מי שלא,
+     ממשיך לסין 02.
+
+     זה הדפוס מלומדת המקור: `methodica-math-scale-01-01` עושה בדיוק
+     `if (getQuizScore() >= 4)` ומדלג על הרכיב המחזק. הוא גם עקבי עם מה
+     שהלומדה הזאת כבר עושה בסין 05 → 06 (`moedAFullyPassed()` מדלג על מועד ב').
+     תואם גם למטא-דאטה: סין 02 הוא היחיד עם recommendedAfterFail → סין 01,
+     כלומר הקטלוג מדגמן אותו כרכיב מחזק ולא כחלק מהמסלול הראשי.
+
+     window.location.search נגרר בכל מעבר — הוא נושא את ?slxapi ואת
+     ?registration, ובלעדיו הגדרת ה-LRS אובדת מכאן והלאה (REPORT-XAPI.md §6).
+
+     recordForwardEdge: סין 03 ניתן להגעה משני מקומות, ולכן צריך לזכור מאיפה
+     הלומד באמת הגיע — אחרת כפתור "חזרה" שם ישלח את מי שדילג לתוך סין 02,
+     תוכן שהוא לא ראה. המסך שממנו יוצאים הוא 20, כלומר '#screen=19'. */
+  var _dest = practiceDestinationSlug();
+  recordForwardEdge(_dest, '#screen=19');
+  window.location.href = '../' + _dest + '/index.html' + window.location.search;
+}
+
+/* כלל הניתוב עצמו, מופרד מהניווט. מופרד כדי שיהיה ניתן לבדיקה בלי לנווט
+   בפועל — location.href אינו ניתן ל-stub ב-jsdom, ובלי ההפרדה הזאת הכלל
+   הזה, שקובע איזה תוכן הלומד יראה בכלל, לא היה מכוסה בבדיקות. */
+function practiceDestinationSlug() {
+  return (getPracticeScore() >= 4)
+    ? 'Methodica-science-mass-measure-02-03'   // עמד בסף — מדלג על התרגול המחזק
+    : 'Methodica-science-mass-measure-02-02';  // לא עמד — תרגול מחזק
 }
 
 function s20OpenHint() {
+  /* xAPI: requested.1 — מוצב אחרי כל הגארדים ומיד לפני שהרמז
+     באמת נחשף, כדי לא לדווח בקשה שלא קרתה. הפונקציה פותחת בלבד
+     (hidden=false) ולא toggle, ולכן אין סיכון לדיווח כפול. */
+  xapiRequestedHint('014', 'q1');
   document.getElementById('s20-hint-overlay').hidden = false;
 }
 
@@ -3613,3 +3731,75 @@ initImageZoom();
 scaleApp();
 resetScreenState(0);
 SCQ_FB_BOX_IDS.forEach(scqFbMakeDraggable);
+
+/* קישור בין סינים: הגעה לכאן דרך "חזרה" מהסיין הבא נכנסת ישירות למסך
+   המבוקש לפי #screen=N ב-URL, במקום למסך הראשון כברירת מחדל.
+
+   היה חסר כאן בלבד. סיין 2 מקשר אחורה ל-01/index.html#screen=19, אבל בלי
+   הקורא הזה הלומד היה נוחת על מסך 0 — מסך בחירת הדמות — ולא על מסך 20.
+   הבלוק זהה לזה שקיים בסינים 02–05. סיין 6 לא צריך אותו: שום דבר לא מקשר
+   אליו עם hash (סיין 5 עובר אליו בלי), ולכן שם זה היה קוד מת.
+
+   המקום נושא-משקל: הבלוק הזה חייב לרוץ לפני ../unit-js/90-boot.js, כי
+   bootXAPI() מדווח את ה-initialized של הפריט לפי currentScreen — אם הקפיצה
+   הייתה מתרחשת אחריו, הדיווח היה מצביע על מסך 0 במקום על המסך שהלומד
+   באמת רואה. תג ה-script של 90-boot.js בא אחרי script.js, ולכן זה מובטח. */
+(function jumpToLinkedScreen() {
+  const m = /^#screen=(\d+)$/.exec(location.hash);
+  if (m) goTo(parseInt(m[1], 10));
+})();
+
+
+/* ═══════════════════ xAPI (720) — קונפיגורציה של הסין ═══════════════════
+   נתונים בלבד. השכבה המשותפת ב-../unit-js/ קוראת אותם בזמן call.
+   ראו REPORT-XAPI.md §2 בלומדת methodica-math-scale-01. */
+
+/* מסך -> [סיומת פריט, עמוד-בפריט]; null = אין פריט בקטלוג.
+   נגזר מהתאמת הכותרת/שאלה של כל מסך ל-title ול-questionText ב-metadata/,
+   ובהצלבה מול המסך שנושא כל פונקציית Check.
+
+   שלושה זוגות שבהם פריט אחד פרוש על שני מסכים — מסך הקנייה/חשיפה ואחריו
+   מסך השאלה. ההצמדה הזאת מכוונת: היא משאירה את הפריט פתוח על פני שני
+   המסכים, כך שה-completed היחיד שלו נושא את התוצאה המלאה במקום לנעול ניקוד
+   חלקי ברגע שהלומד דורך על מסך נרטיבי (REPORT-XAPI.md §4):
+     002 = מסך 3 (למה חשוב להבחין) + מסך 4 (מהו החלק החסר?)
+     004 = מסך 7 (מה משותף ל...)   + מסך 8 (מה הבעיה במידע?)
+   פריט 007 (משחק הזיכרון, מסך 11) אין לו פונקציית Check — הוא מסתיים מעצמו,
+   ולכן הוא מחוץ ל-XAPI_EVAL_ITEMS למרות שיש לו שאלה במטא-דאטה. */
+var SCREEN_TO_SUBCONTENT = {
+  0: null,
+  1: ['001', 1],
+  2: ['002', 1],
+  3: ['002', 2],
+  4: ['003', 1],
+  5: null,
+  6: ['004', 1],
+  7: ['004', 2],
+  8: ['005', 1],
+  9: ['006', 1],
+  10: ['007', 1],
+  11: null,
+  12: ['008', 1],
+  13: ['009', 1],
+  14: null,
+  15: ['010', 1],
+  16: ['011', 1],
+  17: ['012', 1],
+  18: ['013', 1],
+  19: ['014', 1]
+};
+
+/* ⚠️ SCREEN_TO_SUBCONTENT חייב להחזיק בדיוק TOTAL_SCREENS מפתחות (20).
+   מפתח חסר = מסך שלא מדווח, בשקט. _test/verify-report.js אוכף את זה. */
+
+var XAPI_COMP_SLUG = 'methodica-science-mass-measure-02-01';
+/* מזהי הרכיב והפריטים חייבים להתאים ל-metadata/*.json בית-לבית — המוסכמה
+   כאן נושאת TRAILING SLASH על יחידה, רכיב ופריט (לא על שאלה). */
+var XAPI_COMP_ID   = XAPI_ID_PREFIX + XAPI_COMP_SLUG + '/';
+
+/* פריטים שנושאים שאלה מדורגת **בקוד**. 007 חסר בכוונה: משחק הזיכרון
+   במסך 11 אינו נבדק ואינו מדווח כתשובה. */
+var XAPI_EVAL_ITEMS = {'001': 1, '002': 1, '003': 1, '004': 1, '005': 1, '006': 1, '008': 1, '009': 1, '010': 1, '011': 1, '012': 1, '013': 1, '014': 1};
+
+var XAPI_METADATA_FILE = '../metadata/methodica-science-mass-measure-02-01.json';
+

@@ -57,6 +57,12 @@ function goTo(n) {
   currentScreen = n;
   resetScreenState(n);
   target.classList.add('active');
+  /* xAPI: זוגות initialized/completed ברמת הפריט. מוצב **אחרון**, אחרי
+     ה-.active, כדי שקריאת רשת לא תעכב את ה-paint; ואחרי currentScreen = n,
+     שממנו submitReport והיומן קוראים. עטוף ב-try/catch — דיווח לעולם לא
+     יעצור ניווט. resetScreenState לפני ה-.active נשאר כפי שהיה: זה הכלל
+     שמונע הבהוב אווטאר (CLAUDE.md כלל 1). */
+  try { xapiOnScreen(n); } catch (e) {}
 }
 
 function resetScreenState(n) {
@@ -79,8 +85,9 @@ function resetScreenState0() {
 
 function s0Continue() { goTo(1); }
 function s0Back() {
-  /* קישור בין סינים: מסך ראשון בסיין 4 -> מסך אחרון (2) בסיין 3 */
-  window.location.href = '../Methodica-science-mass-measure-02-03/index.html#screen=1';
+  /* קישור בין סינים: מסך ראשון בסיין 4 -> מסך אחרון (2) בסיין 3.
+     ה-query string לפני ה-hash — ראו REPORT-XAPI.md §6. */
+  window.location.href = '../Methodica-science-mass-measure-02-03/index.html' + window.location.search + '#screen=1';
 }
 
 /* =========================================================
@@ -288,6 +295,8 @@ function tblCheck() {
   });
   const ddsCorrect = TBL_DD_IDS.every(function (id) { return tblDdValues[id] === TBL_DD_CORRECT[id]; });
   const allCorrect = inputsCorrect && ddsCorrect;
+  xapiAnswered('001', 'q1', allCorrect, allCorrect || tblAttempts >= 2,
+    xapiFieldsAnswer(TBL_INPUT_IDS) + ' | ' + xapiFieldsAnswer(TBL_DD_IDS, tblDdValues));
 
   if (allCorrect) {
     tblDone = true; tblPhase = 'correct';
@@ -324,11 +333,22 @@ function tblCheck() {
 /* מסך 2 הוא כרגע המסך האחרון בסיין 4 — ממשיכים לסיין 5 (מסך מעבר
    "כל הכבוד! עכשיו מגיעה שאלת השיא" ואילך) */
 function tblContinue() {
-  /* קישור בין סינים: מסך אחרון בסיין 4 -> מסך ראשון בסיין 5 */
-  window.location.href = '../Methodica-science-mass-measure-02-05/index.html';
+  /* xAPI: לסין הזה שאלה מדורגת אחת (הטבלה המקיפה), ולכן המכנה הוא 1 והציון
+     בינארי. התוצאה נלקחת מ-XAPI_Q_RESULTS ולא מחושבת מחדש, כדי שהציון יהיה
+     בהכרח זהה למה שדווח ב-answered. */
+  var _ok = !!XAPI_Q_RESULTS['001/q1'];
+  xapiCompleteComponent({ success: _ok, score: { scaled: _ok ? 1 : 0 } });
+
+  /* קישור בין סינים: מסך אחרון בסיין 4 -> מסך ראשון בסיין 5 (+ ?slxapi, §6) */
+  window.location.href = '../Methodica-science-mass-measure-02-05/index.html' + window.location.search;
 }
 
-function tblOpenHint() { document.getElementById('tbl-hint-overlay').hidden = false; }
+function tblOpenHint() {
+  /* xAPI: requested.1 — אחרי הגארדים ומיד לפני החשיפה, כדי לא
+     לדווח בקשה שלא קרתה. פותח בלבד, לא toggle. */
+  xapiRequestedHint('001', 'q1');
+  document.getElementById('tbl-hint-overlay').hidden = false;
+}
 function tblCloseHint() { document.getElementById('tbl-hint-overlay').hidden = true; }
 document.getElementById('tbl-hint-overlay').addEventListener('click', function (e) {
   if (e.target === this) tblCloseHint();
@@ -468,3 +488,27 @@ scqFbMakeDraggable('tbl-feedbox');
   const m = /^#screen=(\d+)$/.exec(location.hash);
   if (m) goTo(parseInt(m[1], 10));
 })();
+
+
+/* ═══════════════════ xAPI (720) — קונפיגורציה של הסין ═══════════════════
+   נתונים בלבד. השכבה המשותפת ב-../unit-js/ קוראת אותם בזמן call.
+   ראו REPORT-XAPI.md §2 בלומדת methodica-math-scale-01. */
+
+/* מסך מעבר, ואז טבלת המסה המקיפה (מסך גלילה). */
+var SCREEN_TO_SUBCONTENT = {
+  0: null,
+  1: ['001', 1]
+};
+
+/* ⚠️ SCREEN_TO_SUBCONTENT חייב להחזיק בדיוק TOTAL_SCREENS מפתחות (2).
+   מפתח חסר = מסך שלא מדווח, בשקט. _test/verify-report.js אוכף את זה. */
+
+var XAPI_COMP_SLUG = 'methodica-science-mass-measure-02-04';
+/* מזהי הרכיב והפריטים חייבים להתאים ל-metadata/*.json בית-לבית — המוסכמה
+   כאן נושאת TRAILING SLASH על יחידה, רכיב ופריט (לא על שאלה). */
+var XAPI_COMP_ID   = XAPI_ID_PREFIX + XAPI_COMP_SLUG + '/';
+
+var XAPI_EVAL_ITEMS = {'001': 1};
+
+var XAPI_METADATA_FILE = '../metadata/methodica-science-mass-measure-02-04.json';
+

@@ -65,6 +65,12 @@ function goTo(n) {
   // הציג את ברירת המחדל הישנה ורק אז JS מחליף אותה.
   resetScreenState(n);
   target.classList.add('active');
+  /* xAPI: זוגות initialized/completed ברמת הפריט. מוצב **אחרון**, אחרי
+     ה-.active, כדי שקריאת רשת לא תעכב את ה-paint; ואחרי currentScreen = n,
+     שממנו submitReport והיומן קוראים. עטוף ב-try/catch — דיווח לעולם לא
+     יעצור ניווט. resetScreenState לפני ה-.active נשאר כפי שהיה: זה הכלל
+     שמונע הבהוב אווטאר (CLAUDE.md כלל 1). */
+  try { xapiOnScreen(n); } catch (e) {}
 }
 
 function resetScreenState(n) {
@@ -96,8 +102,11 @@ function resetScreenState0() {
 
 function s0Continue() { goTo(1); }
 function s0Back() {
-  /* קישור בין סינים: מסך ראשון בסיין 2 -> מסך אחרון (20) בסיין 1 */
-  window.location.href = '../Methodica-science-mass-measure-02-01/index.html#screen=19';
+  /* קישור בין סינים: מסך ראשון בסיין 2 -> מסך אחרון (20) בסיין 1.
+     הסדר קריטי: ה-query string לפני ה-hash. '...index.html?slxapi=...#screen=19'
+     תקין; '...index.html#screen=19?slxapi=...' הופך את הפרמטרים לחלק מה-hash
+     והם נעלמים מ-location.search. ראו REPORT-XAPI.md §6. */
+  window.location.href = '../Methodica-science-mass-measure-02-01/index.html' + window.location.search + '#screen=19';
 }
 
 /* =========================================================
@@ -209,6 +218,7 @@ function sq2Check() {
   const correct = MCQ_SQ2.correctIds;
   const isCorrect = correct.length === sq2Selected.length &&
     correct.every(function (cid) { return sq2Selected.indexOf(cid) >= 0; });
+  xapiAnswered('001', 'q1', isCorrect, isCorrect || sq2Attempts >= MCQ_SQ2.maxAttempts, xapiMultiAnswer(sq2Selected, sq2OptEl));
 
   if (isCorrect) {
     sq2Phase = 'correct';
@@ -272,7 +282,12 @@ function sq2UnlockOptions() {
 
 function sq2Continue() { goTo(2); }
 
-function sq2OpenHint() { document.getElementById('sq2-hint-overlay').hidden = false; }
+function sq2OpenHint() {
+  /* xAPI: requested.1 — אחרי הגארדים ומיד לפני החשיפה, כדי לא
+     לדווח בקשה שלא קרתה. פותח בלבד, לא toggle. */
+  xapiRequestedHint('001', 'q1');
+  document.getElementById('sq2-hint-overlay').hidden = false;
+}
 function sq2CloseHint() { document.getElementById('sq2-hint-overlay').hidden = true; }
 document.getElementById('sq2-hint-overlay').addEventListener('click', function (e) {
   if (e.target === this) sq2CloseHint();
@@ -368,6 +383,7 @@ function sq3Check() {
   const correct = MCQ_SQ3.correctIds;
   const isCorrect = correct.length === sq3Selected.length &&
     correct.every(function (cid) { return sq3Selected.indexOf(cid) >= 0; });
+  xapiAnswered('002', 'q1', isCorrect, isCorrect || sq3Attempts >= MCQ_SQ3.maxAttempts, xapiMultiAnswer(sq3Selected, sq3OptEl));
 
   if (isCorrect) {
     sq3Phase = 'correct';
@@ -431,7 +447,12 @@ function sq3UnlockOptions() {
 
 function sq3Continue() { goTo(3); }
 
-function sq3OpenHint() { document.getElementById('sq3-hint-overlay').hidden = false; }
+function sq3OpenHint() {
+  /* xAPI: requested.1 — אחרי הגארדים ומיד לפני החשיפה, כדי לא
+     לדווח בקשה שלא קרתה. פותח בלבד, לא toggle. */
+  xapiRequestedHint('002', 'q1');
+  document.getElementById('sq3-hint-overlay').hidden = false;
+}
 function sq3CloseHint() { document.getElementById('sq3-hint-overlay').hidden = true; }
 document.getElementById('sq3-hint-overlay').addEventListener('click', function (e) {
   if (e.target === this) sq3CloseHint();
@@ -527,6 +548,7 @@ function sq4Check() {
   const correct = MCQ_SQ4.correctIds;
   const isCorrect = correct.length === sq4Selected.length &&
     correct.every(function (cid) { return sq4Selected.indexOf(cid) >= 0; });
+  xapiAnswered('003', 'q1', isCorrect, isCorrect || sq4Attempts >= MCQ_SQ4.maxAttempts, xapiMultiAnswer(sq4Selected, sq4OptEl));
 
   if (isCorrect) {
     sq4Phase = 'correct';
@@ -590,7 +612,12 @@ function sq4UnlockOptions() {
 
 function sq4Continue() { goTo(4); }
 
-function sq4OpenHint() { document.getElementById('sq4-hint-overlay').hidden = false; }
+function sq4OpenHint() {
+  /* xAPI: requested.1 — אחרי הגארדים ומיד לפני החשיפה, כדי לא
+     לדווח בקשה שלא קרתה. פותח בלבד, לא toggle. */
+  xapiRequestedHint('003', 'q1');
+  document.getElementById('sq4-hint-overlay').hidden = false;
+}
 function sq4CloseHint() { document.getElementById('sq4-hint-overlay').hidden = true; }
 document.getElementById('sq4-hint-overlay').addEventListener('click', function (e) {
   if (e.target === this) sq4CloseHint();
@@ -774,6 +801,16 @@ function sq5Check() {
   const allCorrect = ['r1', 'r2', 'r3', 'r4'].every(function (r) {
     return sq5Selected[r] === TF_SQ5_CORRECT[r];
   });
+  /* xAPI: פריט 004 נושא ארבע שאלות נכון/לא-נכון (q1-q4) על מסך אחד,
+     והקוד יודע את נכונות כל שורה בנפרד — לכן כל אחת מדווחת בנפרד
+     ולא כתוצאה אחת הכל-או-כלום. השורות r1..r4 בסדר התצוגה, תואם
+     למספור "1."…"4." ב-questionText שבמטא-דאטה. */
+  ['r1', 'r2', 'r3', 'r4'].forEach(function (r, i) {
+    xapiAnswered('004', 'q' + (i + 1),
+      sq5Selected[r] === TF_SQ5_CORRECT[r],
+      allCorrect || sq5Attempts >= TF_SQ5.maxAttempts,
+      String(sq5Selected[r]));
+  });
 
   if (allCorrect) {
     sq5Phase = 'correct';
@@ -828,7 +865,12 @@ function sq5Check() {
 
 function sq5Continue() { goTo(5); }
 
-function sq5OpenHint() { document.getElementById('sq5-hint-overlay').hidden = false; }
+function sq5OpenHint() {
+  /* xAPI: requested.1 — אחרי הגארדים ומיד לפני החשיפה, כדי לא
+     לדווח בקשה שלא קרתה. פותח בלבד, לא toggle. */
+  xapiRequestedHint('004', 'q1');
+  document.getElementById('sq5-hint-overlay').hidden = false;
+}
 function sq5CloseHint() { document.getElementById('sq5-hint-overlay').hidden = true; }
 document.getElementById('sq5-hint-overlay').addEventListener('click', function (e) {
   if (e.target === this) sq5CloseHint();
@@ -931,6 +973,7 @@ function sq6Check() {
   const correct = MCQ_SQ6.correctIds;
   const isCorrect = correct.length === sq6Selected.length &&
     correct.every(function (cid) { return sq6Selected.indexOf(cid) >= 0; });
+  xapiAnswered('005', 'q1', isCorrect, isCorrect || sq6Attempts >= MCQ_SQ6.maxAttempts, xapiMultiAnswer(sq6Selected, sq6OptEl));
 
   if (isCorrect) {
     sq6Phase = 'correct';
@@ -994,7 +1037,12 @@ function sq6UnlockOptions() {
 
 function sq6Continue() { goTo(6); }
 
-function sq6OpenHint() { document.getElementById('sq6-hint-overlay').hidden = false; }
+function sq6OpenHint() {
+  /* xAPI: requested.1 — אחרי הגארדים ומיד לפני החשיפה, כדי לא
+     לדווח בקשה שלא קרתה. פותח בלבד, לא toggle. */
+  xapiRequestedHint('005', 'q1');
+  document.getElementById('sq6-hint-overlay').hidden = false;
+}
 function sq6CloseHint() { document.getElementById('sq6-hint-overlay').hidden = true; }
 document.getElementById('sq6-hint-overlay').addEventListener('click', function (e) {
   if (e.target === this) sq6CloseHint();
@@ -1207,6 +1255,7 @@ function dd8Check() {
   dd8CloseAllDropdowns();
   dd8Attempts++;
   const allCorrect = DD8_IDS.every(function (id) { return dd8Values[id] === DD8_CORRECT[id]; });
+  xapiAnswered('006', 'q1', allCorrect, allCorrect || dd8Attempts >= 2, xapiFieldsAnswer(DD8_IDS, dd8Values));
 
   if (allCorrect) {
     dd8Done = true;
@@ -1241,6 +1290,9 @@ function dd8Continue() { goTo(8); }
 
 function dd8OpenHint() {
   if (dd8Done) return;
+  /* xAPI: requested.1 — אחרי הגארדים ומיד לפני החשיפה, כדי לא
+     לדווח בקשה שלא קרתה. פותח בלבד, לא toggle. */
+  xapiRequestedHint('006', 'q1');
   document.getElementById('dd8-hint-overlay').hidden = false;
 }
 function dd8CloseHint() { document.getElementById('dd8-hint-overlay').hidden = true; }
@@ -1484,6 +1536,8 @@ function drag9Check() {
   });
 
   const checkBtn = document.getElementById('drag9-check');
+  /* xAPI: אחרי הלופ — allCorrect סופי רק כאן. */
+  xapiAnswered('007', 'q1', allCorrect, allCorrect || drag9Attempts >= 2, xapiZoneAnswer('drag9', DRAG9_ZONES));
   if (allCorrect) {
     drag9Done = true;
     drag9ShowFeedback('correct', true);
@@ -1517,13 +1571,57 @@ function drag9Check() {
   }
 }
 
+/* ── ציון הרכיב ──
+   לסין הזה שני סטים נפרדים, ולכן שתי פונקציות:
+     חמש שאלות התרגול הבסיסי (מסכים 1-5)  — stationProgress2
+     שני התרגילים ברמה גבוהה (מסכים 7-8)  — stationProgress3
+
+   ה-score נושא את כל שבעת התרגילים, כי זו כל העבודה שהלומד עשה בסין.
+
+   ה-success דורש **את שני הספים**: 4 מתוך 5 בבסיסיות (מסך 1 — "ענו נכון על
+   4 שאלות ומעלה (80%) כדי להתקדם") **וגם** 2 מתוך 2 בתרגילים הקשים.
+
+   זה הדפוס מלומדת המקור, לא הכרעה מקומית: `methodica-math-scale-01-02`
+   מדווח בדיוק כך ב-routeAfterAdvancedPractice() —
+   `success: getBasicPracticeScore() >= 3 && getAdvancedPracticeScore() >= 2`,
+   ‎`score: { scaled: n / 7 }` — ו-REPORT-XAPI.md §5 שם מתעד את הכלל:
+   "success requires **both** stated gates". */
+function getBasicPracticeScore() {
+  return ['q2', 'q3', 'q4', 'q5', 'q6'].filter(function (k) {
+    return stationProgress2[k] === 'success';
+  }).length;
+}
+
+function getStandardPracticeScore() {
+  return ['q8', 'q9'].filter(function (k) {
+    return stationProgress3[k] === 'success';
+  }).length;
+}
+
 function drag9Continue() {
-  /* קישור בין סינים: מסך אחרון בסיין 2 -> מסך ראשון בסיין 3 */
-  window.location.href = '../Methodica-science-mass-measure-02-03/index.html';
+  /* xAPI: סוגר את הפריט הפתוח ומדווח את תוצאת הרכיב. נשלח גם כשהלומד לא
+     עמד בסף — רכיב שלא נצלח חייב להיות מדווח, אחרת כל הניסיון לא נרשם;
+     ניתוב לומד שנכשל הוא תפקיד הפלטפורמה דרך recommendedAfterFail, שמצביע
+     כאן בחזרה לסין 01. */
+  var _basic = getBasicPracticeScore();
+  var _standard = getStandardPracticeScore();
+  xapiCompleteComponent({
+    success: _basic >= 4 && _standard >= 2,
+    score: { scaled: (_basic + _standard) / 7 }
+  });
+
+  /* קישור בין סינים: מסך אחרון בסיין 2 -> מסך ראשון בסיין 3 (+ ?slxapi, §6).
+     רושם את קשת החזרה: סין 03 ניתן להגעה גם מסין 01 (בדילוג), ולכן כפתור
+     "חזרה" שם צריך לדעת מאיפה הלומד באמת הגיע. המסך שממנו יוצאים הוא 9. */
+  recordForwardEdge('Methodica-science-mass-measure-02-03', '#screen=8');
+  window.location.href = '../Methodica-science-mass-measure-02-03/index.html' + window.location.search;
 }
 
 function drag9OpenHint() {
   if (drag9Done) return;
+  /* xAPI: requested.1 — אחרי הגארדים ומיד לפני החשיפה, כדי לא
+     לדווח בקשה שלא קרתה. פותח בלבד, לא toggle. */
+  xapiRequestedHint('007', 'q1');
   document.getElementById('drag9-hint-overlay').hidden = false;
 }
 function drag9CloseHint() { document.getElementById('drag9-hint-overlay').hidden = true; }
@@ -1700,3 +1798,37 @@ SCQ_FB_BOX_IDS.forEach(scqFbMakeDraggable);
   const m = /^#screen=(\d+)$/.exec(location.hash);
   if (m) goTo(parseInt(m[1], 10));
 })();
+
+
+/* ═══════════════════ xAPI (720) — קונפיגורציה של הסין ═══════════════════
+   נתונים בלבד. השכבה המשותפת ב-../unit-js/ קוראת אותם בזמן call.
+   ראו REPORT-XAPI.md §2 בלומדת methodica-math-scale-01. */
+
+/* חמש שאלות התרגול הבסיסי (מסכים 2-6 = פריטים 001-005), מסך מעבר,
+   ואז שני התרגילים ברמה גבוהה (מסכים 8-9 = פריטים 006-007).
+   פריט 004 נושא ארבע שאלות נכון/לא-נכון (q1-q4) על מסך אחד. */
+var SCREEN_TO_SUBCONTENT = {
+  0: null,
+  1: ['001', 1],
+  2: ['002', 1],
+  3: ['003', 1],
+  4: ['004', 1],
+  5: ['005', 1],
+  6: null,
+  7: ['006', 1],
+  8: ['007', 1]
+};
+
+/* ⚠️ SCREEN_TO_SUBCONTENT חייב להחזיק בדיוק TOTAL_SCREENS מפתחות (9).
+   מפתח חסר = מסך שלא מדווח, בשקט. _test/verify-report.js אוכף את זה. */
+
+var XAPI_COMP_SLUG = 'methodica-science-mass-measure-02-02';
+/* מזהי הרכיב והפריטים חייבים להתאים ל-metadata/*.json בית-לבית — המוסכמה
+   כאן נושאת TRAILING SLASH על יחידה, רכיב ופריט (לא על שאלה). */
+var XAPI_COMP_ID   = XAPI_ID_PREFIX + XAPI_COMP_SLUG + '/';
+
+/* כל שבעת הפריטים מדורגים בקוד. */
+var XAPI_EVAL_ITEMS = {'001': 1, '002': 1, '003': 1, '004': 1, '005': 1, '006': 1, '007': 1};
+
+var XAPI_METADATA_FILE = '../metadata/methodica-science-mass-measure-02-02.json';
+

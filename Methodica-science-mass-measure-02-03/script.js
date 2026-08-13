@@ -57,6 +57,12 @@ function goTo(n) {
   currentScreen = n;
   resetScreenState(n);
   target.classList.add('active');
+  /* xAPI: זוגות initialized/completed ברמת הפריט. מוצב **אחרון**, אחרי
+     ה-.active, כדי שקריאת רשת לא תעכב את ה-paint; ואחרי currentScreen = n,
+     שממנו submitReport והיומן קוראים. עטוף ב-try/catch — דיווח לעולם לא
+     יעצור ניווט. resetScreenState לפני ה-.active נשאר כפי שהיה: זה הכלל
+     שמונע הבהוב אווטאר (CLAUDE.md כלל 1). */
+  try { xapiOnScreen(n); } catch (e) {}
 }
 
 function resetScreenState(n) {
@@ -79,8 +85,14 @@ function resetScreenState0() {
 
 function s0Continue() { goTo(1); }
 function s0Back() {
-  /* קישור בין סינים: מסך ראשון בסיין 3 -> מסך אחרון (9) בסיין 2 */
-  window.location.href = '../Methodica-science-mass-measure-02-02/index.html#screen=8';
+  /* הסין הזה ניתן להגעה משני מקומות: מסין 02 (המסלול הרגיל) ומסין 01 ישירות,
+     כשהלומד עמד בסף 4/5 ודילג על סין 02. לכן ה"חזרה" נגזרת מקשת שנרשמה
+     בניווט קדימה, ולא מקובעת — אחרת מי שדילג היה נשלח לתוך סין 02, תוכן
+     שלא ראה.
+     ה-fallback הוא ההתנהגות שהייתה קודם (סין 02, מסך 9), כך שאם sessionStorage
+     חסום או שלא נרשמה קשת — הכפתור מתנהג בדיוק כמו לפני השינוי.
+     ראו unit-js/40-ledger.js → "קשתות-חזרה בין סינים". */
+  goBackToPreviousPart('Methodica-science-mass-measure-02-02', '#screen=8');
 }
 
 /* =========================================================
@@ -92,8 +104,14 @@ function s0Back() {
 function resetScreenState1() {}
 
 function s1Continue() {
-  /* קישור בין סינים: מסך אחרון בסיין 3 -> מסך ראשון בסיין 4 */
-  window.location.href = '../Methodica-science-mass-measure-02-04/index.html';
+  /* xAPI: הרכיב הזה הוא משימת כיתה מחוץ למחשב — פריט 001 במטא-דאטה הוא
+     contentType=task-inquiry-or-project ואין לו שאלות בכלל. לכן מדווח
+     success בלי score: אין מה לדרג, אבל חשוב לרשום שהלומד עבר בו.
+     ‎(דיווח score כאן היה ממציא ניקוד שאף אחד לא מדד.) */
+  xapiCompleteComponent({ success: true });
+
+  /* קישור בין סינים: מסך אחרון בסיין 3 -> מסך ראשון בסיין 4 (+ ?slxapi, §6) */
+  window.location.href = '../Methodica-science-mass-measure-02-04/index.html' + window.location.search;
 }
 
 /* ─── Dev mode: postMessage bridge ─────────────────────── */
@@ -123,3 +141,29 @@ resetScreenState(0);
   const m = /^#screen=(\d+)$/.exec(location.hash);
   if (m) goTo(parseInt(m[1], 10));
 })();
+
+
+/* ═══════════════════ xAPI (720) — קונפיגורציה של הסין ═══════════════════
+   נתונים בלבד. השכבה המשותפת ב-../unit-js/ קוראת אותם בזמן call.
+   ראו REPORT-XAPI.md §2 בלומדת methodica-math-scale-01. */
+
+/* מסך מעבר, ואז משימת הכיתה. לפריט 001 אין שאלות במטא-דאטה
+   (contentType=task-inquiry-or-project) — משימה מחוץ למחשב, אין מה לדרג. */
+var SCREEN_TO_SUBCONTENT = {
+  0: null,
+  1: ['001', 1]
+};
+
+/* ⚠️ SCREEN_TO_SUBCONTENT חייב להחזיק בדיוק TOTAL_SCREENS מפתחות (2).
+   מפתח חסר = מסך שלא מדווח, בשקט. _test/verify-report.js אוכף את זה. */
+
+var XAPI_COMP_SLUG = 'methodica-science-mass-measure-02-03';
+/* מזהי הרכיב והפריטים חייבים להתאים ל-metadata/*.json בית-לבית — המוסכמה
+   כאן נושאת TRAILING SLASH על יחידה, רכיב ופריט (לא על שאלה). */
+var XAPI_COMP_ID   = XAPI_ID_PREFIX + XAPI_COMP_SLUG + '/';
+
+/* אין שאלות מדורגות בסין הזה. */
+var XAPI_EVAL_ITEMS = {};
+
+var XAPI_METADATA_FILE = '../metadata/methodica-science-mass-measure-02-03.json';
+

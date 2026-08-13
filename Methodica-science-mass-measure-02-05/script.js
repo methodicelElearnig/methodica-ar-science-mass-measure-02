@@ -62,6 +62,12 @@ function goTo(n) {
   currentScreen = n;
   resetScreenState(n);
   target.classList.add('active');
+  /* xAPI: זוגות initialized/completed ברמת הפריט. מוצב **אחרון**, אחרי
+     ה-.active, כדי שקריאת רשת לא תעכב את ה-paint; ואחרי currentScreen = n,
+     שממנו submitReport והיומן קוראים. עטוף ב-try/catch — דיווח לעולם לא
+     יעצור ניווט. resetScreenState לפני ה-.active נשאר כפי שהיה: זה הכלל
+     שמונע הבהוב אווטאר (CLAUDE.md כלל 1). */
+  try { xapiOnScreen(n); } catch (e) {}
 }
 
 function resetScreenState(n) {
@@ -100,8 +106,9 @@ function resetScreenState0() {
 
 function s0Continue() { goTo(1); }
 function s0Back() {
-  /* קישור בין סינים: מסך ראשון בסיין 5 -> מסך אחרון (2) בסיין 4 */
-  window.location.href = '../Methodica-science-mass-measure-02-04/index.html#screen=1';
+  /* קישור בין סינים: מסך ראשון בסיין 5 -> מסך אחרון (2) בסיין 4.
+     ה-query string לפני ה-hash — ראו REPORT-XAPI.md §6. */
+  window.location.href = '../Methodica-science-mass-measure-02-04/index.html' + window.location.search + '#screen=1';
 }
 
 /* =========================================================
@@ -314,6 +321,21 @@ function makeDragQuestion(cfg) {
     render();
 
     const btn = document.getElementById(cfg.checkBtnId);
+    /* xAPI: מוצב כאן כי allCorrect ו-attempts סופיים רק אחרי לופ היעדים.
+       אילו שאלות המופע הזה מדווח נקבע ב-cfg (xapiItem/xapiQuestions) ולא
+       בפאבריקה — אותו עיקרון של תפרי-נתונים כמו בכל השכבה המשותפת.
+       טקסט התשובה נבנה ממצב הפאבריקה עצמה (איזה פריט הונח בכל יעד), ולא
+       דרך xapiZoneAnswer, כי היעדים כאן אינם בתבנית '<prefix>-zone-<id>'. */
+    if (cfg.xapiItem) {
+      var _ans = targetIds.map(function (tId) {
+        var placed = null;
+        dragIds.forEach(function (dId) { if (placement[dId] === tId) placed = dId; });
+        return tId + '=' + (placed ? labels[placed] : '—');
+      }).join(' | ');
+      (cfg.xapiQuestions || ['q1']).forEach(function (q) {
+        xapiAnswered(cfg.xapiItem, q, allCorrect, allCorrect || attempts >= 2, _ans);
+      });
+    }
     if (allCorrect) {
       done = true;
       saveResult(true);
@@ -376,6 +398,9 @@ function makeDragQuestion(cfg) {
   function openHint() {
     const hintBtn = document.getElementById(cfg.hintBtnId);
     if (hintBtn) hintBtn.disabled = true;
+    /* xAPI: requested.1 — פותח בלבד (hidden=false), לא toggle, ולכן אין
+       סיכון לדיווח בקשה שנייה בסגירה. */
+    if (cfg.xapiItem) xapiRequestedHint(cfg.xapiItem, (cfg.xapiQuestions || ['q1'])[0]);
     document.getElementById(cfg.hintOverlayId).hidden = false;
   }
   function closeHint() {
@@ -434,7 +459,12 @@ function makeDragQuestion(cfg) {
   window[P + 'Reveal'] = revealSolution;
   window[P + 'Reset'] = reset;
 
-  return { reset: reset };
+  /* onContinue נחשף כדי שאפשר יהיה לאמת אותו: הוא נושא את ה-completed
+     של הרכיב, כולל במסלול הכשל — הדבר היחיד שאם ישבר בשקט, כל ניסיון
+     של לומד שלא צלח לא יירשם בכלל (REPORT-XAPI.md §5). בלי החשיפה הוא
+     מגיע רק דרך btn.onclick אחרי בדיקה מוצלחת, כלומר לא ניתן לבדיקה.
+     תוספת בלבד — שום קורא קיים לא נשען על צורת המבנה המוחזר. */
+  return { reset: reset, onContinue: cfg.onContinue };
 }
 
 const TEXTS_DQ_A = {
@@ -454,6 +484,8 @@ const dqA = makeDragQuestion({
   feedboxId: 'dqA-feedbox',
   revealBtnId: 'dqA-reveal-btn',
   resultKey: 'lomda_moedA_partA_result',
+  xapiItem: '001',
+  xapiQuestions: ['q1'],
   onContinue: function () { goTo(3); },
   labels: {
     'dqA-drag-41': '41',
@@ -493,14 +525,38 @@ const dqB = makeDragQuestion({
   feedboxId: 'dqB-feedbox',
   revealBtnId: 'dqB-reveal-btn',
   resultKey: 'lomda_moedA_partB_result',
+  /* dqB מכריע גם את q2 וגם את q3 בבדיקה אחת הכל-או-כלום (ארבעה
+     שדות: המספר, שני מושגי המסה ויחידת הדלק), ולכן שתי השאלות
+     מקבלות את אותה תוצאה. פיצול לגרנולריות שה-UI לא מספק היה
+     המצאת נתון. */
+  xapiItem: '001',
+  xapiQuestions: ['q2', 'q3'],
   onContinue: function () {
+    /* xAPI: תוצאת הרכיב מדווחת **לפני** ההסתעפות, ולכן בשני המסלולים.
+       שאלת השיא (מועד א') היא שני חלקים ושניהם חייבים לעבור — זה בדיוק
+       מה ש-moedAFullyPassed() בודק, ולכן המכנה 2 והסף 2.
+       ⚠️ הדיווח במסלול הכשל אינו אופציונלי: לומד שלא צלח את מועד א' חייב
+       להיות מדווח, אחרת כל הניסיון שלו לא נרשם. ניתובו לסין 6 הוא ההמשך
+       הלימודי, לא תחליף לדיווח. ראו REPORT-XAPI.md §5. */
+    var _parts = ['lomda_moedA_partA_result', 'lomda_moedA_partB_result'];
+    var _passed = 0;
+    try {
+      _passed = _parts.filter(function (k) {
+        return localStorage.getItem(k) === 'pass';
+      }).length;
+    } catch (e) { /* localStorage חסום — נשאר 0 */ }
+    xapiCompleteComponent({
+      success: moedAFullyPassed(),
+      score: { scaled: _passed / 2 }
+    });
+
     if (moedAFullyPassed()) {
       /* עברו את שני חלקי משימת השיא בהצלחה מלאה — מדלגים על כל
          סיין 6 (מועד ב') ועוברים ישר למסך המעבר של הצלחה */
       goTo(4);
     } else {
-      /* לא עברו בהצלחה מלאה — ממשיכים לסיין 6 (מועד ב') */
-      window.location.href = '../Methodica-science-mass-measure-02-06/index.html';
+      /* לא עברו בהצלחה מלאה — ממשיכים לסיין 6 (מועד ב') (+ ?slxapi, §6) */
+      window.location.href = '../Methodica-science-mass-measure-02-06/index.html' + window.location.search;
     }
   },
   labels: {
@@ -538,9 +594,14 @@ function resetScreenState4() {
       : 'assets/images/avatar-orange-dancing.gif';
   }
 }
-/* TODO: "סיימתי" — אין עדיין פעולה מוגדרת (סוף היקף הבנייה הנוכחי) */
+/* "סיימתי" — נקודת סיום היחידה במסלול ההצלחה במועד א'.
+   הלומד שהגיע לכאן צלח את שאלת השיא בפעם הראשונה ודילג על סין 6 כליל.
+
+   ליחידה שלוש נקודות סיום (כאן, וסין 06 מסכים 8 ו-9), ולכן ה-completed של
+   היחידה עובר דרך היומן — הוא מבטיח דיווח אחד לכל ניסיון גם אם הלומד מגיע
+   לנקודת סיום אחרת אחרי חזרה אחורה. ראו unit-js/40-ledger.js. */
 function s4Finish() {
-  console.log('TODO: כפתור "סיימתי" (מסך 5) — לחבר לפעולת סיום הלומדה כשתיבנה.');
+  xapiCompleteUnit({ success: true });
 }
 
 /* ─── Dev mode: postMessage bridge ─────────────────────── */
@@ -634,3 +695,35 @@ scqFbMakeDraggable('dqB-feedbox');
   const m = /^#screen=(\d+)$/.exec(location.hash);
   if (m) goTo(parseInt(m[1], 10));
 })();
+
+
+/* ═══════════════════ xAPI (720) — קונפיגורציה של הסין ═══════════════════
+   נתונים בלבד. השכבה המשותפת ב-../unit-js/ קוראת אותם בזמן call.
+   ראו REPORT-XAPI.md §2 בלומדת methodica-math-scale-01. */
+
+/* פריט אחד (שאלת השיא, מועד א') פרוש על מסכים 2-4: הקדמת היישומון
+   ושני חלקי השאלה. ההצמדה מכוונת — היא משאירה את הפריט פתוח על פני כל
+   השאלה, כך שה-completed היחיד שלו נושא את התוצאה של שני החלקים ולא של
+   הראשון בלבד (REPORT-XAPI.md §4).
+   מסך 5 (מעבר ההצלחה) הוא null במכוון: כך הפריט נסגר בכניסה אליו, בלי
+   להיות תלוי בכך שהלומד ילחץ "סיימתי". */
+var SCREEN_TO_SUBCONTENT = {
+  0: null,
+  1: ['001', 1],
+  2: ['001', 2],
+  3: ['001', 3],
+  4: null
+};
+
+/* ⚠️ SCREEN_TO_SUBCONTENT חייב להחזיק בדיוק TOTAL_SCREENS מפתחות (5).
+   מפתח חסר = מסך שלא מדווח, בשקט. _test/verify-report.js אוכף את זה. */
+
+var XAPI_COMP_SLUG = 'methodica-science-mass-measure-02-05';
+/* מזהי הרכיב והפריטים חייבים להתאים ל-metadata/*.json בית-לבית — המוסכמה
+   כאן נושאת TRAILING SLASH על יחידה, רכיב ופריט (לא על שאלה). */
+var XAPI_COMP_ID   = XAPI_ID_PREFIX + XAPI_COMP_SLUG + '/';
+
+var XAPI_EVAL_ITEMS = {'001': 1};
+
+var XAPI_METADATA_FILE = '../metadata/methodica-science-mass-measure-02-05.json';
+
