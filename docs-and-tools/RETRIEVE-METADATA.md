@@ -5,14 +5,15 @@ it reads a content unit out of the Katalog (Kata) catalog at `https://kata.cet.a
 and writes it back out as metadata files — same schema, same key order, same formatting
 as the `metadata/` folder — into **`metadata-from/`**. It never writes to `metadata/`.
 
+The script lives in `docs-and-tools/`; both `metadata/` and `metadata-from/` sit at the
+repo root, so run it from there. `metadata-from/` is git-ignored.
+
 The point is comparison. Diff the two folders to see exactly where the catalog and the
 repo disagree:
 
 ```bash
 git diff --no-index metadata metadata-from
 ```
-
-See [KATA-API-DETAILED.md](../../KATA-API-DETAILED.md) for the endpoint schemas.
 
 ## Requirements
 
@@ -53,11 +54,11 @@ A single `GET /api/v1/content-units/{unitKey}` returns the whole tree — unit,
 `components[]`, each component's `subContent[]`, and each item's `questions[]` — so
 there is one request per run regardless of size.
 
-**Enum values are passed through untouched.** KATA now stores the same kebab-case
+**Enum values are passed through untouched.** KATA stores the same kebab-case
 vocabulary the metadata files use (`state-general`, `core-curriculum-basic`,
 `project-or-inquiry-task`, `interactive-content`, …), so unlike the sender this script
-has no enum-mapping tables. *(Note that the Title-Case vocabularies still documented in
-`KATA-API.md` — and still used by `send-metadata.ps1` — are stale.)*
+has no enum-mapping tables. `send-metadata.ps1` uses the same kebab-case vocabulary in
+its `$Valid*` lists; any Title-Case table you encounter in older notes is stale.
 
 | Metadata | Rebuilt from KATA |
 |---|---|
@@ -71,8 +72,13 @@ has no enum-mapping tables. *(Note that the Title-Case vocabularies still docume
 
 **Dropped**, because the metadata format has no place for them — use `-KeepRaw` if you
 need them: unit `kind`, `providerName`, `providerLogoUrl`, `componentCount`, `createdAt`,
-`updatedAt`; component `status`, `manufacturerGroupId`, `masteryLevel`,
-`hostedContentRef`; item `uniqueKey`, `hostedContentRef`, `order`; question `order`.
+`updatedAt`; component `status`, `manufacturerGroupId`, `hostedContentRef`; item
+`uniqueKey`, `hostedContentRef`, `order`; question `order`.
+
+Component **`masteryLevel` is kept** (inserted after `relativeDifficulty`, where the
+hand-authored files hold it) whenever KATA returns one. `send-metadata.ps1` pushes the
+value, so dropping it here would make a retrieve → overwrite cycle silently lose it. In
+this unit all six components are `masteryLevel: null`, so in practice nothing is emitted.
 
 Component `createdAt`/`updatedAt` **are** kept — they are KATA's real timestamps, so
 they always differ from the placeholder dates in `metadata/`.
@@ -94,18 +100,16 @@ diff). The rule, all of it configurable in the CONFIG block:
 - a flat object of at most `$InlineObjectMaxProps` (3) primitive values goes on one line —
   that's how the `matching` questions' `correctAnswers` pairs are stored
 
-**Fidelity.** The two array budgets were fitted by parsing each `metadata/*.json` and
-re-emitting it through this formatter: 8 / 62 reproduces **5 of the 6 files byte for
-byte**. The one residual line is `"answers": ["כן", "לא"]` in part 04, which `metadata/`
-inlines at 12 characters — but a 12-character budget re-formats more lines elsewhere
-than it fixes, because the hand-authored files aren't self-consistent about it. Re-measure
-before changing either number.
+**Fidelity.** ⚠️ The two array budgets (8 / 62) were fitted against a **different unit's**
+metadata — they came in with this script and have **not** been re-measured against this
+repo's 7 files. They are a reasonable starting point, not a verified fit here. Before
+trusting a `metadata` vs `metadata-from` diff to be noise-free, re-measure: parse each
+`metadata/*.json` and re-emit it through this formatter, then compare byte for byte and
+adjust `$InlineArrayMaxChars` / `$InlineTupleMaxChars` if the residuals are formatting
+rather than content.
 
-## What a first run showed (2026-07-25)
+## First run against this unit
 
-Every file's diff against `metadata/` was genuine drift, not noise — the catalog holds
-different values from the repo for `title` (all 5 components), `cognitiveLevel` (all 5 —
-KATA has `algorithmic-thinking`, the metadata has the 720 science labels),
-`estimatedTimeInMinutes`, `skills` (KATA has `MOE.SKILL.*` codes, the metadata has none),
-`contentType`, `mediaFormat`, `questionType`, `questionText`, `answers`,
-`correctAnswers`, and `recommendedAfterFail`.
+Not yet performed — `methodica-science-mass-measure-02` has not been pushed to the
+catalog. Once it has, record here which fields genuinely drift between the catalog and
+the repo, so later diffs can be read quickly.

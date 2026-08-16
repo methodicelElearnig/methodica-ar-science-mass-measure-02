@@ -23,7 +23,7 @@
       "title": "הוק: מציאת האוצר - איזה מידע חסר?",
       "informationToBot": "מטרת הפריט: יצירת סקרנות ראשונית וחיבור הלומד לבעיה שהיחידה פותרת - שידיעת המסה הכוללת בלבד אינה מספיקה. מה התלמיד אמור להבין: שתי תיבות באותה מסה כוללת (10 ק\"ג) עשויות להכיל תכולה שונה לגמרי - צריך לדעת גם את מסת התיבה הריקה עצמה כדי להסיק מה בפנים. כיווני חשיבה ואסטרטגיות: הלומד בוחר דמות מלווה, ואז מתמודד עם חידת האוצר. טעויות נפוצות: בחירה במסת האוצר/נפח/גודל התיבה במקום במסת התיבה הריקה עצמה. מידע נוסף: מסך פתיחה כולל בחירת דמות מלווה (בחירה טכנית, לא מוערכת) לפני החידה עצמה. צילום מסך: לא צורף.",
       "contentType": "motivational",
-      "mediaFormat": "content-interactive",
+      "mediaFormat": "interactive-content",
       "questions": [
         {
           "questionId": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-01/methodica-science-mass-measure-02-01-001/q1",
@@ -39,7 +39,7 @@
       "title": "הקנייה 1: מושגי ברוטו ונטו",
       "informationToBot": "מטרת הפריט: הקניית שני המושגים הראשונים - נטו (מסת התכולה בלבד) וברוטו (מסה כוללת של התכולה והאריזה יחד), דרך דוגמאות מחיי היום-יום (צנצנת חמוצים, מזוודת טיסה). מה התלמיד אמור להבין/לתרגל: אם ברוטו (צנצנת+חמוצים)=1400 גרם ונטו (חמוצים בלבד)=900 גרם, אז מסת הצנצנת הריקה (טרה, אם כי המושג טרה עצמו מוצג רק בפריט הבא) מתקבלת מחיסור: 1400-900=500 גרם. כיווני חשיבה ואסטרטגיות: הבנה שיש להחסיר את הנטו מהברוטו כדי לקבל את מסת האריזה בלבד. טעויות נפוצות: בחירה ב-1400 או 900 עצמם, או ב'לא ניתן לדעת', בלי לבצע את החיסור. מידע נוסף: לחיצה על תמונות (לא סרטון) היא מנגנון ההקנייה. צילום מסך: לא צורף.",
       "contentType": "instruction",
-      "mediaFormat": "content-interactive",
+      "mediaFormat": "interactive-content",
       "questions": [
         {
           "questionId": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-01/methodica-science-mass-measure-02-01-002/q1",
@@ -55,7 +55,7 @@
       "title": "תרגול: מיון פריטים לברוטו/נטו/טרה",
       "informationToBot": "מטרת הפריט: תרגול ראשוני במיון פריטים חזותיים (איקונים/תמונות) לשלוש קטגוריות המסה. מה התלמיד אמור להבין/לתרגל: 9 תמונות מייצגות 3 קבוצות של 3 (מזוודה+בגדים, צנצנת+חמוצים, קופסה+עוגיות): הפריט המלא (עם התכולה) = ברוטו, התכולה בלבד = נטו, האריזה הריקה בלבד = טרה. כיווני חשיבה ואסטרטגיות: זיהוי חזותי של כל תמונה (מזוודה עם בגדים לעומת בגדים בלבד לעומת מזוודה ריקה, וכן הלאה) ומיונה לסל הנכון. טעויות נפוצות: בלבול בין 'המלא' (ברוטו) ל'תכולה בלבד' (נטו). מידע נוסף: תיאור התמונות ושיוכן הנכון אושרו ישירות מול המשתמש (התמונות עצמן אינן מתוארות כטקסט בשקף). צילום מסך: לא צורף.",
       "contentType": "practice",
-      "mediaFormat": "content-interactive",
+      "mediaFormat": "interactive-content",
       "questions": [
         {
           "questionId": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-01/methodica-science-mass-measure-02-01-003/q1",
@@ -84,7 +84,7 @@
       "title": "הקנייה 2: למה חייבים יחידת מידה",
       "informationToBot": "מטרת הפריט: הבנה שמספר בלבד (ללא יחידת מידה) אינו מספיק כדי לתאר מסה. מה התלמיד אמור להבין/לתרגל: קטר, צב ענק, תפוח וגרגר מלח גס - כולם 'מסתם 150', אבל זה חסר משמעות בלי לדעת אם מדובר בטון, קילוגרם, גרם או מיליגרם. כיווני חשיבה ואסטרטגיות: זיהוי שהבעיה היא חוסר ביחידת המידה, לא סתירה עובדתית. טעויות נפוצות: הנחה שהנתון 'שגוי' (למשל שמסת קטר לא יכולה להיות 150) במקום זיהוי החסר האמיתי. מידע נוסף: פותח את הנושא של יחידות מסה שיפותח בפריטים הבאים. צילום מסך: לא צורף.",
       "contentType": "instruction",
-      "mediaFormat": "content-interactive",
+      "mediaFormat": "interactive-content",
       "questions": [
         {
           "questionId": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-01/methodica-science-mass-measure-02-01-004/q1",
@@ -100,7 +100,7 @@
       "title": "תרגול: התאמת גוף ליחידת מסה",
       "informationToBot": "מטרת הפריט: תרגול ראשוני בבחירת יחידת המסה המתאימה לגוף לפי גודלו. מה התלמיד אמור להבין/לתרגל: קטר→טון, צב ענק→קילוגרם, תפוח→גרם, גרגר מלח גס→מיליגרם. כיווני חשיבה ואסטרטגיות: ככל שהגוף גדול יותר, כך יחידת המידה גדולה יותר (מיליגרם<גרם<קילוגרם<טון). טעויות נפוצות: בחירת יחידה גדולה מדי לגוף קטן ולהיפך. מידע נוסף: נבנה ישירות על פריט 004. צילום מסך: לא צורף.",
       "contentType": "practice",
-      "mediaFormat": "content-interactive",
+      "mediaFormat": "interactive-content",
       "questions": [
         {
           "questionId": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-01/methodica-science-mass-measure-02-01-005/q1",
@@ -124,7 +124,7 @@
       "title": "תרגול: למה משתמשים ביחידות מסה שונות",
       "informationToBot": "מטרת הפריט: הבנה מושגית של הרציונל לקיום מספר יחידות מסה, מעבר לזיהוי הטכני של איזו יחידה מתאימה לאיזה גוף. מה התלמיד אמור להבין/לתרגל: אפשר למדוד כל גוף בכל יחידת מסה (למשל קטר גם ב-150 טון וגם ב-150,000,000 גרם), אבל יחידות שונות הופכות את המספר המתקבל לנוח יותר לשימוש ולהשוואה. כיווני חשיבה ואסטרטגיות: דחיית האפשרות שלכל גוף 'יחידה קבועה בלעדית'. טעויות נפוצות: מחשבה שהחומר/סוג הגוף (ולא רק גודלו) קובע את היחידה. מידע נוסף: דוגמה מספרית (150 טון = 150,000,000 גרם) ממחישה את השקילות. צילום מסך: לא צורף.",
       "contentType": "practice",
-      "mediaFormat": "content-interactive",
+      "mediaFormat": "interactive-content",
       "questions": [
         {
           "questionId": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-01/methodica-science-mass-measure-02-01-006/q1",
@@ -140,7 +140,7 @@
       "title": "תרגול: זיווג יחידות מסה שקולות (קלפים)",
       "informationToBot": "מטרת הפריט: תרגול הקשר הקבוע (פי 1000) בין יחידות מסה סמוכות, במשחק זיכרון/זיווג קלפים. מה התלמיד אמור להבין/לתרגל: 1000 מיליגרם=1 גרם, 1000 גרם=1 קילוגרם, 1000 קילוגרם=1 טון - כל זוג מייצג אותה מסה בדיוק. כיווני חשיבה ואסטרטגיות: זיהוי שהיחס הקבוע בין כל שתי יחידות סמוכות הוא פי 1000. טעויות נפוצות: זיווג לא נכון בין הערך המספרי ליחידה השקולה. מידע נוסף: משחק קלפים הפוכים (memory-style). צילום מסך: לא צורף.",
       "contentType": "practice",
-      "mediaFormat": "content-interactive",
+      "mediaFormat": "interactive-content",
       "questions": [
         {
           "questionId": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-01/methodica-science-mass-measure-02-01-007/q1",
@@ -163,7 +163,7 @@
       "title": "חימום 1: זיהוי נטו (בקבוק מים)",
       "informationToBot": "מטרת הפריט: שאלת חימום ראשונה - זיהוי נטו מתוך תמונה מתוארת (בקבוק עם מים). מה התלמיד אמור להבין/לתרגל: נטו הוא מסת התכולה בלבד, ללא האריזה/המיכל - במקרה זה, המים שבתוך הבקבוק (לא הבקבוק עצמו ולא השניים יחד). כיווני חשיבה ואסטרטגיות: התמקדות במה שהלומד היה 'רוצה לקבל' בפועל (שאלת עזר: אם הייתם קונים את זה, מה הייתם רוצים?). טעויות נפוצות: בחירת הבקבוק בלבד או הבקבוק+המים יחד. מידע נוסף: תמונה מתפקדת כאיור להמחשת תרחיש מוכר (בקבוק מים), התוכן הרעיוני נגזר במלואו מהטקסט. צילום מסך: לא צורף.",
       "contentType": "practice",
-      "mediaFormat": "content-interactive",
+      "mediaFormat": "interactive-content",
       "questions": [
         {
           "questionId": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-01/methodica-science-mass-measure-02-01-008/q1",
@@ -179,7 +179,7 @@
       "title": "חימום 2: זיהוי טרה (אריזות)",
       "informationToBot": "מטרת הפריט: שאלת חימום שנייה - זיהוי טרה מתוך רשימת פריטים מתוארת. מה התלמיד אמור להבין/לתרגל: טרה היא מסת האריזה/המיכל הריק בלבד - קופסת הקרטון הריקה של המשחק ופחית השתייה הריקה הן שתי דוגמאות לטרה, לעומת המשחק עצמו (נטו) והפחית המלאה (ברוטו). כיווני חשיבה ואסטרטגיות: חיפוש הפריטים המתארים אריזה ריקה בלבד. טעויות נפוצות: בחירת פריט שמכיל גם תוכן (המשחק בקופסה, הפחית המלאה). מידע נוסף: שאלת בחירה מרובה (2 תשובות נכונות). צילום מסך: לא צורף.",
       "contentType": "practice",
-      "mediaFormat": "content-interactive",
+      "mediaFormat": "interactive-content",
       "questions": [
         {
           "questionId": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-01/methodica-science-mass-measure-02-01-009/q1",
@@ -195,7 +195,7 @@
       "title": "סטנדרטי 1: זיהוי ברוטו (מתנה)",
       "informationToBot": "מטרת הפריט: תרגול סטנדרטי בזיהוי ברוטו מתוך תמונה מתוארת (מתנה עטופה). מה התלמיד אמור להבין/לתרגל: ברוטו הוא המסה הכוללת של התוכן והאריזה יחד - במקרה זה, המתנה והאריזה שלה ביחד. כיווני חשיבה ואסטרטגיות: חשיבה על מה שיישקל בפועל אם מודדים את הפריט כפי שהוא (עם העטיפה). טעויות נפוצות: בחירת המתנה בלבד או האריזה בלבד. מידע נוסף: תמונה מתפקדת כאיור, התוכן הרעיוני נגזר במלואו מהטקסט. צילום מסך: לא צורף.",
       "contentType": "practice",
-      "mediaFormat": "content-interactive",
+      "mediaFormat": "interactive-content",
       "questions": [
         {
           "questionId": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-01/methodica-science-mass-measure-02-01-010/q1",
@@ -211,7 +211,7 @@
       "title": "סטנדרטי 2: זיהוי טרה (סלסלת פירות)",
       "informationToBot": "מטרת הפריט: תרגול סטנדרטי בזיהוי טרה מתוך תמונה מתוארת (סלסלת פירות). מה התלמיד אמור להבין/לתרגל: טרה היא מסת האריזה/המיכל בלבד - במקרה זה, הסל עצמו, ללא הפירות שבתוכו. כיווני חשיבה ואסטרטגיות: דמיינו מה יישאר אם מוציאים את כל התכולה. טעויות נפוצות: בחירת הפירות בלבד או הפירות עם הסל יחד. מידע נוסף: תמונה מתפקדת כאיור, התוכן הרעיוני נגזר במלואו מהטקסט. צילום מסך: לא צורף.",
       "contentType": "practice",
-      "mediaFormat": "content-interactive",
+      "mediaFormat": "interactive-content",
       "questions": [
         {
           "questionId": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-01/methodica-science-mass-measure-02-01-011/q1",
@@ -227,7 +227,7 @@
       "title": "סטנדרטי 3: חישוב נטו/טרה/ברוטו בטבלה",
       "informationToBot": "מטרת הפריט: תרגול סטנדרטי בחישוב הערך החסר בטבלת מסה, לפי הנוסחה נטו+טרה=ברוטו. מה התלמיד אמור להבין/לתרגל: צנצנת מלפפונים חמוצים (טרה=350, נטו=400, ברוטו חסר=750); בקבוק משקה (טרה חסר=50, נטו=1500, ברוטו=1550); מזוודת טרולי (טרה=2.5 ק\"ג, נטו חסר=6 ק\"ג, ברוטו=8.5 ק\"ג); בלון גומי מלא באוויר (טרה=3, נטו=1, ברוטו חסר=4). כיווני חשיבה ואסטרטגיות: זיהוי איזה מהשלושה חסר בכל שורה, והפעלת חיבור (טרה+נטו=ברוטו) או חיסור (ברוטו-נטו=טרה, ברוטו-טרה=נטו) בהתאם. טעויות נפוצות: חיבור/חיסור הפוך, בלבול ביחידות (גרם מול קילוגרם). מידע נוסף: 4 שורות בטבלה, כל אחת עם נתון חסר אחר. צילום מסך: לא צורף.",
       "contentType": "practice",
-      "mediaFormat": "content-interactive",
+      "mediaFormat": "interactive-content",
       "questions": [
         {
           "questionId": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-01/methodica-science-mass-measure-02-01-012/q1",
@@ -251,7 +251,7 @@
       "title": "סטנדרטי 4: התאמת יחידת מסה לגוף",
       "informationToBot": "מטרת הפריט: תרגול סטנדרטי בבחירת יחידת המסה המתאימה ביותר לגופים מחיי היום-יום. מה התלמיד אמור להבין/לתרגל: בן אדם→קילוגרם, נמלה→מיליגרם, משאית→טון, טלפון נייד→גרם - יישום ידע עולם על גודל/משקל טיפוסי של כל גוף. כיווני חשיבה ואסטרטגיות: השוואת גודל הגוף לסולם היחידות (מיליגרם<גרם<קילוגרם<טון). טעויות נפוצות: בחירת יחידה גדולה/קטנה מדי ביחס לגודל הגוף בפועל. מידע נוסף: אין נתון מספרי - הערכה איכותית לפי ידע עולם. צילום מסך: לא צורף.",
       "contentType": "practice",
-      "mediaFormat": "content-interactive",
+      "mediaFormat": "interactive-content",
       "questions": [
         {
           "questionId": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-01/methodica-science-mass-measure-02-01-013/q1",
@@ -275,7 +275,7 @@
       "title": "סטנדרטי 5: מיון מושגים (חטיף וויטמינים)",
       "informationToBot": "מטרת הפריט: תרגול סטנדרטי מסכם - מיון 6 פריטים (משני תרחישים) לשלוש קטגוריות המסה. מה התלמיד אמור להבין/לתרגל: תרחיש חטיף - חטיף באריזתו=ברוטו, החטיף בלבד=נטו, אריזת החטיף הריקה=טרה. תרחיש ויטמינים - אריזת כדורי ויטמינים מלאה=ברוטו, כדורי ויטמין בלבד=נטו, אריזת הפלסטיק של הכדורים (ריקה)=טרה. כיווני חשיבה ואסטרטגיות: יישום עצמאי של שלושת המושגים על שני תרחישים שונים במקביל. טעויות נפוצות: בלבול בין הפריטים של שני התרחישים. מידע נוסף: פריט מסכם לרכיב הראשון. צילום מסך: לא צורף.",
       "contentType": "practice",
-      "mediaFormat": "content-interactive",
+      "mediaFormat": "interactive-content",
       "questions": [
         {
           "questionId": "https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/methodica-science-mass-measure-02-01/methodica-science-mass-measure-02-01-014/q1",

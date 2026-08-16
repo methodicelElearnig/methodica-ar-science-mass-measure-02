@@ -21,9 +21,14 @@
     vocabulary the metadata files use (state-general, core-curriculum-basic,
     project-or-inquiry-task, interactive-content ...), so no remapping is needed in
     this direction. Fields KATA adds and the metadata format has no place for
-    (status, masteryLevel, manufacturerGroupId, hostedContentRef, kind, providerName,
+    (status, manufacturerGroupId, hostedContentRef, kind, providerName,
     providerLogoUrl, componentCount, per-item/per-question order) are dropped — use
     -KeepRaw to also save the untouched API response.
+
+    masteryLevel IS emitted whenever KATA returns one. send-metadata.ps1 pushes the value
+    when a component carries it, so dropping it here would make a retrieve -> overwrite
+    cycle silently lose it. (In this unit all six components have masteryLevel: null, so
+    nothing is emitted in practice — the handling matters for units that do set it.)
 
     Runtime: PowerShell 7+ and curl.exe (bundled with Windows 10/11).
 
@@ -42,7 +47,8 @@
     Override the API base URL (default https://kata.cet.ac.il).
 
 .PARAMETER OutDir
-    Override the output folder (default: metadata-from/ next to this script).
+    Override the output folder (default: metadata-from/ at the repo root, alongside
+    metadata/ — this script lives in docs-and-tools/).
 
 .PARAMETER IdBase
     URL prefix used to rebuild the `id` URLs when KATA carries no hostedContentRef
@@ -54,7 +60,7 @@
 .EXAMPLE
     pwsh -File retrieve-metadata.ps1
 .EXAMPLE
-    pwsh -File retrieve-metadata.ps1 -UnitKey methodica-science-mass-measure-01 -KeepRaw
+    pwsh -File retrieve-metadata.ps1 -UnitKey methodica-science-mass-measure-02 -KeepRaw
 #>
 [CmdletBinding()]
 param(
@@ -86,9 +92,11 @@ param(
 $ApiKeyFile = Join-Path $PSScriptRoot 'kata-api-key.txt'
 # API base URL (override at launch with -BaseUrl).
 if (-not $BaseUrl) { $BaseUrl = 'https://kata.cet.ac.il' }
-# Where the retrieved metadata files go (override with -OutDir).
-if (-not $OutDir)  { $OutDir  = Join-Path $PSScriptRoot 'metadata-from' }
-# Run log (git-ignored via *.log).
+# Where the retrieved metadata files go (override with -OutDir). This script lives in
+# docs-and-tools/, so the default sits one level up, next to metadata/ — that keeps the
+# documented `git diff --no-index metadata metadata-from` working from the repo root.
+if (-not $OutDir)  { $OutDir  = Join-Path $PSScriptRoot '..\metadata-from' }
+# Run log (git-ignored by name).
 $LogFile = Join-Path $PSScriptRoot 'retrieve-metadata.log'
 
 # ── (2) PER-UNIT — usually fine as-is ───────────────────────────────────────
@@ -101,7 +109,7 @@ $TitleLangKey = 'Hebrew'
 $Manufacture = 'methodica'
 # Fallback URL prefix for rebuilding `id` fields, used ONLY when no component
 # carries a hostedContentRef to derive the real prefix from (override with -IdBase).
-if (-not $IdBase) { $IdBase = 'https://lomdot.education.gov.il/metodica/720active/science/mass-measure/01' }
+if (-not $IdBase) { $IdBase = 'https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02' }
 
 # ── (3) OUTPUT FORMATTING — mirrors the hand-authored style of metadata/ ─────
 # An empty array is always `[]`. A non-empty array of primitives goes on one line
@@ -384,7 +392,7 @@ function New-ComponentFileBody {
         New-ItemFileBody $it $compId
     }
 
-    return [ordered]@{
+    $out = [ordered]@{
         id                     = $compId
         title                  = $Comp.title
         learningUnitId         = $UnitId
@@ -404,6 +412,17 @@ function New-ComponentFileBody {
         updatedAt              = $Comp.updatedAt
         subContent             = (ConvertTo-JsonArray $items)
     }
+    # Insert masteryLevel where the hand-authored files keep it (after relativeDifficulty), so a
+    # metadata/ vs metadata-from/ diff stays clean rather than showing a key-order change.
+    if ($null -ne $Comp.masteryLevel -and "$($Comp.masteryLevel)".Trim() -ne '') {
+        $reordered = [ordered]@{}
+        foreach ($k in $out.Keys) {
+            $reordered[$k] = $out[$k]
+            if ($k -eq 'relativeDifficulty') { $reordered['masteryLevel'] = $Comp.masteryLevel }
+        }
+        return $reordered
+    }
+    return $out
 }
 
 # ---- Main -------------------------------------------------------------------
@@ -424,7 +443,7 @@ Write-Log ("Output dir : {0}" -f $OutDir)
 # 1) Which unit? Parameter, else the local metadata folder, else ask the catalog.
 if ($UnitKey) { Write-Log ("Unit key   : {0} (-UnitKey)" -f $UnitKey) }
 if (-not $UnitKey) {
-    $localUnit = Get-ChildItem -Path (Join-Path $PSScriptRoot 'metadata') -Filter '*_unit.json' -ErrorAction SilentlyContinue |
+    $localUnit = Get-ChildItem -Path (Join-Path $PSScriptRoot '..\metadata') -Filter '*_unit.json' -ErrorAction SilentlyContinue |
         Select-Object -First 1
     if ($localUnit) {
         $UnitKey = Get-Slug ((Get-Content -Raw -Path $localUnit.FullName -Encoding UTF8 | ConvertFrom-Json).id)

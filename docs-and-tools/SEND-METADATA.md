@@ -1,11 +1,12 @@
 # Sending metadata to the Kata catalog
 
-`send-metadata.ps1` pushes the `metadata/` folder (1 unit + 5 components + their
-items) into the Katalog (Kata) catalog at `https://kata.cet.ac.il/api/v1`.
+`send-metadata.ps1` pushes the repo-root `metadata/` folder (1 unit + 6 components +
+25 items) into the Katalog (Kata) catalog at `https://kata.cet.ac.il/api/v1`.
 It **upserts**: for each entity it does a `GET` by uniqueKey, then `PATCH` if it
 already exists or `POST` if it doesn't — so it's safe to run more than once.
 
-See [KATA-API-DETAILED.md](../../KATA-API-DETAILED.md) for the full endpoint schemas.
+The script lives in `docs-and-tools/` and resolves `../metadata` by default, so it is
+run from the repo root.
 
 ## Requirements
 
@@ -20,12 +21,12 @@ available in any **one** of these ways — the script checks them in this order:
 
 1. `-ApiKey '<key>'` on the command line.
 2. The `KATA_API_KEY` environment variable.
-3. **`kata-api-key.txt`** next to the script — one line, just the key. This is the
-   usual choice; the file is git-ignored.
+3. **`docs-and-tools/kata-api-key.txt`** — next to the script, one line, just the key.
+   This is the usual choice; the file is git-ignored.
 
 ```powershell
-# option 3, once:
-'<your-key>' | Set-Content kata-api-key.txt -NoNewline
+# option 3, once — from the repo root:
+'<your-key>' | Set-Content docs-and-tools\kata-api-key.txt -NoNewline
 ```
 
 Outside `-DryRun` the script refuses to run when no key is found. The key is never
@@ -37,16 +38,23 @@ written to the log, and both scripts share the same file.
 
 ## Usage
 
+Run from the **repo root**, and from native PowerShell — Git Bash garbles the Hebrew in
+the console output (the data itself is fine).
+
 ```powershell
 # 1) Dry run — builds and prints every payload, no network, no key needed.
-pwsh -File send-metadata.ps1 -DryRun
+pwsh -File docs-and-tools\send-metadata.ps1 -DryRun
 
 # 2) Live run — after setting up the key (see above).
-pwsh -File send-metadata.ps1
+pwsh -File docs-and-tools\send-metadata.ps1
 
 # Optional overrides:
-pwsh -File send-metadata.ps1 -BaseUrl 'https://kata.cet.ac.il' -MetadataDir '.\metadata'
+pwsh -File docs-and-tools\send-metadata.ps1 -BaseUrl 'https://kata.cet.ac.il' -MetadataDir '.\metadata'
 ```
+
+A clean dry run for this unit reports `created=32 updated=1 failed=0` and exits 0 —
+1 unit + 6 components + 25 items, plus one `LINKED` line for part `-02`'s
+`recommendedAfterFail`.
 
 Progress prints to the console and to `send-metadata.log` (git-ignored). Each line is
 `CREATED` / `UPDATED` / `FAILED` with the HTTP status; the run ends with a
@@ -59,62 +67,100 @@ this is controlled from the **CONFIG** block at the top of the file.
 
 | Metadata | Sent to API |
 |---|---|
-| `id` (full URL) | `uniqueKey` = last path segment (slug), e.g. `methodica-science-mass-measure-01-01` |
+| `id` (full URL) | `uniqueKey` = last path segment (slug), e.g. `methodica-science-mass-measure-02-01`. Trailing slashes are trimmed first, so `…/foo/` yields `foo`, not `""`. |
 | unit `title` (string) | `title` object `{ "Hebrew": "…" }` (`$TitleLangKey`) |
 | unit — (no manufacture) | `manufacture` = `'methodica'` (`$UnitManufacture`) |
-| component — (missing) | `relativeDifficulty` falls back to component `order`; `depthLevel` to `core-curriculum-basic` — see `$ComponentOverrides` to force per-component values |
+| unit `targetSector` / `targetAudience` | passed through, but **validated** against `$ValidTargetSector` / `$ValidTargetAudience` first — a bad value stops the run instead of 422-ing after the unit was already created |
+| component `relativeDifficulty` / `depthLevel` / `cognitiveLevel` | read **from the metadata**. Precedence is `$ComponentOverrides` > metadata value > fallback (component `order` for `relativeDifficulty`, `$DefaultDepthLevel` for `depthLevel`) |
+| component `masteryLevel` | forwarded when present and non-null; absent stays absent rather than being defaulted. (All six components in this unit are `null`, so no key is emitted.) |
+| component `id` | also becomes `hostedContentRef` = component id + `/index.html` |
 | component `manufacture` | dropped (owning group is derived from the API key) |
+| component `recommendedAfterFail` | URLs reduced to component keys and applied in a **second pass** — see below |
 | item — (no order) | `order` = 1-based position in `subContent[]` |
 | `questions[]` | passed through unchanged |
+
+### `recommendedAfterFail` is a second pass, not part of the create
+
+These references can point at components created later in the same run, which KATA
+rejects at create time (`"… is not a component"`). So `New-ComponentBody` deliberately
+omits the field, and after every component exists the script issues one `PATCH` per
+component that has any — logged as `LINKED`. Forward references are therefore fine.
+
+### The unit slug is guarded
+
+`New-UnitBody` throws if `uniqueKey` resolves to anything that isn't a `methodica-*`
+slug. This catches a unit `id` that stops at the folder (`…/mass-measure/02/`), which
+would otherwise key the unit as the bare string `"02"` and collide with every other
+unit numbered 02 across every subject.
 
 ### Enums are kebab-case — no translation needed
 
 Since the metadata was aligned to 720 v2.3 it stores the **same kebab-case vocabulary
 the API uses** (`core-curriculum-basic`, `project-or-inquiry-task`,
-`interactive-content`, `applying-a-model-or-procedure`, `state-general`, …), verified
-live against the API on 2026-07-25. So values pass straight through and are only
-*checked* against `$ValidContentType` / `$ValidMediaFormat` / `$ValidDepthLevel` /
-`$ValidComponentPurpose` in CONFIG section (4).
-
-> ⚠️ The Title Case tables in **`KATA-API.md` → "Controlled Vocabularies"** and in
-> `KATA-API-DETAILED.md` are **stale** — the API neither returns nor accepts that form.
+`interactive-content`, `applying-a-model-or-procedure`, `state-general`, …). So values
+pass straight through and are only *checked* against `$ValidContentType` /
+`$ValidMediaFormat` / `$ValidDepthLevel` / `$ValidComponentPurpose` in CONFIG
+section (4).
 
 `$ComponentPurposeMap` / `$ContentTypeMap` / `$CognitiveLevelMap` now only rewrite
 leftover **pre-v2.3** spellings (`ClassroomTask`, `Assessment`, `Analyzing`, …), which
 current metadata no longer contains. Any value outside the API enums makes the script
 **stop with an error** naming the offender rather than send bad data.
 
-### `cognitiveLevel` — 8 of the 12 science levels are live (parts 04 and 05 still blocked)
+> ⚠️ **Watch for word-reversed spellings.** This unit's metadata was authored with
+> `content-interactive` and `task-inquiry-or-project` — the right words in the wrong
+> order. Both were corrected (2026-08-16) to `interactive-content` and
+> `project-or-inquiry-task`. The `$Valid*` lists hold the live vocabulary, so a dry run
+> names any such value rather than letting it 422 mid-push.
+
+### How the vocabularies were verified
+
+Only two of the controlled vocabularies have list endpoints. Checked 2026-08-16:
+
+| Endpoint | Result |
+|---|---|
+| `GET /api/v1/cognitive-levels` | **200** — authoritative |
+| `GET /api/v1/skills` | **200** |
+| `media-formats`, `content-types`, `depth-levels`, `mastery-levels`, `component-purposes`, `target-sectors`, `target-audiences` | **404** — no list endpoint |
+
+For the seven with no endpoint, the reference is the **already-published sibling unit**
+`methodica-science-mass-measure-01`: `GET /api/v1/content-units/methodica-science-mass-measure-01`
+returns values KATA has actually accepted for this same subject and series. That is what
+confirmed `interactive-content` and `project-or-inquiry-task`.
+
+### `cognitiveLevel` — all 12 science levels are live
 
 KATA validates `cognitiveLevel` against a **per-discipline coded taxonomy**
-(`GET /api/v1/cognitive-levels`). Those codes turned out to be kebab-case slugs
-**identical to what the metadata stores**, so no mapping is required — the value passes
-through and is checked against `$ValidCognitiveLevel`.
+(`GET /api/v1/cognitive-levels`). Those codes are kebab-case slugs **identical to what
+the metadata stores**, so no mapping is required — the value passes through and is
+checked against `$ValidCognitiveLevel`.
 
-Verified live 2026-07-25: 12 codes exist, 8 `science` + 4 `mathematics`. The science
-ones available are `identifying`, `describing`, `retrieving-information`,
-`providing-examples`, `making-connections`, `interpreting`,
-`applying-a-model-or-procedure`, `explaining`.
+Verified live 2026-08-16: **16 codes — 12 `science` + 4 `mathematics`.** All 12 science
+levels from 720 v2.2 pp.17-18 are loaded, so `$PendingCognitiveLevel` is **empty** and
+nothing is blocked. What this unit uses:
 
-⚠️ Four of the 12 science levels in 720 v2.2 pp.17-18 are **still not loaded**:
-`providing-scientific-reasoning`, `analyzing`, `synthesizing`,
-`evaluating-and-justifying` (listed in `$PendingCognitiveLevel`). Parts **04**
-(`analyzing`) and **05** (`evaluating-and-justifying`) therefore still stop the run with
-an explicit message instead of taking a `422`. Parts 01–03 build fine. When MOE/CET
-release the rest, move the code from `$PendingCognitiveLevel` into
-`$ValidCognitiveLevel` and re-run. (See `docs/note-to-cet-science-cognitive-levels.md`.)
+| Component | `cognitiveLevel` |
+|---|---|
+| `-01`, `-02`, `-03` | `applying-a-model-or-procedure` |
+| `-04`, `-05` | `analyzing` |
+| `-06` | `evaluating-and-justifying` |
 
-`depthLevel`, by contrast, is a **plain enum** (720 v2.2 p.16) and is read straight
-from the metadata. `relativeDifficulty`, `depthLevel`, and `recommendedAfterFail` are
-now all read from the metadata (not defaulted); `recommendedAfterFail` URLs are
-reduced to component keys and may be forward references (see the note in
-`New-ComponentBody`).
+`$PendingCognitiveLevel` is retained as a mechanism: if a future spec level isn't loaded
+in KATA yet, listing it there produces an explanatory error instead of a bare "unknown
+value", and the fix is to move it into `$ValidCognitiveLevel` once released.
+
+`depthLevel`, by contrast, is a **plain enum** (720 v2.2 p.16), not a coded taxonomy, and
+is read straight from the metadata.
 
 ## Going the other way
 
 [`retrieve-metadata.ps1`](RETRIEVE-METADATA.md) pulls a unit back out of the catalog
-into `metadata-from/`, in this same file format, so you can diff the catalog against
-the repo.
+into `metadata-from/` at the repo root, in this same file format, so you can diff the
+catalog against the repo:
+
+```bash
+git diff --no-index metadata metadata-from
+```
 
 ## Assumptions to verify on the first live run
 
@@ -127,10 +173,16 @@ Two mappings are best-guesses and isolated to single config points, so a first-c
 2. **Unit `title` is an object** `{ "Hebrew": "…" }`. If rejected, adjust the
    title builder in `New-UnitBody`.
 
+Also unresolved, though it will not fail a dry run: the unit's
+`prerequisiteLearningObjective` holds a **URL**
+(`…/mass-measure/01/methodica-science-mass-measure-01/`) while the neighbouring
+`subTopic` and `learningObjective` are MOE codes. There is no endpoint to check it
+against, and picking the right code is a content decision — flagged, not guessed.
+
 ## Verify the result
 
-- `GET /api/v1/content-units/methodica-science-mass-measure-01` returns the unit with
-  its components; spot-check `GET /api/v1/components/methodica-science-mass-measure-01-01`
+- `GET /api/v1/content-units/methodica-science-mass-measure-02` returns the unit with
+  its components; spot-check `GET /api/v1/components/methodica-science-mass-measure-02-01`
   and one item.
 - In the Kata UI: **יחידות תוכן** (`/author`).
 - Re-run once — every entity should report `UPDATED` (not duplicated).
