@@ -14,19 +14,25 @@
    נפרד, ולא כמה שורות בסוף כל סין.
 
    ── הסדר נושא-משקל ──
-     1. initLedgerResetHatch() ראשון — הוא עשוי לנקות את היומן ולשנות את ה-URL
-        (הסרת ?resetLedger), ולכן חייב לרוץ לפני שמישהו קורא או כותב ליומן.
-     2. initReportModal() — כפתור הדגל, ה-select המותאם, שלושת הדיאלוגים.
-     3. bootXAPI() אחרון. הוא טוען שני סקריפטים מה-CDN ומדווח את ה-initialized
-        של הרכיב, ובמימוש resume עתידי הוא גם עשוי לעשות
-        window.location.replace() לסין אחר — ואז שום דבר אחריו לא היה רץ.
+     1. initResumeResetHatch() ראשון — הוא משנה את ה-URL (הסרת ?resetState)
+        ומדליק את דגל האיפוס, ולכן חייב לרוץ לפני שמישהו קורא את ה-query או
+        נוגע במסמך ה-state.
+     2. initResumeLeaveHandlers() — beforeunload / pagehide / visibilitychange.
+        נרשם מוקדם במכוון: הוא הרשת שתופסת לומד שעוזב לפני שהגיע לניווט מסודר.
+        אין צורך לגדר אותו ב-RESUME_ENABLED — flushResumeSave בודק את הדגל
+        בעצמו, ולכן ה-handlers פשוט אינרטיים כשה-resume כבוי.
+     3. initReportModal() — כפתור הדגל, ה-select המותאם, שלושת הדיאלוגים.
+     4. bootXAPI() אחרון. הוא טוען שני סקריפטים מה-CDN, מדווח את ה-initialized
+        של הרכיב, ובמסלול ה-resume עשוי לעשות window.location.replace() לסין
+        אחר — ואז שום דבר אחריו לא היה רץ.
 
-   שתי הראשונות עטופות ב-try/catch כל אחת בנפרד, כדי שכשל באחת לא ימנע את
+   שלוש הראשונות עטופות ב-try/catch כל אחת בנפרד, כדי שכשל באחת לא ימנע את
    האחרות. bootXAPI() עוטף כבר את עצמו פנימה.
 
    אין צורך ב-DOMContentLoaded: התג הזה יושב מיד לפני </body>, ולכן ה-DOM שלם. */
 (function boot() {
-  try { initLedgerResetHatch(); } catch (e) { console.error('[boot] initLedgerResetHatch', e); }
-  try { initReportModal(); }     catch (e) { console.error('[boot] initReportModal', e); }
+  try { initResumeResetHatch(); }    catch (e) { console.error('[boot] initResumeResetHatch', e); }
+  try { initResumeLeaveHandlers(); } catch (e) { console.error('[boot] initResumeLeaveHandlers', e); }
+  try { initReportModal(); }         catch (e) { console.error('[boot] initReportModal', e); }
   bootXAPI();
 })();

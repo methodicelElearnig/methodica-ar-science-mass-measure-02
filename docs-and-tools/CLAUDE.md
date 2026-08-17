@@ -1,6 +1,6 @@
 # Instructions for Claude Code — Methodica mass-measure (720 lomda family)
 
-This file applies to all sub-projects in this directory (`Methodica-science-mass-measure-02-01` through `-06`, and any new Sain added later). Each is an independent HTML/CSS/JS lomda ("Sain") sharing the same template conventions. These bugs happened in this project and must not happen again in future lomdas.
+This file applies to all sub-projects in this directory (`methodica-science-mass-measure-02-01` through `-06`, and any new Sain added later). Each is an independent HTML/CSS/JS lomda ("Sain") sharing the same template conventions. These bugs happened in this project and must not happen again in future lomdas.
 
 ## 1. Companion-character avatar images must never change by themselves a few seconds after the screen appears
 
@@ -25,7 +25,7 @@ When a dragged item (a distractor/word chip) is dropped into a target slot and r
 
 - In an RTL flex row, `flex-start` anchors content to the **right** (where it visually belongs, adjacent to the preceding text/slot edge). `flex-end` anchors it to the **left** — the opposite of what it looks like in an LTR mental model.
 - This only becomes visible when the slot can be wider than the placed content (e.g. a `min-width` on the drop zone that isn't collapsed to the content size when occupied) — a short label like "טון" or "מסה" gets shoved to the far side of the slot, reading as "the word jumped left after I dropped it."
-- The correct reference implementation is `.dq-placed-card` in `Methodica-science-mass-measure-02-05/styles.css` (`justify-content: flex-start`). This bug was introduced in `-02-06` by copying that block but transcribing `flex-end` instead — always copy this rule verbatim, never "fix" it based on LTR intuition.
+- The correct reference implementation is `.dq-placed-card` in `methodica-science-mass-measure-02-05/styles.css` (`justify-content: flex-start`). This bug was introduced in `-02-06` by copying that block but transcribing `flex-end` instead — always copy this rule verbatim, never "fix" it based on LTR intuition.
 
 **Quick self-check for a new drag&drop screen:** grep the project's CSS for `justify-content: flex-end` anywhere inside a `direction: rtl` block that positions a placed/dropped label, and confirm it's `flex-start` (or `center`, if the slot is always sized to fit its content exactly).
 

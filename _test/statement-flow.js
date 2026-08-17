@@ -22,9 +22,9 @@ function ok(name, cond, extra) {
 }
 
 function boot(comp) {
-  const dir = path.join(BASE, 'Methodica-science-mass-measure-02-' + comp);
+  const dir = path.join(BASE, 'methodica-science-mass-measure-02-' + comp);
   const dom = new JSDOM(fs.readFileSync(path.join(dir, 'index.html'), 'utf8'), {
-    url: 'http://localhost:8777/Methodica-science-mass-measure-02-' + comp + '/index.html',
+    url: 'http://localhost:8777/methodica-science-mass-measure-02-' + comp + '/index.html',
     runScripts: 'dangerously', pretendToBeVisual: true,
   });
   const w = dom.window;
@@ -53,6 +53,19 @@ function boot(comp) {
   w.METADATA = JSON.parse(fs.readFileSync(
     path.join(BASE, 'metadata', 'methodica-science-mass-measure-02-' + comp + '.json'),
     'utf8').replace(/^﻿/, ''));
+
+  /* Since 2026-08-17 the 'completed' ledger lives in the xAPI State document
+     (unit-js/40-resume.js) rather than sessionStorage, so the dedupe assertions
+     below need a document to exist. With no document the ledger deliberately
+     fails OPEN and every repeat 'completed' goes out — that guarantee is
+     asserted separately in verify-report.js §10(a). An in-memory store is enough
+     here; the real transport is the CDN library, or _test/xapi-720-k.js for the
+     browser walkthrough. */
+  w.__store = null;
+  w.loadState720 = function () { return w.__store ? JSON.parse(w.__store) : null; };
+  w.saveState720 = function (id, doc) { w.__store = JSON.stringify(doc); return true; };
+  w.saveState720Debounced = function (id, doc) { w.__store = JSON.stringify(doc); };
+  exec('_resumeReady = true; _unitState = emptyUnitState();');
 
   const run = (code) => {
     w.__log = [];
@@ -280,7 +293,7 @@ function probeRouting() {
      navigation itself (practiceDestinationSlug / previousPartHref), precisely
      so they can be asserted without navigating — jsdom will not let
      location.href be stubbed. */
-  const EDGE_KEY = 'lomda_nav_edges::Methodica-science-mass-measure-02';
+  const EDGE_KEY = 'lomda_nav_edges::methodica-science-mass-measure-02';
 
   const destAfter01 = (correct) => {
     const { w, exec, val } = boot('01');
@@ -300,19 +313,19 @@ function probeRouting() {
   let r = destAfter01(5);
   ok(C + ' score 5 of 5 is read correctly', r.score === 5, String(r.score));
   ok(C + ' 5 of 5 -> skips 02, goes to 03',
-    r.dest === 'Methodica-science-mass-measure-02-03', r.dest);
+    r.dest === 'methodica-science-mass-measure-02-03', r.dest);
 
   r = destAfter01(4);
   ok(C + ' 4 of 5 — exactly the promised threshold — skips 02',
-    r.dest === 'Methodica-science-mass-measure-02-03', r.dest);
-  const edge = r.edges && r.edges['Methodica-science-mass-measure-02-03'];
+    r.dest === 'methodica-science-mass-measure-02-03', r.dest);
+  const edge = r.edges && r.edges['methodica-science-mass-measure-02-03'];
   ok(C + ' the back edge records 01 as 03\'s origin, returning to screen 20',
-    edge && edge.from === 'Methodica-science-mass-measure-02-01' && edge.hash === '#screen=19',
+    edge && edge.from === 'methodica-science-mass-measure-02-01' && edge.hash === '#screen=19',
     JSON.stringify(r.edges));
 
   r = destAfter01(3);
   ok(C + ' 3 of 5 — below the threshold — goes to the reinforcement part 02',
-    r.dest === 'Methodica-science-mass-measure-02-02', r.dest);
+    r.dest === 'methodica-science-mass-measure-02-02', r.dest);
 
   /* 03's back button must follow the edge, and fall back to 02 without one. */
   const backFrom03 = (edgeDoc) => {
@@ -321,24 +334,24 @@ function probeRouting() {
       ? "try { sessionStorage.setItem('" + EDGE_KEY + "', " +
         JSON.stringify(JSON.stringify(edgeDoc)) + "); } catch (e) {}"
       : "try { sessionStorage.removeItem('" + EDGE_KEY + "'); } catch (e) {}");
-    const href = val("previousPartHref('Methodica-science-mass-measure-02-02', '#screen=8')");
+    const href = val("previousPartHref('methodica-science-mass-measure-02-02', '#screen=8')");
     w.close();
     return href;
   };
 
-  let href = backFrom03({ 'Methodica-science-mass-measure-02-03':
-    { from: 'Methodica-science-mass-measure-02-01', hash: '#screen=19' } });
+  let href = backFrom03({ 'methodica-science-mass-measure-02-03':
+    { from: 'methodica-science-mass-measure-02-01', hash: '#screen=19' } });
   ok(C + ' a learner who skipped 02 goes BACK to 01 screen 20',
-    href === '../Methodica-science-mass-measure-02-01/index.html#screen=19', href);
+    href === '../methodica-science-mass-measure-02-01/index.html#screen=19', href);
 
-  href = backFrom03({ 'Methodica-science-mass-measure-02-03':
-    { from: 'Methodica-science-mass-measure-02-02', hash: '#screen=8' } });
+  href = backFrom03({ 'methodica-science-mass-measure-02-03':
+    { from: 'methodica-science-mass-measure-02-02', hash: '#screen=8' } });
   ok(C + ' a learner who came through 02 goes BACK to 02 screen 9',
-    href === '../Methodica-science-mass-measure-02-02/index.html#screen=8', href);
+    href === '../methodica-science-mass-measure-02-02/index.html#screen=8', href);
 
   href = backFrom03(null);
   ok(C + ' with no edge recorded it falls back to the pre-change behaviour',
-    href === '../Methodica-science-mass-measure-02-02/index.html#screen=8', href);
+    href === '../methodica-science-mass-measure-02-02/index.html#screen=8', href);
 }
 
 probe01(); probe02(); probe03(); probe05(); probe06(); probeRouting();

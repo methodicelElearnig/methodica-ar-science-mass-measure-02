@@ -63,6 +63,12 @@ function goTo(n) {
      יעצור ניווט. resetScreenState לפני ה-.active נשאר כפי שהיה: זה הכלל
      שמונע הבהוב אווטאר (CLAUDE.md כלל 1). */
   try { xapiOnScreen(n); } catch (e) {}
+  /* resume: נקודת החנק לשמירה — כל החלפת מסך עוברת כאן, וזה מה שתוחם את
+     האיבוד למסך אחד. מושהה (800ms), ולכן דפדוף מהיר מתקבץ לכתיבה אחת.
+     מוצב אחרון, אחרי ה-paint ואחרי xapiOnScreen, מאותו נימוק: שמירה לא
+     מעכבת את מה שהלומד רואה. עטוף כמו שכנו — ניווט לעולם לא נשבר מדיווח
+     או משמירה. */
+  try { scheduleResumeSave(); } catch (e) {}
 }
 
 function resetScreenState(n) {
@@ -91,8 +97,8 @@ function s0Back() {
      שלא ראה.
      ה-fallback הוא ההתנהגות שהייתה קודם (סין 02, מסך 9), כך שאם sessionStorage
      חסום או שלא נרשמה קשת — הכפתור מתנהג בדיוק כמו לפני השינוי.
-     ראו unit-js/40-ledger.js → "קשתות-חזרה בין סינים". */
-  goBackToPreviousPart('Methodica-science-mass-measure-02-02', '#screen=8');
+     ראו unit-js/40-resume.js → "קשתות-חזרה בין סינים". */
+  goBackToPreviousPart('methodica-science-mass-measure-02-02', '#screen=8');
 }
 
 /* =========================================================
@@ -110,8 +116,13 @@ function s1Continue() {
      ‎(דיווח score כאן היה ממציא ניקוד שאף אחד לא מדד.) */
   xapiCompleteComponent({ success: true });
 
-  /* קישור בין סינים: מסך אחרון בסיין 3 -> מסך ראשון בסיין 4 (+ ?slxapi, §6) */
-  window.location.href = '../Methodica-science-mass-measure-02-04/index.html' + window.location.search;
+  /* קישור בין סינים: מסך אחרון בסיין 3 -> מסך ראשון בסיין 4 (+ ?slxapi, §6).
+     writeForwardState מזיז את מצביע הנחיתה של מסמך ה-resume ליעד ורושם את
+     קשת החזרה (סין 04 חוזר לכאן, למסך 2 = '#screen=1'). בלי הזזת המצביע,
+     כפתור "חזרה" בסין 04 היה מגיע לכאן והלואדר כאן היה מקפיץ אותו מיד
+     חזרה ל-04 — ping-pong. ראו unit-js/40-resume.js. */
+  writeForwardState('methodica-science-mass-measure-02-04', '#screen=1');
+  window.location.href = '../methodica-science-mass-measure-02-04/index.html' + window.location.search;
 }
 
 /* ─── Dev mode: postMessage bridge ─────────────────────── */
@@ -167,3 +178,68 @@ var XAPI_EVAL_ITEMS = {};
 
 var XAPI_METADATA_FILE = '../metadata/methodica-science-mass-measure-02-03.json';
 
+
+/* ═══════════════════ resume — התפרים הפר-סיניים ═══════════════════
+   ארבעת השמות האלה נקראים מ-unit-js/40-resume.js ומ-unit-js/50-loader.js
+   בזמן call, לא בזמן טעינה — ולכן מותר להם לשבת בתחתית הקובץ.
+
+   הם חייבים לשבת **כאן**, בתוך script.js, ולא בשכבה המשותפת: כל מצב הלומד
+   בסין הזה מוצהר כ-let/const ברמת top-level, כלומר הוא יושב ב-global
+   lexical scope ואינו נגיש דרך window. השכבה המשותפת לא יכולה להגיע אליו,
+   וזו הסיבה שהחוזה הזה הוא פר-סין ולא פונקציה משותפת אחת.
+
+   ── שלב 1 (הנוכחי): מצביע מסך בלבד ──
+   capturePartPayload מחזיר את currentScreen, ושלושת האחרים הם no-op.
+   התוצאה: לומד שחוזר נוחת על **המסך** הנכון, אבל המסך עצמו נקי — מצב
+   התשובות אינו משוחזר.
+
+   זה מכוון ולא חוסר. החזרת משתני התשובה בלי ה-painters הייתה מייצרת מסך
+   שנראה כאילו אפשר לענות עליו אבל מתעלם מלחיצות (כי sNNDone כבר true),
+   ולכן השניים נשארים צמודים לשלב 2. במצב הנוכחי המסך פשוט טרי וניתן
+   לענות עליו שוב.
+
+   ⚠️ הנגזרת המוכרת של שלב 1: stationProgress* ו-XAPI_Q_RESULTS אינם
+   משוחזרים, ולכן הניתוב קדימה שנגזר מהם עלול לשלוח לומד שעמד בסף אל
+   התרגול המחזק. ראו unit-js/10-identity.js. */
+function capturePartPayload() {
+  var st = { currentScreen: currentScreen };
+
+  /* שלב 2א — מצב הניקוד וההסתעפות.
+     XAPI_Q_RESULTS הוא var ב-20-xapi.js ולכן נגיש כאן; המפות stationProgress*
+     הן let פר-סין ולכן **חייבות** לעבור דרך ה-hook הזה. */
+  st.qResults = Object.assign({}, XAPI_Q_RESULTS);
+  return st;
+}
+
+/* שלב 2 — החזרת משתני התשובה של הסין.
+   ⚠️ אם המימוש יעבור ל-eval כמו בלומדת המקור, שם הפרמטר חייב להישאר `st`:
+   ה-eval מפרש אותו לקסיקלית, ושינוי שם נכשל **בשקט** (הזריקה נבלעת
+   ב-try/catch העוטף) ולוקח איתו את התשובות של הלומד. */
+/* שלב 2א — מחזיר את מצב הניקוד וההסתעפות בלבד.
+
+   למה זה חייב לקרות, ולא רק "נחמד": הניתוב קדימה נגזר מהמפות האלה, ולכן
+   לומד שהמשיך אחרי resume בלעדיהן היה מנותב לפי ציון 0 — כלומר מי שעמד
+   בסף נשלח לתרגול מחזק שהוא כבר דילג עליו.
+
+   מוטציה במקום ולא הצבה מחדש: 20-xapi.js כותב ל-XAPI_Q_RESULTS[key] דרך
+   הגלובל, וקוד הסין מחזיק הפניה חיה למפות — החלפת האובייקט הייתה עלולה
+   להשאיר קוראים על עותק מיושן.
+
+   ⚠️ במכוון **לא** מחזיר דגלי sNNDone/Selected/Attempts. הם משוחזרים רק
+   יחד עם ה-painters (שלב 2ב), כי מסך עם Done=true ובלי ציור נראה כאילן
+   אפשר לענות עליו אבל מתעלם מלחיצות. */
+function applyResumeVars(st) {
+  if (!st) return;
+  if (st.qResults) {
+    Object.keys(st.qResults).forEach(function (k) { XAPI_Q_RESULTS[k] = st.qResults[k]; });
+  }
+}
+
+/* שלב 2 — החזרת ערכים שיושבים רק ב-DOM: טקסט שהוקלד בשדות, ותוויות
+   של dropdown שה-value המכונה שלהן נשמר בנפרד. */
+function applyResumeDom(st) {}
+
+/* שלב 2 — ציור מצב "נענה" (מסומן, נעול, פידבק גלוי).
+   חייב להישאר exception-safe: נקרא גם מ-applyExecutionState וגם — בשלב 2 —
+   מכל ניווט, ואסור לו לשבור ניווט. */
+function restoreScreenUI(n) {}

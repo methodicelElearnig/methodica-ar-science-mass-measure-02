@@ -1,7 +1,8 @@
 'use strict';
 /* ═══════════════════ xAPI — loader / init ═══════════════════
-   משותף לששת הסינים. Definition-only. bootXAPI() נקרא אחרון מבלוק ה"אתחול"
-   שבתחתית כל script.js, כי זה השלב שעשוי לנווט הלאה (ב-resume; כרגע לא).
+   משותף לששת הסינים. Definition-only. bootXAPI() נקרא אחרון מ-90-boot.js,
+   כי זה השלב שעשוי לנווט הלאה: כשמסמך ה-resume מצביע על סין אחר הוא עושה
+   window.location.replace() ושום דבר אחריו לא ירוץ.
 
    התפרים הפר-סיניים:
      XAPI_METADATA_FILE   חובה — '../metadata/<component>.json'
@@ -10,7 +11,7 @@
                           בו לטעינת מטא-דאטת היחידה.
 
    מקור: methodica-math-scale-01-vadimr-1/unit-js/50-loader.js. בלוק ה-resume
-   hop הוסר במקום להישאר מגודר-בדגל, כי אין כאן readUnitState() לקרוא לו. */
+   hop הוחזר ב-2026-08-17 יחד עם unit-js/40-resume.js. */
 
 function bootXAPI() {
   var CDN = 'https://lomdot.education.gov.il/metodica/720active/common/';
@@ -52,21 +53,38 @@ function bootXAPI() {
     setTimeout(function () { pollMetadataReady(cb, tries + 1); }, 200);
   }
 
-  /* -i הוא בילד הייצור (הנחיות 720 v2.4); -j הוא -i בתוספת שכבת ה-State API
-     שרק resume צריך. RESUME_ENABLED=false ולכן נטען -i.
-     ב-localhost בלבד, ?xapiLib=<נתיב same-origin> יכול לעקוף לבדיקת בילד מקומי.
+  /* -i הוא בילד הייצור (הנחיות 720 v2.4); -k הוא -j (שהוא -i + שכבת ה-State API)
+     בתוספת אבחון על שכבת ה-state. RESUME_ENABLED=true ולכן נטען -k.
+
+     למה -k ולא -j: ב-j כל כשל של state חזר כביט אחד — loadState720 החזיר null
+     גם ל-404 ("עוד אין מצב", המקרה הרגיל בקריאה הראשונה), גם ל-401 (טוקן פגום)
+     וגם ל-500 או ל-200 ריק; saveState720 החזיר false גם ל-412, גם ל-413 (מסמך
+     מעל ~1MB) וגם לכשל רשת/CORS. כלומר הרצה שנכשלת מול הפלטפורמה לא הייתה
+     ניתנת לפירוש — וזו בדיוק ההרצה שלמנגנון הזה עוד לא הייתה.
+     ‎-k מוסיף stateLastResult720() עם {op,status,ok,reason} ומחזיק את חוזי
+     ההחזרה בדיוק כפי שהיו, ולכן הוא תואם-לאחור מול -j.
+     ‎-j נשאר ללא שינוי ב-CDN, כך שהיחידות האחרות שטוענות אותו אינן מושפעות.
+
+     ב-localhost בלבד, ?xapiLib=<נתיב same-origin> יכול לעקוף לבדיקת בילד מקומי
+     — כך נבדק ה-resume מול _test/xapi-720-k.js בלי LRS אמיתי.
+
+     ⚠️ שם הקובץ של ה-stub חייב להסתיים באות ספרייה שה-regex למטה מכיר
+     (xapi-720-k.js): ה-regex הוא מה שקובע את XAPI_USING_G, ושם שלא תואם משתיק
+     את כל ה-statements ברמת הפריט בלי שום שגיאה.
 
      ⚠️ window.XAPI_USING_G אומר לסינים אם statements ברמת פריט זמינים בכלל.
-     ה-regex חייב למנות כל אות ספרייה שתומכת בהם — אם ה-CDN יעבור לאות חדשה
-     ולא נרחיב כאן, xapiOnScreen ודיווח הווידאו משתתקים בלי שום שגיאה. */
-  var LIB720 = CDN + (RESUME_ENABLED ? 'xapi-720-j.js' : 'xapi-720-i.js');
+     ה-regex חייב למנות כל אות ספרייה שתומכת בהם — **אות חדשה שלא תתווסף כאן
+     משתיקה את xapiOnScreen ואת דיווח הווידאו בלי שום שגיאה.** לכן שינוי
+     ה-LIB720 ושינוי ה-regex חייבים לקרות באותו commit; זה הכשל השקט של המעבר
+     בין אותיות. */
+  var LIB720 = CDN + (RESUME_ENABLED ? 'xapi-720-k.js' : 'xapi-720-i.js');
   try {
     if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
       var _ovr = new URLSearchParams(location.search).get('xapiLib');
       if (_ovr && /^(\.\.?\/|\/)[^:]*$/.test(_ovr)) LIB720 = _ovr;   // same-origin יחסי בלבד
     }
   } catch (e) {}
-  window.XAPI_USING_G = /xapi-720-[ghij]\.js/.test(LIB720);
+  window.XAPI_USING_G = /xapi-720-[ghijk]\.js/.test(LIB720);
 
   loadScript(CDN + 'xapiwrapper.min.js', function () {
     loadScript(LIB720, function () {
@@ -96,13 +114,52 @@ function bootXAPI() {
               }
             } catch (e) {}
 
+            /* ── שחזור ה-resume ──
+               יושב כאן במכוון: **אחרי** changeConfig (כי הקריאה מ-Kata צריכה
+               endpoint+auth) ו**לפני** ה-initialized של הרכיב. הסדר הזה הוא מה
+               שמונע מסשן שרק *עובר* דרך הסין הזה להשאיר אחריו statement —
+               ה-return המקדים קופץ לפני שנשלח משהו.
+
+               כל הכתיבות חסומות עד ש-_resumeReady נדלק, ולכן הוא נדלק גם
+               ב-catch: קריאה שנכשלה לא אמורה לבטל את השמירה להמשך, ובטח לא
+               להשתיק את הדיווחיות. */
+            var _resumed = false;
+            if (RESUME_ENABLED) {
+              try {
+                var _saved = readUnitState();
+                if (_saved.part && _saved.part !== currentPartSlug()) {
+                  /* replace() ולא href: משאיר את הסין שננטש מחוץ ל-back-stack,
+                     שם לחיצת Back הייתה נוחתת על URL שמיד מקפיץ קדימה.
+                     ה-query string נגרר כמו בכל מעבר — בלעדיו ה-registration
+                     אובד וכל הסינים מדווחים כלום (REPORT-XAPI.md §6). */
+                  window.location.replace('../' + _saved.part + '/index.html' + window.location.search);
+                  return;
+                }
+                _resumeReady = true;
+                var _payload = _saved.parts[currentPartSlug()];
+                /* ה-hash מנצח את המסמך. '#screen=N' מגיע מלחיצה על "חזרה",
+                   כלומר מכוונה מפורשת של הלומד עכשיו, בעוד המסמך מתאר איפה
+                   הוא היה פעם. jumpToLinkedScreen() כבר קפץ לשם בזמן טעינת
+                   ה-script, ולכן שחזור מסך כאן היה דורך עליו בשקט. */
+                if (_payload && !/^#screen=\d+$/.test(window.location.hash)) {
+                  applyExecutionState(_payload);
+                  _resumed = true;
+                }
+              } catch (e) {
+                console.error('[resume] init', e);
+                _resumeReady = true;
+                if (!_unitState) _unitState = emptyUnitState();
+              }
+            }
+
             try { sendStatement720('initialized', 'onlinelesson'); } catch (e) {}
             try { xapiWireVideos(); } catch (e) {}
             /* init ברמת הפריט עבור מסך הנחיתה. בלומדה הזאת מסך הפתיחה לא
                עובר דרך goTo() בכלל — ה-.active מקובע ב-HTML ובלוק האתחול
                קורא ל-resetScreenState(0) ישירות — ולכן זו הקריאה היחידה
-               שפותחת את הפריט של המסך הראשון. */
-            try { xapiOnScreen(currentScreen); } catch (e) {}
+               שפותחת את הפריט של המסך הראשון.
+               ב-resume, applyExecutionState כבר שלח אותו בעצמו. */
+            if (!_resumed) { try { xapiOnScreen(currentScreen); } catch (e) {} }
             if (typeof onXapiReady === 'function') {
               try { onXapiReady(); } catch (e) { console.error('[xAPI] ready hook', e); }
             }

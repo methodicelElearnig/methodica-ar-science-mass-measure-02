@@ -71,6 +71,12 @@ function goTo(n) {
      יעצור ניווט. resetScreenState לפני ה-.active נשאר כפי שהיה: זה הכלל
      שמונע הבהוב אווטאר (CLAUDE.md כלל 1). */
   try { xapiOnScreen(n); } catch (e) {}
+  /* resume: נקודת החנק לשמירה — כל החלפת מסך עוברת כאן, וזה מה שתוחם את
+     האיבוד למסך אחד. מושהה (800ms), ולכן דפדוף מהיר מתקבץ לכתיבה אחת.
+     מוצב אחרון, אחרי ה-paint ואחרי xapiOnScreen, מאותו נימוק: שמירה לא
+     מעכבת את מה שהלומד רואה. עטוף כמו שכנו — ניווט לעולם לא נשבר מדיווח
+     או משמירה. */
+  try { scheduleResumeSave(); } catch (e) {}
 }
 
 function resetScreenState(n) {
@@ -105,8 +111,15 @@ function s0Back() {
   /* קישור בין סינים: מסך ראשון בסיין 2 -> מסך אחרון (20) בסיין 1.
      הסדר קריטי: ה-query string לפני ה-hash. '...index.html?slxapi=...#screen=19'
      תקין; '...index.html#screen=19?slxapi=...' הופך את הפרמטרים לחלק מה-hash
-     והם נעלמים מ-location.search. ראו REPORT-XAPI.md §6. */
-  window.location.href = '../Methodica-science-mass-measure-02-01/index.html' + window.location.search + '#screen=19';
+     והם נעלמים מ-location.search. ראו REPORT-XAPI.md §6 —
+     previousPartHref בונה את ה-URL בסדר הזה בדיוק.
+
+     ⚠️ עובר דרך goBackToPreviousPart ולא דרך location.href ישיר, וזה **חובה**
+     מרגע שיש מצביע נחיתה: הכפתור חייב להזיז את המצביע ליעד לפני הניווט.
+     בלי זה הלואדר של סין 01 היה רואה מצביע שעדיין מכוון לסין 02 ומקפיץ את
+     הלומד מיד חזרה — כלומר הכפתור נראה שבור. שני הארגומנטים הם ה-fallback
+     המקובע, ההתנהגות שהייתה לפני הקשתות. */
+  goBackToPreviousPart('methodica-science-mass-measure-02-01', '#screen=19');
 }
 
 /* =========================================================
@@ -265,6 +278,11 @@ function sq2Check() {
     updateQuestionNav2('sq2');
     sq2SetBarDone('המשך', function () { sq2Continue(); });
   }
+
+  /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
+     לא מספיקה כאן — תשובה שניתנה ואז הלשונית נהרגה לפני הניווט הבא הייתה
+     נאבדת. עטוף: דיווח ושמירה לעולם לא שוברים את זרימת התשובה. */
+  try { flushResumeSave(); } catch (e) {}
 }
 
 function sq2LockOptions() {
@@ -430,6 +448,11 @@ function sq3Check() {
     updateQuestionNav2('sq3');
     sq3SetBarDone('המשך', function () { sq3Continue(); });
   }
+
+  /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
+     לא מספיקה כאן — תשובה שניתנה ואז הלשונית נהרגה לפני הניווט הבא הייתה
+     נאבדת. עטוף: דיווח ושמירה לעולם לא שוברים את זרימת התשובה. */
+  try { flushResumeSave(); } catch (e) {}
 }
 
 function sq3LockOptions() {
@@ -595,6 +618,11 @@ function sq4Check() {
     updateQuestionNav2('sq4');
     sq4SetBarDone('המשך', function () { sq4Continue(); });
   }
+
+  /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
+     לא מספיקה כאן — תשובה שניתנה ואז הלשונית נהרגה לפני הניווט הבא הייתה
+     נאבדת. עטוף: דיווח ושמירה לעולם לא שוברים את זרימת התשובה. */
+  try { flushResumeSave(); } catch (e) {}
 }
 
 function sq4LockOptions() {
@@ -861,6 +889,11 @@ function sq5Check() {
     checkBtn.disabled = false;
     checkBtn.onclick = sq5Continue;
   }
+
+  /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
+     לא מספיקה כאן — תשובה שניתנה ואז הלשונית נהרגה לפני הניווט הבא הייתה
+     נאבדת. עטוף: דיווח ושמירה לעולם לא שוברים את זרימת התשובה. */
+  try { flushResumeSave(); } catch (e) {}
 }
 
 function sq5Continue() { goTo(5); }
@@ -1020,6 +1053,11 @@ function sq6Check() {
     updateQuestionNav2('sq6');
     sq6SetBarDone('סיום', function () { sq6Continue(); });
   }
+
+  /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
+     לא מספיקה כאן — תשובה שניתנה ואז הלשונית נהרגה לפני הניווט הבא הייתה
+     נאבדת. עטוף: דיווח ושמירה לעולם לא שוברים את זרימת התשובה. */
+  try { flushResumeSave(); } catch (e) {}
 }
 
 function sq6LockOptions() {
@@ -1284,6 +1322,11 @@ function dd8Check() {
     updateQuestionNav3('dd8');
     dd8SetBarDone(dd8Continue);
   }
+
+  /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
+     לא מספיקה כאן — תשובה שניתנה ואז הלשונית נהרגה לפני הניווט הבא הייתה
+     נאבדת. עטוף: דיווח ושמירה לעולם לא שוברים את זרימת התשובה. */
+  try { flushResumeSave(); } catch (e) {}
 }
 
 function dd8Continue() { goTo(8); }
@@ -1569,6 +1612,11 @@ function drag9Check() {
     checkBtn.disabled = true;
     drag9EnableHint();
   }
+
+  /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
+     לא מספיקה כאן — תשובה שניתנה ואז הלשונית נהרגה לפני הניווט הבא הייתה
+     נאבדת. עטוף: דיווח ושמירה לעולם לא שוברים את זרימת התשובה. */
+  try { flushResumeSave(); } catch (e) {}
 }
 
 /* ── ציון הרכיב ──
@@ -1613,8 +1661,8 @@ function drag9Continue() {
   /* קישור בין סינים: מסך אחרון בסיין 2 -> מסך ראשון בסיין 3 (+ ?slxapi, §6).
      רושם את קשת החזרה: סין 03 ניתן להגעה גם מסין 01 (בדילוג), ולכן כפתור
      "חזרה" שם צריך לדעת מאיפה הלומד באמת הגיע. המסך שממנו יוצאים הוא 9. */
-  recordForwardEdge('Methodica-science-mass-measure-02-03', '#screen=8');
-  window.location.href = '../Methodica-science-mass-measure-02-03/index.html' + window.location.search;
+  writeForwardState('methodica-science-mass-measure-02-03', '#screen=8');
+  window.location.href = '../methodica-science-mass-measure-02-03/index.html' + window.location.search;
 }
 
 function drag9OpenHint() {
@@ -1832,3 +1880,367 @@ var XAPI_EVAL_ITEMS = {'001': 1, '002': 1, '003': 1, '004': 1, '005': 1, '006': 
 
 var XAPI_METADATA_FILE = '../metadata/methodica-science-mass-measure-02-02.json';
 
+
+/* ═══════════════════ resume — התפרים הפר-סיניים ═══════════════════
+   ארבעת השמות האלה נקראים מ-unit-js/40-resume.js ומ-unit-js/50-loader.js
+   בזמן call, לא בזמן טעינה — ולכן מותר להם לשבת בתחתית הקובץ.
+
+   הם חייבים לשבת **כאן**, בתוך script.js, ולא בשכבה המשותפת: כל מצב הלומד
+   בסין הזה מוצהר כ-let/const ברמת top-level, כלומר הוא יושב ב-global
+   lexical scope ואינו נגיש דרך window. השכבה המשותפת לא יכולה להגיע אליו,
+   וזו הסיבה שהחוזה הזה הוא פר-סין ולא פונקציה משותפת אחת.
+
+   ── שלב 1 (הנוכחי): מצביע מסך בלבד ──
+   capturePartPayload מחזיר את currentScreen, ושלושת האחרים הם no-op.
+   התוצאה: לומד שחוזר נוחת על **המסך** הנכון, אבל המסך עצמו נקי — מצב
+   התשובות אינו משוחזר.
+
+   זה מכוון ולא חוסר. החזרת משתני התשובה בלי ה-painters הייתה מייצרת מסך
+   שנראה כאילו אפשר לענות עליו אבל מתעלם מלחיצות (כי sNNDone כבר true),
+   ולכן השניים נשארים צמודים לשלב 2. במצב הנוכחי המסך פשוט טרי וניתן
+   לענות עליו שוב.
+
+   ⚠️ הנגזרת המוכרת של שלב 1: stationProgress* ו-XAPI_Q_RESULTS אינם
+   משוחזרים, ולכן הניתוב קדימה שנגזר מהם עלול לשלוח לומד שעמד בסף אל
+   התרגול המחזק. ראו unit-js/10-identity.js. */
+function capturePartPayload() {
+  var st = { currentScreen: currentScreen };
+
+  /* שלב 2א — מצב הניקוד וההסתעפות.
+     XAPI_Q_RESULTS הוא var ב-20-xapi.js ולכן נגיש כאן; המפות stationProgress*
+     הן let פר-סין ולכן **חייבות** לעבור דרך ה-hook הזה. */
+  st.qResults = Object.assign({}, XAPI_Q_RESULTS);
+  st.stations2 = Object.assign({}, stationProgress2);
+  st.stations3 = Object.assign({}, stationProgress3);
+
+  /* ── שלב 2ב — מצב התשובות ──
+     ארבעת מסכי הבחירה-המרובה נלכדים באותה צורה, ולכן דרך עוזר אחד.
+
+     ⚠️ mcqWrongIds אינו כפילות של sel: sqNCheck מאפס את sqNSelected ל-[] בכל
+     תשובה שגויה, ולכן **הבחירה השגויה של הלומד לא קיימת יותר באף משתנה** —
+     היא שרדה רק כ-class 'wrong' על האופציות. בלי הלכידה הזאת מסך משוחזר היה
+     מציג את התשובה הנכונה בלי להראות ללומד במה הוא טעה. */
+  st.mcq = {
+    sq2: captureMcq('#s1', sq2Selected, sq2Attempts, sq2Done, sq2Phase),
+    sq3: captureMcq('#s2', sq3Selected, sq3Attempts, sq3Done, sq3Phase),
+    sq4: captureMcq('#s3', sq4Selected, sq4Attempts, sq4Done, sq4Phase),
+    sq6: captureMcq('#s5', sq6Selected, sq6Attempts, sq6Done, sq6Phase)
+  };
+
+  /* sq5 / dd8 / drag9 נושאים טוגל "התשובה הנכונה" ⇄ "התשובה שלי", ולכן כל
+     אחד מהם נושא גם את התשובה המקורית (LastAnswer) וגם את מצב הטוגל
+     (ShowingCorrect) — כלל 4 ב-CLAUDE.md. */
+  st.sq5 = {
+    sel: Object.assign({}, sq5Selected),
+    att: sq5Attempts, done: sq5Done, phase: sq5Phase,
+    last: sq5LastAnswer, showing: sq5ShowingCorrect
+  };
+  st.dd8 = {
+    vals: Object.assign({}, dd8Values),
+    att: dd8Attempts, done: dd8Done,
+    last: dd8LastAnswer, showing: dd8ShowingCorrect
+  };
+  /* drag9 מחזיק את המיקום **רק ב-DOM** (הפריט יושב פיזית בתוך האזור), ולכן
+     הוא נקרא משם — אותה נגזרת בדיוק שה-wrong-final עושה ל-drag9LastAnswer. */
+  st.drag9 = {
+    place: captureDrag9Placement(),
+    att: drag9Attempts, done: drag9Done,
+    last: drag9LastAnswer, showing: drag9ShowingCorrect
+  };
+  return st;
+}
+
+/* לוכד מסך בחירה-מרובה אחד. wrong נקרא מה-DOM כי הוא לא קיים במשתנים. */
+function captureMcq(screenSel, selected, attempts, done, phase) {
+  var wrong = [];
+  document.querySelectorAll(screenSel + ' .scq-opt').forEach(function (el) {
+    if (el.classList.contains('wrong') && el.dataset.id) wrong.push(el.dataset.id);
+  });
+  return { sel: (selected || []).slice(), att: attempts, done: done, phase: phase, wrong: wrong };
+}
+
+function captureDrag9Placement() {
+  var out = {};
+  DRAG9_ITEM_IDS.forEach(function (id) {
+    var el = document.getElementById(id);
+    var pid = (el && el.parentElement) ? el.parentElement.id : '';
+    out[id] = (pid.indexOf('drag9-zone-') === 0) ? pid.replace('drag9-zone-', '') : 'source';
+  });
+  return out;
+}
+
+/* שלב 2 — החזרת משתני התשובה של הסין.
+   ⚠️ אם המימוש יעבור ל-eval כמו בלומדת המקור, שם הפרמטר חייב להישאר `st`:
+   ה-eval מפרש אותו לקסיקלית, ושינוי שם נכשל **בשקט** (הזריקה נבלעת
+   ב-try/catch העוטף) ולוקח איתו את התשובות של הלומד. */
+/* שלב 2א — מחזיר את מצב הניקוד וההסתעפות בלבד.
+
+   למה זה חייב לקרות, ולא רק "נחמד": הניתוב קדימה נגזר מהמפות האלה, ולכן
+   לומד שהמשיך אחרי resume בלעדיהן היה מנותב לפי ציון 0 — כלומר מי שעמד
+   בסף נשלח לתרגול מחזק שהוא כבר דילג עליו.
+   התלויות בסין הזה: getBasicPracticeScore(), getStandardPracticeScore().
+
+   מוטציה במקום ולא הצבה מחדש: 20-xapi.js כותב ל-XAPI_Q_RESULTS[key] דרך
+   הגלובל, וקוד הסין מחזיק הפניה חיה למפות — החלפת האובייקט הייתה עלולה
+   להשאיר קוראים על עותק מיושן.
+
+   ⚠️ במכוון **לא** מחזיר דגלי sNNDone/Selected/Attempts. הם משוחזרים רק
+   יחד עם ה-painters (שלב 2ב), כי מסך עם Done=true ובלי ציור נראה כאילן
+   אפשר לענות עליו אבל מתעלם מלחיצות. */
+function applyResumeVars(st) {
+  if (!st) return;
+  if (st.qResults) {
+    Object.keys(st.qResults).forEach(function (k) { XAPI_Q_RESULTS[k] = st.qResults[k]; });
+  }
+  if (st.stations2) {
+    Object.keys(st.stations2).forEach(function (k) { stationProgress2[k] = st.stations2[k]; });
+  }
+  if (st.stations3) {
+    Object.keys(st.stations3).forEach(function (k) { stationProgress3[k] = st.stations3[k]; });
+  }
+
+  if (st.mcq) {
+    /* ה-'wrong' עובר ל-__mcqWrong, שממנו הציור קורא. הוא לא יכול לחזור לתוך
+       משתני המסך כי אין שם מקום כזה — sqNSelected מתאפס בכל טעות. */
+    ['sq2', 'sq3', 'sq4', 'sq6'].forEach(function (k) {
+      __mcqWrong[k] = (st.mcq[k] && st.mcq[k].wrong) ? st.mcq[k].wrong.slice() : [];
+    });
+    if (st.mcq.sq2) { sq2Selected = (st.mcq.sq2.sel || []).slice(); sq2Attempts = st.mcq.sq2.att || 0; sq2Done = !!st.mcq.sq2.done; sq2Phase = st.mcq.sq2.phase || 'before'; }
+    if (st.mcq.sq3) { sq3Selected = (st.mcq.sq3.sel || []).slice(); sq3Attempts = st.mcq.sq3.att || 0; sq3Done = !!st.mcq.sq3.done; sq3Phase = st.mcq.sq3.phase || 'before'; }
+    if (st.mcq.sq4) { sq4Selected = (st.mcq.sq4.sel || []).slice(); sq4Attempts = st.mcq.sq4.att || 0; sq4Done = !!st.mcq.sq4.done; sq4Phase = st.mcq.sq4.phase || 'before'; }
+    if (st.mcq.sq6) { sq6Selected = (st.mcq.sq6.sel || []).slice(); sq6Attempts = st.mcq.sq6.att || 0; sq6Done = !!st.mcq.sq6.done; sq6Phase = st.mcq.sq6.phase || 'before'; }
+  }
+  if (st.sq5) {
+    /* מוטציה לפי מפתח: sq5Select כותב לתוך האובייקט הקיים. */
+    if (st.sq5.sel) Object.keys(st.sq5.sel).forEach(function (k) { sq5Selected[k] = st.sq5.sel[k]; });
+    sq5Attempts = st.sq5.att || 0;
+    sq5Done = !!st.sq5.done;
+    sq5Phase = st.sq5.phase || 'before';
+    sq5LastAnswer = st.sq5.last || null;
+    sq5ShowingCorrect = !!st.sq5.showing;
+  }
+  if (st.dd8) {
+    if (st.dd8.vals) Object.keys(st.dd8.vals).forEach(function (k) { dd8Values[k] = st.dd8.vals[k]; });
+    dd8Attempts = st.dd8.att || 0;
+    dd8Done = !!st.dd8.done;
+    dd8LastAnswer = st.dd8.last || null;
+    dd8ShowingCorrect = !!st.dd8.showing;
+  }
+  if (st.drag9) {
+    drag9Attempts = st.drag9.att || 0;
+    drag9Done = !!st.drag9.done;
+    drag9LastAnswer = st.drag9.last || null;
+    drag9ShowingCorrect = !!st.drag9.showing;
+  }
+}
+
+/* מחזיר מה שיושב רק ב-DOM: תוויות ה-dropdown של מסך 8, ומיקום הפריטים
+   הפיזי של מסך 9. רץ **לפני** ה-painter, שנועל ומסמן אותם. */
+function applyResumeDom(st) {
+  if (!st) return;
+  if (st.dd8 && st.dd8.vals) {
+    DD8_IDS.forEach(function (id) {
+      var valEl = document.getElementById(id + '-val');
+      if (valEl && typeof st.dd8.vals[id] === 'string') valEl.textContent = st.dd8.vals[id];
+    });
+  }
+  if (st.drag9 && st.drag9.place) {
+    /* אותה מכניקה כמו drag9ShowMyAnswer: מזיזים את הצומת עצמו. */
+    DRAG9_ITEM_IDS.forEach(function (id) {
+      var item = document.getElementById(id);
+      if (!item) return;
+      var dest = st.drag9.place[id];
+      var destEl = (!dest || dest === 'source')
+        ? document.getElementById('drag9-source-bank')
+        : document.getElementById('drag9-zone-' + dest);
+      if (!destEl) return;
+      if (item.parentElement) item.parentElement.removeChild(item);
+      destEl.appendChild(item);
+    });
+  }
+}
+
+/* ציור מצב "נענה". חייב להישאר exception-safe — נקרא גם מ-applyExecutionState
+   וגם מכל ניווט, ואסור לו לשבור ניווט. */
+function restoreScreenUI(n) {
+  try {
+    if (n === 1) restoreMcqUI(MCQ_SQ2, '#s1', 'sq2', sq2OptEl, sq2Selected, sq2Attempts, sq2Done, sq2Phase, sq2LockOptions, sq2ShowFeedback, sq2SetBarDone, sq2Continue, sq2Check, __mcqWrong.sq2);
+    if (n === 2) restoreMcqUI(MCQ_SQ3, '#s2', 'sq3', sq3OptEl, sq3Selected, sq3Attempts, sq3Done, sq3Phase, sq3LockOptions, sq3ShowFeedback, sq3SetBarDone, sq3Continue, sq3Check, __mcqWrong.sq3);
+    if (n === 3) restoreMcqUI(MCQ_SQ4, '#s3', 'sq4', sq4OptEl, sq4Selected, sq4Attempts, sq4Done, sq4Phase, sq4LockOptions, sq4ShowFeedback, sq4SetBarDone, sq4Continue, sq4Check, __mcqWrong.sq4);
+    if (n === 4) sq5RestoreUI();
+    if (n === 5) restoreMcqUI(MCQ_SQ6, '#s5', 'sq6', sq6OptEl, sq6Selected, sq6Attempts, sq6Done, sq6Phase, sq6LockOptions, sq6ShowFeedback, sq6SetBarDone, sq6Continue, sq6Check, __mcqWrong.sq6);
+    if (n === 7) dd8RestoreUI();
+    if (n === 8) drag9RestoreUI();
+  } catch (e) { console.error('[resume] restoreScreenUI', e); }
+}
+
+/* ה-'wrong' של כל מסך בחירה, כפי שנלכד. מוחזק בנפרד ולא בתוך המשתנים של
+   המסך, כי הוא לא קיים שם מלכתחילה (ראו ההערה ב-capturePartPayload). */
+var __mcqWrong = { sq2: [], sq3: [], sq4: [], sq6: [] };
+
+/* ציור משותף לארבעת מסכי הבחירה-המרובה. ארבעתם זהים במבנה ונבדלים רק
+   בקידומת ובקבוצת התשובות הנכונות, ולכן ציור אחד ולא ארבעה עותקים
+   שיכולים להיסחף זה מזה.
+   משקף **רק** את כתיבות ה-DOM של sqNCheck — אין כאן שינוי state, אין
+   xapiAnswered ואין נגיעה ב-stationProgress2 (הוא הוחזר כבר ב-applyResumeVars). */
+function restoreMcqUI(cfg, screenSel, prefix, optEl, selected, attempts, done, phase,
+                      lockOptions, showFeedback, setBarDone, continueFn, checkFn, wrongIds) {
+  if (!done && attempts === 0 && (!selected || selected.length === 0)) return;  // מסך נקי
+
+  if (done) {
+    /* הבחירה השגויה של הלומד נצבעת ראשונה, ואז התשובה הנכונה — אותו סדר
+       כמו ב-check(), כך שאופציה שהיא גם נכונה וגם נבחרה יוצאת ירוקה. */
+    (wrongIds || []).forEach(function (id) {
+      var el = optEl(id);
+      if (el) el.classList.add('wrong');
+    });
+    cfg.correctIds.forEach(function (cid) {
+      var el = optEl(cid);
+      if (el) { el.classList.remove('selected', 'wrong'); el.classList.add('correct'); }
+    });
+    lockOptions();
+    showFeedback(phase === 'correct' ? 'correct' : 'wrong2', phase === 'correct');
+    setBarDone('המשך', continueFn);
+    return;
+  }
+
+  /* לא נפתר. מחזירים את הסימונים ואת הפידבק, ואז מחשבים את הכפתור
+     מ**אותו** predicate של sqNToggle — בחירה קיימת ⇒ כפתור פעיל. אחרת הוא
+     נשאר מושבת, וזה נכון ולא תקוע: לחיצה על אופציה קוראת ל-Toggle שמפעיל
+     אותו, וגם מנקה את סימוני ה-wrong בדיוק כמו בזרימה החיה. */
+  (wrongIds || []).forEach(function (id) {
+    var el = optEl(id);
+    if (el) el.classList.add('wrong');
+  });
+  (selected || []).forEach(function (id) {
+    var el = optEl(id);
+    if (el) { el.classList.add('selected'); el.setAttribute('aria-checked', 'true'); }
+  });
+  if (phase === 'wrong1') showFeedback('wrong1', false);
+  var checkBtn = document.getElementById(prefix + '-check');
+  if (checkBtn) {
+    checkBtn.textContent = 'צדקתי?';
+    checkBtn.onclick = checkFn;
+    checkBtn.disabled = !selected || selected.length === 0;
+  }
+}
+
+/* מסך 5 — ארבע שורות נכון/לא-נכון. sq5Selected **אינו** מתאפס בתשובה שגויה,
+   ולכן שתי פונקציות הציור החיות (sq5MarkOwnAnswer / sq5MarkRevealed) עובדות
+   כמו שהן, והציור כאן רק בוחר ביניהן לפי מצב הטוגל. */
+function sq5RestoreUI() {
+  if (!sq5Done && sq5Attempts === 0 &&
+      !Object.keys(sq5Selected).some(function (k) { return sq5Selected[k] != null; })) return;
+
+  var checkBtn = document.getElementById('sq5-check');
+  var revealBtn = document.getElementById('sq5-reveal-btn');
+
+  if (sq5Done) {
+    sq5LockRows(false);
+    if (sq5Phase === 'correct') {
+      sq5ShowFeedback('correct', true);
+    } else {
+      if (sq5ShowingCorrect) { sq5MarkRevealed(); sq5ShowFeedback('wrong2', false); }
+      else { sq5MarkOwnAnswer(); sq5ShowFeedback('wrongPending', false); }
+      if (revealBtn) {
+        revealBtn.hidden = false;
+        revealBtn.textContent = sq5ShowingCorrect ? 'התשובה שלי' : 'התשובה הנכונה';
+      }
+    }
+    if (checkBtn) { checkBtn.textContent = 'המשך'; checkBtn.disabled = false; checkBtn.onclick = sq5Continue; }
+    return;
+  }
+
+  /* לא נפתר: מחזירים את הבחירות עצמן ואת סימוני הטעות של ניסיון שגוי אחד. */
+  ['r1', 'r2', 'r3', 'r4'].forEach(function (r, idx) {
+    var rowNum = idx + 1;
+    var v = sq5Selected[r];
+    if (!v) return;
+    var btn = document.getElementById('sq5-r' + rowNum + '-' + v);
+    if (btn) btn.classList.add('selected');
+    if (sq5Attempts >= 1) {
+      if (v === TF_SQ5_CORRECT[r]) { if (btn) btn.classList.add('btn-correct'); }
+      else {
+        var row = document.getElementById('sq5-row-' + rowNum);
+        if (row) row.classList.add('row-wrong');
+        if (btn) btn.classList.add('btn-wrong');
+      }
+    }
+  });
+  if (sq5Attempts >= 1) sq5ShowFeedback('wrong1', false);
+  /* אותו predicate של הזרימה החיה: הכפתור פעיל רק כשכל ארבע השורות נבחרו. */
+  if (checkBtn) { checkBtn.textContent = 'צדקתי?'; checkBtn.onclick = sq5Check; checkBtn.disabled = !sq5AllSelected(); }
+}
+
+/* מסך 8 — שש רשימות נפתחות. */
+function dd8RestoreUI() {
+  if (!dd8Done && dd8Attempts === 0 &&
+      !DD8_IDS.some(function (id) { return dd8Values[id] !== ''; })) return;
+
+  var revealBtn = document.getElementById('dd8-reveal-btn');
+  if (dd8Done) {
+    dd8LockDropdowns(false);
+    dd8MarkDropdowns();
+    if (DD8_IDS.every(function (id) { return dd8Values[id] === DD8_CORRECT[id]; }) && !dd8LastAnswer) {
+      dd8ShowFeedback('correct', true);
+    } else {
+      dd8ShowFeedback(dd8ShowingCorrect ? 'wrong2' : 'wrongPending', false);
+      if (revealBtn) {
+        revealBtn.hidden = false;
+        revealBtn.textContent = dd8ShowingCorrect ? 'התשובה שלי' : 'התשובה הנכונה';
+      }
+    }
+    dd8SetBarDone(dd8Continue);
+    return;
+  }
+
+  if (dd8Attempts >= 1) { dd8MarkDropdowns(); dd8ShowFeedback('wrong1', false); dd8EnableHint(); }
+  /* אותו predicate של dd8Select: פעיל כשכל השש מולאו. */
+  var checkBtn = document.getElementById('dd8-check');
+  if (checkBtn) checkBtn.disabled = !DD8_IDS.every(function (id) { return dd8Values[id] !== ''; });
+}
+
+/* מסך 9 — גרירה לארבעה אזורים. המיקום עצמו הוחזר כבר ב-applyResumeDom;
+   כאן רק הסימון, הפידבק והכפתורים. */
+function drag9RestoreUI() {
+  if (!drag9Done && drag9Attempts === 0 && !drag9AllPlaced()) return;
+
+  var checkBtn = document.getElementById('drag9-check');
+  var revealBtn = document.getElementById('drag9-reveal-btn');
+
+  /* אותו לופ סימון כמו ב-drag9Check. */
+  var allCorrect = true;
+  DRAG9_ZONES.forEach(function (zoneId) {
+    var zoneEl = document.getElementById('drag9-zone-' + zoneId);
+    if (!zoneEl) return;
+    var items = zoneEl.querySelectorAll('.drag-item');
+    var zoneOk = items.length > 0;
+    items.forEach(function (item) {
+      var itemOk = item.dataset.correct === zoneId;
+      if (!itemOk) zoneOk = false;
+      item.classList.remove('drag-item-correct', 'drag-item-wrong');
+      item.classList.add(itemOk ? 'drag-item-correct' : 'drag-item-wrong');
+    });
+    zoneEl.classList.toggle('correct', zoneOk);
+    zoneEl.classList.toggle('wrong', !zoneOk);
+    if (!zoneOk) allCorrect = false;
+  });
+
+  if (drag9Done) {
+    if (!drag9LastAnswer) {
+      drag9ShowFeedback('correct', true);
+    } else {
+      drag9ShowFeedback(drag9ShowingCorrect ? 'wrong2' : 'wrong2Pending', false);
+      if (revealBtn) {
+        revealBtn.hidden = false;
+        revealBtn.textContent = drag9ShowingCorrect ? 'התשובה שלי' : 'התשובה הנכונה';
+      }
+    }
+    if (checkBtn) { checkBtn.textContent = 'סיום'; checkBtn.disabled = false; checkBtn.onclick = drag9Continue; }
+    return;
+  }
+
+  if (drag9Attempts >= 1) { drag9ShowFeedback('wrong1', false); drag9EnableHint(); }
+  /* אותו predicate של הזרימה החיה. */
+  drag9UpdateCheckBtn();
+}

@@ -63,6 +63,12 @@ function goTo(n) {
      יעצור ניווט. resetScreenState לפני ה-.active נשאר כפי שהיה: זה הכלל
      שמונע הבהוב אווטאר (CLAUDE.md כלל 1). */
   try { xapiOnScreen(n); } catch (e) {}
+  /* resume: נקודת החנק לשמירה — כל החלפת מסך עוברת כאן, וזה מה שתוחם את
+     האיבוד למסך אחד. מושהה (800ms), ולכן דפדוף מהיר מתקבץ לכתיבה אחת.
+     מוצב אחרון, אחרי ה-paint ואחרי xapiOnScreen, מאותו נימוק: שמירה לא
+     מעכבת את מה שהלומד רואה. עטוף כמו שכנו — ניווט לעולם לא נשבר מדיווח
+     או משמירה. */
+  try { scheduleResumeSave(); } catch (e) {}
 }
 
 function resetScreenState(n) {
@@ -86,8 +92,11 @@ function resetScreenState0() {
 function s0Continue() { goTo(1); }
 function s0Back() {
   /* קישור בין סינים: מסך ראשון בסיין 4 -> מסך אחרון (2) בסיין 3.
-     ה-query string לפני ה-hash — ראו REPORT-XAPI.md §6. */
-  window.location.href = '../Methodica-science-mass-measure-02-03/index.html' + window.location.search + '#screen=1';
+     ה-query string לפני ה-hash — ראו REPORT-XAPI.md §6.
+     עובר דרך goBackToPreviousPart כדי להזיז את מצביע הנחיתה לפני הניווט;
+     בלעדיו הלואדר של היעד מקפיץ את הלומד מיד חזרה לכאן. הארגומנטים הם
+     ה-fallback המקובע. ראו unit-js/40-resume.js. */
+  goBackToPreviousPart('methodica-science-mass-measure-02-03', '#screen=1');
 }
 
 /* =========================================================
@@ -328,6 +337,11 @@ function tblCheck() {
     if (revealBtn) { revealBtn.hidden = false; revealBtn.textContent = 'התשובה הנכונה'; }
     tblSetBtnCheck('המשך', true, 'continue');
   }
+
+  /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
+     לא מספיקה כאן — תשובה שניתנה ואז הלשונית נהרגה לפני הניווט הבא הייתה
+     נאבדת. עטוף: דיווח ושמירה לעולם לא שוברים את זרימת התשובה. */
+  try { flushResumeSave(); } catch (e) {}
 }
 
 /* מסך 2 הוא כרגע המסך האחרון בסיין 4 — ממשיכים לסיין 5 (מסך מעבר
@@ -339,8 +353,11 @@ function tblContinue() {
   var _ok = !!XAPI_Q_RESULTS['001/q1'];
   xapiCompleteComponent({ success: _ok, score: { scaled: _ok ? 1 : 0 } });
 
-  /* קישור בין סינים: מסך אחרון בסיין 4 -> מסך ראשון בסיין 5 (+ ?slxapi, §6) */
-  window.location.href = '../Methodica-science-mass-measure-02-05/index.html' + window.location.search;
+  /* קישור בין סינים: מסך אחרון בסיין 4 -> מסך ראשון בסיין 5 (+ ?slxapi, §6).
+     writeForwardState מזיז את מצביע הנחיתה ליעד ורושם את קשת החזרה (סין 05
+     חוזר לכאן, למסך 2 = '#screen=1'). ראו unit-js/40-resume.js. */
+  writeForwardState('methodica-science-mass-measure-02-05', '#screen=1');
+  window.location.href = '../methodica-science-mass-measure-02-05/index.html' + window.location.search;
 }
 
 function tblOpenHint() {
@@ -512,3 +529,138 @@ var XAPI_EVAL_ITEMS = {'001': 1};
 
 var XAPI_METADATA_FILE = '../metadata/methodica-science-mass-measure-02-04.json';
 
+
+/* ═══════════════════ resume — התפרים הפר-סיניים ═══════════════════
+   ארבעת השמות האלה נקראים מ-unit-js/40-resume.js ומ-unit-js/50-loader.js
+   בזמן call, לא בזמן טעינה — ולכן מותר להם לשבת בתחתית הקובץ.
+
+   הם חייבים לשבת **כאן**, בתוך script.js, ולא בשכבה המשותפת: כל מצב הלומד
+   בסין הזה מוצהר כ-let/const ברמת top-level, כלומר הוא יושב ב-global
+   lexical scope ואינו נגיש דרך window. השכבה המשותפת לא יכולה להגיע אליו,
+   וזו הסיבה שהחוזה הזה הוא פר-סין ולא פונקציה משותפת אחת.
+
+   ── שלב 1 (הנוכחי): מצביע מסך בלבד ──
+   capturePartPayload מחזיר את currentScreen, ושלושת האחרים הם no-op.
+   התוצאה: לומד שחוזר נוחת על **המסך** הנכון, אבל המסך עצמו נקי — מצב
+   התשובות אינו משוחזר.
+
+   זה מכוון ולא חוסר. החזרת משתני התשובה בלי ה-painters הייתה מייצרת מסך
+   שנראה כאילו אפשר לענות עליו אבל מתעלם מלחיצות (כי sNNDone כבר true),
+   ולכן השניים נשארים צמודים לשלב 2. במצב הנוכחי המסך פשוט טרי וניתן
+   לענות עליו שוב.
+
+   ⚠️ הנגזרת המוכרת של שלב 1: stationProgress* ו-XAPI_Q_RESULTS אינם
+   משוחזרים, ולכן הניתוב קדימה שנגזר מהם עלול לשלוח לומד שעמד בסף אל
+   התרגול המחזק. ראו unit-js/10-identity.js. */
+function capturePartPayload() {
+  var st = { currentScreen: currentScreen };
+
+  /* שלב 2א — מצב הניקוד וההסתעפות.
+     XAPI_Q_RESULTS הוא var ב-20-xapi.js ולכן נגיש כאן. */
+  st.qResults = Object.assign({}, XAPI_Q_RESULTS);
+
+  /* שלב 2ב — מצב התשובה של מסך 2 (הטבלה).
+     tblDdValues הוא ה"אמת" של ה-dropdowns; ערכי השדות עצמם יושבים **רק
+     ב-DOM** ולכן נקראים משם (st.inputs).
+
+     ⚠️ שלושה שדות שנראים מיותרים והם דווקא הליבה של כלל 4 ב-CLAUDE.md:
+     כשהלומד לחץ "התשובה הנכונה", tblReveal קרא ל-tblLockAll(true) שדרס את
+     tblDdValues ואת השדות בערכים הנכונים. כלומר במצב הזה dd/inputs מתארים
+     את **הפתרון**, לא את הלומד — והתשובה האמיתית שלו שרדה רק ב-tblLastAnswer.
+     showingCorrect הוא מה שאומר איזה מהשניים מוצג כרגע. בלי שלושתם יחד,
+     שחזור היה מקבע את הפתרון כאילו הלומד ענה אותו. */
+  st.tbl = {
+    dd: Object.assign({}, tblDdValues),
+    done: tblDone,
+    attempts: tblAttempts,
+    phase: tblPhase,
+    lastAnswer: tblLastAnswer,
+    showingCorrect: tblShowingCorrect
+  };
+  st.inputs = {};
+  TBL_INPUT_IDS.forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) st.inputs[id] = el.value;
+  });
+  return st;
+}
+
+/* מחזיר את משתני המצב. נקרא **פעמיים** מ-applyExecutionState — לפני ה-goTo
+   ואחריו — כי resetScreenState הוא מאתחל ולא משחזר. ראו unit-js/40-resume.js.
+
+   מוטציה במקום ולא הצבה מחדש, במקומות שבהם קוד המסך מחזיק הפניה חיה
+   לאובייקט (XAPI_Q_RESULTS, tblDdValues); החלפת האובייקט הייתה משאירה
+   קוראים על עותק מיושן. */
+function applyResumeVars(st) {
+  if (!st) return;
+  if (st.qResults) {
+    Object.keys(st.qResults).forEach(function (k) { XAPI_Q_RESULTS[k] = st.qResults[k]; });
+  }
+  if (st.tbl) {
+    if (st.tbl.dd) Object.keys(st.tbl.dd).forEach(function (k) { tblDdValues[k] = st.tbl.dd[k]; });
+    tblDone           = !!st.tbl.done;
+    tblAttempts       = st.tbl.attempts || 0;
+    tblPhase          = st.tbl.phase || 'before';
+    tblLastAnswer     = st.tbl.lastAnswer || null;
+    tblShowingCorrect = !!st.tbl.showingCorrect;
+  }
+}
+
+/* מחזיר ערכים שיושבים רק ב-DOM. רץ **לפני** ה-painter, שנועל ומסמן אותם. */
+function applyResumeDom(st) {
+  if (!st || !st.inputs) return;
+  TBL_INPUT_IDS.forEach(function (id) {
+    if (typeof st.inputs[id] !== 'string') return;
+    var el = document.getElementById(id);
+    if (el) el.value = st.inputs[id];
+  });
+}
+
+/* ציור מצב "נענה". חייב להישאר exception-safe — נקרא גם מ-applyExecutionState
+   וגם מכל ניווט, ואסור לו לשבור ניווט. */
+function restoreScreenUI(n) {
+  try {
+    if (n === 1) tblRestoreUI();
+  } catch (e) { console.error('[resume] restoreScreenUI', e); }
+}
+
+/* מסך 2 — משקף **רק** את כתיבות ה-DOM של tblCheck. אין כאן שינוי state, אין
+   דיווח xAPI ואין xapiAnswered: הכל כבר קרה בפעם הראשונה, וכפילות כאן הייתה
+   מדווחת תשובה שנייה על אותה שאלה.
+
+   הערכים עצמם (dd ו-inputs) הוחזרו כבר ע"י applyResumeVars/applyResumeDom,
+   ולכן tblLockAll נקרא עם false גם במצב "מציג פתרון" — קריאה עם true הייתה
+   דורסת אותם מחדש ללא צורך. */
+function tblRestoreUI() {
+  const revealBtn = document.getElementById('tbl-reveal-btn');
+
+  if (tblDone) {
+    tblLockAll(false);
+    tblMarkAll();
+    if (tblPhase === 'correct') {
+      tblShowFeedback('correct', true);
+    } else {
+      /* wrong-final. הטוגל נשמר: מי שהשאיר את הפתרון על המסך חוזר לפתרון,
+         ומי שהחזיר את תשובתו חוזר אליה — עם התווית המתאימה לכל מצב. */
+      tblShowFeedback(tblShowingCorrect ? 'wrongFinal' : 'wrongPending', false);
+      if (revealBtn) {
+        revealBtn.hidden = false;
+        revealBtn.textContent = tblShowingCorrect ? 'התשובה שלי' : 'התשובה הנכונה';
+      }
+    }
+    tblSetBtnCheck('המשך', true, 'continue');
+    return;
+  }
+
+  if (tblAttempts >= 1) {
+    tblMarkAll();
+    tblShowFeedback('wrong1', false);
+    const hb = document.getElementById('tbl-hint');
+    if (hb) hb.hidden = false;
+  }
+  /* מחשב מחדש את כפתור הבדיקה מ**אותו** predicate שהקוד החי משתמש בו.
+     זה מה שמונע לומד תקוע: tblCheck משבית את הכפתור אחרי טעות, והוא חוזר
+     לפעולה רק דרך tblOnInput. בלי הקריאה הזאת מסך משוחזר עם כל השדות
+     מלאים היה מציג כפתור מושבת בלי דרך להפעיל אותו. */
+  tblOnInput();
+}

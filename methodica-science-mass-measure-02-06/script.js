@@ -70,6 +70,12 @@ function goTo(n) {
      יעצור ניווט. resetScreenState לפני ה-.active נשאר כפי שהיה: זה הכלל
      שמונע הבהוב אווטאר (CLAUDE.md כלל 1). */
   try { xapiOnScreen(n); } catch (e) {}
+  /* resume: נקודת החנק לשמירה — כל החלפת מסך עוברת כאן, וזה מה שתוחם את
+     האיבוד למסך אחד. מושהה (800ms), ולכן דפדוף מהיר מתקבץ לכתיבה אחת.
+     מוצב אחרון, אחרי ה-paint ואחרי xapiOnScreen, מאותו נימוק: שמירה לא
+     מעכבת את מה שהלומד רואה. עטוף כמו שכנו — ניווט לעולם לא נשבר מדיווח
+     או משמירה. */
+  try { scheduleResumeSave(); } catch (e) {}
 }
 
 function resetScreenState(n) {
@@ -117,8 +123,11 @@ function s6Continue() { goTo(1); }
 function s6Back() {
   /* קישור בין סינים: מסך ראשון בסיין 6 -> חלק ב' (מסך 4) בסיין 5,
      נקודת ההסתעפות שממנה נכנסים לסיין 6 (מועד ב') כשלא עוברים בהצלחה מלאה.
-     ה-query string לפני ה-hash — ראו REPORT-XAPI.md §6. */
-  window.location.href = '../Methodica-science-mass-measure-02-05/index.html' + window.location.search + '#screen=3';
+     ה-query string לפני ה-hash — ראו REPORT-XAPI.md §6.
+     עובר דרך goBackToPreviousPart כדי להזיז את מצביע הנחיתה לפני הניווט;
+     בלעדיו הלואדר של היעד מקפיץ את הלומד מיד חזרה לכאן. הארגומנטים הם
+     ה-fallback המקובע. ראו unit-js/40-resume.js. */
+  goBackToPreviousPart('methodica-science-mass-measure-02-05', '#screen=3');
 }
 
 /* =========================================================
@@ -157,6 +166,10 @@ function makeDragQuestion(cfg) {
   let done = false;
   let lastWrongPlacement = null;
   let showingCorrect = false;
+
+  /* resume: האם הפתרון היה נכון. אי אפשר לגזור את זה בדיעבד מ-placement,
+     כי revealCorrect() דורס אותו בפתרון הנכון — ולכן נשמר במפורש. */
+  let passed = false;
 
   function render() {
     dragIds.forEach(function (dragId) {
@@ -351,11 +364,13 @@ function makeDragQuestion(cfg) {
     }
     if (allCorrect) {
       done = true;
+      passed = true;
       saveResult(true);
       showFeedback('correct');
       if (btn) { btn.textContent = 'המשך'; btn.disabled = false; btn.onclick = cfg.onContinue; }
     } else if (attempts >= 2) {
       done = true;
+      passed = false;
       saveResult(false);
       if (cfg.revealBtnId) {
         /* דריסה: הפתרון לא נחשף אוטומטית — רק בלחיצה על "התשובה הנכונה" */
@@ -377,6 +392,11 @@ function makeDragQuestion(cfg) {
       if (hintBtn) hintBtn.hidden = false;
       if (btn) { btn.innerHTML = '<span dir="ltr">?צדקתי</span>'; btn.disabled = true; btn.onclick = check; }
     }
+
+    /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
+       לא מספיקה כאן — תשובה שניתנה ואז הלשונית נהרגה לפני הניווט הבא הייתה
+       נאבדת. עטוף: דיווח ושמירה לעולם לא שוברים את זרימת התשובה. */
+    try { flushResumeSave(); } catch (e) {}
   }
 
   function showMyAnswer() {
@@ -424,7 +444,7 @@ function makeDragQuestion(cfg) {
 
   function resetInitial() {
     done = false; checked = false; attempts = 0; dragActive = null; dropHandled = false;
-    lastWrongPlacement = null; showingCorrect = false;
+    lastWrongPlacement = null; showingCorrect = false; passed = false;
     dragIds.forEach(function (dId) { placement[dId] = 'source'; });
     targetIds.forEach(function (tId) {
       const zone = document.getElementById(tId);
@@ -460,6 +480,94 @@ function makeDragQuestion(cfg) {
     /* else: יש התקדמות (ניסיון או פריט מוצב) — לא מאפסים, משאירים כמו שהלומד השאיר */
   }
 
+  /* ═══════════ resume — התפר אל מצב ה-closure ═══════════
+     placement / attempts / done / checked / lastWrongPlacement /
+     showingCorrect / passed הם `let` פרטיים לפאבריקה, והמבנה המוחזר חשף
+     עד כה רק {reset, onContinue}. בלי שני התפרים האלה אין שום דרך לשחזר
+     שאלת גרירה מבחוץ — זו הסיבה שהם נוספו ולא משהו נוח בלבד. */
+  function getState() {
+    return {
+      placement: Object.assign({}, placement),
+      attempts: attempts,
+      done: done,
+      checked: checked,
+      lastWrongPlacement: lastWrongPlacement ? Object.assign({}, lastWrongPlacement) : null,
+      showingCorrect: showingCorrect,
+      passed: passed
+    };
+  }
+
+  function setState(s) {
+    if (!s) return;
+    if (s.placement) {
+      /* מוטציה לפי מפתח ולא הצבה: showMyAnswer() מציב ל-placement אובייקט
+         חדש, ולכן אין להסתמך על זהות האובייקט — אבל כן על המפתחות. */
+      dragIds.forEach(function (dId) {
+        placement[dId] = (typeof s.placement[dId] === 'string') ? s.placement[dId] : 'source';
+      });
+    }
+    attempts           = s.attempts || 0;
+    done               = !!s.done;
+    checked            = !!s.checked;
+    lastWrongPlacement = s.lastWrongPlacement || null;
+    showingCorrect     = !!s.showingCorrect;
+    passed             = !!s.passed;
+  }
+
+  /* ציור מצב "נענה" אחרי טעינת עמוד. משקף **רק** את כתיבות ה-DOM של
+     check() ו-revealSolution(): אין כאן שינוי state, אין saveResult ואין
+     xapiAnswered — כל אלה קרו בפעם הראשונה, וכפילות כאן הייתה מדווחת
+     תשובה שנייה על אותה שאלה.
+
+     render() נקרא אחרון בכל מסלול. הוא זה שמחשב את כפתור הבדיקה מ-allFilled
+     — אותו predicate שהקוד החי משתמש בו — ולכן הוא מה שמונע לומד תקוע.
+     במסלול "ניסיון שגוי אחד" **לא** משביתים את הכפתור כמו ש-check() עושה:
+     שם ההשבתה נכונה כי היא רגעית ומתבטלת בגרירה הבאה, אבל אחרי טעינת
+     עמוד היא הייתה משאירה לומד עם לוח מלא וכפתור מת. */
+  function restoreUI() {
+    if (!done && attempts === 0) { resetInitial(); return; }
+
+    /* סימון היעדים מול ה-placement הנוכחי — אותו לופ בדיוק כמו ב-check(). */
+    targetIds.forEach(function (tId) {
+      const valid = correctMap[tId];
+      let placed = null;
+      dragIds.forEach(function (dId) { if (placement[dId] === tId) placed = dId; });
+      const ok = (placed === valid) || (placed && labels[placed] === labels[valid]);
+      const zone = document.getElementById(tId);
+      if (zone) { zone.classList.remove('correct', 'wrong'); zone.classList.add(ok ? 'correct' : 'wrong'); }
+    });
+
+    const btn = document.getElementById(cfg.checkBtnId);
+    const hintBtn = document.getElementById(cfg.hintBtnId);
+    const revealBtn = cfg.revealBtnId ? document.getElementById(cfg.revealBtnId) : null;
+
+    if (done) {
+      if (passed) {
+        showFeedback('correct');
+      } else if (cfg.revealBtnId) {
+        /* הטוגל נשמר. showingCorrect אומר מה מוצג כרגע, ו-lastWrongPlacement
+           שומר את תשובת הלומד עצמה — כלל 4 ב-CLAUDE.md. */
+        showFeedback(showingCorrect ? 'wrongFinal' : 'wrongFinalPending');
+        if (revealBtn) {
+          revealBtn.hidden = false;
+          revealBtn.textContent = showingCorrect ? 'התשובה שלי' : 'התשובה הנכונה';
+        }
+      } else {
+        showFeedback('wrongFinal');
+      }
+      if (hintBtn) hintBtn.hidden = true;
+      if (btn) { btn.textContent = 'המשך'; btn.disabled = false; btn.onclick = cfg.onContinue; }
+      render();
+      return;
+    }
+
+    /* ניסיון שגוי אחד, עוד לא נפתר — נשאר פתוח לניסיון נוסף. */
+    showFeedback('wrong1');
+    if (hintBtn) hintBtn.hidden = false;
+    if (btn) { btn.innerHTML = '<span dir="ltr">?צדקתי</span>'; btn.onclick = check; }
+    render();
+  }
+
   window[P + 'DragOver'] = dragOver;
   window[P + 'DragEnter'] = dragEnter;
   window[P + 'DragLeave'] = dragLeave;
@@ -476,7 +584,14 @@ function makeDragQuestion(cfg) {
      של לומד שלא צלח לא יירשם בכלל (REPORT-XAPI.md §5). בלי החשיפה הוא
      מגיע רק דרך btn.onclick אחרי בדיקה מוצלחת, כלומר לא ניתן לבדיקה.
      תוספת בלבד — שום קורא קיים לא נשען על צורת המבנה המוחזר. */
-  return { reset: reset, onContinue: cfg.onContinue };
+  return {
+    reset: reset,
+    onContinue: cfg.onContinue,
+    /* resume (שלב 2ב): התפרים שמאפשרים ללכוד ולשחזר את מצב ה-closure. */
+    getState: getState,
+    setState: setState,
+    restoreUI: restoreUI
+  };
 }
 
 const TEXTS_TBL9 = {
@@ -675,6 +790,11 @@ function s12Check() {
     if (btn) { btn.disabled = true; }
     setTimeout(function () { if (wrongEl) wrongEl.classList.remove('wrong', 'selected'); }, 800);
   }
+
+  /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
+     לא מספיקה כאן — תשובה שניתנה ואז הלשונית נהרגה לפני הניווט הבא הייתה
+     נאבדת. עטוף: דיווח ושמירה לעולם לא שוברים את זרימת התשובה. */
+  try { flushResumeSave(); } catch (e) {}
 }
 
 /* בהגעה למסך זה, מועד א' כבר ידוע ככושל (אחרת היינו מדלגים על כל
@@ -939,3 +1059,126 @@ var XAPI_EVAL_ITEMS = {'001': 1};
 
 var XAPI_METADATA_FILE = '../metadata/methodica-science-mass-measure-02-06.json';
 
+
+/* ═══════════════════ resume — התפרים הפר-סיניים ═══════════════════
+   ארבעת השמות האלה נקראים מ-unit-js/40-resume.js ומ-unit-js/50-loader.js
+   בזמן call, לא בזמן טעינה — ולכן מותר להם לשבת בתחתית הקובץ.
+
+   הם חייבים לשבת **כאן**, בתוך script.js, ולא בשכבה המשותפת: כל מצב הלומד
+   בסין הזה מוצהר כ-let/const ברמת top-level, כלומר הוא יושב ב-global
+   lexical scope ואינו נגיש דרך window. השכבה המשותפת לא יכולה להגיע אליו,
+   וזו הסיבה שהחוזה הזה הוא פר-סין ולא פונקציה משותפת אחת.
+
+   ── שלב 1 (הנוכחי): מצביע מסך בלבד ──
+   capturePartPayload מחזיר את currentScreen, ושלושת האחרים הם no-op.
+   התוצאה: לומד שחוזר נוחת על **המסך** הנכון, אבל המסך עצמו נקי — מצב
+   התשובות אינו משוחזר.
+
+   זה מכוון ולא חוסר. החזרת משתני התשובה בלי ה-painters הייתה מייצרת מסך
+   שנראה כאילו אפשר לענות עליו אבל מתעלם מלחיצות (כי sNNDone כבר true),
+   ולכן השניים נשארים צמודים לשלב 2. במצב הנוכחי המסך פשוט טרי וניתן
+   לענות עליו שוב.
+
+   ⚠️ הנגזרת המוכרת של שלב 1: stationProgress* ו-XAPI_Q_RESULTS אינם
+   משוחזרים, ולכן הניתוב קדימה שנגזר מהם עלול לשלוח לומד שעמד בסף אל
+   התרגול המחזק. ראו unit-js/10-identity.js. */
+function capturePartPayload() {
+  var st = { currentScreen: currentScreen };
+
+  /* שלב 2א — מצב הניקוד וההסתעפות.
+     XAPI_Q_RESULTS הוא var ב-20-xapi.js ולכן נגיש כאן; המפות stationProgress*
+     הן let פר-סין ולכן **חייבות** לעבור דרך ה-hook הזה. */
+  st.qResults = Object.assign({}, XAPI_Q_RESULTS);
+
+  /* שלב 2ב — מצב שאלות הגרירה. הוא יושב ב-closure של makeDragQuestion,
+     ולכן עובר דרך getState/setState שנוספו שם במיוחד לשם כך. */
+  st.tbl9Q = tbl9Q.getState();
+  st.para10Q = para10Q.getState();
+  /* מסך 7 — שאלת הבחירה היחידה בסין. s12Selected שורד את מסלול
+     ה-wrong-final (רק הענף הבינוני מאפס אותו), ולכן הוא גם מה שקובע
+     נכון/שגוי בציור — בדיוק כמו ב-s12Check. */
+  st.s12 = { selected: s12Selected, attempts: s12Attempts, done: s12Done };
+  return st;
+}
+
+/* שלב 2 — החזרת משתני התשובה של הסין.
+   ⚠️ אם המימוש יעבור ל-eval כמו בלומדת המקור, שם הפרמטר חייב להישאר `st`:
+   ה-eval מפרש אותו לקסיקלית, ושינוי שם נכשל **בשקט** (הזריקה נבלעת
+   ב-try/catch העוטף) ולוקח איתו את התשובות של הלומד. */
+/* שלב 2א — מחזיר את מצב הניקוד וההסתעפות בלבד.
+
+   למה זה חייב לקרות, ולא רק "נחמד": הניתוב קדימה נגזר מהמפות האלה, ולכן
+   לומד שהמשיך אחרי resume בלעדיהן היה מנותב לפי ציון 0 — כלומר מי שעמד
+   בסף נשלח לתרגול מחזק שהוא כבר דילג עליו.
+
+   מוטציה במקום ולא הצבה מחדש: 20-xapi.js כותב ל-XAPI_Q_RESULTS[key] דרך
+   הגלובל, וקוד הסין מחזיק הפניה חיה למפות — החלפת האובייקט הייתה עלולה
+   להשאיר קוראים על עותק מיושן.
+
+   ⚠️ במכוון **לא** מחזיר דגלי sNNDone/Selected/Attempts. הם משוחזרים רק
+   יחד עם ה-painters (שלב 2ב), כי מסך עם Done=true ובלי ציור נראה כאילן
+   אפשר לענות עליו אבל מתעלם מלחיצות. */
+function applyResumeVars(st) {
+  if (!st) return;
+  if (st.qResults) {
+    Object.keys(st.qResults).forEach(function (k) { XAPI_Q_RESULTS[k] = st.qResults[k]; });
+  }
+  if (st.tbl9Q) tbl9Q.setState(st.tbl9Q);
+  if (st.para10Q) para10Q.setState(st.para10Q);
+  if (st.s12) {
+    s12Selected = (typeof st.s12.selected === 'string') ? st.s12.selected : null;
+    s12Attempts = st.s12.attempts || 0;
+    s12Done     = !!st.s12.done;
+  }
+}
+
+/* אין בסין הזה שדות קלט חופשיים — כל המצב יושב במשתנים. */
+function applyResumeDom(st) {}
+
+/* ציור מצב "נענה". חייב להישאר exception-safe — נקרא גם מ-applyExecutionState
+   וגם מכל ניווט, ואסור לו לשבור ניווט. */
+function restoreScreenUI(n) {
+  try {
+    if (n === 2) tbl9Q.restoreUI();
+    if (n === 3) para10Q.restoreUI();
+    if (n === 6) s12RestoreUI();
+  } catch (e) { console.error('[resume] restoreScreenUI', e); }
+}
+/* מסך 7 — משקף **רק** את כתיבות ה-DOM של s12Check. הנכונות נגזרת מהבחירה
+   ולא ממספר הניסיונות, בדיוק כמו בקוד החי. */
+function s12RestoreUI() {
+  const btn = document.getElementById('s12-check');
+
+  if (s12Done) {
+    const isCorrect = (s12Selected === S12_CORRECT_ID);
+    if (isCorrect) {
+      const el = document.getElementById(S12_CORRECT_ID);
+      if (el) { el.classList.remove('selected'); el.classList.add('correct', 'locked'); }
+      document.querySelectorAll('#s11 .s12-opt').forEach(function (o) {
+        if (!o.classList.contains('correct')) o.classList.add('locked');
+      });
+      s12ShowFeedback('correct', true);
+    } else {
+      const wrongEl = s12Selected ? document.getElementById(s12Selected) : null;
+      if (wrongEl) { wrongEl.classList.remove('selected'); wrongEl.classList.add('wrong', 'locked'); }
+      const corEl = document.getElementById(S12_CORRECT_ID);
+      if (corEl) corEl.classList.add('correct', 'locked');
+      document.querySelectorAll('#s11 .s12-opt').forEach(function (o) {
+        if (!o.classList.contains('correct') && !o.classList.contains('wrong')) o.classList.add('locked');
+      });
+      s12ShowFeedback('wrongFinal', false);
+    }
+    if (btn) { btn.textContent = 'המשך'; btn.disabled = false; btn.onclick = s12Continue; }
+    return;
+  }
+
+  if (s12Attempts >= 1) s12ShowFeedback('wrong1', false);
+  /* הבחירה עצמה מוחזרת, והכפתור מחושב מ**אותו** predicate של s12Select.
+     כשאין בחירה הכפתור נשאר מושבת — וזה נכון ולא תקוע, כי לחיצה על אופציה
+     היא הדרך קדימה והיא עובדת. */
+  if (s12Selected) {
+    const opt = document.getElementById(s12Selected);
+    if (opt) { opt.classList.add('selected'); opt.setAttribute('aria-checked', 'true'); }
+  }
+  if (btn) btn.disabled = !s12Selected;
+}

@@ -68,6 +68,12 @@ function goTo(n) {
      יעצור ניווט. resetScreenState לפני ה-.active נשאר כפי שהיה: זה הכלל
      שמונע הבהוב אווטאר (CLAUDE.md כלל 1). */
   try { xapiOnScreen(n); } catch (e) {}
+  /* resume: נקודת החנק לשמירה — כל החלפת מסך עוברת כאן, וזה מה שתוחם את
+     האיבוד למסך אחד. מושהה (800ms), ולכן דפדוף מהיר מתקבץ לכתיבה אחת.
+     מוצב אחרון, אחרי ה-paint ואחרי xapiOnScreen, מאותו נימוק: שמירה לא
+     מעכבת את מה שהלומד רואה. עטוף כמו שכנו — ניווט לעולם לא נשבר מדיווח
+     או משמירה. */
+  try { scheduleResumeSave(); } catch (e) {}
 }
 
 function resetScreenState(n) {
@@ -267,6 +273,11 @@ function scqCheck() {
     scqShowFeedback('wrong2', false);
     scqSetBarDone('המשך', function () { advanceScreen(); });
   }
+
+  /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
+     לא מספיקה כאן — תשובה שניתנה ואז הלשונית נהרגה לפני הניווט הבא הייתה
+     נאבדת. עטוף: דיווח ושמירה לעולם לא שוברים את זרימת התשובה. */
+  try { flushResumeSave(); } catch (e) {}
 }
 
 function scqLockOptions() {
@@ -514,6 +525,11 @@ function scq4Check() {
     scq4ShowFeedback('wrong2', false);
     scq4SetBarDone('המשך', function () { scq4Continue(); });
   }
+
+  /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
+     לא מספיקה כאן — תשובה שניתנה ואז הלשונית נהרגה לפני הניווט הבא הייתה
+     נאבדת. עטוף: דיווח ושמירה לעולם לא שוברים את זרימת התשובה. */
+  try { flushResumeSave(); } catch (e) {}
 }
 
 function scq4LockOptions() {
@@ -833,6 +849,11 @@ function s5Check() {
     checkBtn.disabled = false;
     checkBtn.onclick = s5Continue;
   }
+
+  /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
+     לא מספיקה כאן — תשובה שניתנה ואז הלשונית נהרגה לפני הניווט הבא הייתה
+     נאבדת. עטוף: דיווח ושמירה לעולם לא שוברים את זרימת התשובה. */
+  try { flushResumeSave(); } catch (e) {}
 }
 
 function s5Continue() {
@@ -1052,6 +1073,11 @@ function scq8Check() {
     scq8ShowFeedback('wrong2', false);
     scq8SetBarDone('המשך', function () { scq8Continue(); });
   }
+
+  /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
+     לא מספיקה כאן — תשובה שניתנה ואז הלשונית נהרגה לפני הניווט הבא הייתה
+     נאבדת. עטוף: דיווח ושמירה לעולם לא שוברים את זרימת התשובה. */
+  try { flushResumeSave(); } catch (e) {}
 }
 
 function scq8LockOptions() {
@@ -1393,6 +1419,11 @@ function s9Check() {
     checkBtn.disabled = false;
     checkBtn.onclick = s9Continue;
   }
+
+  /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
+     לא מספיקה כאן — תשובה שניתנה ואז הלשונית נהרגה לפני הניווט הבא הייתה
+     נאבדת. עטוף: דיווח ושמירה לעולם לא שוברים את זרימת התשובה. */
+  try { flushResumeSave(); } catch (e) {}
 }
 
 function s9OpenHint() {
@@ -1570,6 +1601,11 @@ function scq10Check() {
     scq10ShowFeedback('wrong2', false);
     scq10SetBarDone('המשך', function () { scq10Continue(); });
   }
+
+  /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
+     לא מספיקה כאן — תשובה שניתנה ואז הלשונית נהרגה לפני הניווט הבא הייתה
+     נאבדת. עטוף: דיווח ושמירה לעולם לא שוברים את זרימת התשובה. */
+  try { flushResumeSave(); } catch (e) {}
 }
 
 function scq10LockOptions() {
@@ -1955,6 +1991,11 @@ function scq13Check() {
     scq13ShowFeedback('wrong2', false);
     scq13SetBarDone('המשך', function () { scq13Continue(); });
   }
+
+  /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
+     לא מספיקה כאן — תשובה שניתנה ואז הלשונית נהרגה לפני הניווט הבא הייתה
+     נאבדת. עטוף: דיווח ושמירה לעולם לא שוברים את זרימת התשובה. */
+  try { flushResumeSave(); } catch (e) {}
 }
 
 function scq13LockOptions() {
@@ -2154,6 +2195,11 @@ function scq14Check() {
     scq14ShowFeedback('wrong2', false);
     scq14SetBarDone('המשך', function () { scq14Continue(); });
   }
+
+  /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
+     לא מספיקה כאן — תשובה שניתנה ואז הלשונית נהרגה לפני הניווט הבא הייתה
+     נאבדת. עטוף: דיווח ושמירה לעולם לא שוברים את זרימת התשובה. */
+  try { flushResumeSave(); } catch (e) {}
 }
 
 function scq14LockOptions() {
@@ -2397,6 +2443,11 @@ function scq16Check() {
     stationProgress.q16 = 'fail';
     updateQuestionNav('s16');
   }
+
+  /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
+     לא מספיקה כאן — תשובה שניתנה ואז הלשונית נהרגה לפני הניווט הבא הייתה
+     נאבדת. עטוף: דיווח ושמירה לעולם לא שוברים את זרימת התשובה. */
+  try { flushResumeSave(); } catch (e) {}
 }
 
 function scq16LockOptions() {
@@ -2580,6 +2631,11 @@ function scq17Check() {
     stationProgress.q17 = 'fail';
     updateQuestionNav('s17');
   }
+
+  /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
+     לא מספיקה כאן — תשובה שניתנה ואז הלשונית נהרגה לפני הניווט הבא הייתה
+     נאבדת. עטוף: דיווח ושמירה לעולם לא שוברים את זרימת התשובה. */
+  try { flushResumeSave(); } catch (e) {}
 }
 
 function scq17LockOptions() {
@@ -2811,6 +2867,11 @@ function s18Check() {
     stationProgress.q18 = 'fail';
     updateQuestionNav('s18');
   }
+
+  /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
+     לא מספיקה כאן — תשובה שניתנה ואז הלשונית נהרגה לפני הניווט הבא הייתה
+     נאבדת. עטוף: דיווח ושמירה לעולם לא שוברים את זרימת התשובה. */
+  try { flushResumeSave(); } catch (e) {}
 }
 
 function s18Continue() {
@@ -3043,6 +3104,11 @@ function s19Check() {
     stationProgress.q19 = 'fail';
     updateQuestionNav('s19');
   }
+
+  /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
+     לא מספיקה כאן — תשובה שניתנה ואז הלשונית נהרגה לפני הניווט הבא הייתה
+     נאבדת. עטוף: דיווח ושמירה לעולם לא שוברים את זרימת התשובה. */
+  try { flushResumeSave(); } catch (e) {}
 }
 
 function s19Continue() {
@@ -3355,6 +3421,11 @@ function s20Check() {
       }
     }
   }
+
+  /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
+     לא מספיקה כאן — תשובה שניתנה ואז הלשונית נהרגה לפני הניווט הבא הייתה
+     נאבדת. עטוף: דיווח ושמירה לעולם לא שוברים את זרימת התשובה. */
+  try { flushResumeSave(); } catch (e) {}
 }
 
 /* ── ציון הרכיב ──
@@ -3393,11 +3464,16 @@ function s20Continue() {
      window.location.search נגרר בכל מעבר — הוא נושא את ?slxapi ואת
      ?registration, ובלעדיו הגדרת ה-LRS אובדת מכאן והלאה (REPORT-XAPI.md §6).
 
-     recordForwardEdge: סין 03 ניתן להגעה משני מקומות, ולכן צריך לזכור מאיפה
-     הלומד באמת הגיע — אחרת כפתור "חזרה" שם ישלח את מי שדילג לתוך סין 02,
-     תוכן שהוא לא ראה. המסך שממנו יוצאים הוא 20, כלומר '#screen=19'. */
+     writeForwardState: שני דברים במכה אחת.
+     (א) קשת החזרה — סין 03 ניתן להגעה משני מקומות, ולכן צריך לזכור מאיפה
+         הלומד באמת הגיע, אחרת כפתור "חזרה" שם ישלח את מי שדילג לתוך סין 02,
+         תוכן שהוא לא ראה. המסך שממנו יוצאים הוא 20, כלומר '#screen=19'.
+     (ב) מצביע הנחיתה של מסמך ה-resume מוזז ליעד **לפני** הניווט. בלעדיו
+         השיגור הבא היה מחזיר את הלומד לתוך סין 01 שהוא בדיוק סיים.
+     הכתיבה סינכרונית ומחמשת מחדש את ה-debounce, כדי ש-timer מיושן מה-goTo
+     האחרון לא ידרוך עליה בזמן שהעמוד עוד חי. ראו unit-js/40-resume.js. */
   var _dest = practiceDestinationSlug();
-  recordForwardEdge(_dest, '#screen=19');
+  writeForwardState(_dest, '#screen=19');
   window.location.href = '../' + _dest + '/index.html' + window.location.search;
 }
 
@@ -3406,8 +3482,8 @@ function s20Continue() {
    הזה, שקובע איזה תוכן הלומד יראה בכלל, לא היה מכוסה בבדיקות. */
 function practiceDestinationSlug() {
   return (getPracticeScore() >= 4)
-    ? 'Methodica-science-mass-measure-02-03'   // עמד בסף — מדלג על התרגול המחזק
-    : 'Methodica-science-mass-measure-02-02';  // לא עמד — תרגול מחזק
+    ? 'methodica-science-mass-measure-02-03'   // עמד בסף — מדלג על התרגול המחזק
+    : 'methodica-science-mass-measure-02-02';  // לא עמד — תרגול מחזק
 }
 
 function s20OpenHint() {
@@ -3803,3 +3879,581 @@ var XAPI_EVAL_ITEMS = {'001': 1, '002': 1, '003': 1, '004': 1, '005': 1, '006': 
 
 var XAPI_METADATA_FILE = '../metadata/methodica-science-mass-measure-02-01.json';
 
+
+/* ═══════════════════ resume — התפרים הפר-סיניים ═══════════════════
+   ארבעת השמות האלה נקראים מ-unit-js/40-resume.js ומ-unit-js/50-loader.js
+   בזמן call, לא בזמן טעינה — ולכן מותר להם לשבת בתחתית הקובץ.
+
+   הם חייבים לשבת **כאן**, בתוך script.js, ולא בשכבה המשותפת: כל מצב הלומד
+   בסין הזה מוצהר כ-let/const ברמת top-level, כלומר הוא יושב ב-global
+   lexical scope ואינו נגיש דרך window. השכבה המשותפת לא יכולה להגיע אליו,
+   וזו הסיבה שהחוזה הזה הוא פר-סין ולא פונקציה משותפת אחת.
+
+   ── שלב 1 (הנוכחי): מצביע מסך בלבד ──
+   capturePartPayload מחזיר את currentScreen, ושלושת האחרים הם no-op.
+   התוצאה: לומד שחוזר נוחת על **המסך** הנכון, אבל המסך עצמו נקי — מצב
+   התשובות אינו משוחזר.
+
+   זה מכוון ולא חוסר. החזרת משתני התשובה בלי ה-painters הייתה מייצרת מסך
+   שנראה כאילו אפשר לענות עליו אבל מתעלם מלחיצות (כי sNNDone כבר true),
+   ולכן השניים נשארים צמודים לשלב 2. במצב הנוכחי המסך פשוט טרי וניתן
+   לענות עליו שוב.
+
+   ⚠️ הנגזרת המוכרת של שלב 1: stationProgress* ו-XAPI_Q_RESULTS אינם
+   משוחזרים, ולכן הניתוב קדימה שנגזר מהם עלול לשלוח לומד שעמד בסף אל
+   התרגול המחזק. ראו unit-js/10-identity.js. */
+function capturePartPayload() {
+  var st = { currentScreen: currentScreen };
+
+  /* שלב 2א — מצב הניקוד וההסתעפות.
+     XAPI_Q_RESULTS הוא var ב-20-xapi.js ולכן נגיש כאן; המפות stationProgress*
+     הן let פר-סין ולכן **חייבות** לעבור דרך ה-hook הזה. */
+  st.qResults = Object.assign({}, XAPI_Q_RESULTS);
+  st.stations = Object.assign({}, stationProgress);
+
+  /* ── שלב 2ב, קבוצה א — מסכי הבחירה ──
+     שבעת מסכי הבחירה-היחידה שומרים את הבחירה גם אחרי טעות (scqSelect מנקה את
+     הסימון, לא את המשתנה), ולכן הכל נגזר מהמשתנים ואין צורך לקרוא מה-DOM. */
+  st.scq = {
+    scq: { sel: scqSelected, att: scqAttempts, done: scqDone, phase: scqPhase },
+    scq4: { sel: scq4Selected, att: scq4Attempts, done: scq4Done, phase: scq4Phase },
+    scq8: { sel: scq8Selected, att: scq8Attempts, done: scq8Done, phase: scq8Phase },
+    scq10: { sel: scq10Selected, att: scq10Attempts, done: scq10Done, phase: scq10Phase },
+    scq13: { sel: scq13Selected, att: scq13Attempts, done: scq13Done, phase: scq13Phase },
+    scq16: { sel: scq16Selected, att: scq16Attempts, done: scq16Done, phase: scq16Phase },
+    scq17: { sel: scq17Selected, att: scq17Attempts, done: scq17Done, phase: scq17Phase }
+  };
+
+  /* ⚠️ מסך 13 (בחירה מרובה) הוא היוצא מן הכלל: scq14Check מאפס את
+     scq14Selected ל-[] בכל טעות, ולכן הבחירה השגויה של הלומד **לא קיימת באף
+     משתנה** — היא שרדה רק כ-class 'wrong'. נלכדת מה-DOM. */
+  st.scq14 = {
+    sel: scq14Selected.slice(), att: scq14Attempts, done: scq14Done, phase: scq14Phase,
+    wrong: captureWrongMarks('#s13')
+  };
+
+  /* ── קבוצה ב — קלפי היפוך. אין כאן ניקוד, רק "האם הקלף הופך". ── */
+  st.flip = {
+    scr3a: scr3Card1Flipped, scr3b: scr3Card2Flipped, scr3Done: scr3Done,
+    s7: s7Flipped
+  };
+
+  /* ── קבוצה ג — קלט ערכים (17) ורשימות נפתחות (18). שניהם נושאים טוגל, ולכן
+     שניהם נושאים גם LastAnswer וגם ShowingCorrect (כלל 4 ב-CLAUDE.md).
+     ערכי השדות של מסך 17 יושבים **רק ב-DOM** ולכן נקראים משם. ── */
+  st.s18 = {
+    att: s18Attempts, done: s18Done, phase: s18Phase,
+    last: s18LastAnswer, showing: s18ShowingCorrect,
+    inputs: {}
+  };
+  S18_IDS.forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) st.s18.inputs[id] = el.value;
+  });
+  st.s19 = {
+    vals: Object.assign({}, s19DdValues),
+    att: s19Attempts, done: s19Done, phase: s19Phase,
+    last: s19LastAnswer, showing: s19ShowingCorrect
+  };
+
+  /* ── קבוצה ד — שלושת מסכי הגרירה שנכתבו ביד (4, 8, 19).
+     המיקום הוא parentage ב-DOM: הפריט יושב פיזית בתוך האזור, ואין שום משתנה
+     שמחזיק אותו. נלכד דרך parentElement.id — אותה נגזרת בדיוק שהענף
+     wrong-final עושה ל-sNNLastAnswer. ── */
+  /* ── קבוצה ה — משחק הזיכרון (מסך 10).
+     ⚠️ s11Cards **מעורבב ב-Fisher-Yates** בתוך s11Init(), ולכן חייב להישמר
+     ולהיטען. הרצה מחדש של s11Init() מחלקת לוח **אחר** — לומד שחוזר היה מוצא
+     משחק חדש במקום את זה שהתחיל, כולל הזיווגים שכבר מצא.
+     s11SingleTimer לא נשמר (הוא timer, ארעי), ו-s11Locked תמיד חוזר false:
+     נעילה היא חלון של מילישניות בזמן השוואת שני קלפים, ולומד שנטען מחדש
+     לעולם לא אמור לחזור לתוכה. ── */
+  st.s11 = {
+    cards: s11Cards.map(function (c) { return { pairId: c.pairId, text: c.text, matched: !!c.matched }; }),
+    matches: s11Matches, done: s11Done
+  };
+
+  st.s5  = { place: captureDragPlacement('s5',  S5_ITEM_IDS),  att: s5Attempts,  done: s5Done,  last: s5LastAnswer,  showing: s5ShowingCorrect };
+  st.s9  = { place: captureDragPlacement('s9',  S9_ITEM_IDS),  att: s9Attempts,  done: s9Done,  last: s9LastAnswer,  showing: s9ShowingCorrect,  hint: s9HintShown };
+  st.s20 = { place: captureDragPlacement('s20', S20_ITEM_IDS), att: s20Attempts, done: s20Done, last: s20LastAnswer, showing: s20ShowingCorrect, hint: s20HintShown };
+  return st;
+}
+
+/* המיקום הנוכחי של פריטי גרירה, לפי ההורה שלהם ב-DOM. */
+function captureDragPlacement(prefix, itemIds) {
+  var out = {};
+  var zonePrefix = prefix + '-zone-';
+  itemIds.forEach(function (id) {
+    var el = document.getElementById(id);
+    var pid = (el && el.parentElement) ? el.parentElement.id : '';
+    out[id] = (pid.indexOf(zonePrefix) === 0) ? pid.slice(zonePrefix.length) : 'source';
+  });
+  return out;
+}
+
+/* אילו אופציות מסומנות כרגע כשגויות. קיים בשביל מסך 13 בלבד (ראו למעלה). */
+function captureWrongMarks(screenSel) {
+  var out = [];
+  document.querySelectorAll(screenSel + ' .scq-opt').forEach(function (el) {
+    if (el.classList.contains('wrong') && el.dataset.id) out.push(el.dataset.id);
+  });
+  return out;
+}
+
+/* שלב 2 — החזרת משתני התשובה של הסין.
+   ⚠️ אם המימוש יעבור ל-eval כמו בלומדת המקור, שם הפרמטר חייב להישאר `st`:
+   ה-eval מפרש אותו לקסיקלית, ושינוי שם נכשל **בשקט** (הזריקה נבלעת
+   ב-try/catch העוטף) ולוקח איתו את התשובות של הלומד. */
+/* שלב 2א — מחזיר את מצב הניקוד וההסתעפות בלבד.
+
+   למה זה חייב לקרות, ולא רק "נחמד": הניתוב קדימה נגזר מהמפות האלה, ולכן
+   לומד שהמשיך אחרי resume בלעדיהן היה מנותב לפי ציון 0 — כלומר מי שעמד
+   בסף נשלח לתרגול מחזק שהוא כבר דילג עליו.
+   התלויות בסין הזה: getPracticeScore() → practiceDestinationSlug().
+
+   מוטציה במקום ולא הצבה מחדש: 20-xapi.js כותב ל-XAPI_Q_RESULTS[key] דרך
+   הגלובל, וקוד הסין מחזיק הפניה חיה למפות — החלפת האובייקט הייתה עלולה
+   להשאיר קוראים על עותק מיושן.
+
+   ⚠️ במכוון **לא** מחזיר דגלי sNNDone/Selected/Attempts. הם משוחזרים רק
+   יחד עם ה-painters (שלב 2ב), כי מסך עם Done=true ובלי ציור נראה כאילן
+   אפשר לענות עליו אבל מתעלם מלחיצות. */
+function applyResumeVars(st) {
+  if (!st) return;
+  if (st.qResults) {
+    Object.keys(st.qResults).forEach(function (k) { XAPI_Q_RESULTS[k] = st.qResults[k]; });
+  }
+  if (st.stations) {
+    Object.keys(st.stations).forEach(function (k) { stationProgress[k] = st.stations[k]; });
+  }
+  if (st.scq && st.scq.scq) { scqSelected = (typeof st.scq.scq.sel === 'string') ? st.scq.scq.sel : null; scqAttempts = st.scq.scq.att || 0; scqDone = !!st.scq.scq.done; scqPhase = st.scq.scq.phase || 'before'; }
+  if (st.scq && st.scq.scq4) { scq4Selected = (typeof st.scq.scq4.sel === 'string') ? st.scq.scq4.sel : null; scq4Attempts = st.scq.scq4.att || 0; scq4Done = !!st.scq.scq4.done; scq4Phase = st.scq.scq4.phase || 'before'; }
+  if (st.scq && st.scq.scq8) { scq8Selected = (typeof st.scq.scq8.sel === 'string') ? st.scq.scq8.sel : null; scq8Attempts = st.scq.scq8.att || 0; scq8Done = !!st.scq.scq8.done; scq8Phase = st.scq.scq8.phase || 'before'; }
+  if (st.scq && st.scq.scq10) { scq10Selected = (typeof st.scq.scq10.sel === 'string') ? st.scq.scq10.sel : null; scq10Attempts = st.scq.scq10.att || 0; scq10Done = !!st.scq.scq10.done; scq10Phase = st.scq.scq10.phase || 'before'; }
+  if (st.scq && st.scq.scq13) { scq13Selected = (typeof st.scq.scq13.sel === 'string') ? st.scq.scq13.sel : null; scq13Attempts = st.scq.scq13.att || 0; scq13Done = !!st.scq.scq13.done; scq13Phase = st.scq.scq13.phase || 'before'; }
+  if (st.scq && st.scq.scq16) { scq16Selected = (typeof st.scq.scq16.sel === 'string') ? st.scq.scq16.sel : null; scq16Attempts = st.scq.scq16.att || 0; scq16Done = !!st.scq.scq16.done; scq16Phase = st.scq.scq16.phase || 'before'; }
+  if (st.scq && st.scq.scq17) { scq17Selected = (typeof st.scq.scq17.sel === 'string') ? st.scq.scq17.sel : null; scq17Attempts = st.scq.scq17.att || 0; scq17Done = !!st.scq.scq17.done; scq17Phase = st.scq.scq17.phase || 'before'; }
+  if (st.s11) {
+    if (Array.isArray(st.s11.cards) && st.s11.cards.length) {
+      s11Cards = st.s11.cards.map(function (c) { return { pairId: c.pairId, text: c.text, matched: !!c.matched }; });
+    }
+    s11Matches = st.s11.matches || 0;
+    s11Done    = !!st.s11.done;
+    s11Flipped = [];      // אין "שני קלפים באוויר" אחרי טעינה
+    s11Locked  = false;   // ראו ההערה ב-capturePartPayload
+  }
+  if (st.s5)  { s5Attempts  = st.s5.att  || 0; s5Done  = !!st.s5.done;  s5LastAnswer  = st.s5.last  || null; s5ShowingCorrect  = !!st.s5.showing; }
+  if (st.s9)  { s9Attempts  = st.s9.att  || 0; s9Done  = !!st.s9.done;  s9LastAnswer  = st.s9.last  || null; s9ShowingCorrect  = !!st.s9.showing;  s9HintShown  = !!st.s9.hint; }
+  if (st.s20) { s20Attempts = st.s20.att || 0; s20Done = !!st.s20.done; s20LastAnswer = st.s20.last || null; s20ShowingCorrect = !!st.s20.showing; s20HintShown = !!st.s20.hint; }
+  if (st.s18) {
+    s18Attempts = st.s18.att || 0;
+    s18Done = !!st.s18.done;
+    s18Phase = st.s18.phase || 'before';
+    s18LastAnswer = st.s18.last || null;
+    s18ShowingCorrect = !!st.s18.showing;
+  }
+  if (st.s19) {
+    /* מוטציה לפי מפתח: s19DdSelect כותב לתוך האובייקט הקיים. */
+    if (st.s19.vals) Object.keys(st.s19.vals).forEach(function (k) { s19DdValues[k] = st.s19.vals[k]; });
+    s19Attempts = st.s19.att || 0;
+    s19Done = !!st.s19.done;
+    s19Phase = st.s19.phase || 'before';
+    s19LastAnswer = st.s19.last || null;
+    s19ShowingCorrect = !!st.s19.showing;
+  }
+  if (st.flip) {
+    scr3Card1Flipped = !!st.flip.scr3a;
+    scr3Card2Flipped = !!st.flip.scr3b;
+    scr3Done         = !!st.flip.scr3Done;
+    s7Flipped        = !!st.flip.s7;
+  }
+  if (st.scq14) {
+    scq14Selected = (st.scq14.sel || []).slice();
+    scq14Attempts = st.scq14.att || 0;
+    scq14Done     = !!st.scq14.done;
+    scq14Phase    = st.scq14.phase || 'before';
+    __scq14Wrong  = (st.scq14.wrong || []).slice();
+  }
+}
+
+/* סימוני הטעות של מסך 13, שאין להם מקום במשתני המסך. */
+var __scq14Wrong = [];
+
+/* מחזיר ערכים שיושבים רק ב-DOM: הטקסט שהוקלד במסך 17, ותוויות הרשימות של
+   מסך 18 (ה-value המכונה שלהן נשמר בנפרד ב-s19DdValues).
+   רץ **לפני** ה-painters, שנועלים ומסמנים אותם. */
+function applyResumeDom(st) {
+  if (!st) return;
+  if (st.s18 && st.s18.inputs) {
+    S18_IDS.forEach(function (id) {
+      if (typeof st.s18.inputs[id] !== 'string') return;
+      var el = document.getElementById(id);
+      if (el) el.value = st.s18.inputs[id];
+    });
+  }
+  if (st.s19 && st.s19.vals) {
+    S19_IDS.forEach(function (id) {
+      var valEl = document.getElementById(id + '-val');
+      if (valEl && typeof st.s19.vals[id] === 'string') valEl.textContent = st.s19.vals[id];
+    });
+  }
+  /* מסכי הגרירה: מזיזים את הצומת עצמו, כמו sNNShowMyAnswer. */
+  if (st.s5  && st.s5.place)  applyDragPlacement('s5',  S5_ITEM_IDS,  st.s5.place);
+  if (st.s9  && st.s9.place)  applyDragPlacement('s9',  S9_ITEM_IDS,  st.s9.place);
+  if (st.s20 && st.s20.place) applyDragPlacement('s20', S20_ITEM_IDS, st.s20.place);
+}
+
+function applyDragPlacement(prefix, itemIds, place) {
+  itemIds.forEach(function (id) {
+    var item = document.getElementById(id);
+    if (!item) return;
+    var dest = place[id];
+    var destEl = (!dest || dest === 'source')
+      ? document.getElementById(prefix + '-source-bank')
+      : document.getElementById(prefix + '-zone-' + dest);
+    if (!destEl) return;
+    if (item.parentElement) item.parentElement.removeChild(item);
+    destEl.appendChild(item);
+  });
+}
+
+/* ציור מצב "נענה". חייב להישאר exception-safe — נקרא גם מ-applyExecutionState
+   וגם מכל ניווט, ואסור לו לשבור ניווט. */
+function restoreScreenUI(n) {
+  try {
+    if (n === 1) restoreScqUI(SCQ, '#s1', 'scq', scqOptEl, scqSelected, scqAttempts, scqDone, scqPhase,
+                                scqLockOptions, scqShowFeedback, scqSetBarDone, scqCheck, function () { advanceScreen(); }, 'scq-hint');
+    if (n === 3) restoreScqUI(SCQ4, '#s3', 'scq4', scq4OptEl, scq4Selected, scq4Attempts, scq4Done, scq4Phase,
+                                scq4LockOptions, scq4ShowFeedback, scq4SetBarDone, scq4Check, function () { scq4Continue(); }, null);
+    if (n === 7) restoreScqUI(SCQ8, '#s7', 'scq8', scq8OptEl, scq8Selected, scq8Attempts, scq8Done, scq8Phase,
+                                scq8LockOptions, scq8ShowFeedback, scq8SetBarDone, scq8Check, function () { scq8Continue(); }, null);
+    if (n === 9) restoreScqUI(SCQ10, '#s9', 'scq10', scq10OptEl, scq10Selected, scq10Attempts, scq10Done, scq10Phase,
+                                scq10LockOptions, scq10ShowFeedback, scq10SetBarDone, scq10Check, function () { scq10Continue(); }, null);
+    if (n === 12) restoreScqUI(SCQ13, '#s12', 'scq13', scq13OptEl, scq13Selected, scq13Attempts, scq13Done, scq13Phase,
+                                scq13LockOptions, scq13ShowFeedback, scq13SetBarDone, scq13Check, function () { scq13Continue(); }, null);
+    if (n === 15) restoreScqUI(SCQ16, '#s15', 'scq16', scq16OptEl, scq16Selected, scq16Attempts, scq16Done, scq16Phase,
+                                scq16LockOptions, scq16ShowFeedback, scq16SetBarDone, scq16Check, function () { scq16Continue(); }, null);
+    if (n === 16) restoreScqUI(SCQ17, '#s16', 'scq17', scq17OptEl, scq17Selected, scq17Attempts, scq17Done, scq17Phase,
+                                scq17LockOptions, scq17ShowFeedback, scq17SetBarDone, scq17Check, function () { scq17Continue(); }, null);
+    if (n === 2) scr3RestoreUI();
+    if (n === 6) s7RestoreUI();
+    if (n === 13) restoreScq14UI();
+    if (n === 10) s11RestoreUI();
+    if (n === 4)  restoreDragUI({ prefix: 's5',  zones: ['bruto', 'neto', 'tara'], itemIds: S5_ITEM_IDS,
+                                   done: s5Done,  att: s5Attempts,  last: s5LastAnswer,  showing: s5ShowingCorrect,
+                                   /* לכל מסך שמות סוגי פידבק משלו — s5 קורא לזה
+                                      'wrongFinal' ולא 'wrong2'. אימות מול
+                                      TEXTS5/TEXTS9/TEXTS_S20, לא ניחוש. */
+                                   kindWrong1: 'wrong', kindPending: 'wrongPending', kindFinal: 'wrongFinal',
+                                   showFeedback: s5ShowFeedback,  updateBtn: s5UpdateCheckBtn,
+                                   checkBtnId: 's5-check',  revealBtnId: 's5-reveal-btn',
+                                   continueFn: s5Continue,  hintBtnId: null,      hintShown: false });
+    if (n === 8)  restoreDragUI({ prefix: 's9',  zones: S9_ZONE_IDS, itemIds: S9_ITEM_IDS,
+                                   done: s9Done,  att: s9Attempts,  last: s9LastAnswer,  showing: s9ShowingCorrect,
+                                   kindWrong1: 'wrong', kindPending: 'wrongPending', kindFinal: 'wrong2',
+                                   showFeedback: s9ShowFeedback,  updateBtn: s9UpdateCheckBtn,
+                                   checkBtnId: 's9-check',  revealBtnId: 's9-reveal-btn',
+                                   continueFn: s9Continue,  hintBtnId: 's9-hint',  hintShown: s9HintShown });
+    if (n === 19) restoreDragUI({ prefix: 's20', zones: ['bruto', 'neto', 'tara'], itemIds: S20_ITEM_IDS,
+                                   done: s20Done, att: s20Attempts, last: s20LastAnswer, showing: s20ShowingCorrect,
+                                   kindWrong1: 'wrong1', kindPending: 'wrong2Pending', kindFinal: 'wrong2',
+                                   showFeedback: s20ShowFeedback, updateBtn: s20UpdateCheckBtn,
+                                   checkBtnId: 's20-check', revealBtnId: 's20-reveal-btn',
+                                   continueFn: s20Continue, hintBtnId: 's20-hint', hintShown: s20HintShown });
+    if (n === 17) s18RestoreUI();
+    if (n === 18) s19RestoreUI();
+  } catch (e) { console.error('[resume] restoreScreenUI', e); }
+}
+
+/* ציור משותף לשבעת מסכי הבחירה-היחידה. שבעתם זהים במבנה ונבדלים רק בקידומת,
+   ב-selector, בתשובה הנכונה ובמי שממשיך הלאה — ולכן ציור אחד ולא שבעה עותקים
+   שיכולים להיסחף זה מזה.
+   משקף **רק** את כתיבות ה-DOM של scqNCheck: אין שינוי state, אין xapiAnswered
+   ואין נגיעה ב-stationProgress (הוא הוחזר כבר ב-applyResumeVars). */
+function restoreScqUI(cfg, screenSel, prefix, optEl, selected, attempts, done, phase,
+                      lockOptions, showFeedback, setBarDone, checkFn, continueFn, hintId) {
+  if (!done && attempts === 0 && !selected) return;   // מסך נקי — לא נוגעים
+
+  var correctEl = optEl(cfg.correctId);
+
+  if (done) {
+    if (phase === 'correct') {
+      if (correctEl) { correctEl.classList.remove('selected'); correctEl.classList.add('correct'); }
+    } else {
+      /* wrong-final: הבחירה השגויה נשארת מסומנת, והנכונה מתווספת — אותו סדר
+         כמו ב-check(), כך שגם אם השניים חופפים התוצאה ירוקה. */
+      var wrongEl = selected ? optEl(selected) : null;
+      if (wrongEl && selected !== cfg.correctId) {
+        wrongEl.classList.remove('selected');
+        wrongEl.classList.add('wrong');
+      }
+      if (correctEl) { correctEl.classList.remove('selected'); correctEl.classList.add('correct'); }
+    }
+    lockOptions();
+    showFeedback(phase === 'correct' ? 'correct' : 'wrong2', phase === 'correct');
+    setBarDone('המשך', continueFn);
+    return;
+  }
+
+  /* לא נפתר. מחזירים את הבחירה ואת סימון הטעות, ואז מחשבים את הכפתור
+     מ**אותו** predicate של scqNSelect — יש בחירה ⇒ פעיל. גם כשהוא מושבת אין
+     כאן תקיעות: לחיצה על אופציה קוראת ל-Select, שמפעיל אותו ומנקה את הסימון,
+     בדיוק כמו בזרימה החיה. */
+  if (selected) {
+    var selEl = optEl(selected);
+    if (selEl) {
+      if (phase === 'wrong1') selEl.classList.add('wrong');
+      else { selEl.classList.add('selected'); selEl.setAttribute('aria-checked', 'true'); }
+    }
+  }
+  if (phase === 'wrong1') {
+    showFeedback('wrong1', false);
+    if (hintId) { var hb = document.getElementById(hintId); if (hb) hb.hidden = false; }
+  }
+  var checkBtn = document.getElementById(prefix + '-check');
+  if (checkBtn) {
+    checkBtn.textContent = 'צדקתי?';
+    checkBtn.onclick = checkFn;
+    /* אחרי טעות הקוד החי משבית עד לבחירה חדשה; אחרת פעיל אם יש בחירה. */
+    checkBtn.disabled = (phase === 'wrong1') || !selected;
+  }
+}
+
+/* מסך 10 — משחק הזיכרון.
+   resetScreenState10 מטפל בעצמו בשני הקצוות (סיום ⇒ מסך סיכום; אפס זיווגים
+   ⇒ s11Init מחדש), אבל **לא** במצב שבאמצע: הוא יוצא מוקדם כש-s11Matches > 0,
+   ואחרי טעינת עמוד זה משאיר לוח **ריק** — s11RenderBoard מעולם לא רץ.
+   הציור כאן מרנדר את הלוח מ-s11Cards המשוחזר (כלומר אותו סידור בדיוק) ואז
+   מחזיר את הקלפים שכבר זווגו למצבם. */
+function s11RestoreUI() {
+  if (s11Done) return;                       // resetScreenState10 מציג את מסך הסיכום
+  if (s11Matches === 0) return;              // resetScreenState10 כבר קרא ל-s11Init
+  if (!s11Cards.length) return;              // אין מה לצייר
+
+  s11UpdatePairsCounter();
+  s11RenderBoard();                          // אותו סידור — s11Cards לא עורבב מחדש
+
+  /* הקלפים שזווגו נשארים הפוכים ומסומנים. s11-match-flash **לא** מוחזר:
+     הוא אנימציית רגע ההתאמה, ולומד שחוזר כבר ראה אותה. */
+  s11Cards.forEach(function (card, idx) {
+    if (!card.matched) return;
+    var el = document.querySelector('#s11-board .s11-card[data-idx="' + idx + '"]');
+    if (el) el.classList.add('s11-flipped', 's11-matched');
+  });
+
+  /* אותו predicate של הזרימה החיה: הכפתור נפתח רק בשלושת הזיווגים. */
+  var btn = document.getElementById('s11-btn-continue');
+  if (btn) btn.disabled = (s11Matches !== 3);
+  var game = document.getElementById('s11-game-view');
+  var sum = document.getElementById('s11-summary-view');
+  if (game) game.hidden = false;
+  if (sum) sum.hidden = true;
+}
+
+/* ציור משותף לשלושת מסכי הגרירה שנכתבו ביד. שלושתם זהים במבנה ונבדלים רק
+   בקידומת, ברשימת האזורים, בשמות סוגי הפידבק ובקיום מצב רמז — ולכן ציור אחד
+   ולא שלושה עותקים שיכולים להיסחף.
+
+   המיקום עצמו הוחזר כבר ב-applyResumeDom; כאן רק הסימון, הפידבק והכפתורים.
+   משקף **רק** את כתיבות ה-DOM של sNNCheck: אין שינוי state, אין xapiAnswered
+   ואין נגיעה ב-stationProgress (הוא הוחזר כבר ב-applyResumeVars).
+
+   ⚠️ ההבחנה בין "נפתר" ל"נכשל סופית" נעשית לפי sNNLastAnswer ולא לפי הסימון:
+   כשהלומד לחץ "התשובה הנכונה", sNNRevealCorrect הזיז את הפריטים לפתרון, ולכן
+   הלוח **נראה** נכון בעוד התשובה שלו שרדה רק ב-LastAnswer (כלל 4 ב-CLAUDE.md). */
+function restoreDragUI(cfg) {
+  var anyPlaced = cfg.itemIds.some(function (id) {
+    var el = document.getElementById(id);
+    return el && el.parentElement && el.parentElement.id !== cfg.prefix + '-source-bank';
+  });
+  if (!cfg.done && cfg.att === 0 && !anyPlaced) return;   // מסך נקי
+
+  /* אותו לופ סימון בדיוק כמו ב-sNNCheck. */
+  cfg.zones.forEach(function (zoneId) {
+    var zoneEl = document.getElementById(cfg.prefix + '-zone-' + zoneId);
+    if (!zoneEl) return;
+    var items = zoneEl.querySelectorAll('.' + cfg.prefix + '-drag-item');
+    var zoneOk = items.length > 0;
+    items.forEach(function (item) {
+      var itemOk = item.dataset.correct === zoneId;
+      if (!itemOk) zoneOk = false;
+      item.classList.remove(cfg.prefix + '-item-correct', cfg.prefix + '-item-wrong');
+      item.classList.add(itemOk ? cfg.prefix + '-item-correct' : cfg.prefix + '-item-wrong');
+    });
+    zoneEl.classList.toggle('correct', zoneOk);
+    zoneEl.classList.toggle('wrong', !zoneOk);
+  });
+
+  var checkBtn = document.getElementById(cfg.checkBtnId);
+  var revealBtn = cfg.revealBtnId ? document.getElementById(cfg.revealBtnId) : null;
+
+  if (cfg.done) {
+    if (!cfg.last) {
+      cfg.showFeedback('correct', true);
+    } else {
+      cfg.showFeedback(cfg.showing ? cfg.kindFinal : cfg.kindPending, false);
+      if (revealBtn) {
+        revealBtn.hidden = false;
+        revealBtn.textContent = cfg.showing ? 'התשובה שלי' : 'התשובה הנכונה';
+      }
+    }
+    if (checkBtn) { checkBtn.textContent = 'המשך'; checkBtn.disabled = false; checkBtn.onclick = cfg.continueFn; }
+    return;
+  }
+
+  /* ניסיון שגוי אחד, עוד לא נפתר. */
+  if (cfg.att >= 1) {
+    cfg.showFeedback(cfg.kindWrong1, false);
+    if (cfg.hintBtnId && cfg.hintShown) {
+      var hb = document.getElementById(cfg.hintBtnId);
+      if (hb) { hb.hidden = false; hb.disabled = false; }
+    }
+  }
+  /* מחשב מחדש מ**אותו** predicate של הזרימה החיה (sNNAllPlaced). הקוד החי
+     משבית את הכפתור אחרי טעות והוא חוזר לפעולה רק בהצבה הבאה — אחרי טעינת
+     עמוד זה היה משאיר לומד עם לוח מלא וכפתור מת. */
+  cfg.updateBtn();
+}
+
+/* מסך 17 — ארבעה שדות קלט, עם טוגל "התשובה הנכונה" ⇄ "התשובה שלי".
+   משקף **רק** את כתיבות ה-DOM של s18Check. הערכים עצמם הוחזרו כבר
+   ב-applyResumeDom, ולכן s18LockInputs נקרא עם false גם במצב "מציג פתרון":
+   קריאה עם true הייתה דורסת אותם מחדש ללא צורך. */
+function s18RestoreUI() {
+  if (!s18Done && s18Attempts === 0 &&
+      !S18_IDS.some(function (id) { var el = document.getElementById(id); return el && el.value !== ''; })) return;
+
+  var revealBtn = document.getElementById('s18-reveal-btn');
+  s18ClearInputStateClasses();
+
+  if (s18Done) {
+    s18LockInputs(false);
+    s18MarkInputs();
+    if (s18Phase === 'correct') {
+      s18ShowFeedback('correct', true);
+    } else {
+      s18ShowFeedback(s18ShowingCorrect ? 'wrong2' : 'wrongPending', false);
+      if (revealBtn) {
+        revealBtn.hidden = false;
+        revealBtn.textContent = s18ShowingCorrect ? 'התשובה שלי' : 'התשובה הנכונה';
+      }
+    }
+    s18SetBarDone('המשך', function () { s18Continue(); });
+    return;
+  }
+
+  if (s18Attempts >= 1) {
+    s18MarkInputs();
+    s18ShowFeedback('wrong1', false);
+    var hb = document.getElementById('s18-hint');
+    if (hb) { hb.hidden = false; hb.disabled = false; }
+  }
+  /* מחשב מחדש מ**אותו** predicate של הזרימה החיה. s18Check משבית את הכפתור
+     אחרי טעות והוא חוזר לפעולה רק דרך s18OnInput — בלי הקריאה הזאת מסך משוחזר
+     עם כל השדות מלאים היה מציג כפתור מושבת בלי דרך להפעיל אותו. */
+  s18OnInput();
+}
+
+/* מסך 18 — ארבע רשימות נפתחות, עם אותו טוגל. */
+function s19RestoreUI() {
+  if (!s19Done && s19Attempts === 0 &&
+      !S19_IDS.some(function (id) { return s19DdValues[id] !== ''; })) return;
+
+  var revealBtn = document.getElementById('s19-reveal-btn');
+
+  if (s19Done) {
+    s19LockDropdowns(false);
+    s19MarkDropdowns();
+    if (s19Phase === 'correct') {
+      s19ShowFeedback('correct', true);
+    } else {
+      s19ShowFeedback(s19ShowingCorrect ? 'wrong2' : 'wrongPending', false);
+      if (revealBtn) {
+        revealBtn.hidden = false;
+        revealBtn.textContent = s19ShowingCorrect ? 'התשובה שלי' : 'התשובה הנכונה';
+      }
+    }
+    s19SetBarDone('המשך', function () { s19Continue(); });
+    return;
+  }
+
+  if (s19Attempts >= 1) {
+    s19MarkDropdowns();
+    s19ShowFeedback('wrong1', false);
+    var hb2 = document.getElementById('s19-hint');
+    if (hb2) { hb2.hidden = false; hb2.disabled = false; }
+  }
+  s19OnChange();
+}
+
+/* מסך 2 — שני קלפי היפוך.
+   כששניהם הופכו, resetScreenState2 כבר מצייר את המצב בעצמו (זה המסלול
+   scr3Done שלו), ולכן כאן מטופל רק המצב **החלקי**: קלף אחד הופך והלומד עזב.
+   בלי זה resetScreenState2 היה מאפס את שניהם, כלומר מבטל היפוך שכבר קרה. */
+function scr3RestoreUI() {
+  if (scr3Done) return;                                   // כבר טופל ב-reset
+  if (!scr3Card1Flipped && !scr3Card2Flipped) return;      // מסך נקי
+  if (scr3Card1Flipped) {
+    var c1 = document.getElementById('flip-card-right');
+    if (c1) c1.classList.add('flipped');
+  }
+  if (scr3Card2Flipped) {
+    var c2 = document.getElementById('flip-card-left');
+    if (c2) c2.classList.add('flipped');
+  }
+  /* אותו predicate של scr3FlipCard: הכפתור נפתח רק כששניהם הופכו. */
+  var btn = document.getElementById('btn-s3-continue');
+  if (btn) btn.disabled = !(scr3Card1Flipped && scr3Card2Flipped);
+}
+
+/* מסך 6 — קלף היפוך אחד.
+   resetScreenState6 יוצא מוקדם כש-s7Flipped, ולכן אחרי טעינת עמוד ה-DOM נשאר
+   נקי והציור כאן הוא מה שמחזיר אותו.
+   ⚠️ ה-setTimeout של שתי השניות ב-s7FlipCard **לא** משוחזר במכוון: ההשהיה היא
+   אפקט תצוגה לרגע ההיפוך עצמו, ולומד שחוזר כבר עבר אותו — השהייה חוזרת הייתה
+   מקפיאה אותו מול כפתור מושבת בלי סיבה. */
+function s7RestoreUI() {
+  if (!s7Flipped) return;
+  var card = document.getElementById('s7-flip-card');
+  if (card) card.classList.add('flipped');
+  var area = document.getElementById('s7-avatar-area');
+  if (area) area.hidden = false;
+  var btn = document.getElementById('s7-btn-continue');
+  if (btn) btn.disabled = false;
+}
+
+/* מסך 13 — בחירה מרובה. נבדל משבעת האחרים בכך ש-scq14Selected מתאפס בכל טעות,
+   ולכן סימוני הטעות באים מ-__scq14Wrong שנלכד מה-DOM. */
+function restoreScq14UI() {
+  if (!scq14Done && scq14Attempts === 0 && scq14Selected.length === 0) return;
+
+  if (scq14Done) {
+    __scq14Wrong.forEach(function (id) {
+      var el = scq14OptEl(id);
+      if (el) el.classList.add('wrong');
+    });
+    SCQ14.correctIds.forEach(function (cid) {
+      var el = scq14OptEl(cid);
+      if (el) { el.classList.remove('selected', 'wrong'); el.classList.add('correct'); }
+    });
+    scq14LockOptions();
+    scq14ShowFeedback(scq14Phase === 'correct' ? 'correct' : 'wrong2', scq14Phase === 'correct');
+    scq14SetBarDone('המשך', function () { scq14Continue(); });
+    return;
+  }
+
+  __scq14Wrong.forEach(function (id) {
+    var el = scq14OptEl(id);
+    if (el) el.classList.add('wrong');
+  });
+  scq14Selected.forEach(function (id) {
+    var el = scq14OptEl(id);
+    if (el) { el.classList.add('selected'); el.setAttribute('aria-checked', 'true'); }
+  });
+  if (scq14Phase === 'wrong1') scq14ShowFeedback('wrong1', false);
+  var btn = document.getElementById('scq14-check');
+  if (btn) {
+    btn.textContent = 'צדקתי?';
+    btn.onclick = scq14Check;
+    btn.disabled = scq14Selected.length === 0;
+  }
+}
