@@ -62,6 +62,15 @@ function goTo(n) {
   currentScreen = n;
   resetScreenState(n);
   target.classList.add('active');
+  /* resume: ציור מצב "נענה" של המסך הזה. חייב לשבת כאן ולא רק
+     ב-applyExecutionState, שמצייר את מסך הנחיתה **בלבד** — בלי זה כל מסך אחר
+     שנענה נשאר ריק ותקוע (הקליקים נבלעים ב-`if (scqNDone) return;` וכפתור
+     הבדיקה נשאר disabled מה-markup). לפני xapiOnScreen ולפני
+     scheduleResumeSave במכוון: capturePartPayload קורא סימוני 'wrong' מה-DOM,
+     ולכן שמירה שהייתה מקדימה את הציור הייתה מרוקנת אותם.
+     בלי catch ריק: repaintScreen יושב ב-40-resume.js, וגרסה מיושנת בקאש
+     הייתה זורקת ReferenceError שקט בכל ניווט. */
+  try { repaintScreen(n); } catch (e) { console.error('[resume] repaint', e); }
   /* xAPI: זוגות initialized/completed ברמת הפריט. מוצב **אחרון**, אחרי
      ה-.active, כדי שקריאת רשת לא תעכב את ה-paint; ואחרי currentScreen = n,
      שממנו submitReport והיומן קוראים. עטוף ב-try/catch — דיווח לעולם לא
@@ -4078,11 +4087,24 @@ function applyResumeVars(st) {
 /* סימוני הטעות של מסך 13, שאין להם מקום במשתני המסך. */
 var __scq14Wrong = [];
 
-/* מחזיר ערכים שיושבים רק ב-DOM: הטקסט שהוקלד במסך 17, ותוויות הרשימות של
-   מסך 18 (ה-value המכונה שלהן נשמר בנפרד ב-s19DdValues).
-   רץ **לפני** ה-painters, שנועלים ומסמנים אותם. */
+/* מחזיר ערכים שיושבים רק ב-DOM: הטקסט שהוקלד במסך 17, תוויות הרשימות של
+   מסך 18 (ה-value המכונה שלהן נשמר בנפרד ב-s19DdValues), וסימוני הטעות של
+   מסך 13. רץ **לפני** ה-painters, שנועלים ומסמנים אותם. */
 function applyResumeDom(st) {
   if (!st) return;
+  /* ⚠️ סימוני 'wrong' של מסך 13 חייבים לחזור ל-DOM כאן, ולא רק ל-__scq14Wrong.
+     captureWrongMarks קורא אותם **מה-DOM** (ראו ההערה למעלה: scq14Check מאפס
+     את scq14Selected בכל טעות, ולכן הבחירה השגויה לא קיימת באף משתנה), ואילו
+     applyResumeVars מחזיר אותם רק למשתנה שה-capture לא מסתכל בו. התוצאה לפני
+     התיקון: כל ניווט אחרי שחזור הריץ scheduleResumeSave → capturePartPayload
+     → wrong: [] — כלומר הבחירה השגויה של הלומד נמחקה מהמסמך לתמיד, גם אם
+     מעולם לא נכנס למסך 13. הציור ב-repaintScreen מכסה רק מסכים שבהם ביקר. */
+  if (st.scq14 && Array.isArray(st.scq14.wrong)) {
+    st.scq14.wrong.forEach(function (id) {
+      var el = document.querySelector('#s13 .scq-opt[data-id="' + id + '"]');
+      if (el) el.classList.add('wrong');
+    });
+  }
   if (st.s18 && st.s18.inputs) {
     S18_IDS.forEach(function (id) {
       if (typeof st.s18.inputs[id] !== 'string') return;

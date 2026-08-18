@@ -334,15 +334,29 @@ function writeForwardState(destSlug, returnHash) {
    - **איפוס xapiCurrentItem** (7). xapiOnScreen() יוצא מוקדם כש-
      item === xapiCurrentItem, וה-latch נשאר דלוק מתוך ה-goTo שדוכא, למרות
      שה-statement נבלע. בלי האיפוס סשן משוחזר לא היה שולח 'initialized'
-     של פריט **בכלל**, והחלפת המסך הבאה הייתה סוגרת פריט שלא נפתח. */
-function applyExecutionState(st) {
+     של פריט **בכלל**, והחלפת המסך הבאה הייתה סוגרת פריט שלא נפתח.
+
+   ── screenOverride ──
+   ה-hash מנצח את המסמך בבחירת **המסך**, אבל לא בשחזור **המצב**. עד 2026-08-18
+   ה-loader דילג על applyExecutionState כולו כשהיה '#screen=N' ב-URL, ולכן
+   הגעה דרך "חזרה" בין-סינית איבדה את כל השחזור — כולל XAPI_Q_RESULTS ו-
+   stationProgress, שמהם נגזר הניתוב קדימה. לומד שעמד בסף היה נשלח לתרגול
+   המחזק. עכשיו תמיד משחזרים, וה-hash קובע רק לאן נוחתים. */
+function applyExecutionState(st, screenOverride) {
   if (!st) return;
   _restoring = true;
   var _origSend = window.sendStatement720;
   window.sendStatement720 = function () {};
   try {
     applyResumeVars(st);
-    goTo((typeof st.currentScreen === 'number') ? st.currentScreen : 0);
+    /* טווח נבדק מול TOTAL_SCREENS: goTo() חוסם מחוץ לטווח ו**חוזר**, כלומר
+       currentScreen היה נשאר על הערך הקודם וה-painter היה מצייר מסך אחר.
+       hash מיושן (סין שהתקצר) חוזר לערך שבמסמך, לא נוחת בשום מקום. */
+    var _n = (typeof screenOverride === 'number' && screenOverride >= 0 &&
+              screenOverride < TOTAL_SCREENS)
+      ? screenOverride
+      : ((typeof st.currentScreen === 'number') ? st.currentScreen : 0);
+    goTo(_n);
     applyResumeVars(st);   // מבטל את האיפוס שעשה resetScreenState של המסך הזה
     applyResumeDom(st);    // לפני ה-painter, שנועל/משבית את השדות
     restoreScreenUI(currentScreen);
@@ -354,6 +368,34 @@ function applyExecutionState(st) {
   }
   xapiCurrentItem = null;
   try { xapiOnScreen(currentScreen); } catch (e) {}
+}
+
+/* ═══════════════════ ציור מסך שנענה, בכל ניווט ═══════════════════
+   התיקון לבאג ש-applyExecutionState לבדו לא כיסה: applyResumeVars מחזיר את
+   משתני התשובה של **כל** השאלות בסין, אבל restoreScreenUI נקרא שם למסך
+   הנחיתה **בלבד**. כל מסך אחר שנענה נשאר עם "המשתנים אומרים נענה, ה-DOM
+   אומר ריק" — וזה חסימה מלאה, לא אי-נוחות: scqNSelect פותח ב-
+   `if (scqNDone) return;` ולכן כל קליק נבלע; resetScreenStateN יוצא מוקדם על
+   scqNDone ולכן לא מצייר ולא מפעיל; וה-disabled של כפתור הבדיקה מגיע
+   מה-markup, כך שרק restoreScqUI או scqNCheck חי מסירים אותו. הלומד נשאר בלי
+   שום שליטה קדימה — וכפתור "חזרה" של כל מסך הוא goTo(n-1), כלומר לחיצה אחת
+   מנחיתה אותו על מסך תקוע נוסף. רק רענון עמוד משחרר.
+
+   למה בלי "פעם אחת למסך": כל 20 ה-painters כבר idempotent ומוגנים ב-guard
+   של מסך נקי, ושלושת המפגעים שבגללם שקלתי bookkeeping אינם ניתנים להגעה
+   בניווט חוזר (resetScreenState10 יוצא על s11Matches > 0, s11RestoreUI יוצא
+   על s11Matches === 0, ו-scqFbResetPosition רץ כבר בכל showFeedback חי).
+   בנוסף, gating היה מסתיר את התיקון של סימוני הטעות (ראו applyResumeDom).
+   ההערות בכל ששת הסינים ממילא מתארות את ההתנהגות הזאת ("נקרא גם
+   מ-applyExecutionState וגם — בשלב 2 — מכל ניווט"); רק הקריאה עצמה חסרה.
+
+   מדלגים בזמן _restoring: applyExecutionState מצייר בעצמו, ו**אחרי**
+   applyResumeDom — ציור מוקדם משם היה על placement שעוד לא הוחזר. */
+function repaintScreen(n) {
+  if (!RESUME_ENABLED || _restoring) return;
+  if (typeof restoreScreenUI !== 'function') return;
+  try { restoreScreenUI(n); }
+  catch (e) { console.error('[resume] repaintScreen', e); }
 }
 
 /* ═══════════════════ מתי נכתב ═══════════════════

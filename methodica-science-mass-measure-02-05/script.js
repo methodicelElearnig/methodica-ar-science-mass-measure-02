@@ -62,6 +62,13 @@ function goTo(n) {
   currentScreen = n;
   resetScreenState(n);
   target.classList.add('active');
+  /* resume: ציור מצב "נענה" של המסך הזה — applyExecutionState מצייר את מסך
+     הנחיתה בלבד, וכל מסך אחר שנענה היה נשאר ריק ותקוע. לפני xapiOnScreen
+     ולפני scheduleResumeSave במכוון.
+     ⚠️ תלוי בתיקון restoreUI במפעל השאלות: הגרסה הקודמת קראה resetInitial()
+     על `attempts === 0` ולכן קריאה מכל ניווט הייתה מוחקת גרירות שלא הוגשו.
+     ההנמקה המלאה: unit-js/40-resume.js ליד repaintScreen. */
+  try { repaintScreen(n); } catch (e) { console.error('[resume] repaint', e); }
   /* xAPI: זוגות initialized/completed ברמת הפריט. מוצב **אחרון**, אחרי
      ה-.active, כדי שקריאת רשת לא תעכב את ה-paint; ואחרי currentScreen = n,
      שממנו submitReport והיומן קוראים. עטוף ב-try/catch — דיווח לעולם לא
@@ -513,7 +520,23 @@ function makeDragQuestion(cfg) {
      שם ההשבתה נכונה כי היא רגעית ומתבטלת בגרירה הבאה, אבל אחרי טעינת
      עמוד היא הייתה משאירה לומד עם לוח מלא וכפתור מת. */
   function restoreUI() {
-    if (!done && attempts === 0) { resetInitial(); return; }
+    /* ⚠️ render() ולא resetInitial(). תוקן 2026-08-18, שלושה באגים בשורה אחת:
+       (א) resetInitial() מאפס placement ל-'source' לכל פריט — כלומר לומד
+           שגרר ולא לחץ "צדקתי?" היה מאבד את העבודה, גם היום במסך הנחיתה
+           וגם — מאז שהציור רץ מכל ניווט — בכל מעבר מסך.
+       (ב) reset() מדלג על resetInitial() כש-hasProgress, ולכן **אף אחד** לא
+           קרא ל-render() במצב "יש גרירות, אין ניסיון": הלוח הוצג ריק.
+       (ג) בסין 06, resetInitial() מסתיר את כפתור הרמז של מסך 3, שנשלח גלוי
+           מה-markup ו-resetScreenState3 מקפיד לחשוף.
+       ולא hasProgress כמו ב-reset(): הוא היה מפיל את המצב הזה לזנב הפונקציה,
+       ששולח showFeedback('wrong1') — כלומר "התשובה אינה נכונה" על תשובה
+       שהלומד מעולם לא הגיש. render() לבדו הוא בדיוק הנכון: הוא מצייר את
+       הקלפים מ-placement ומחשב את כפתור הבדיקה מ-allFilled, אותו predicate
+       של הקוד החי, בלי להמציא פידבק ובלי לגעת ברמז.
+       hideFeedback() כן נשמר מ-resetInitial(): "אין ניסיונות" חייב להיראות
+       ככה גם אם קופסת המשוב נשארה גלויה ממצב קודם. שורה אחת של
+       classList.remove — בלי תופעות לוואי. */
+    if (!done && attempts === 0) { hideFeedback(); render(); return; }
 
     /* סימון היעדים מול ה-placement הנוכחי — אותו לופ בדיוק כמו ב-check(). */
     targetIds.forEach(function (tId) {

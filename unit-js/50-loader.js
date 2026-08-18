@@ -137,12 +137,24 @@ function bootXAPI() {
                 }
                 _resumeReady = true;
                 var _payload = _saved.parts[currentPartSlug()];
-                /* ה-hash מנצח את המסמך. '#screen=N' מגיע מלחיצה על "חזרה",
-                   כלומר מכוונה מפורשת של הלומד עכשיו, בעוד המסמך מתאר איפה
-                   הוא היה פעם. jumpToLinkedScreen() כבר קפץ לשם בזמן טעינת
-                   ה-script, ולכן שחזור מסך כאן היה דורך עליו בשקט. */
-                if (_payload && !/^#screen=\d+$/.test(window.location.hash)) {
-                  applyExecutionState(_payload);
+                /* ה-hash מנצח את המסמך בבחירת **המסך** — '#screen=N' מגיע
+                   מלחיצה על "חזרה", כלומר מכוונה מפורשת של הלומד עכשיו, בעוד
+                   המסמך מתאר איפה הוא היה פעם.
+
+                   ⚠️ אבל הוא לא מנצח בשחזור **המצב**. עד 2026-08-18 התנאי כאן
+                   דילג על applyExecutionState כולו כשהיה hash, ולכן הגעה דרך
+                   "חזרה" בין-סינית איבדה את כל השחזור — כולל XAPI_Q_RESULTS
+                   ו-stationProgress, שמהם נגזר הניתוב קדימה (getPracticeScore),
+                   כך שלומד שעמד בסף נשלח לתרגול המחזק. עכשיו תמיד משחזרים
+                   ומעבירים את המסך כ-override.
+
+                   parseInt ולא ה-capture הגולמי: applyExecutionState בודק
+                   `typeof === 'number'`, ומחרוזת הייתה נופלת ל-fallback
+                   ומורידה את הלומד מהמסך ש-jumpToLinkedScreen הביא אליו —
+                   בדיוק הבאג שההערה הזאת נכתבה כדי למנוע. */
+                var _hm = /^#screen=(\d+)$/.exec(window.location.hash);
+                if (_payload) {
+                  applyExecutionState(_payload, _hm ? parseInt(_hm[1], 10) : undefined);
                   _resumed = true;
                 }
               } catch (e) {

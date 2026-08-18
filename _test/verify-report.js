@@ -113,6 +113,11 @@ async function run(c) {
                     'emptyUnitState', 'applyExecutionState', 'writeForwardState',
                     'recordForwardEdge', 'previousPartHref', 'goBackToPreviousPart',
                     'scheduleResumeSave', 'flushResumeSave', 'initResumeLeaveHandlers',
+                    /* repaintScreen lives in 40-resume.js but is CALLED from every
+                       part's goTo(). A version skew that ships a new script.js
+                       against a cached 40-resume.js would throw a ReferenceError on
+                       every navigation, so its presence is asserted here. */
+                    'repaintScreen',
                     /* resume, per-part hooks (this component's script.js) */
                     'capturePartPayload', 'applyResumeVars', 'applyResumeDom',
                     'restoreScreenUI']) {
@@ -685,6 +690,54 @@ async function runResume(c) {
       val("document.getElementById('scq-feedbox').classList.contains('visible')") === false &&
       val("scqOptEl(SCQ.correctId).classList.contains('correct')") === false);
 
+    /* ── The hard block: an answered screen that is NOT the landing screen ──
+       Every assertion above calls restoreScreenUI() directly, so none of them
+       exercise the path that was actually broken: navigation. applyExecutionState
+       paints the landing screen only, so before the 2026-08-18 fix any OTHER
+       answered screen came up blank *and inert* — the click is swallowed by
+       `if (scqDone) return;`, and the check button keeps the `disabled` it was
+       shipped with, which only restoreScqUI or a live scqCheck ever clears. The
+       learner had no forward control at all, and every screen's back button is
+       goTo(n-1), so one press stranded them again. Only a reload escaped.
+
+       Landing on screen 0 and navigating to 1 is what makes this a regression
+       test for repaintScreen rather than for the painter. */
+    exec('window.__wipeScq(); scqSelect(SCQ.correctId); scqCheck();');
+    exec('window.__snapNav = capturePartPayload(); window.__snapNav.currentScreen = 0;');
+    exec('window.__wipeScq(); scqSelected = null; scqAttempts = 0; scqDone = false;');
+    exec('applyExecutionState(window.__snapNav);');
+    ok(c, 'a resume that lands elsewhere leaves the answered screen unpainted',
+      val('currentScreen') === 0 &&
+      val("scqOptEl(SCQ.correctId).classList.contains('correct')") === false,
+      'landed on ' + val('currentScreen'));
+    exec('goTo(1);');
+    ok(c, 'navigating to an answered non-landing screen paints it',
+      val("scqOptEl(SCQ.correctId).classList.contains('correct')") === true);
+    ok(c, 'and the learner is not stranded on it',
+      val("document.getElementById('scq-check').disabled") === false &&
+      val("document.getElementById('scq-check').textContent") === 'המשך',
+      'disabled=' + val("document.getElementById('scq-check').disabled") +
+      ' text=' + val("document.getElementById('scq-check').textContent"));
+    exec('goTo(0); goTo(1);');
+    ok(c, 'a repeat visit keeps it painted and usable',
+      val("scqOptEl(SCQ.correctId).classList.contains('correct')") === true &&
+      val("document.getElementById('scq-check').disabled") === false);
+
+    /* Wrong marks live ONLY as a DOM class on the multi-choice screen — see
+       captureWrongMarks. applyResumeVars puts them in __scq14Wrong, which capture
+       never reads, so before the fix the first save after a resume wrote
+       wrong: [] and erased them for good, even for a screen never visited.
+       Restoring them in applyResumeDom is what closes that. */
+    exec("window.__snapW = capturePartPayload();");
+    exec("window.__snapW.scq14 = { sel: [], att: 1, done: false, phase: 'wrong1', wrong: ['a'] };");
+    exec("document.querySelectorAll('#s13 .scq-opt').forEach(function (el) { el.classList.remove('wrong'); });");
+    exec('applyResumeDom(window.__snapW);');
+    ok(c, 'applyResumeDom puts screen-13 wrong marks back into the DOM',
+      val("document.querySelector('#s13 .scq-opt[data-id=\"a\"]').classList.contains('wrong')") === true);
+    ok(c, 'so a save taken without visiting screen 13 keeps them',
+      JSON.parse(val("JSON.stringify(capturePartPayload().scq14.wrong)")).indexOf('a') !== -1,
+      val("JSON.stringify(capturePartPayload().scq14.wrong)"));
+
     /* ── The memory game (screen 10) ────────────────────────────────────
        The board is Fisher-Yates shuffled inside s11Init(), so re-running init
        deals a DIFFERENT board. The payload must carry the deal itself. */
@@ -1064,6 +1117,37 @@ async function runResume(c) {
             return s.lastWrongPlacement !== null &&
                    JSON.stringify(s.placement) !== JSON.stringify(s.lastWrongPlacement); })()`) === true,
       String(val(`JSON.stringify(${inst}.getState())`)).slice(0, 200));
+
+    /* ── Unsubmitted work must survive a repaint, without inventing feedback ──
+       restoreUI() used to call resetInitial() whenever attempts === 0, which
+       reset every placement to 'source'. Harmless while the painter ran once at
+       load; destructive now that it runs from every goTo. The naive fix — reusing
+       reset()'s hasProgress predicate — is worse: it drops this state through to
+       the function tail, which calls showFeedback('wrong1') and tells the learner
+       their never-submitted answer is wrong. render() alone is correct. */
+    /* The placement must contain REAL zone ids, not 'source' — otherwise
+       resetInitial()'s wipe-to-'source' is a no-op and the assertion is vacuous.
+       After the reveal above, placement holds the solution, i.e. every drag id
+       mapped to its correct target. Reuse it as "what the learner dragged". */
+    exec(`window.__placed = JSON.parse(JSON.stringify(${inst}.getState().placement));
+          window.__placedKey = Object.keys(window.__placed).filter(function (k) {
+            return window.__placed[k] !== 'source'; })[0];`);
+    ok(c, inst + ' test fixture holds a real zone placement (guards vacuity)',
+      val('typeof window.__placedKey === "string" && window.__placed[window.__placedKey] !== "source"') === true,
+      String(val('JSON.stringify(window.__placed)')).slice(0, 160));
+    exec(`${inst}.setState({ placement: JSON.parse(JSON.stringify(window.__placed)),
+                             attempts: 0, done: false, checked: false,
+                             lastWrongPlacement: null, showingCorrect: false, passed: false });`);
+    exec('restoreScreenUI(' + screen + ');');
+    ok(c, inst + ' keeps an unsubmitted placement when the painter runs',
+      val(`${inst}.getState().placement[window.__placedKey] === window.__placed[window.__placedKey]`) === true,
+      'expected ' + String(val('window.__placed[window.__placedKey]')) +
+      ' got ' + String(val(`${inst}.getState().placement[window.__placedKey]`)));
+    ok(c, inst + ' does not fabricate wrong feedback on an unsubmitted answer',
+      val(`(function(){ var b = document.getElementById('${c === '05' ? 'dqA-feedbox' : 'tbl9-feedbox'}');
+            return b ? (b.classList.contains('visible') === false) : 'no-box'; })()`) === true,
+      String(val(`(function(){ var b = document.getElementById('${c === '05' ? 'dqA-feedbox' : 'tbl9-feedbox'}');
+            return b ? b.className : 'no-box'; })()`)));
   }
 
   if (c === '06') {
@@ -1075,6 +1159,35 @@ async function runResume(c) {
       val('getMoedBScore()') === 0, String(val('getMoedBScore()')));
     exec('applyResumeVars(window.__snap);');
     ok(c, 'restore returns the moed-B score', val('getMoedBScore()') === 3, String(val('getMoedBScore()')));
+
+    /* para10-hint ships VISIBLE (no `hidden` in the markup) and resetScreenState3
+       re-shows it on purpose, while resetInitial() hides it. So a painter that
+       routed a clean screen through resetInitial() made the hint vanish for a
+       resumed learner on the first visit and reappear on the second. */
+    exec('applyExecutionState({ currentScreen: 0 }); goTo(3);');
+    ok(c, 'the para10 hint stays visible on a clean screen after a resume',
+      val("document.getElementById('para10-hint').hidden") === false,
+      'hidden=' + val("document.getElementById('para10-hint').hidden"));
+  }
+
+  if (c === '02') {
+    /* The progress rail is painted only by updateQuestionNav2, which used to sit
+       AFTER the resume guard in resetScreenState1..5 — so an answered screen,
+       which returns at that guard, never repainted it and no painter does. The
+       learner saw correct answers marked but a rail of all-future icons. */
+    ok(c, 'the rail icon exists (guards vacuity)',
+      val("document.getElementById('sq2-qnav-icon-1') !== null") === true);
+    /* Force the answered state so resetScreenState1's resume guard early-returns:
+       that is the branch under test. The rail must still be repainted, and it must
+       carry the SPECIFIC success class — asserting merely "not future" passes
+       vacuously off a stale qnav-current left by an earlier navigation. */
+    exec("goTo(0); sq2Done = true; sq2Attempts = 1; stationProgress2.q2 = 'success';");
+    exec("document.getElementById('sq2-qnav-icon-1').className = 'qnav-icon qnav-future';");
+    exec('goTo(1);');
+    ok(c, 'the progress rail is repainted on an answered screen',
+      val("document.getElementById('sq2-qnav-icon-1').classList.contains('qnav-success')") === true,
+      String(val("document.getElementById('sq2-qnav-icon-1').className")));
+    exec("sq2Done = false; sq2Attempts = 0; stationProgress2.q2 = null;");
   }
 
   dom.window.close();

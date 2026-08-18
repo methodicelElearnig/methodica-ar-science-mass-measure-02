@@ -57,6 +57,11 @@ function goTo(n) {
   currentScreen = n;
   resetScreenState(n);
   target.classList.add('active');
+  /* resume: ציור מצב "נענה" של המסך הזה — applyExecutionState מצייר את מסך
+     הנחיתה בלבד, וכל מסך אחר שנענה היה נשאר ריק ותקוע. לפני xapiOnScreen
+     ולפני scheduleResumeSave במכוון.
+     ההנמקה המלאה: unit-js/40-resume.js ליד repaintScreen. */
+  try { repaintScreen(n); } catch (e) { console.error('[resume] repaint', e); }
   /* xAPI: זוגות initialized/completed ברמת הפריט. מוצב **אחרון**, אחרי
      ה-.active, כדי שקריאת רשת לא תעכב את ה-paint; ואחרי currentScreen = n,
      שממנו submitReport והיומן קוראים. עטוף ב-try/catch — דיווח לעולם לא

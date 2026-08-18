@@ -65,6 +65,11 @@ function goTo(n) {
   // הציג את ברירת המחדל הישנה ורק אז JS מחליף אותה.
   resetScreenState(n);
   target.classList.add('active');
+  /* resume: ציור מצב "נענה" של המסך הזה — applyExecutionState מצייר את מסך
+     הנחיתה בלבד, וכל מסך אחר שנענה היה נשאר ריק ותקוע. לפני xapiOnScreen
+     ולפני scheduleResumeSave במכוון (captureMcq קורא 'wrong' מה-DOM).
+     ההנמקה המלאה: unit-js/40-resume.js ליד repaintScreen. */
+  try { repaintScreen(n); } catch (e) { console.error('[resume] repaint', e); }
   /* xAPI: זוגות initialized/completed ברמת הפריט. מוצב **אחרון**, אחרי
      ה-.active, כדי שקריאת רשת לא תעכב את ה-paint; ואחרי currentScreen = n,
      שממנו submitReport והיומן קוראים. עטוף ב-try/catch — דיווח לעולם לא
@@ -313,6 +318,11 @@ document.getElementById('sq2-hint-overlay').addEventListener('click', function (
 
 
 function resetScreenState1() {
+  /* ⚠️ סרגל ההתקדמות מעל ה-guard, כמו בסינים שכבר עושים כך (מסכים 8–9 כאן,
+     ומסכים 16–20 בסין 01). כשהוא היה בסוף הגוף, מסך שנענה — שיוצא ב-guard —
+     לא צבע אותו מעולם, וגם אף painter לא צובע אותו: לומד משוחזר ראה תשובות
+     נכונות מסומנות אבל סרגל שכל האיקונים בו 'עתיד'. */
+  updateQuestionNav2('sq2');
   if (sq2Done || sq2Attempts > 0 || sq2Selected.length > 0) return; // resume-state: שאלה שהתחילה/נענתה כבר לא מקבלת איפוס
   sq2Selected = [];
   sq2Attempts = 0;
@@ -328,7 +338,6 @@ function resetScreenState1() {
   checkBtn.disabled = true;
   checkBtn.onclick = sq2Check;
   document.getElementById('sq2-hint-overlay').hidden = true;
-  updateQuestionNav2('sq2');
 }
 
 /* =========================================================
@@ -483,6 +492,7 @@ document.getElementById('sq3-hint-overlay').addEventListener('click', function (
 
 
 function resetScreenState2() {
+  updateQuestionNav2('sq3');   // מעל ה-guard — ראו resetScreenState1
   if (sq3Done || sq3Attempts > 0 || sq3Selected.length > 0) return;
   sq3Selected = [];
   sq3Attempts = 0;
@@ -498,7 +508,6 @@ function resetScreenState2() {
   checkBtn.disabled = true;
   checkBtn.onclick = sq3Check;
   document.getElementById('sq3-hint-overlay').hidden = true;
-  updateQuestionNav2('sq3');
 }
 
 /* =========================================================
@@ -653,6 +662,7 @@ document.getElementById('sq4-hint-overlay').addEventListener('click', function (
 
 
 function resetScreenState3() {
+  updateQuestionNav2('sq4');   // מעל ה-guard — ראו resetScreenState1
   if (sq4Done || sq4Attempts > 0 || sq4Selected.length > 0) return;
   sq4Selected = [];
   sq4Attempts = 0;
@@ -668,7 +678,6 @@ function resetScreenState3() {
   checkBtn.disabled = true;
   checkBtn.onclick = sq4Check;
   document.getElementById('sq4-hint-overlay').hidden = true;
-  updateQuestionNav2('sq4');
 }
 
 /* =========================================================
@@ -911,6 +920,7 @@ document.getElementById('sq5-hint-overlay').addEventListener('click', function (
 
 
 function resetScreenState4() {
+  updateQuestionNav2('sq5');   // מעל ה-guard — ראו resetScreenState1
   if (sq5Done || sq5Attempts > 0 || Object.values(sq5Selected).some(function (v) { return v != null; })) return;
   sq5Selected = { r1: null, r2: null, r3: null, r4: null };
   sq5Attempts = 0;
@@ -933,7 +943,6 @@ function resetScreenState4() {
   document.getElementById('sq5-hint-overlay').hidden = true;
   const revealBtn = document.getElementById('sq5-reveal-btn');
   if (revealBtn) { revealBtn.hidden = true; revealBtn.textContent = 'התשובה הנכונה'; }
-  updateQuestionNav2('sq5');
 }
 
 /* =========================================================
@@ -1088,6 +1097,7 @@ document.getElementById('sq6-hint-overlay').addEventListener('click', function (
 
 
 function resetScreenState5() {
+  updateQuestionNav2('sq6');   // מעל ה-guard — ראו resetScreenState1
   if (sq6Done || sq6Attempts > 0 || sq6Selected.length > 0) return;
   sq6Selected = [];
   sq6Attempts = 0;
@@ -1103,7 +1113,6 @@ function resetScreenState5() {
   checkBtn.disabled = true;
   checkBtn.onclick = sq6Check;
   document.getElementById('sq6-hint-overlay').hidden = true;
-  updateQuestionNav2('sq6');
 }
 
 /* =========================================================
@@ -2034,10 +2043,27 @@ function applyResumeVars(st) {
   }
 }
 
-/* מחזיר מה שיושב רק ב-DOM: תוויות ה-dropdown של מסך 8, ומיקום הפריטים
-   הפיזי של מסך 9. רץ **לפני** ה-painter, שנועל ומסמן אותם. */
+/* מחזיר מה שיושב רק ב-DOM: סימוני הטעות של ארבעת מסכי הבחירה-המרובה, תוויות
+   ה-dropdown של מסך 8, ומיקום הפריטים הפיזי של מסך 9.
+   רץ **לפני** ה-painter, שנועל ומסמן אותם. */
 function applyResumeDom(st) {
   if (!st) return;
+  /* ⚠️ סימוני 'wrong' חייבים לחזור ל-DOM כאן, ולא רק ל-__mcqWrong. captureMcq
+     קורא אותם **מה-DOM** (sqNSelected מתאפס בכל טעות, ולכן הבחירה השגויה לא
+     קיימת באף משתנה), ואילו applyResumeVars מחזיר אותם רק ל-__mcqWrong,
+     שה-capture לא מסתכל בו. לפני התיקון: כל ניווט אחרי שחזור הריץ
+     scheduleResumeSave → capturePartPayload → wrong: [] לארבעת המסכים,
+     כלומר מחיקה סופית מהמסמך גם בלי להיכנס אליהם. */
+  if (st.mcq) {
+    [['sq2', '#s1'], ['sq3', '#s2'], ['sq4', '#s3'], ['sq6', '#s5']].forEach(function (pair) {
+      var rec = st.mcq[pair[0]];
+      if (!rec || !Array.isArray(rec.wrong)) return;
+      rec.wrong.forEach(function (id) {
+        var el = document.querySelector(pair[1] + ' .scq-opt[data-id="' + id + '"]');
+        if (el) el.classList.add('wrong');
+      });
+    });
+  }
   if (st.dd8 && st.dd8.vals) {
     DD8_IDS.forEach(function (id) {
       var valEl = document.getElementById(id + '-val');
