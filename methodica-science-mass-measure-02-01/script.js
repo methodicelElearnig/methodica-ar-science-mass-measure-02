@@ -258,6 +258,8 @@ function scqCheck() {
     scqLockOptions();
     scqShowFeedback('correct', true);
     scqSetBarDone('המשך', function () { advanceScreen(); });
+    /* resume: מחויבות התשובה. הענף הזה חוזר לפני הזנב — ראו ההערה שם. */
+    try { flushResumeSave(); } catch (e) {}
     return;
   }
 
@@ -388,6 +390,10 @@ function scr3CardKey(event, cardId) {
 
 function scr3Continue() {
   scr3Done = true;
+  /* resume: מסכים 2 ו-3 הם **אותו** פריט xAPI ('002'), ולכן xapiOnScreen יוצא
+     מוקדם ב-goTo ואין כתיבת יומן שתגרור persistUnitState. בלי השורה הזאת
+     המחויבות הזאת מגיעה למסמך רק דרך ה-debounce של 800ms. */
+  try { flushResumeSave(); } catch (e) {}
   goTo(3);
 }
 
@@ -509,6 +515,8 @@ function scq4Check() {
     scq4LockOptions();
     scq4ShowFeedback('correct', true);
     scq4SetBarDone('המשך', function () { scq4Continue(); });
+    /* resume: מחויבות התשובה. הענף הזה חוזר לפני הזנב — ראו ההערה שם. */
+    try { flushResumeSave(); } catch (e) {}
     return;
   }
 
@@ -1058,6 +1066,8 @@ function scq8Check() {
     scq8LockOptions();
     scq8ShowFeedback('correct', true);
     scq8SetBarDone('המשך', function () { scq8Continue(); });
+    /* resume: מחויבות התשובה. הענף הזה חוזר לפני הזנב — ראו ההערה שם. */
+    try { flushResumeSave(); } catch (e) {}
     return;
   }
 
@@ -1586,6 +1596,8 @@ function scq10Check() {
     scq10LockOptions();
     scq10ShowFeedback('correct', true);
     scq10SetBarDone('המשך', function () { scq10Continue(); });
+    /* resume: מחויבות התשובה. הענף הזה חוזר לפני הזנב — ראו ההערה שם. */
+    try { flushResumeSave(); } catch (e) {}
     return;
   }
 
@@ -1823,6 +1835,16 @@ function s11CardClick(idx) {
         if (s11Matches === 3) {
           s11Done = true;
           document.getElementById('s11-btn-continue').disabled = false;
+          /* resume: מחויבות — סינכרוני, כמו בכל sNNCheck. */
+          try { flushResumeSave(); } catch (e) {}
+        } else {
+          /* resume: זיווג בודד הוא התקדמות אמיתית, אבל **מושהה** ולא סינכרוני:
+             הלוח באמצע אנימציית ההבזק (600ms), וכתיבה חוסמת כאן הייתה עוצרת
+             אותה. בלי זה s11CardClick לא מחמש כלום — גם לא את ה-debounce —
+             והזיווגים הגיעו למסמך רק ב-goTo הבא. זה נושא משקל דווקא כאן:
+             s11Init מערבב ב-Fisher-Yates, ולכן חלוקה שנאבדת מחלקת לוח **אחר**
+             והלומד משחק מאפס במקום להמשיך. */
+          try { scheduleResumeSave(); } catch (e) {}
         }
 
         // הבזק ירוק+וי קצר, ואז הזוג "מתיישב" למראה הסופי (לפי Figma) —
@@ -1866,7 +1888,12 @@ function resetScreenState10() {
     document.getElementById('s11-summary-view').hidden = false;
     return;
   }
-  if (s11Matches > 0) return; // resume-state: זיווג שבוצע כבר לא נמחק (לוח לא מתאתחל) בחזרה למסך
+  /* resume-state: זיווג שבוצע כבר לא נמחק (לוח לא מתאתחל) בחזרה למסך — הציור
+     ב-s11RestoreUI מרנדר אותו מחדש מ-s11Cards.
+     דורש **גם** קלפים: applyResumeVars מחזיר s11Matches תמיד אבל את החלוקה רק
+     כשהיא לא ריקה, ולכן מסמך לא-עקבי (התקדמות בלי חלוקה) היה יוצא כאן ומשאיר
+     לוח שאין דרך לשחק בו. חלוקה מחדש עולה 1-2 זיווגים, ועדיפה על מסך תקוע. */
+  if (s11Matches > 0 && s11Cards.length) return;
   s11Init();
 }
 
@@ -1976,6 +2003,8 @@ function scq13Check() {
     scq13LockOptions();
     scq13ShowFeedback('correct', true);
     scq13SetBarDone('המשך', function () { scq13Continue(); });
+    /* resume: מחויבות התשובה. הענף הזה חוזר לפני הזנב — ראו ההערה שם. */
+    try { flushResumeSave(); } catch (e) {}
     return;
   }
 
@@ -2171,6 +2200,8 @@ function scq14Check() {
     scq14LockOptions();
     scq14ShowFeedback('correct', true);
     scq14SetBarDone('המשך', function () { scq14Continue(); });
+    /* resume: מחויבות התשובה. הענף הזה חוזר לפני הזנב — ראו ההערה שם. */
+    try { flushResumeSave(); } catch (e) {}
     return;
   }
 
@@ -2426,6 +2457,8 @@ function scq16Check() {
     scq16SetBarDone('המשך', function () { scq16Continue(); });
     stationProgress.q16 = 'success';
     updateQuestionNav('s16');
+    /* resume: מחויבות התשובה. הענף הזה חוזר לפני הזנב — ראו ההערה שם. */
+    try { flushResumeSave(); } catch (e) {}
     return;
   }
 
@@ -2614,6 +2647,8 @@ function scq17Check() {
     scq17SetBarDone('המשך', function () { scq17Continue(); });
     stationProgress.q17 = 'success';
     updateQuestionNav('s17');
+    /* resume: מחויבות התשובה. הענף הזה חוזר לפני הזנב — ראו ההערה שם. */
+    try { flushResumeSave(); } catch (e) {}
     return;
   }
 
@@ -4240,15 +4275,28 @@ function restoreScqUI(cfg, screenSel, prefix, optEl, selected, attempts, done, p
   }
 }
 
-/* מסך 10 — משחק הזיכרון.
-   resetScreenState10 מטפל בעצמו בשני הקצוות (סיום ⇒ מסך סיכום; אפס זיווגים
-   ⇒ s11Init מחדש), אבל **לא** במצב שבאמצע: הוא יוצא מוקדם כש-s11Matches > 0,
-   ואחרי טעינת עמוד זה משאיר לוח **ריק** — s11RenderBoard מעולם לא רץ.
-   הציור כאן מרנדר את הלוח מ-s11Cards המשוחזר (כלומר אותו סידור בדיוק) ואז
-   מחזיר את הקלפים שכבר זווגו למצבם. */
+/* מסך 10 — משחק הזיכרון. הלוח מוזרק ל-DOM, ולכן אחרי טעינת עמוד הוא ריק —
+   וה-markup לבדו נותן מונה "0 מתוך 3" וכפתור "המשך" disabled.
+
+   ⚠️ מצייר גם כשהמשחק **הושלם**, ולא רק במצב שבאמצע. resetScreenState10 לא
+   מרנדר את הלוח באף אחד משני הקצוות שלו — הוא יוצא מוקדם גם על s11Done (רק
+   מחליף לתצוגת הסיכום) וגם על s11Matches > 0 — ולכן s11RenderBoard רץ אך ורק
+   מ-s11Init (משחק חדש) ומכאן. וכפתור "חזרה" של מסך הסיכום חושף את הלוח שוב
+   (s11SumBack), כך שהתצוגה שלא צוירה **כן** מוצגת ללומד: מי שסיים את המשחק,
+   חזר אליו ולחץ "חזרה" קיבל לוח ריק, מונה 0 וכפתור מושבת — חסימה מלאה שרק
+   רענון עמוד משחרר (דווח מהייצור 2026-08-19).
+
+   הציור מרנדר את הלוח מ-s11Cards המשוחזר (כלומר אותו סידור בדיוק) ומחזיר את
+   הקלפים שכבר זווגו למצבם. */
 function s11RestoreUI() {
-  if (s11Done) return;                       // resetScreenState10 מציג את מסך הסיכום
-  if (s11Matches === 0) return;              // resetScreenState10 כבר קרא ל-s11Init
+  if (s11Matches === 0 && !s11Done) return;  // s11Init כבר צייר לוח נקי
+
+  /* לפני בדיקת הקלפים במכוון: מצב מסמך לא-עקבי (התקדמות בלי חלוקה — ראו
+     resetScreenState10) לא ישאיר כפתור מושבת בלי שום מסלול קדימה.
+     אותו predicate של הזרימה החיה: נפתח רק בשלושת הזיווגים. */
+  var btn = document.getElementById('s11-btn-continue');
+  if (btn) btn.disabled = (s11Matches !== 3);
+
   if (!s11Cards.length) return;              // אין מה לצייר
 
   s11UpdatePairsCounter();
@@ -4262,13 +4310,23 @@ function s11RestoreUI() {
     if (el) el.classList.add('s11-flipped', 's11-matched');
   });
 
-  /* אותו predicate של הזרימה החיה: הכפתור נפתח רק בשלושת הזיווגים. */
-  var btn = document.getElementById('s11-btn-continue');
-  if (btn) btn.disabled = (s11Matches !== 3);
-  var game = document.getElementById('s11-game-view');
-  var sum = document.getElementById('s11-summary-view');
-  if (game) game.hidden = false;
-  if (sum) sum.hidden = true;
+  /* ה-render בנה קלפים חדשים, ולכן כל 's11-flipped' של קלף שלא זווג נעלם.
+     המצב הארעי חייב להתאפס יחד איתו — אחרת s11Flipped מצביע על קלף שכבר לא
+     נראה הפוך, וה-timer של "קלף בודד" יורה על אלמנט שהוחלף. אותו איפוס בדיוק
+     כמו ב-s11Init. הציור נקרא רק מ-goTo (repaintScreen), והיפוך קלף לא מנווט,
+     ולכן זה לא יכול לדרוך על משחק חי. */
+  if (s11SingleTimer) { clearTimeout(s11SingleTimer); s11SingleTimer = null; }
+  s11Flipped = [];
+  s11Locked  = false;
+
+  /* איזו תצוגה גלויה — resetScreenState10 מחליט. אילוץ game.hidden=false
+     כשהמשחק הושלם היה מבטל את מסך הסיכום שהוא בדיוק הציג. */
+  if (!s11Done) {
+    var game = document.getElementById('s11-game-view');
+    var sum = document.getElementById('s11-summary-view');
+    if (game) game.hidden = false;
+    if (sum) sum.hidden = true;
+  }
 }
 
 /* ציור משותף לשלושת מסכי הגרירה שנכתבו ביד. שלושתם זהים במבנה ונבדלים רק
@@ -4444,7 +4502,17 @@ function s7RestoreUI() {
 }
 
 /* מסך 13 — בחירה מרובה. נבדל משבעת האחרים בכך ש-scq14Selected מתאפס בכל טעות,
-   ולכן סימוני הטעות באים מ-__scq14Wrong שנלכד מה-DOM. */
+   ולכן סימוני הטעות באים מ-__scq14Wrong שנלכד מה-DOM.
+
+   ⚠️ הקונפיג של המסך הזה נקרא **MCQ14** ולא SCQ14 — הוא היחיד בסין שאינו SCQ*,
+   כי הוא היחיד שהוא בחירה מרובה (כמו MCQ_SQ2..MCQ_SQ6 בסין 02). אין "לתקן" את
+   השם לפי הדפוס: עד 2026-08-19 הציור כאן פנה ל-SCQ14, שאינו מוגדר בשום מקום,
+   וזרק ReferenceError בדיוק אחרי לופ סימוני הטעות — כלומר לפני הנעילה, הפידבק
+   וכפתור "המשך". שלוש שכבות try/catch (כאן, ב-repaintScreen וב-goTo) בלעו את
+   הזריקה, ולכן המסך יצא לייצור נעול: הלומד שענה נכון קיבל מסך ריק לגמרי,
+   קליקים נבלעו ב-`if (scq14Done) return;` וכפתור הבדיקה נשאר disabled
+   מה-markup. הבדיקה ששומרת על זה עכשיו היא ה-sweep ב-_test/verify-report.js
+   ("no painter throws when every question is restored as answered"). */
 function restoreScq14UI() {
   if (!scq14Done && scq14Attempts === 0 && scq14Selected.length === 0) return;
 
@@ -4453,7 +4521,7 @@ function restoreScq14UI() {
       var el = scq14OptEl(id);
       if (el) el.classList.add('wrong');
     });
-    SCQ14.correctIds.forEach(function (cid) {
+    MCQ14.correctIds.forEach(function (cid) {
       var el = scq14OptEl(cid);
       if (el) { el.classList.remove('selected', 'wrong'); el.classList.add('correct'); }
     });
@@ -4471,7 +4539,14 @@ function restoreScq14UI() {
     var el = scq14OptEl(id);
     if (el) { el.classList.add('selected'); el.setAttribute('aria-checked', 'true'); }
   });
-  if (scq14Phase === 'wrong1') scq14ShowFeedback('wrong1', false);
+  /* הרמז נחשף יחד עם הפידבק, בדיוק כמו בענף wrong1 של scq14Check — בלי זה לומד
+     שחוזר לשאלה באמצע מאבד את הרמז שהיה לו לפני הרענון. השאר שבעת מסכי הבחירה
+     היחידה מקבלים את זה מ-restoreScqUI דרך הפרמטר hintId. */
+  if (scq14Phase === 'wrong1') {
+    scq14ShowFeedback('wrong1', false);
+    var hintBtn = document.getElementById('scq14-hint');
+    if (hintBtn) { hintBtn.hidden = false; hintBtn.disabled = false; }
+  }
   var btn = document.getElementById('scq14-check');
   if (btn) {
     btn.textContent = 'צדקתי?';

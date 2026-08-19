@@ -503,8 +503,10 @@ async function runResume(c) {
   exec(`
     window.__store = null; window.__fail = false; window.__stmts = [];
     window.loadState720 = function () { return window.__store ? JSON.parse(window.__store) : null; };
+    window.__syncWrites = 0;
     window.saveState720 = function (id, doc) {
       if (window.__fail) return false;
+      window.__syncWrites++;                       /* counts SYNCHRONOUS writes only */
       window.__store = JSON.stringify(doc); return true;
     };
     window.saveState720Debounced = function (id, doc) { window.__pending = JSON.stringify(doc); };
@@ -784,6 +786,199 @@ async function runResume(c) {
           }); })()`) === true);
     ok(c, 'restore keeps continue disabled until all three pairs are found',
       val("document.getElementById('s11-btn-continue').disabled") === true);
+
+    /* ── The memory game, COMPLETED (screen 10) ─────────────────────────
+       The block above covers the MID-GAME state, which is the one branch
+       s11RestoreUI used to paint — and that is exactly why the completed state
+       shipped broken. The board is JS-injected, so after a page load it is
+       empty, and NEITHER path renders it: resetScreenState10 only switches to
+       the summary view and returns, and the painter opened with
+       `if (s11Done) return;` on the assumption that reset had it covered.
+
+       That would be invisible if the summary were the end of the screen — but
+       its own "חזרה" un-hides the game view (s11SumBack), so the view nobody
+       painted IS what the learner ends up looking at: an empty board, the
+       markup's "0 מתוך 3", and a disabled המשך. With no back button in that nav
+       row either, only a page reload escaped. Reported from production
+       2026-08-19. */
+    exec(`(function () {
+      s11Cards.forEach(function (card) { card.matched = true; });
+      s11Matches = 3; s11Done = true;
+      window.__snapS11Done = capturePartPayload();
+    })();`);
+    /* A fresh page load: variables gone, board markup empty, counter and button
+       back at their markup defaults. */
+    exec("s11Cards = []; s11Matches = 0; s11Done = false;" +
+         "document.getElementById('s11-board').innerHTML = '';" +
+         "document.getElementById('s11-pairs-counter').textContent = 'זוגות שנמצאו: 0 מתוך 3';" +
+         "document.getElementById('s11-btn-continue').disabled = true;");
+    exec('applyResumeVars(window.__snapS11Done); goTo(10);');
+    ok(c, 'resuming a completed memory game lands on the summary view',
+      val("document.getElementById('s11-summary-view').hidden") === false &&
+      val("document.getElementById('s11-game-view').hidden") === true,
+      'game hidden=' + val("document.getElementById('s11-game-view').hidden"));
+    ok(c, 'and the board behind it is painted, not left empty',
+      val("document.querySelectorAll('#s11-board .s11-card').length") === val('s11Cards.length'),
+      val("document.querySelectorAll('#s11-board .s11-card').length") + ' cards');
+
+    exec('s11SumBack();');
+    ok(c, 'so pressing חזרה on the summary gives back a usable board',
+      val("document.getElementById('s11-game-view').hidden") === false &&
+      val("document.querySelectorAll('#s11-board .s11-card').length") === val('s11Cards.length') &&
+      val("document.getElementById('s11-btn-continue').disabled") === false,
+      'cards=' + val("document.querySelectorAll('#s11-board .s11-card').length") +
+      ' disabled=' + val("document.getElementById('s11-btn-continue').disabled"));
+    ok(c, 'with all three pairs shown matched and the counter caught up',
+      val(`(function(){ return s11Cards.every(function (card, i) {
+            var el = document.querySelector('#s11-board .s11-card[data-idx="' + i + '"]');
+            return el && el.classList.contains('s11-flipped') && el.classList.contains('s11-matched');
+          }); })()`) === true &&
+      val("document.getElementById('s11-pairs-counter').textContent").indexOf('3 מתוך 3') !== -1,
+      val("document.getElementById('s11-pairs-counter').textContent"));
+
+    /* applyResumeVars restores s11Matches unconditionally but the deal only when
+       it is non-empty, so a document carrying progress without a deal used to
+       early-return out of resetScreenState10 and then bail out of the painter on
+       the empty-cards check — a board that cannot be played. */
+    exec("s11Cards = []; s11Matches = 2; s11Done = false;" +
+         "document.getElementById('s11-board').innerHTML = '';");
+    exec('goTo(10);');
+    ok(c, 'progress recorded without a deal re-deals instead of stranding',
+      val("document.querySelectorAll('#s11-board .s11-card').length") === 6 &&
+      val('s11Cards.length') === 6 && val('s11Matches') === 0,
+      val("document.querySelectorAll('#s11-board .s11-card').length") + ' cards');
+
+    /* The painter runs on every goTo now, and its re-render drops the flipped
+       class off every unmatched card — so the transient state has to be cleared
+       with it, or s11Flipped keeps pointing at a card that no longer looks
+       flipped and the single-card timer fires on a replaced element. */
+    exec(`(function () {
+      s11Init();
+      var i2 = -1;
+      for (var j = 1; j < s11Cards.length; j++) {
+        if (s11Cards[j].pairId === s11Cards[0].pairId) { i2 = j; break; }
+      }
+      s11Cards[0].matched = true; s11Cards[i2].matched = true;
+      s11Matches = 1;
+      s11Flipped = [(i2 === 1) ? 2 : 1];   // a third card, caught mid-flip
+      s11Locked = true;
+    })();`);
+    exec('goTo(10);');
+    ok(c, 'a repeat visit mid-game keeps the board and clears the mid-flip state',
+      val("document.querySelectorAll('#s11-board .s11-card').length") === 6 &&
+      val('s11Flipped.length') === 0 && val('s11Locked') === false,
+      'cards=' + val("document.querySelectorAll('#s11-board .s11-card').length") +
+      ' flipped=' + val('s11Flipped.length') + ' locked=' + val('s11Locked'));
+
+    /* המשך opens only on the third pair, so without a חזרה in this nav row a
+       learner who cannot solve the game has no exit — and the summary's own back
+       button only leads here. Every other screen 1-19 carries one; s0's omission
+       is the deliberate exception. */
+    exec("window.__s11Back = (function () {" +
+         "  var b = document.querySelector('#s11-game-view .bar-back .btn-back');" +
+         "  return b ? (b.getAttribute('onclick') || 'NO-ONCLICK') : 'MISSING'; })();");
+    ok(c, "the memory game's own nav row offers חזרה, to screen 9",
+      val('window.__s11Back') === 'goTo(9)', val('window.__s11Back'));
+
+    /* ── The multi-select (screen 13) ───────────────────────────────────
+       The one multi-select in this part, and the one painter in the unit that
+       read its config from a hard-coded global rather than a parameter — the
+       config is MCQ14, the painter asked for SCQ14, and the resulting
+       ReferenceError was swallowed by restoreScreenUI's catch. Reported from
+       production 2026-08-19: answered, refreshed, came back to a blank screen
+       with a dead "צדקתי?" and options that ignored every click.
+
+       The sweep at the end of this function is the general guard; these are the
+       specific ones, because "does not throw" is not the same as "paints the
+       right thing". Part 02's four multi-selects go through the parameterised
+       restoreMcqUI and are covered separately (see the c === '02' block). */
+    ok(c, 'the multi-select painter exists', val('typeof restoreScq14UI') === 'function');
+    ok(c, 'its config is MCQ14, and SCQ14 is not a thing',
+      val('typeof MCQ14') === 'object' && val('typeof SCQ14') === 'undefined',
+      'MCQ14=' + val('typeof MCQ14') + ' SCQ14=' + val('typeof SCQ14'));
+
+    /* resetScreenState13 refuses to run once the question has been started —
+       that is its resume guard — so the wipe has to clear the DOM itself. This
+       is exactly the state a page load produces: markup defaults, no marks. */
+    exec(`window.__wipeS13 = function () {
+      document.querySelectorAll('#s13 .scq-opt').forEach(function (el) {
+        el.classList.remove('selected', 'wrong', 'correct', 'disabled');
+        el.setAttribute('aria-checked', 'false');
+        el.onclick = (function (i) { return function () { scq14Toggle(i); }; }(el.dataset.id));
+      });
+      document.getElementById('scq14-feedbox').classList.remove('visible');
+      var b = document.getElementById('scq14-check');
+      b.textContent = 'צדקתי?'; b.disabled = true; b.onclick = scq14Check;
+      document.getElementById('scq14-hint').hidden = true;
+      scq14Selected = []; scq14Attempts = 0; scq14Done = false; scq14Phase = 'before';
+      __scq14Wrong = [];
+    };`);
+
+    /* Path 1 — answered correctly. __scq14Wrong is empty here, so the loop that
+       runs BEFORE the throw paints nothing and the screen came up completely
+       blank. This is the exact case in the QA screenshot. */
+    exec('goTo(13); window.__wipeS13();');
+    exec('MCQ14.correctIds.forEach(function (id) { scq14Toggle(id); }); scq14Check();');
+    ok(c, 'answering the multi-select correctly reaches done',
+      val('scq14Done') === true && val('scq14Phase') === 'correct',
+      val('scq14Done') + ' / ' + val('scq14Phase'));
+    exec('window.__snapS13 = capturePartPayload(); window.__snapS13.currentScreen = 0;');
+    exec('window.__wipeS13(); applyExecutionState(window.__snapS13); goTo(13);');
+    ok(c, 'a resumed correct multi-select marks both correct answers',
+      val("MCQ14.correctIds.every(function (id) { return scq14OptEl(id).classList.contains('correct'); })") === true);
+    ok(c, 'and locks the options rather than leaving dead ones clickable',
+      val("[].slice.call(document.querySelectorAll('#s13 .scq-opt')).every(function (el) { return el.classList.contains('disabled'); })") === true);
+    ok(c, 'and shows the feedback it showed live',
+      val("document.getElementById('scq14-feedbox').classList.contains('visible')") === true);
+    ok(c, 'and lets the learner continue',
+      val("document.getElementById('scq14-check').disabled") === false &&
+      val("document.getElementById('scq14-check').textContent") === 'המשך',
+      'disabled=' + val("document.getElementById('scq14-check').disabled") +
+      ' text=' + val("document.getElementById('scq14-check').textContent"));
+
+    /* Path 2 — wrong twice. Here the pre-throw loop DID paint the red marks, so
+       the symptom was subtler: red present, green absent, button still dead. */
+    exec('window.__wipeS13();');
+    exec(`window.__badS13 = [].slice.call(document.querySelectorAll('#s13 .scq-opt'))
+      .map(function (el) { return el.dataset.id; })
+      .filter(function (id) { return MCQ14.correctIds.indexOf(id) === -1; });`);
+    exec('window.__badS13.forEach(function (id) { scq14Toggle(id); }); scq14Check();');
+    exec('window.__badS13.forEach(function (id) { scq14Toggle(id); }); scq14Check();');
+    ok(c, 'two wrong multi-select attempts reach wrong-final',
+      val('scq14Done') === true && val('scq14Phase') === 'wrong-final',
+      val('scq14Done') + ' / ' + val('scq14Phase'));
+    exec('window.__snapS13F = capturePartPayload(); window.__snapS13F.currentScreen = 0;');
+    ok(c, 'the wrong picks were captured off the DOM (they exist in no variable)',
+      JSON.parse(val('JSON.stringify(window.__snapS13F.scq14.wrong)')).length ===
+        JSON.parse(val('JSON.stringify(window.__badS13)')).length,
+      val('JSON.stringify(window.__snapS13F.scq14.wrong)'));
+    exec('window.__wipeS13(); applyExecutionState(window.__snapS13F); goTo(13);');
+    ok(c, 'a resumed wrong-final multi-select keeps the wrong picks marked',
+      val("window.__badS13.every(function (id) { return scq14OptEl(id).classList.contains('wrong'); })") === true);
+    ok(c, 'and ALSO shows what the right answer was',
+      val("MCQ14.correctIds.every(function (id) { return scq14OptEl(id).classList.contains('correct'); })") === true);
+    ok(c, 'and is continuable, not stranded',
+      val("document.getElementById('scq14-check').disabled") === false &&
+      val("document.getElementById('scq14-check').textContent") === 'המשך',
+      'disabled=' + val("document.getElementById('scq14-check').disabled") +
+      ' text=' + val("document.getElementById('scq14-check').textContent"));
+
+    /* Path 3 — mid-question. This branch never threw, but it dropped the hint
+       that the live wrong1 branch reveals; the seven single-choice screens get
+       it from restoreScqUI's hintId parameter. */
+    exec('window.__wipeS13();');
+    exec('scq14Toggle(window.__badS13[0]); scq14Check();');
+    ok(c, 'one wrong multi-select attempt stays answerable',
+      val('scq14Done') === false && val('scq14Phase') === 'wrong1',
+      val('scq14Done') + ' / ' + val('scq14Phase'));
+    exec('window.__snapS13W = capturePartPayload(); window.__snapS13W.currentScreen = 0;');
+    exec('window.__wipeS13(); applyExecutionState(window.__snapS13W); goTo(13);');
+    ok(c, 'a resumed mid-question multi-select still offers its hint',
+      val("document.getElementById('scq14-hint').hidden") === false,
+      'hidden=' + val("document.getElementById('scq14-hint').hidden"));
+    ok(c, 'and a click re-enables the check button, as in the live flow',
+      val("(function(){ scq14Toggle(MCQ14.correctIds[0]); return document.getElementById('scq14-check').disabled; })()") === false);
+    exec('window.__wipeS13();');
 
     /* ── The shared drag painter (screens 4 / 8 / 19) ───────────────────
        Placement is DOM parentage; screen 4 stands in for all three. */
@@ -1190,6 +1385,139 @@ async function runResume(c) {
     exec("sq2Done = false; sq2Attempts = 0; stationProgress2.q2 = null;");
   }
 
+  /* ── An answer commitment persists SYNCHRONOUSLY ─────────────────────────
+     The static checkCommitmentFlush() proves the call is present and reachable;
+     these prove it actually writes, and writes the right thing. Before
+     2026-08-19 there was no assertion anywhere that answer commitment produced a
+     synchronous write — the 24 flush sites were covered only by a
+     `typeof flushResumeSave === 'function'` existence check.
+
+     __store is written ONLY by the synchronous saveState720 and __pending ONLY
+     by saveState720Debounced, so asserting on __store is a true
+     "this was persisted synchronously" assertion rather than "a save happened". */
+  const slugFor = 'methodica-science-mass-measure-02-' + c;
+  const storedDone = (expr) =>
+    val('(function(){ try { return ' +
+        'JSON.parse(window.__store).parts["' + slugFor + '"].' + expr + '; } ' +
+        'catch (e) { return "__NO_STORE__"; } })()');
+
+  if (c === '01') {
+    exec('goTo(1); window.__wipeScq();');
+    exec('window.__store = null; window.__syncWrites = 0;');
+    exec('scqSelect(SCQ.correctId); scqCheck();');
+    ok(c, 'a correct single-choice answer is persisted synchronously',
+      storedDone('scq.scq.done') === true, String(storedDone('scq.scq.done')));
+    /* The regression the insert POSITION guards against: the branch must flush
+       and return, never also fall through to the tail flush. Two blocking PUTs
+       on one click is a visible hitch on a school network. */
+    ok(c, 'and exactly once — the branch does not also reach the tail flush',
+      val('window.__syncWrites') === 1, val('window.__syncWrites') + ' sync write(s)');
+
+    /* The wrong path always reached the tail flush; asserted so a future
+       refactor cannot lose it while "fixing" the correct one. */
+    exec('window.__wipeScq(); window.__store = null; window.__syncWrites = 0;');
+    exec('scqSelect(window.__badScq); scqCheck();');
+    ok(c, 'a wrong single-choice attempt is also persisted synchronously, once',
+      storedDone('scq.scq.att') === 1 && val('window.__syncWrites') === 1,
+      'att=' + storedDone('scq.scq.att') + ' writes=' + val('window.__syncWrites'));
+
+    exec('goTo(13); window.__wipeS13();');
+    exec('window.__store = null; window.__syncWrites = 0;');
+    exec('MCQ14.correctIds.forEach(function (id) { scq14Toggle(id); }); scq14Check();');
+    ok(c, 'a correct multi-select answer is persisted synchronously, once',
+      storedDone('scq14.done') === true && val('window.__syncWrites') === 1,
+      String(storedDone('scq14.done')) + ' writes=' + val('window.__syncWrites'));
+
+    /* ORDERING GUARD. capturePartPayload reads screen 13's wrong-marks off the
+       live DOM (captureWrongMarks), so a flush that ran before the marks were
+       painted would persist `wrong: []` — the exact bug fixed on 2026-08-18.
+       A wrong attempt must therefore reach the store WITH its marks. */
+    exec('window.__wipeS13(); window.__store = null;');
+    exec('scq14Toggle(window.__badS13[0]); scq14Check();');
+    ok(c, 'the commitment flush runs AFTER the wrong marks are painted',
+      Array.isArray(storedDone('scq14.wrong')) && storedDone('scq14.wrong').length > 0,
+      JSON.stringify(storedDone('scq14.wrong')));
+    exec('window.__wipeS13(); window.__wipeScq();');
+  }
+
+  if (c === '02') {
+    exec(`goTo(1);
+      sq2Selected = []; sq2Attempts = 0; sq2Done = false; sq2Phase = 'before';
+      __mcqWrong.sq2 = [];
+      document.querySelectorAll('#s1 .scq-opt').forEach(function (el) {
+        el.classList.remove('selected', 'wrong', 'correct', 'disabled');
+      });
+      document.getElementById('sq2-feedbox').classList.remove('visible');
+      window.__store = null; window.__syncWrites = 0;`);
+    exec('MCQ_SQ2.correctIds.forEach(function (id) { sq2Toggle(id); }); sq2Check();');
+    ok(c, 'a correct multi-select answer is persisted synchronously, once',
+      storedDone('mcq.sq2.done') === true && val('window.__syncWrites') === 1,
+      String(storedDone('mcq.sq2.done')) + ' writes=' + val('window.__syncWrites'));
+    exec("sq2Selected = []; sq2Attempts = 0; sq2Done = false; sq2Phase = 'before';");
+  }
+
+  /* ── A painter must never throw, whatever the state ──────────────────────
+     THE GENERIC DETECTOR. Three try/catch layers stand between a painter and
+     the learner — restoreScreenUI's own, repaintScreen's in 40-resume.js, and
+     the goTo call site. They exist so a broken paint can never break
+     navigation, and they work: navigation survives. What they also do is make a
+     painter fault completely invisible in production, reduced to one console
+     line nobody reads.
+
+     That is how screen 13 shipped hard-locked: restoreScq14UI dereferenced a
+     config global named SCQ14, which does not exist (the real one is MCQ14), so
+     it threw before locking the options, showing the feedback, or enabling
+     "המשך" — leaving exactly the "variables say answered, DOM says blank" trap
+     that the 2026-08-18 repaint fix was written to eliminate. The suite could
+     not have caught it: restoreScq14UI was never called by a single assertion.
+
+     So this sweep asserts the invariant directly, and does it WITHOUT naming
+     any screen or state variable: force every `done` in a captured payload,
+     restore it, then walk every screen and demand silence. Any new question, in
+     any part, is covered the day it is written.
+
+     Deliberately not enumerating per-screen expectations here — that is what
+     the targeted assertions above are for. This one only asks "did anything
+     blow up", which is the question the catches suppress. */
+  exec(`
+    window.__sweepErrs = [];
+    window.__sweepOn = false;
+    (function () {
+      var orig = console.error;
+      console.error = function () {
+        if (window.__sweepOn) {
+          window.__sweepErrs.push(Array.prototype.map.call(arguments, String).join(' '));
+        }
+        return orig.apply(console, arguments);
+      };
+    }());
+  `);
+  /* Recursive because payload shapes differ per part: some questions sit at the
+     top level, others inside st.scq / st.mcq / st.flip. `phase` goes to
+     'correct' alongside `done` so painters that branch on it take the
+     answered-correctly path rather than reading a stale 'before'. */
+  exec(`
+    window.__forceDone = function (o) {
+      if (!o || typeof o !== 'object') return o;
+      Object.keys(o).forEach(function (k) {
+        var v = o[k];
+        if (k === 'done') o[k] = true;
+        else if (k === 'phase') o[k] = 'correct';
+        else if (v && typeof v === 'object') window.__forceDone(v);
+      });
+      return o;
+    };
+    window.__sweepSnap = window.__forceDone(capturePartPayload());
+    applyResumeVars(window.__sweepSnap);
+    window.__sweepOn = true;
+    for (var __n = 0; __n < TOTAL_SCREENS; __n++) { goTo(__n); }
+    window.__sweepOn = false;
+  `);
+  const sweepErrs = val('window.__sweepErrs.slice(0, 4).join(" || ")');
+  ok(c, 'no painter throws when every question is restored as answered',
+    val('window.__sweepErrs.length') === 0,
+    val('window.__sweepErrs.length') + ' error(s): ' + sweepErrs);
+
   dom.window.close();
 }
 
@@ -1239,6 +1567,71 @@ function checkLibraryLetter() {
     const txt = fs.readFileSync(path.join(BASE, rel), 'utf8');
     const stale = [...txt.matchAll(/_test\/xapi-720-([a-z])\.js/g)].map(m => m[1]).filter(l => l !== letter);
     ok('lib', rel + ' has no stale stub-path letter', stale.length === 0, stale.join(','));
+  }
+}
+
+/* ── Every commitment flushes ────────────────────────────────────────────
+   §8.3 of ADDING-REPORTING-AND-RESUME.md states the contract as
+   "flushResumeSave() at the tail of every …Check()". Until 2026-08-19 the code
+   did not honour it: 13 of the 25 committing functions ended their
+   correct-answer branch in `return;` BEFORE the tail flush, so a WRONG answer
+   was persisted synchronously and a CORRECT one was not. The split fell exactly
+   along authoring style — the choice-type questions used
+   `if (isCorrect) { … return; }`, while every drag/table/dropdown/select one
+   used `if / else if / else` with a common tail and was always fine.
+
+   Nobody reading a single branch would predict that asymmetry, which is why it
+   is asserted here rather than trusted. Two clauses:
+     1. a function that commits must flush at all
+     2. no `return` may sit between a commitment and a flush
+
+   ⚠️ Brace-matches every `function NAME(...)`, deliberately NOT keyed on the
+   `*Check` naming convention: parts 05/06 commit inside a closure named plain
+   `check`, and an audit that grepped for `*Check` missed all four questions it
+   serves. Any future question is covered whatever its function is called.
+
+   ⚠️ This is a TEXTUAL approximation of control flow, not a proof. Callback
+   `return`s inside .every()/.forEach() are tolerated today only because every
+   one of them sits before its function's first commitment; a future callback
+   return placed after one would be a false positive. Hence the line numbers in
+   the failure message.
+
+   Scope is `*Done`-style commitment flags on purpose. Reveal-only flags
+   (s7Flipped, scr3Card1Flipped/scr3Card2Flipped in part 01) are deliberately
+   left on the debounce — see RESUME.md §6ג. */
+function checkCommitmentFlush() {
+  for (const c of COMPONENTS) {
+    const rel = path.join('methodica-science-mass-measure-02-' + c, 'script.js');
+    const src = fs.readFileSync(path.join(BASE, rel), 'utf8');
+    let found = 0;
+    for (const m of src.matchAll(/function\s+(\w+)\s*\([^)]*\)\s*\{/g)) {
+      const name = m.group ? m.group(1) : m[1];
+      // brace-match the body
+      let i = m.index + m[0].length - 1, depth = 0, j = i;
+      while (j < src.length) {
+        if (src[j] === '{') depth++;
+        else if (src[j] === '}') { depth--; if (depth === 0) break; }
+        j++;
+      }
+      const body = src.slice(i, j);
+      const commits = [...body.matchAll(/(?:\w+Done|\bdone)\s*=\s*true/g)].map(x => x.index);
+      if (!commits.length) continue;
+      found++;
+      const flushes = [...body.matchAll(/flushResumeSave\s*\(/g)].map(x => x.index);
+      const lineOf = off => src.slice(0, i + off).split('\n').length;
+
+      ok('flush', c + '/' + name + ' flushes at all',
+        flushes.length > 0, 'commits at line ' + lineOf(commits[0]) + ', no flushResumeSave');
+
+      const firstCommit = Math.min(...commits);
+      const escaping = [...body.matchAll(/\breturn\b/g)].map(x => x.index)
+        .filter(r => r > firstCommit && !flushes.some(f => f < r))
+        .map(lineOf);
+      ok('flush', c + '/' + name + ' has no return between a commitment and its flush',
+        escaping.length === 0, 'escaping return(s) at line ' + escaping.join(', '));
+    }
+    ok('flush', rel + ' has committing functions to check', found > 0 || c === '03',
+      found + ' found');
   }
 }
 
@@ -1341,6 +1734,7 @@ function checkSlugCase() {
   checkVersionQueries();
   checkSlugCase();
   checkLibraryLetter();
+  checkCommitmentFlush();
   await checkStateDiagnostics();
   for (const c of COMPONENTS) await run(c);
   for (const [c, screen] of Object.entries(INBOUND_HASH)) await runHashLanding(c, screen);

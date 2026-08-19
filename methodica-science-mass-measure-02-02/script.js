@@ -251,6 +251,8 @@ function sq2Check() {
     stationProgress2.q2 = 'success';
     updateQuestionNav2('sq2');
     sq2SetBarDone('המשך', function () { sq2Continue(); });
+    /* resume: מחויבות התשובה. הענף הזה חוזר לפני הזנב — ראו ההערה שם. */
+    try { flushResumeSave(); } catch (e) {}
     return;
   }
 
@@ -425,6 +427,8 @@ function sq3Check() {
     stationProgress2.q3 = 'success';
     updateQuestionNav2('sq3');
     sq3SetBarDone('המשך', function () { sq3Continue(); });
+    /* resume: מחויבות התשובה. הענף הזה חוזר לפני הזנב — ראו ההערה שם. */
+    try { flushResumeSave(); } catch (e) {}
     return;
   }
 
@@ -595,6 +599,8 @@ function sq4Check() {
     stationProgress2.q4 = 'success';
     updateQuestionNav2('sq4');
     sq4SetBarDone('המשך', function () { sq4Continue(); });
+    /* resume: מחויבות התשובה. הענף הזה חוזר לפני הזנב — ראו ההערה שם. */
+    try { flushResumeSave(); } catch (e) {}
     return;
   }
 
@@ -860,6 +866,8 @@ function sq5Check() {
     checkBtn.textContent = 'המשך';
     checkBtn.disabled = false;
     checkBtn.onclick = sq5Continue;
+    /* resume: מחויבות התשובה. הענף הזה חוזר לפני הזנב — ראו ההערה שם. */
+    try { flushResumeSave(); } catch (e) {}
     return;
   }
 
@@ -1030,6 +1038,8 @@ function sq6Check() {
     stationProgress2.q6 = 'success';
     updateQuestionNav2('sq6');
     sq6SetBarDone('סיום', function () { sq6Continue(); });
+    /* resume: מחויבות התשובה. הענף הזה חוזר לפני הזנב — ראו ההערה שם. */
+    try { flushResumeSave(); } catch (e) {}
     return;
   }
 

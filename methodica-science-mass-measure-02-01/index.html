@@ -752,6 +752,13 @@
           <div class="bar-actions">
             <button class="btn-continue" id="s11-btn-continue" dir="rtl" disabled onclick="s11Continue()">המשך</button>
           </div>
+          <!-- "המשך" נפתח רק אחרי שלושת הזיווגים, ולכן בלי "חזרה" כאן מי שלא
+               פותר את המשחק נשאר בלי שום מסלול — לתצוגת הסיכום יש כפתור חזרה
+               משלה, אך הוא רק מחזיר ללוח הזה. goTo(9): למסך הזה מגיעים אך ורק
+               ממסך 9 (scq10Continue), אין הסתעפות. -->
+          <div class="bar-back">
+            <button class="btn-back" dir="rtl" onclick="goTo(9)">חזרה</button>
+          </div>
         </div>
       </div>
     </div><!-- /#s11-game-view -->
@@ -1783,7 +1790,7 @@
 <script src="../unit-js/25-report.js?v=4"></script>
 <script src="../unit-js/40-resume.js?v=4"></script>
 <script src="../unit-js/50-loader.js?v=4"></script>
-<script src="script.js?v=3"></script>
+<script src="script.js?v=6"></script>
 <!-- ה-side-effects היחידים. חייב להיות אחרון, ובתג נפרד: זריקה ברמת
      top-level ב-script.js לא מפילה תג script אחר. ראו unit-js/90-boot.js. -->
 <script src="../unit-js/90-boot.js?v=4"></script>
