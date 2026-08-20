@@ -2183,6 +2183,25 @@ function sq5RestoreUI() {
   if (sq5Done) {
     sq5LockRows(false);
     if (sq5Phase === 'correct') {
+      /* ── QA 2026-08-20, שקופית 5 ──
+         sq5LockRows(false) נועל ומשבית אבל **לא מסמן**: כל הסימון שלו יושב
+         בענף `if (revealCorrect)`, שלא רץ כאן. `.tf-btn.selected` הוא הסימן
+         היחיד שמראה מה נבחר (styles.css), ובזרימה חיה הוא פשוט נשאר על
+         הכפתור מ-sq5Select — ולכן אחרי רענון, ב-DOM טרי, לא נשאר כלום:
+         הפידבק הירוק חזר וארבע הכפתורים חזרו ריקים.
+
+         הענף שלא-נפתר למטה תמיד עשה את זה נכון, וזו הסיבה שה-QA ראה את הבאג
+         רק לפעמים — רענון באמצע שאלה שוחזר תקין, ורק שאלה שנפתרה **כולה
+         נכון** איבדה את הסימון.
+
+         `selected` בלבד ולא סימוני נכון/שגוי: כך המסך המשוחזר זהה בדיוק למה
+         שהלומד ראה רגע אחרי שענה, והרענון נעשה בלתי-מורגש. */
+      ['r1', 'r2', 'r3', 'r4'].forEach(function (r, idx) {
+        var v = sq5Selected[r];
+        if (!v) return;
+        var btn = document.getElementById('sq5-r' + (idx + 1) + '-' + v);
+        if (btn) btn.classList.add('selected');
+      });
       sq5ShowFeedback('correct', true);
     } else {
       if (sq5ShowingCorrect) { sq5MarkRevealed(); sq5ShowFeedback('wrong2', false); }

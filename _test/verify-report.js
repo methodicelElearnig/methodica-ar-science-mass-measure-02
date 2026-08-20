@@ -1130,6 +1130,72 @@ async function runResume(c) {
       val('getBasicPracticeScore()') + ' / ' + val('getStandardPracticeScore()'));
   }
 
+  /* ── Phase 2b: the true/false round-trip, part 02 (screen 4, sq5) ─────
+     QA 2026-08-20 slide 5. sq5RestoreUI's SOLVED-correct branch ran only
+     sq5LockRows(false) + feedback, and every marking class sq5LockRows can add
+     sits inside its skipped `revealCorrect` branch. `.tf-btn.selected` is the
+     only visual indicator of a choice, and live play merely inherits it from
+     the click — so a fresh DOM came back with the popup and four blank pills.
+     The not-yet-solved branch always did re-apply it, which is exactly why QA
+     saw this only intermittently. sq5 had no coverage here at all. */
+  if (c === '02') {
+    exec(`window.__wipeSq5 = function () {
+      sq5Selected = { r1: null, r2: null, r3: null, r4: null };
+      sq5Attempts = 0; sq5Done = false; sq5Phase = 'before';
+      sq5LastAnswer = null; sq5ShowingCorrect = false;
+      [1, 2, 3, 4].forEach(function (n) {
+        var row = document.getElementById('sq5-row-' + n);
+        if (row) row.classList.remove('row-locked', 'row-wrong');
+        ['true', 'false'].forEach(function (v) {
+          var b = document.getElementById('sq5-r' + n + '-' + v);
+          if (b) { b.classList.remove('selected', 'btn-correct', 'btn-wrong'); b.disabled = false; }
+        });
+      });
+      document.getElementById('sq5-feedbox').classList.remove('visible');
+      var rb = document.getElementById('sq5-reveal-btn');
+      if (rb) { rb.hidden = true; rb.textContent = 'התשובה הנכונה'; }
+      var b = document.getElementById('sq5-check');
+      if (b) { b.textContent = 'צדקתי?'; b.disabled = true; b.onclick = sq5Check; }
+    };`);
+
+    exec('goTo(4); window.__wipeSq5();');
+    exec("['r1','r2','r3','r4'].forEach(function (r, i) { sq5Select(i + 1, TF_SQ5_CORRECT[r]); }); sq5Check();");
+    ok(c, 'sq5 answered all-correct reaches the solved state',
+      val('sq5Done') === true && val('sq5Phase') === 'correct',
+      val('sq5Done') + ' / ' + val('sq5Phase'));
+    ok(c, 'live play marks the choice with `selected` (the class the restore must reproduce)',
+      val("document.getElementById('sq5-r1-true').classList.contains('selected')") === true);
+
+    exec('window.__snapSq5 = capturePartPayload(); window.__wipeSq5();');
+    ok(c, 'the wipe really cleared the pills',
+      val("document.getElementById('sq5-r1-true').classList.contains('selected')") === false);
+    exec('applyResumeVars(window.__snapSq5); applyResumeDom(window.__snapSq5); restoreScreenUI(4);');
+    ok(c, 'solved sq5 restore shows WHICH answer the learner chose, on every row',
+      val("document.getElementById('sq5-r1-true').classList.contains('selected')") === true &&
+      val("document.getElementById('sq5-r4-false').classList.contains('selected')") === true,
+      'r1=' + val("document.getElementById('sq5-r1-true').classList.contains('selected')") +
+      ' r4=' + val("document.getElementById('sq5-r4-false').classList.contains('selected')"));
+    ok(c, 'solved sq5 restore brings the correct-feedback popup back',
+      val("document.getElementById('sq5-feedbox').classList.contains('visible')") === true);
+    ok(c, 'solved sq5 restore leaves the learner able to continue',
+      val("document.getElementById('sq5-check').disabled") === false &&
+      val("document.getElementById('sq5-check').textContent") === 'המשך',
+      val("document.getElementById('sq5-check').textContent"));
+
+    /* The wrong-final branch already worked — btn-wrong/btn-correct override
+       .selected in the cascade. Asserted so this edit cannot regress it. */
+    exec('window.__wipeSq5();');
+    exec("sq5Select(1,'false'); sq5Select(2,'false'); sq5Select(3,'false'); sq5Select(4,'true'); sq5Check();");
+    exec("sq5Select(1,'false'); sq5Select(2,'false'); sq5Select(3,'false'); sq5Select(4,'true'); sq5Check();");
+    ok(c, 'two wrong sq5 attempts reach wrong-final',
+      val('sq5Done') === true && val('sq5Phase') === 'wrong-final',
+      val('sq5Done') + ' / ' + val('sq5Phase'));
+    exec('window.__snapSq5b = capturePartPayload(); window.__wipeSq5();');
+    exec('applyResumeVars(window.__snapSq5b); applyResumeDom(window.__snapSq5b); restoreScreenUI(4);');
+    ok(c, 'wrong-final sq5 restore still marks the wrong pick (path unchanged)',
+      val("document.getElementById('sq5-r1-false').classList.contains('btn-wrong')") === true);
+  }
+
   /* ── Phase 2b: the answer round-trip, part 04 ─────────────────────────
      Answer the table wrong twice to reach the reveal-toggle state, then prove
      a simulated reload comes back locked, marked and never stranded — and that
@@ -1173,6 +1239,15 @@ async function runResume(c) {
       val("document.getElementById('tbl-check').disabled") === true);
     exec('window.__snapInterim = capturePartPayload(); window.__wipe04();');
     exec('applyResumeVars(window.__snapInterim); applyResumeDom(window.__snapInterim); restoreScreenUI(1);');
+    /* QA 2026-08-20 slide 6. The dropdown's visible label lives ONLY in
+       #<id>-val, written by three live-play functions (tblDdSelect,
+       tblLockAll(true), tblShowMyAnswer) — none of which run on a restore.
+       tblDdValues and tblMarkAll did come back, so the screen showed
+       correct/wrong marks on visibly EMPTY cells. __wipe04 clears the label
+       above, which is what makes this assertion meaningful. */
+    ok(c, 'interim restore repaints the dropdown LABEL, not just its value',
+      val("document.getElementById('tblA-dd-1-val').textContent") === 'לא-נכון',
+      '"' + val("document.getElementById('tblA-dd-1-val').textContent") + '"');
     ok(c, 'interim restore keeps the retry state (attempts, not done)',
       val('tblAttempts') === 1 && val('tblDone') === false,
       val('tblAttempts') + ' / ' + val('tblDone'));
@@ -1199,6 +1274,9 @@ async function runResume(c) {
       val('tblDone') + ' / "' + val("tblDdValues['tblA-dd-1']") + '"');
 
     exec('applyResumeVars(window.__snap04); applyResumeDom(window.__snap04); restoreScreenUI(1);');
+    ok(c, 'wrong-final restore repaints the dropdown label too',
+      val("document.getElementById('tblA-dd-1-val').textContent") === 'לא-נכון',
+      '"' + val("document.getElementById('tblA-dd-1-val').textContent") + '"');
     ok(c, 'restore brings back the locked state',
       val('tblDone') === true && val("document.getElementById('tblA-input-2').disabled") === true,
       val('tblDone') + ' / ' + val("document.getElementById('tblA-input-2').disabled"));
@@ -1226,6 +1304,11 @@ async function runResume(c) {
       val('tblShowingCorrect') + ' / ' + val("document.getElementById('tbl-reveal-btn').textContent"));
     exec('window.__snap04b = capturePartPayload(); window.__wipe04();');
     exec('applyResumeVars(window.__snap04b); applyResumeDom(window.__snap04b); restoreScreenUI(1);');
+    /* With the solution on screen tblDdValues holds the CORRECT answers, so the
+       repainted label must follow it — otherwise the reveal view comes back blank. */
+    ok(c, 'the solution view repaints the dropdown label as the correct answer',
+      val("document.getElementById('tblA-dd-1-val').textContent") === val("TBL_DD_CORRECT['tblA-dd-1']"),
+      '"' + val("document.getElementById('tblA-dd-1-val').textContent") + '"');
     ok(c, 'the toggle state survives the round-trip',
       val('tblShowingCorrect') === true &&
       val("document.getElementById('tbl-reveal-btn').textContent") === 'התשובה שלי',

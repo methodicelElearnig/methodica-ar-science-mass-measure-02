@@ -622,7 +622,34 @@ function applyResumeVars(st) {
 
 /* מחזיר ערכים שיושבים רק ב-DOM. רץ **לפני** ה-painter, שנועל ומסמן אותם. */
 function applyResumeDom(st) {
-  if (!st || !st.inputs) return;
+  if (!st) return;
+
+  /* ── התווית הנראית של ה-dropdowns (QA 2026-08-20, שקופית 6) ──
+     ה-dropdowns כאן אינם <select> אלא מותאמים: הערך יושב ב-tblDdValues,
+     אבל **התווית העברית שהלומד רואה** יושבת רק ב-#<id>-val, שריק ב-markup.
+     שלושה מקומות כותבים אותה, וכולם מסלולי זרימה חיה: tblDdSelect,
+     tblLockAll(true) בחשיפה, ו-tblShowMyAnswer בטוגל. אף אחד מהם לא רץ
+     בשחזור.
+
+     מה שכן חזר הטעה: applyResumeVars החזיר את tblDdValues, ו-tblMarkAll
+     צובע את **הכפתור** ב-correct/wrong לפי הערכים האלה — ולכן אחרי רענון
+     המסך הציג סימוני ✓/✗ על תאים ריקים לגמרי, בעוד שדות הטקסט (שכן
+     מוחזרים למטה) שמרו את ערכיהם. זה בדיוק מה שה-QA דיווח.
+
+     ⚠️ הבלוק הזה חייב לשבת **לפני** הבדיקה על st.inputs: עד התיקון הפונקציה
+     פתחה ב-`if (!st || !st.inputs) return`, ומסמך בלי inputs היה מדלג גם על
+     התוויות.
+
+     אותו בלוק בדיוק קיים בשני הסינים האחרים שיש בהם dropdowns מותאמים —
+     סין 02 (st.dd8.vals) וסין 01 (st.s19.vals). סין 04 היה היחיד בלעדיו. */
+  if (st.tbl && st.tbl.dd) {
+    TBL_DD_IDS.forEach(function (id) {
+      var valEl = document.getElementById(id + '-val');
+      if (valEl && typeof st.tbl.dd[id] === 'string') valEl.textContent = st.tbl.dd[id];
+    });
+  }
+
+  if (!st.inputs) return;
   TBL_INPUT_IDS.forEach(function (id) {
     if (typeof st.inputs[id] !== 'string') return;
     var el = document.getElementById(id);
