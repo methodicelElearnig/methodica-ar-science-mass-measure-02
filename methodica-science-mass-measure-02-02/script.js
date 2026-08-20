@@ -7,7 +7,7 @@
 const TOTAL_SCREENS = 9;
 let currentScreen = 0;
 
-/* הדמות שנבחרה בסיין 1 (מסך 1) נשמרת ב-localStorage כי סיין 2 הוא
+/* הדמות שנבחרה בסיין 1 (מסך 1) נשמרת במסמך ה-state של היחידה (v4) ומוקאשת ב-localStorage כי סיין 2 הוא
    מסמך HTML נפרד לחלוטין — window.lomdaState לא "עובר" בין הסינים
    בטעינת עמוד מלאה. קורא כאן את הערך שסיין 1 שמר, עם ברירת מחדל
    'orange' (התנהגות זהה לכל שאר המסכים בפרויקט כשאין בחירה).
@@ -16,7 +16,16 @@ let currentScreen = 0;
    הייתה עוצרת את טעינת כל script.js (גם הפונקציות שמוגדרות בהמשך) */
 let savedCharacter = null;
 try {
-  savedCharacter = localStorage.getItem('lomda_selectedCharacter');
+  /* v4: localStorage הוא הקאש הסינכרוני, לא מקור האמת. getUnitCharacter
+     נופל אליו כל עוד מסמך ה-state לא נקרא — וזה בדיוק המצב כאן, בראש
+     הטעינה, שני סקריפטים מה-CDN לפני שהמסמך זמין. זה מה שמחזיק את כלל 1
+     ב-CLAUDE.md: הצבע נקבע לפני ה-paint הראשון, בלי הבהוב. המסמך מיישר
+     את הערך אחר כך ב-applyUnitProfile (unit-js/50-loader.js, שלב א'),
+     מאחורי #boot-cover.
+     typeof: 40-resume.js שנכשל בטעינה לא אמור להפיל את כל script.js. */
+  savedCharacter = (typeof getUnitCharacter === 'function')
+    ? getUnitCharacter()
+    : localStorage.getItem('lomda_selectedCharacter');
 } catch (e) { /* localStorage חסום (opaque origin/פרטיות) — נמשיך בלי שמירה */ }
 window.lomdaState = {
   selectedCharacter: savedCharacter || null

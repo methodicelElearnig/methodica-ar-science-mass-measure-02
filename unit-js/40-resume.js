@@ -52,7 +52,19 @@
      restoreScreenUI(n)     מצייר מסך שנענה     ← שלב 2, כרגע stub
    ═══════════════════════════════════════════════════════════════════ */
 
-var RESUME_STATE_VERSION = 3;
+/* v4 (2026-08-20): נוספו שתי מחלקות מצב ברמת היחידה — `ui` (הדמות הנבחרת)
+   ו-`results` (תוצאות מועד א/ב). עד v3 הן ישבו **רק** ב-localStorage, ולכן
+   לומד שהמשיך את אותו רישום ממחשב אחר קיבל דמות כתומה במקום ירוקה (כל אתרי
+   האווטאר הם טרנרי דו-כיווני, ולכן null נופל לכתום) ונותב לתוך סין 06 גם
+   כשעבר את מועד א' במלואו. עכשיו המסמך הוא מקור האמת, ו-localStorage הוא
+   קאש סינכרוני בלבד.
+
+   הקפיצה מ-3 ל-4 מוחקת מסמכים קיימים (readUnitState זורק כל v שאינו הנוכחי).
+   זה מכוון ומאושר: השדה נקי. ⚠️ בגלל זה **חייבים** לקדם את כל ה-?v= של
+   unit-js/*.js ושל script.js בששת ה-index.html באותו commit — 40-resume.js
+   מיושן בקאש שקורא מסמך v4 מוחק אותו, ו-script.js חדש מול 40-resume.js
+   מיושן קורא ל-setters שלא קיימים. */
+var RESUME_STATE_VERSION = 4;
 var RESUME_STATE_ID      = 'execution-state';
 
 /* לא נדלק עד הקריאה הראשונה שהצליחה (או ה-catch שלה). כל נתיבי הכתיבה
@@ -100,12 +112,31 @@ function emptyUnitState() {
     parts: {},                 // slug → ה-payload של אותו סין (כולל currentScreen)
     prev:  {},                 // slug → {from, hash}: מאיפה נכנסו אליו, ולאיזה מסך לחזור
     done:  {},                 // slug של רכיב (או 'unit') → ה-completed שלו נשלח
-    doneItems: {}              // '<slug>#<itemId>' → ה-completed של הפריט נשלח
+    doneItems: {},             // '<slug>#<itemId>' → ה-completed של הפריט נשלח
+    /* ── מצב ברמת היחידה (v4) ──
+       שתי המחלקות האלה **אינן** פר-סין ולכן הן לא יושבות ב-parts[]:
+       captureUnitState מחליף את משבצת הסין הנוכחי בכל שמירה, וכל מה שהיה
+       יושב שם היה נמחק בכל מעבר. */
+    ui:      { character: null },   // 'green' | 'orange' | null — נבחר במסך 1 של סין 01
+    results: {}                     // resultKey → 'pass' | 'fail' (שערי מועד א/ב)
   };
 }
 
-/* תמיד מחזיר מסמך שמיש. אין כאן מיגרציה מ-v2: היחידה הזאת מעולם לא שיגרה
-   resume, ולכן לא קיימים מסמכים בפורמט קודם בשטח. כל v שאינו הנוכחי נזרק. */
+/* מפתחות ה-localStorage שהיו עד v3 מקור האמת, ומ-v4 הם קאש סינכרוני בלבד.
+   מוחזקים ברשימה אחת כי שני אתרים צריכים אותה: ה-getters (fallback כשאין
+   מסמך) ו-initResumeResetHatch (איפוס חייב לנקות גם את הקאש). */
+var UI_CHARACTER_KEY = 'lomda_selectedCharacter';
+var RESULT_KEYS = [
+  'lomda_moedA_partA_result',
+  'lomda_moedA_partB_result',
+  'lomda_moedB_partA_step1_result',
+  'lomda_moedB_partA_step2_result',   // נכתב ב-06 ולא נקרא באף שער — נשמר לשלמות
+  'lomda_moedB_partB_result'
+];
+
+/* תמיד מחזיר מסמך שמיש. אין כאן מיגרציה — לא מ-v2 ולא מ-v3. כל v שאינו
+   הנוכחי נזרק, וזה מאושר: השדה נקי בזמן קפיצת v4 (ראו ההערה על
+   RESUME_STATE_VERSION). מסמך v3 שכן יימצא בשטח יאבד את ההתקדמות שבו. */
 function readUnitState() {
   var doc = null;
   try {
@@ -123,6 +154,12 @@ function readUnitState() {
   doc.prev      = doc.prev      || {};
   doc.done      = doc.done      || {};
   doc.doneItems = doc.doneItems || {};
+  /* חייבים להיות אובייקטים קיימים ולא undefined: **קיומם** הוא מה שאומר
+     ל-getters "המסמך הוא הסמכות, אל תיפול ל-localStorage". בלי זה מסמך
+     שאופס היה מחזיר את הדמות והתוצאות מהקאש המיושן — כלומר איפוס שאינו
+     איפוס. */
+  doc.ui        = doc.ui        || { character: null };
+  doc.results   = doc.results   || {};
   _unitState = doc;
   return doc;
 }
@@ -170,6 +207,133 @@ function persistUnitState(doc) {
 function armLeaving() {
   _leavingToNextPart = true;
   try { setTimeout(function () { _leavingToNextPart = false; }, 5000); } catch (e) {}
+}
+
+/* ═══════════════════ מצב ברמת היחידה — דמות ותוצאות מועד ═══════════════════
+   ── למה יש כאן בכלל שכבת getters/setters ──
+   עד v4 שני סוגי המצב האלה נקראו ונכתבו ישירות ל-localStorage בששת הסינים.
+   זה עבד מושלם על מחשב אחד ונשבר לגמרי על שני: המסמך ב-Kata לא הכיל אותם,
+   ולכן לומד שהמשיך את אותו רישום ממחשב אחר קיבל כתום במקום ירוק ונותב
+   לתוך סין 06 למרות שעבר את מועד א'. השכבה הזאת מעבירה את הסמכות למסמך.
+
+   ── סדר העדיפויות בקריאה, ולמה הוא כזה ──
+   1. המסמך, אם `ui`/`results` **קיימים** בו. קיום ולא ערך: מסמך שאופס מכיל
+      `{character:null}` ו-`{}`, וזה חייב לנצח קאש מיושן — אחרת ?resetState
+      אינו איפוס.
+   2. localStorage, כשאין מסמך בכלל — כלומר לפני שה-resume נקרא (הנתיב
+      הסינכרוני בראש כל script.js) או כשה-resume כבוי לגמרי.
+
+   ── ולמה localStorage עדיין נכתב ──
+   הוא הפך מקאש קריא-סינכרונית ולא ממקור אמת. זה מה שמחזיק את כלל 1
+   ב-CLAUDE.md: `window.lomdaState.selectedCharacter` נקבע בשורה 12 של כל
+   script.js, לפני ה-paint הראשון, בזמן שהמסמך עוד רחוק שני סקריפטים מה-CDN.
+   בלי הקאש היה נפתח בדיוק ההבהוב שהכלל ההוא אוסר. */
+
+/* בחירה/תוצאה שנעשתה לפני ש-_resumeReady נדלק. חלון אמיתי ולא תיאורטי:
+   מסך בחירת הדמות הוא מסך 1 של סין 01, והמסמך מגיע רק אחרי שני סקריפטים
+   מה-CDN. בלי התור הזה הבחירה לא הייתה מגיעה למסמך אף פעם — אין אחריה שום
+   כתיבה שהייתה מתקנת את זה. */
+var _pendingProfile = null;
+var _pendingResults = null;
+
+/* localStorage זורק SecurityError ב-origin אטום (file://). כל הגישות עוברות
+   כאן, כדי שאף אתר קריאה לא ייפול על זה בעצמו. */
+function _lsGet(k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } }
+function _lsSet(k, v) { try { window.localStorage.setItem(k, v); } catch (e) {} }
+function _lsDel(k) { try { window.localStorage.removeItem(k); } catch (e) {} }
+
+function getUnitCharacter() {
+  if (_unitState && _unitState.ui) return _unitState.ui.character || null;
+  return _lsGet(UI_CHARACTER_KEY);
+}
+
+function setUnitCharacter(c) {
+  if (window.lomdaState) window.lomdaState.selectedCharacter = c;
+  if (c) _lsSet(UI_CHARACTER_KEY, c); else _lsDel(UI_CHARACTER_KEY);
+  if (!RESUME_ENABLED) return;
+  if (!_resumeReady || !_unitState) { _pendingProfile = { character: c }; return; }
+  _unitState.ui = _unitState.ui || {};
+  _unitState.ui.character = c;
+  /* סינכרוני ולא מושהה: הלומד לוחץ "המשך" מיד אחרי הבחירה, וכתיבה מושהית
+     הייתה יכולה להיירות אחרי הניווט לסין הבא — אותו נימוק בדיוק כמו
+     flushResumeSave. */
+  try { persistUnitState(captureUnitState()); } catch (e) { console.error('[resume] character', e); }
+}
+
+function getUnitResult(key) {
+  if (_unitState && _unitState.results) return _unitState.results[key] || null;
+  return _lsGet(key);
+}
+
+function setUnitResult(key, val) {
+  _lsSet(key, val);
+  if (!RESUME_ENABLED) return;
+  if (!_resumeReady || !_unitState) {
+    _pendingResults = _pendingResults || {};
+    _pendingResults[key] = val;
+    return;
+  }
+  _unitState.results = _unitState.results || {};
+  _unitState.results[key] = val;
+  try { persistUnitState(captureUnitState()); } catch (e) { console.error('[resume] result', e); }
+}
+
+/* נקרא מ-50-loader.js מיד אחרי ש-_resumeReady נדלק, ו**לפני**
+   applyUnitProfile. הסדר הוא מה שמממש את כלל הקדימות: בחירה שנעשתה בסשן
+   הזה חדשה יותר ממה שכתוב במסמך, ולכן היא מנצחת אותו. */
+function drainPendingUnitState() {
+  if (!_unitState) return;
+  var dirty = false;
+  if (_pendingProfile) {
+    _unitState.ui = _unitState.ui || {};
+    _unitState.ui.character = _pendingProfile.character;
+    _pendingProfile = null;
+    dirty = true;
+  }
+  if (_pendingResults) {
+    _unitState.results = _unitState.results || {};
+    Object.keys(_pendingResults).forEach(function (k) {
+      _unitState.results[k] = _pendingResults[k];
+    });
+    _pendingResults = null;
+    dirty = true;
+  }
+  if (dirty) {
+    try { persistUnitState(captureUnitState()); } catch (e) { console.error('[resume] drain', e); }
+  }
+}
+
+/* מיישר את הדמות שבזיכרון לפי המסמך. מחזיר אם היה שינוי — הקורא צריך לדעת,
+   כי מסך שכבר צויר עם הצבע הקודם חייב להיצבע מחדש לפני שהכיסוי מוסר.
+
+   על נתיב השחזור אין צורך בציור נוסף: applyExecutionState קורא ל-goTo(),
+   ושם resetScreenState(n) פותר את ה-src **לפני** classList.add('active')
+   (כלל 1 ב-CLAUDE.md), ולכן ה-paint הראשון של מסך היעד כבר נכון. */
+function applyUnitProfile(doc) {
+  if (!doc || !doc.ui) return false;
+  var c = doc.ui.character || null;
+  var cur = window.lomdaState ? (window.lomdaState.selectedCharacter || null) : null;
+  if (c === cur) return false;
+  if (window.lomdaState) window.lomdaState.selectedCharacter = c;
+  if (c) _lsSet(UI_CHARACTER_KEY, c); else _lsDel(UI_CHARACTER_KEY);
+  return true;
+}
+
+/* ═══════════════════ כיסוי האתחול ═══════════════════
+   #boot-cover יושב ב-markup של ששת ה-index.html (אח של #app, לא בן שלו —
+   #app מוזז ומוקטן ע"י scaleApp) וצבוע ברקע העמוד, כדי שהוא ייצבע בפריים
+   הראשון. הוא מסתיר את החלון שבו מסך 0 כבר גלוי אבל המסמך עוד לא נקרא.
+
+   ⚠️ זו הדרך היחידה שבה השינוי הזה יכול להשאיר לומד מול מסך ריק, ולכן
+   ההסרה מרוכזת כאן, אידמפוטנטית, ונקראת מכל נתיב יציאה של 50-loader.js.
+   מעליה יש רשת ביטחון שאינה תלויה בשום קובץ JS: סקריפט inline קטן ב-markup
+   מסיר את הכיסוי אחרי 800ms בכל מקרה. גם 40-resume.js שנכשל בטעינה לא
+   יכול להשאיר את הכיסוי במקום. */
+function dropBootCover() {
+  try {
+    var c = document.getElementById('boot-cover');
+    if (c && c.parentNode) c.parentNode.removeChild(c);
+  } catch (e) {}
 }
 
 /* ═══════════════════ יומן ה-completed ═══════════════════
@@ -451,6 +615,12 @@ function initResumeResetHatch() {
   if (!/[?&]resetState(=|&|$)/.test(window.location.search)) return;
   _resetRequested = true;
   try { window.sessionStorage.removeItem(NAV_EDGE_KEY); } catch (e) {}
+  /* גם הקאש, לא רק המסמך. ה-getters נופלים ל-localStorage כשאין מסמך — כלומר
+     בדיוק בנתיב הסינכרוני שרץ בראש כל script.js, לפני readUnitState. בלי
+     הניקוי הזה ?resetState היה מותיר את הדמות ואת שערי המועד מהריצה הקודמת
+     בחיים עד שהמסמך מגיע, ואיפוס שמשאיר מצב אינו איפוס. */
+  _lsDel(UI_CHARACTER_KEY);
+  RESULT_KEYS.forEach(_lsDel);
   try {
     var q = window.location.search
       .replace(/([?&])resetState(=[^&]*)?(&|$)/, '$1')

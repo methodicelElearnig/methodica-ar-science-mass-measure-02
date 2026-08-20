@@ -9,7 +9,16 @@ let currentScreen = 0;
 
 let savedCharacter = null;
 try {
-  savedCharacter = localStorage.getItem('lomda_selectedCharacter');
+  /* v4: localStorage הוא הקאש הסינכרוני, לא מקור האמת. getUnitCharacter
+     נופל אליו כל עוד מסמך ה-state לא נקרא — וזה בדיוק המצב כאן, בראש
+     הטעינה, שני סקריפטים מה-CDN לפני שהמסמך זמין. זה מה שמחזיק את כלל 1
+     ב-CLAUDE.md: הצבע נקבע לפני ה-paint הראשון, בלי הבהוב. המסמך מיישר
+     את הערך אחר כך ב-applyUnitProfile (unit-js/50-loader.js, שלב א'),
+     מאחורי #boot-cover.
+     typeof: 40-resume.js שנכשל בטעינה לא אמור להפיל את כל script.js. */
+  savedCharacter = (typeof getUnitCharacter === 'function')
+    ? getUnitCharacter()
+    : localStorage.getItem('lomda_selectedCharacter');
 } catch (e) {}
 window.lomdaState = {
   selectedCharacter: savedCharacter // 'green' | 'orange' — נקבע במסך 1, נצרך בכל מסך שמציג את הדמות הנבחרת
@@ -149,11 +158,20 @@ function selectOption(cardEl) {
   });
   cardEl.classList.add('selected');
   cardEl.setAttribute('aria-checked', 'true');
-  window.lomdaState.selectedCharacter = cardEl.dataset.value;
-  /* try/catch: localStorage חסום ב-SecurityError בפתיחה מ-file:// בחלק
-     מהדפדפנים/opaque origins — שמירת ההעדפה בין הסינים היא nice-to-have,
-     אין להפיל את המסך הראשון אם היא נכשלת */
-  try { localStorage.setItem('lomda_selectedCharacter', cardEl.dataset.value); } catch (e) {}
+  /* v4: הבחירה נכתבת למסמך ה-state, ולא רק ל-localStorage. בלי זה לומד
+     שממשיך את אותו רישום ממחשב אחר קיבל כתום גם כשבחר ירוק — כל אתרי
+     האווטאר הם טרנרי דו-כיווני, ולכן null נופל לכתום.
+     setUnitCharacter מטפל בשלושת היעדים (lomdaState, הקאש, המסמך) וגם
+     בתור: המסך הזה הוא מסך 1 של סין 01 ועשוי להקדים את קריאת המסמך,
+     ואז הבחירה ממתינה ומנוקזת ב-drainPendingUnitState.
+     typeof: 40-resume.js מיושן בקאש לא אמור להפיל את מסך הבחירה — ה-fallback
+     הוא בדיוק ההתנהגות שהייתה לפני v4. */
+  if (typeof setUnitCharacter === 'function') {
+    setUnitCharacter(cardEl.dataset.value);
+  } else {
+    window.lomdaState.selectedCharacter = cardEl.dataset.value;
+    try { localStorage.setItem('lomda_selectedCharacter', cardEl.dataset.value); } catch (e) {}
+  }
   const btn = document.getElementById('s0-continue');
   if (btn) btn.disabled = false;
 }

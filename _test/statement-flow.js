@@ -219,22 +219,39 @@ function probe05() {
   const { w, run, exec } = boot(C);
 
   // failure branch: neither part passed -> must still report the component
-  exec("try { localStorage.removeItem('lomda_moedA_partA_result');" +
-       "localStorage.removeItem('lomda_moedA_partB_result'); } catch (e) {}");
+  /* Since v4 the moed results live in the state document (doc.results), not
+     localStorage — see unit-js/40-resume.js. Seeding localStorage here would
+     no longer reach the gate at all: getUnitResult treats an EXISTING
+     doc.results as authoritative and never falls back, which is what makes
+     ?resetState a real reset. boot() already installs an empty document, so
+     the failure branch needs nothing seeded; cleared explicitly so the intent
+     is on the page rather than inherited from emptyUnitState(). */
+  exec("_unitState.results = {};");
   let r = run('dqB.onContinue();');
   let comp = r.log.find(s => s.type === 'onlinelesson' && s.verb === 'completed');
   ok(C + ' FAILURE path still reports the component completed',
     comp && comp.result.success === false && comp.result.score.scaled === 0,
     comp && JSON.stringify(comp.result));
 
-  const { w: w2, run: run2, exec: exec2 } = boot(C);
-  exec2("try { localStorage.setItem('lomda_moedA_partA_result','pass');" +
-        "localStorage.setItem('lomda_moedA_partB_result','pass'); } catch (e) {}");
+  const { w: w2, run: run2, exec: exec2, val: val2 } = boot(C);
+  exec2("setUnitResult('lomda_moedA_partA_result','pass');" +
+        "setUnitResult('lomda_moedA_partB_result','pass');");
   r = run2('dqB.onContinue();');
   comp = r.log.find(s => s.type === 'onlinelesson' && s.verb === 'completed');
   ok(C + ' SUCCESS path reports success with scaled 1',
     comp && comp.result.success === true && comp.result.score.scaled === 1,
     comp && JSON.stringify(comp.result));
+
+  /* The reason v4 exists: a learner continuing the same registration on a
+     second computer has an EMPTY localStorage, and before v4 that made
+     moedAFullyPassed() return false — routing a learner who passed moed A
+     into Sain 06. The document alone must carry the gate. */
+  exec2("try { localStorage.clear(); } catch (e) {} _unitState = readUnitState();");
+  ok(C + ' moed A gate survives a device switch (document only, empty localStorage)',
+    val2('moedAFullyPassed()') === true, String(val2('JSON.stringify(_unitState.results)')));
+  ok(C + ' the character survives a device switch too',
+    val2("(function(){ _unitState.ui.character = 'green'; " +
+         "applyUnitProfile(_unitState); return window.lomdaState.selectedCharacter; })()") === 'green');
 
   r = run2('s4Finish();');
   const unit = r.log.find(s => s.opts && s.opts.objectId === w2.XAPI_UNIT_ID);
@@ -259,8 +276,8 @@ function probe06() {
     a && /-001\/q3$/.test(a.opts.questionId) && a.result.success === true,
     a && a.opts.questionId);
 
-  exec("try { localStorage.setItem('lomda_moedB_partA_step1_result','pass');" +
-       "localStorage.setItem('lomda_moedB_partB_result','pass'); } catch (e) {}");
+  exec("setUnitResult('lomda_moedB_partA_step1_result','pass');" +
+       "setUnitResult('lomda_moedB_partB_result','pass');");
   r = run('s12Continue();');
   const comp = r.log.find(s => s.type === 'onlinelesson' && s.verb === 'completed');
   ok(C + ' component completed fires at the routing decision',

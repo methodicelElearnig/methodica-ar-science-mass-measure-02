@@ -7,14 +7,23 @@
 const TOTAL_SCREENS = 5;
 let currentScreen = 0;
 
-/* הדמות שנבחרה בסיין 1 נשמרת ב-localStorage כי כל סיין הוא מסמך
+/* הדמות שנבחרה בסיין 1 נשמרת במסמך ה-state של היחידה (v4) ומוקאשת ב-localStorage כי כל סיין הוא מסמך
    HTML נפרד לחלוטין — window.lomdaState לא "עובר" בין הסינים בטעינת
    עמוד מלאה. try/catch: בפתיחה מ-file:// חלק מהדפדפנים (ולמשל jsdom)
    חוסמים גישה ל-localStorage עם SecurityError — בלי ה-try/catch,
    חריגה כאן הייתה עוצרת את טעינת כל script.js */
 let savedCharacter = null;
 try {
-  savedCharacter = localStorage.getItem('lomda_selectedCharacter');
+  /* v4: localStorage הוא הקאש הסינכרוני, לא מקור האמת. getUnitCharacter
+     נופל אליו כל עוד מסמך ה-state לא נקרא — וזה בדיוק המצב כאן, בראש
+     הטעינה, שני סקריפטים מה-CDN לפני שהמסמך זמין. זה מה שמחזיק את כלל 1
+     ב-CLAUDE.md: הצבע נקבע לפני ה-paint הראשון, בלי הבהוב. המסמך מיישר
+     את הערך אחר כך ב-applyUnitProfile (unit-js/50-loader.js, שלב א'),
+     מאחורי #boot-cover.
+     typeof: 40-resume.js שנכשל בטעינה לא אמור להפיל את כל script.js. */
+  savedCharacter = (typeof getUnitCharacter === 'function')
+    ? getUnitCharacter()
+    : localStorage.getItem('lomda_selectedCharacter');
 } catch (e) { /* localStorage חסום (opaque origin/פרטיות) — נמשיך בלי שמירה */ }
 window.lomdaState = {
   selectedCharacter: savedCharacter || null
@@ -96,9 +105,13 @@ function resetScreenState(n) {
 function moedAFullyPassed() {
   let a = null, b = null;
   try {
-    a = localStorage.getItem('lomda_moedA_partA_result');
-    b = localStorage.getItem('lomda_moedA_partB_result');
-  } catch (e) { /* localStorage חסום — נניח שלא עבר, כדי לא לדלג בטעות */ }
+    /* v4: מהמסמך, עם נפילה ל-localStorage כשאין מסמך (ראו getUnitResult).
+       ה-try/catch נשאר בדיוק כפי שהיה, והוא גם מה שמכסה 40-resume.js
+       מיושן בקאש: ReferenceError כאן נבלע, a/b נשארים null, והשער מחזיר
+       false — כלומר "נניח שלא עבר", בדיוק ההתנהגות הבטוחה שההערה מתארת. */
+    a = getUnitResult('lomda_moedA_partA_result');
+    b = getUnitResult('lomda_moedA_partB_result');
+  } catch (e) { /* אחסון חסום / השכבה לא נטענה — נניח שלא עבר, כדי לא לדלג בטעות */ }
   return a === 'pass' && b === 'pass';
 }
 
@@ -319,7 +332,14 @@ function makeDragQuestion(cfg) {
   }
 
   function saveResult(passed) {
-    try { localStorage.setItem(cfg.resultKey, passed ? 'pass' : 'fail'); } catch (e) {}
+    var v = passed ? 'pass' : 'fail';
+    /* v4: התוצאה נכתבת למסמך ה-state ולא רק ל-localStorage — שערי המועד
+       קובעים ניתוב, ולומד שהמשיך ממחשב אחר נותב לתוך מועד ב' גם כשעבר את
+       מועד א' במלואו, כי המפתחות פשוט לא היו שם.
+       typeof: אותו דפוס הגנה כמו בכל קריאה לשכבה המשותפת; ה-fallback הוא
+       ההתנהגות שהייתה לפני v4. */
+    if (typeof setUnitResult === 'function') setUnitResult(cfg.resultKey, v);
+    else { try { localStorage.setItem(cfg.resultKey, v); } catch (e) {} }
   }
 
   function check() {
@@ -680,7 +700,7 @@ const dqB = makeDragQuestion({
     var _passed = 0;
     try {
       _passed = _parts.filter(function (k) {
-        return localStorage.getItem(k) === 'pass';
+        return getUnitResult(k) === 'pass';
       }).length;
     } catch (e) { /* localStorage חסום — נשאר 0 */ }
     xapiCompleteComponent({

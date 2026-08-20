@@ -9,6 +9,27 @@
 <link rel="stylesheet" href="../unit-css/25-report.css?v=3">
 </head>
 <body>
+<!-- ═══ כיסוי האתחול ═══
+     מסתיר את החלון שבו מסך 0 כבר גלוי (class="screen active" מקובע ב-markup
+     כאן למטה) אבל מסמך ה-state עוד לא נקרא. בלעדיו לומד שממשיך ממחשב אחר
+     רואה אווטאר בצבע הלא-נכון ואז החלפה — בדיוק ההבהוב שכלל 1 ב-CLAUDE.md
+     אוסר, כי הדמות נקראת מהמסמך ולא מ-localStorage מ-v4 והלאה.
+
+     אח של #app ולא בן שלו: scaleApp() מזיז ומקטין את #app, ובן היה יורש
+     את ה-transform. הסגנון inline ולא ב-styles.css במכוון — הכיסוי חייב
+     להיצבע בפריים הראשון, ו-inline הוא היחיד שלא תלוי בקאש של CSS.
+
+     ⚠️ הסקריפט שאחריו הוא רשת הביטחון, ואין לו שום תלות בקובץ JS: גם אם
+     40-resume.js או 50-loader.js נכשלים בטעינה, הכיסוי נופל אחרי 800ms.
+     ההסרה בנתיב הרגיל היא dropBootCover() מ-50-loader.js, שרצה מוקדם יותר
+     מזה ברוב הטעינות. -->
+<div id="boot-cover" style="position:fixed;inset:0;z-index:9999;background:#fff"></div>
+<script>
+setTimeout(function () {
+  var c = document.getElementById('boot-cover');
+  if (c && c.parentNode) c.parentNode.removeChild(c);
+}, 800);
+</script>
 <div id="app">
 
   <!-- ============ מסך 1 — מסך מעבר: דמות + בועית (Transition) ============ -->
@@ -953,14 +974,14 @@
      ⚠️ ה-?v= חייב להיות זהה בכל ששת ה-index.html לכל קובץ. אי-התאמה גורמת
      לסין אחד להביא עותק שני תחת URL אחר, ושני סינים יכולים להריץ גרסאות
      שונות של אותה לוגיקה בתוך סשן אחד של לומד. -->
-<script src="../unit-js/10-identity.js?v=4"></script>
-<script src="../unit-js/20-xapi.js?v=4"></script>
-<script src="../unit-js/25-report.js?v=4"></script>
-<script src="../unit-js/40-resume.js?v=4"></script>
-<script src="../unit-js/50-loader.js?v=4"></script>
-<script src="script.js?v=4"></script>
+<script src="../unit-js/10-identity.js?v=5"></script>
+<script src="../unit-js/20-xapi.js?v=5"></script>
+<script src="../unit-js/25-report.js?v=5"></script>
+<script src="../unit-js/40-resume.js?v=5"></script>
+<script src="../unit-js/50-loader.js?v=5"></script>
+<script src="script.js?v=5"></script>
 <!-- ה-side-effects היחידים. חייב להיות אחרון, ובתג נפרד: זריקה ברמת
      top-level ב-script.js לא מפילה תג script אחר. ראו unit-js/90-boot.js. -->
-<script src="../unit-js/90-boot.js?v=4"></script>
+<script src="../unit-js/90-boot.js?v=5"></script>
 </body>
 </html>

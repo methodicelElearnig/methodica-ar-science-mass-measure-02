@@ -26,6 +26,7 @@ function bootXAPI() {
   if (typeof XAPI_METADATA_FILE === 'undefined' || !XAPI_METADATA_FILE) {
     console.warn('[xAPI] XAPI_METADATA_FILE לא מוגדר בסין הזה — הדיווחיות כבויה. ' +
       'זה המצב הצפוי עד להשלמת הקונפיגורציה הפר-סינית (REPORT-XAPI.md §2).');
+    dropBootCover();   // אין resume בנתיב הזה, ואסור להשאיר את הכיסוי במקום
     return;
   }
 
@@ -48,6 +49,7 @@ function bootXAPI() {
     if (tries >= METADATA_POLL_MAX) {
       console.error('[xAPI] מטא-דאטה לא נטענה תוך ' + (METADATA_POLL_MAX * 200 / 1000) + 's — ' +
         'הדיווחיות כבויה בסין הזה. לבדוק שהקובץ קיים ונגיש: ' + XAPI_METADATA_FILE);
+      dropBootCover();   // ה-cb לא ייקרא לעולם — הכיסוי חייב ליפול כאן
       return;
     }
     setTimeout(function () { pollMetadataReady(cb, tries + 1); }, 200);
@@ -90,6 +92,70 @@ function bootXAPI() {
     loadScript(LIB720, function () {
       try {
         getXAPIParameters(XAPI_METADATA_FILE);
+
+        /* ═══ שלב א' של ה-resume — קריאת המסמך, הקפיצה בין סינים, והדמות ═══
+           ── למה כאן, לפני ה-poll ──
+           הכיסוי (#boot-cover) מסתיר את מסך 0 עד שידוע מה לצייר, ולכן אורך
+           החיים שלו הוא זמן ההמתנה של הלומד. השלב הזה יושב לפני
+           pollMetadataReady במכוון: ה-poll חסום ב-10 שניות (50 × 200ms), ולומד
+           שממתין 10 שניות מול כיסוי הוא רגרסיה גרועה יותר מההבהוב שהכיסוי בא
+           לתקן.
+
+           מותר להקדים כי getXAPIParameters קובע את window.slxapi, את
+           XAPI_REGISTRATION ואת XAPI_DISABLED **סינכרונית** לפני שהוא ניגש
+           למטא-דאטה (xapi-720-k.js:274–353), ו-loadState720 עובד ב-XHR גולמי
+           עם window.slxapi.auth — לא דרך ADL.XAPIWrapper, ולכן הוא גם לא תלוי
+           ב-changeConfig שלמטה. אין כאן שום תלות בקובץ המטא-דאטה.
+
+           ⚠️ מה שכן **לא** הוקדם: _resumeReady. הוא נשאר בשלב ב'. הדלקה שלו
+           כאן הייתה פותחת חלון שבו כל goTo() מחמש שמירה שדורסת את
+           doc.parts[slug] ב-payload טרי — כלומר כתיבה לפני השחזור, בדיוק מה
+           שכל נתיבי הכתיבה בנויים למנוע. שלב א' לכן **קורא בלבד**:
+           applyUnitProfile מיישר את הזיכרון ואת הקאש, ולא נוגע במסמך. */
+        var _saved   = null;
+        var _payload = null;
+        if (RESUME_ENABLED) {
+          try {
+            _saved = readUnitState();
+            if (_saved.part && _saved.part !== currentPartSlug()) {
+              /* replace() ולא href: משאיר את הסין שננטש מחוץ ל-back-stack,
+                 שם לחיצת Back הייתה נוחתת על URL שמיד מקפיץ קדימה.
+                 ה-query string נגרר כמו בכל מעבר — בלעדיו ה-registration
+                 אובד וכל הסינים מדווחים כלום (REPORT-XAPI.md §6).
+                 הכיסוי **לא** מוסר כאן במכוון: העמוד עוזב, והוא מסתיר את
+                 ההצצה בסין 01 שהלומד רואה היום בכל קפיצה כזאת. */
+              window.location.replace('../' + _saved.part + '/index.html' + window.location.search);
+              return;
+            }
+            /* הדמות — הסיבה שכל השלב הזה קיים. עד v4 היא ישבה רק
+               ב-localStorage, ולכן המשך ממחשב אחר צבע כתום לומד שבחר ירוק.
+               נקרא ללא תנאי ולא רק כשיש payload: לומד עם מסמך שאין בו
+               משבצת לסין הזה לא נכנס ל-applyExecutionState בכלל, והיה מפספס
+               את היישור. */
+            if (applyUnitProfile(_saved)) {
+              /* מסך 0 כבר צויר בבלוק האתחול של script.js עם הצבע הקודם.
+                 ציור מחדש כאן, מאחורי הכיסוי, לפני שהוא מוסר. */
+              try { resetScreenState(currentScreen); } catch (e) {}
+            }
+            _payload = _saved.parts[currentPartSlug()];
+
+            /* ── אין payload → אין שחזור מסך → אין סיבה להחזיק את הכיסוי ──
+               זה מה שמנטרל את ההתנגדות שעל בסיסה נדחה "וילון ה-boot"
+               ב-2026-08-19 (RESUME.md §6ד): "מחייב ~1 שנייה של קנבס ריק בכל
+               טעינה **ללא** התקדמות שמורה — כלומר גם לכל לומד בפעם הראשונה."
+               לומד חדש מקבל מסמך ריק, ולכן parts[] ריק, ולכן הכיסוי נופל כאן —
+               ברגע המוקדם ביותר האפשרי, בלי להמתין ל-pollMetadataReady.
+               התיקון של הדמות (אם היה) כבר צויר סינכרונית שורה מעל. */
+            if (!_payload) dropBootCover();
+          } catch (e) {
+            console.error('[resume] read', e);
+            dropBootCover();
+          }
+        } else {
+          /* resume כבוי — אין מה לשחזר ואף פעם לא יהיה. */
+          dropBootCover();
+        }
+
         pollMetadataReady(function () {
           try {
             try { ADL.XAPIWrapper.changeConfig({ endpoint: window.slxapi.endpoint, auth: window.slxapi.auth }); } catch (e) {}
@@ -126,17 +192,24 @@ function bootXAPI() {
             var _resumed = false;
             if (RESUME_ENABLED) {
               try {
-                var _saved = readUnitState();
-                if (_saved.part && _saved.part !== currentPartSlug()) {
-                  /* replace() ולא href: משאיר את הסין שננטש מחוץ ל-back-stack,
-                     שם לחיצת Back הייתה נוחתת על URL שמיד מקפיץ קדימה.
-                     ה-query string נגרר כמו בכל מעבר — בלעדיו ה-registration
-                     אובד וכל הסינים מדווחים כלום (REPORT-XAPI.md §6). */
-                  window.location.replace('../' + _saved.part + '/index.html' + window.location.search);
-                  return;
-                }
+                /* ═══ שלב ב' — פתיחת הכתיבות והשחזור עצמו ═══
+                   קריאת המסמך והקפיצה בין הסינים כבר קרו בשלב א' שלמעלה.
+                   מה שנשאר כאן הוא בדיוק מה שחייב לרוץ אחרי שהמטא-דאטה
+                   מוכנה: השחזור, שבסופו applyExecutionState שולח את
+                   ה-initialized של הפריט דרך xapiOnScreen.
+
+                   המקום נשמר כפי שהיה — **אחרי** changeConfig ו**לפני**
+                   ה-initialized של הרכיב — כי זה מה שמונע מסשן שרק *עובר*
+                   דרך הסין הזה להשאיר אחריו statement.
+
+                   _resumeReady נדלק רק כאן, ולא בשלב א': הוא השער של כל
+                   נתיבי הכתיבה, וכתיבה שנפתחת לפני השחזור דורסת את
+                   doc.parts[slug] ב-payload טרי. */
                 _resumeReady = true;
-                var _payload = _saved.parts[currentPartSlug()];
+                if (!_unitState) _unitState = emptyUnitState();
+                /* בחירה שנעשתה בחלון שבין השלבים ממתינה בתור. מנוקזת **לפני**
+                   השחזור, כי היא חדשה יותר ממה שכתוב במסמך ולכן מנצחת אותו. */
+                drainPendingUnitState();
                 /* ה-hash מנצח את המסמך בבחירת **המסך** — '#screen=N' מגיע
                    מלחיצה על "חזרה", כלומר מכוונה מפורשת של הלומד עכשיו, בעוד
                    המסמך מתאר איפה הוא היה פעם.
@@ -164,6 +237,13 @@ function bootXAPI() {
               }
             }
 
+            /* הנתיב הרגיל להסרת הכיסוי: כאן כבר ידוע מה מצייר — הדמות יושרה
+               בשלב א' ומסך היעד צויר בשלב ב'. נקרא גם כשה-resume כבוי וגם
+               כשאין payload, ולכן הוא לא בתוך שום ענף.
+               רשת הביטחון (סקריפט inline ב-markup, 800ms) עומדת מעל זה
+               ומכסה כל נתיב שלא עובר כאן בכלל. */
+            dropBootCover();
+
             try { sendStatement720('initialized', 'onlinelesson'); } catch (e) {}
             try { xapiWireVideos(); } catch (e) {}
             /* init ברמת הפריט עבור מסך הנחיתה. בלומדה הזאת מסך הפתיחה לא
@@ -175,9 +255,9 @@ function bootXAPI() {
             if (typeof onXapiReady === 'function') {
               try { onXapiReady(); } catch (e) { console.error('[xAPI] ready hook', e); }
             }
-          } catch (e) { console.error('[xAPI] init', e); }
+          } catch (e) { console.error('[xAPI] init', e); dropBootCover(); }
         });
-      } catch (e) { console.error('[xAPI] load', e); }
+      } catch (e) { console.error('[xAPI] load', e); dropBootCover(); }
     });
   });
 }
