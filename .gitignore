@@ -18,3 +18,8 @@ metadata-from/
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# תמונות מצב של docs-and-tools/save-restore-state.html — ארטיפקטים של הרצת QA,
+# ועשויות להכיל את התשובות של לומד אמיתי. התיקייה עצמה נשמרת (.gitkeep).
+docs-and-tools/states/*
+!docs-and-tools/states/.gitkeep
