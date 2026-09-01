@@ -3816,15 +3816,15 @@ function scqFbMakeDraggable(boxId) {
   if (!box) return;
 
   let dragging = false;
-  let startX = 0, startY = 0, startLeft = 0, startTop = 0;
+  let startX = 0, startY = 0, startLeft = 0, startTop = 0, scale = 1;
 
   box.addEventListener('mousedown', function (e) {
     if (e.target.closest('.scq-fb-reveal-btn')) return;
     const parent = box.offsetParent || box.parentElement;
-    const boxRect = box.getBoundingClientRect();
     const parentRect = parent.getBoundingClientRect();
-    startLeft = boxRect.left - parentRect.left;
-    startTop = boxRect.top - parentRect.top;
+    scale = parentRect.width / parent.offsetWidth || 1;
+    startLeft = box.offsetLeft;
+    startTop = box.offsetTop;
     box.style.left = startLeft + 'px';
     box.style.top = startTop + 'px';
     box.style.bottom = 'auto';
@@ -3838,11 +3838,10 @@ function scqFbMakeDraggable(boxId) {
   document.addEventListener('mousemove', function (e) {
     if (!dragging) return;
     const parent = box.offsetParent || box.parentElement;
-    const parentRect = parent.getBoundingClientRect();
-    const maxLeft = Math.max(0, parentRect.width - box.offsetWidth);
-    const maxTop = Math.max(0, parentRect.height - box.offsetHeight);
-    let left = startLeft + (e.clientX - startX);
-    let top = startTop + (e.clientY - startY);
+    const maxLeft = Math.max(0, parent.offsetWidth - box.offsetWidth);
+    const maxTop = Math.max(0, parent.offsetHeight - box.offsetHeight);
+    let left = startLeft + (e.clientX - startX) / scale;
+    let top = startTop + (e.clientY - startY) / scale;
     left = Math.min(Math.max(0, left), maxLeft);
     top = Math.min(Math.max(0, top), maxTop);
     box.style.left = left + 'px';
