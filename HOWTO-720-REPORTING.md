@@ -49,37 +49,6 @@ var NAV_EDGE_KEY       = 'lomda_nav_edges::<unit-slug>';           // ← אות
 
 כל השאר ב-`unit-js/` ו-`unit-css/` **נייטרלי ליחידה** ועובר כמות שהוא.
 
-> ### ⚠️ אם מעתיקים מ-`methodica-science-mass-measure-02` — קראו את זה קודם
->
-> היחידה הזאת היא כרגע היחידה הבשלה ביותר להעתיק ממנה, אבל היא **כבר עברה את
-> שלב ה-resume**, והמדריך הזה מתאר במכוון את הבסיס שלפניו (`RESUME_ENABLED =
-> false`, ראו §0 "מה לא צריך"). לכן `unit-js/` שלה **אינו** מה שהטבלה למעלה
-> מתארת:
->
-> | המדריך מניח | ביחידה הזאת בפועל |
-> |---|---|
-> | `40-ledger.js` (179 שורות, יומן ב-`sessionStorage`) | `40-resume.js` (631 שורות, יומן בתוך מסמך ה-State API) |
-> | `RESUME_ENABLED = false` | `RESUME_ENABLED = true` |
-> | `LEDGER_STORAGE_KEY` — אחת מ"ארבע השורות" | **לא קיים.** היומן עבר למסמך ולא לאחסון מקומי |
-> | `NAV_EDGE_KEY` — השורה הרביעית | קיים, אבל ב-`40-resume.js:403` |
->
-> העתקה עיוורת של ששת הקבצים נותנת יחידה חדשה עם resume דלוק ובלי ארבעת
-> ה-hooks הפר-רכיביים שהוא דורש (`capturePartPayload` / `applyResumeVars` /
-> `applyResumeDom` / `restoreScreenUI`) — כלומר בדיוק האזהרה שב-§4.1, רק
-> מהכיוון ההפוך: לא "אל תדליקו את הדגל", אלא "הדגל כבר דלוק".
->
-> **שני מסלולים תקינים:**
->
-> 1. **הבסיס של המדריך (מומלץ ליחידה חדשה).** לקחת את `40-ledger.js` מהיסטוריית
->    ה-git — `git show 1584d49^:unit-js/40-ledger.js` — ולהעמיד
->    `RESUME_ENABLED = false`. חמשת הקבצים האחרים עוברים כמות שהם, וכל השאר
->    במדריך נכון מילה במילה.
-> 2. **עם resume.** לקחת את `40-resume.js` כמות שהוא, להשאיר
->    `RESUME_ENABLED = true`, ולממש את ארבעת ה-hooks בכל רכיב. זה **מחוץ להיקף
->    המדריך הזה**; העיצוב המלא ב-`docs-and-tools/RESUME.md` של היחידה הזאת.
->
-> כל שאר המדריך — §4.3, §8, ורשימת הקבצים ב-§1 — כתוב למסלול 1 ונשאר מדויק לו.
-
 ### ההנחיה לפתיחת עבודה
 
 ```
@@ -160,7 +129,7 @@ var NAV_EDGE_KEY       = 'lomda_nav_edges::<unit-slug>';           // ← אות
     10-identity.js        ← תחילית המזהים, XAPI_UNIT_ID, shortId, RESUME_ENABLED
     20-xapi.js            ← היקף פריטים, מזהי שאלות, והעוזרים
     25-report.js          ← כל שכבת "מצאתם בעיה?"
-    40-ledger.js          ← יומן ה-completed + קשתות חזרה (עם resume: 40-resume.js — ראו §0)
+    40-ledger.js          ← יומן ה-completed + קשתות חזרה
     50-loader.js          ← טעינת ה-CDN, אימות מזהים, bootXAPI()
     90-boot.js            ← **הקובץ היחיד עם side effects**
   _test/
@@ -476,10 +445,6 @@ function xapiMultiAnswer(ids, optElFn) { … }
 ```
 
 ### 4.3 `40-ledger.js` — יומן ה-`completed`
-
-> ⚠️ הקובץ הזה הוא הבסיס ללא resume. ב-`methodica-science-mass-measure-02` הוא
-> כבר הוחלף ב-`40-resume.js`, ולכן אי אפשר להעתיק אותו משם — ראו את ההערה
-> ב-§0 ("אם מעתיקים מ-…") לשני המסלולים ולפקודת ה-git שמחזירה אותו.
 
 ראו §8 להסבר מלא. הליבה:
 
