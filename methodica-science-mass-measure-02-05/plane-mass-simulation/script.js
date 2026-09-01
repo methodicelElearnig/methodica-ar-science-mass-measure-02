@@ -207,20 +207,25 @@ document.addEventListener('selectstart', e => {
 
 const DESIGN_WIDTH = 650;
 /* .simulation's only child is .plane-scene (aspect-ratio 963/1433, width:100%)
-   — the cropped background image's real proportions — so the design
-   canvas's true height is always DESIGN_WIDTH * 1433/963. Must stay in
-   sync with .plane-scene's aspect-ratio in style.css; a stale mismatch
-   here previously undersized the whole simulation and left empty space
-   below it (see git history / prior comment if this happens again). */
-const DESIGN_HEIGHT = DESIGN_WIDTH * (1433 / 963);
+   — the cropped background image's real proportions. Its rendered height is
+   measured directly from the DOM (below) instead of duplicating the ratio
+   as a second hardcoded constant here, so the two can never drift out of
+   sync (a past stale mismatch here previously undersized the whole
+   simulation and left empty space below it). */
 let currentScale = 1;
+
+function getDesignHeight() {
+  const scene = document.querySelector('.plane-scene');
+  return (scene && scene.offsetHeight) || DESIGN_WIDTH * (1433 / 963);
+}
 
 function scaleApp() {
   const sim = document.querySelector('.simulation');
   if (!sim) return;
-  currentScale = Math.min(window.innerWidth / DESIGN_WIDTH, window.innerHeight / DESIGN_HEIGHT);
+  const designHeight = getDesignHeight();
+  currentScale = Math.min(window.innerWidth / DESIGN_WIDTH, window.innerHeight / designHeight);
   const left = (window.innerWidth - DESIGN_WIDTH * currentScale) / 2;
-  const top = (window.innerHeight - DESIGN_HEIGHT * currentScale) / 2;
+  const top = (window.innerHeight - designHeight * currentScale) / 2;
   sim.style.transform = `scale(${currentScale})`;
   sim.style.left = `${left}px`;
   sim.style.top = `${top}px`;
