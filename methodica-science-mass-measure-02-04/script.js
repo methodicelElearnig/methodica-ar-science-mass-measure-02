@@ -475,12 +475,45 @@ document.addEventListener('keydown', function (e) {
    מיושם על תיבת המשוב היחידה בסיין 4: tbl-feedbox.
    ========================================================= */
 
+/* מיקומי בועיות המשוב שהלומד גרר: boxId → {left, top}.
+   הערכים הם פיקסלים של קנבס העיצוב (1280×710) ולא של המסך: ההגדלה
+   היא transform על #app, ולכן layout px אינם משתנים בין חלונות ומכשירים —
+   מיקום שנשמר במסך אחד תקף בדיוק גם באחר.
+   נלכד ב-capturePartPayload ומוחזר ב-applyResumeVars. */
+var fbPositions = {};
+
+/* מחזיר מיקום שנשמר. מחזיר true אם היה משהו להחזיר. */
+function scqFbApplyPosition(boxId) {
+  var box = document.getElementById(boxId);
+  var pos = fbPositions[boxId];
+  if (!box || !pos) return false;
+  /* bottom חייב להיות auto: ברירת המחדל ב-CSS עוגנת את הבועית ב-bottom
+     (ראו .scq-fb-box ב-styles.css), והצבת top לבדה הייתה מותירה את שתיהן
+     פעילות — בדיוק מה ש-mousedown של הגרירה עושה. */
+  box.style.left = pos.left + 'px';
+  box.style.top = pos.top + 'px';
+  box.style.bottom = 'auto';
+  return true;
+}
+
 function scqFbResetPosition(boxId) {
   const box = document.getElementById(boxId);
   if (!box) return;
+  /* צייר רץ → זו אינה הודעת משוב חדשה אלא הצגה מחדש של משוב קיים,
+     ולכן המיקום שהלומד בחר מוחזר במקום להימחק. זה התיקון לתקלה
+     שדווחה מ-QA: כל רענון וכל חזרה למסך עברו דרך showFeedback → איפוס.
+     במסלול הרגיל (משוב חדש) האיפוס **נשמר**: בועית שנגררה לפינה חייבת
+     לחזור לתצוגה כשיש משהו חדש להגיד.
+     ⚠אין כאן clamp במכוון: הפונקציה רצה לפני classList.add('visible'),
+     כלומר כשה-box עדיין display:none וה-offsetWidth שלו 0 — כל חישוב גבולות
+     כאן היה שגוי. הערכים בין כה וכה כבר clamped על ידי mousemove. */
+  if (typeof resumeIsPainting === 'function' && resumeIsPainting()) {
+    if (scqFbApplyPosition(boxId)) return;
+  }
   box.style.left = '';
   box.style.top = '';
   box.style.bottom = '';
+  delete fbPositions[boxId];
 }
 
 function scqFbMakeDraggable(boxId) {
@@ -524,6 +557,12 @@ function scqFbMakeDraggable(boxId) {
     if (!dragging) return;
     dragging = false;
     box.classList.remove('is-dragging');
+    /* עד כאן המיקום חי אך ורק ב-style inline של האלמנט, ולכן כל רענון
+       או ציור מחדש מחק אותו. offsetLeft/offsetTop תקפים כאן כי הבועית
+       גלויה, והערכים כבר clamped על ידי mousemove. */
+    fbPositions[boxId] = { left: box.offsetLeft, top: box.offsetTop };
+    /* מושהיה ולא סינכרונית: זה שינוי קוסמטי, לא תשובה. */
+    if (typeof scheduleResumeSave === 'function') scheduleResumeSave();
   });
 }
 
@@ -616,6 +655,10 @@ function capturePartPayload() {
     var el = document.getElementById(id);
     if (el) st.inputs[id] = el.value;
   });
+  /* מיקומי בועיות המשוב שנגררו (ראו fbPositions). חייב לצאת מכאן
+     ולא להיכתב למסמך ממקום אחר: captureUnitState **מחליף** את
+     parts[slug] בכל שמירה. */
+  st.fbPos = Object.assign({}, fbPositions);
   return st;
 }
 
@@ -627,6 +670,8 @@ function capturePartPayload() {
    קוראים על עותק מיושן. */
 function applyResumeVars(st) {
   if (!st) return;
+  /* מסמך ישן בלי המפתח → המפה נשארת ריקה, וההתנהגות זהה לקודם. */
+  if (st.fbPos) Object.keys(st.fbPos).forEach(function (k) { fbPositions[k] = st.fbPos[k]; });
   if (st.qResults) {
     Object.keys(st.qResults).forEach(function (k) { XAPI_Q_RESULTS[k] = st.qResults[k]; });
   }

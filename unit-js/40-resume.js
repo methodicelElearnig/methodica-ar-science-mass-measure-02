@@ -561,11 +561,27 @@ function applyExecutionState(st, screenOverride) {
 
    מדלגים בזמן _restoring: applyExecutionState מצייר בעצמו, ו**אחרי**
    applyResumeDom — ציור מוקדם משם היה על placement שעוד לא הוחזר. */
+/* דלוק כל עוד repaintScreen מצייר. ראו resumeIsPainting למטה. */
+var _repainting = false;
+
+/* "האם צייר רץ עכשיו" — כלומר מסך נענה מצויר מחדש, ולא אירוע חי של הלומד.
+   שני המצבים נספרים: applyExecutionState (שמסמן _restoring) ו-repaintScreen,
+   שרץ **מחוץ** ל-_restoring במכוון ולכן צריך דגל משלו.
+
+   נדרש כי scqFbResetPosition מאפס את מיקום בועית המשוב בכל showFeedback, וכל
+   ציור מחדש עובר דרך אותן פונקציות showFeedback עצמן. בלי ההבחנה הזאת אי אפשר
+   להבדיל בין "משוב חדש" (שבו האיפוס נכון — בועית שנגררה לפינה חייבת לחזור
+   לתצוגה) לבין "הצייר מציג מחדש משוב קיים" (שבו האיפוס הוא בדיוק הבאג שדווח:
+   המיקום שהלומד בחר נמחק בכל רענון ובכל ניווט חזרה למסך). */
+function resumeIsPainting() { return _restoring || _repainting; }
+
 function repaintScreen(n) {
   if (!RESUME_ENABLED || _restoring) return;
   if (typeof restoreScreenUI !== 'function') return;
+  _repainting = true;
   try { restoreScreenUI(n); }
   catch (e) { console.error('[resume] repaintScreen', e); }
+  finally { _repainting = false; }
 }
 
 /* ═══════════════════ מתי נכתב ═══════════════════

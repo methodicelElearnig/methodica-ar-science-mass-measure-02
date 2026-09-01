@@ -405,6 +405,21 @@ function checkMetadata() {
       fs.existsSync(path.join(mdDir, slug + '.json')) &&
       (/var XAPI_METADATA_FILE = '\.\.\/metadata\/([^']+)'/.exec(js) || [])[1] === slug + '.json');
 
+    /* The feedback popup is dragged inside a CSS-scaled canvas, so the handler
+       must divide pointer deltas by the live scale and measure in layout px.
+       db67eba fixed 01/02/04/05 and MISSED 06, which then dragged at the wrong
+       rate for anyone not at exactly 100%. Sain 03 has no popup at all.
+       Asserted from source in every Sain so a partial rollout cannot recur. */
+    if (c !== '03') {
+      const drag = /function scqFbMakeDraggable\([\s\S]*?\n\}/.exec(js);
+      ok(c, 'the feedback-popup drag is scale-aware',
+        !!drag && /scale = parentRect\.width \/ parent\.offsetWidth/.test(drag[0]) &&
+        /\(e\.clientX - startX\) \/ scale/.test(drag[0]),
+        drag ? 'no scale division found' : 'scqFbMakeDraggable not found');
+      ok(c, 'and persists the dragged position on mouseup',
+        !!drag && /fbPositions\[boxId\] = \{ left: box\.offsetLeft, top: box\.offsetTop \}/.test(drag[0]));
+    }
+
     // Screen map: exactly TOTAL_SCREENS keys, 0..N-1, no gaps.
     const total = parseInt(/const TOTAL_SCREENS = (\d+);/.exec(js)[1], 10);
     const block = /var SCREEN_TO_SUBCONTENT = \{([\s\S]*?)\n\};/.exec(js)[1];
@@ -1360,6 +1375,53 @@ async function runResume(c) {
       val("tblDdValues['tblA-dd-1']") === 'לא-נכון' &&
       val("document.getElementById('tbl-reveal-btn').textContent") === 'התשובה הנכונה',
       val("tblDdValues['tblA-dd-1']"));
+
+    /* ── the dragged feedback-popup position ─────────────────────────────
+       QA: the movable panel snapped back to its default on every refresh AND
+       on every return to the screen. The position lived only in inline
+       style.left/top, and scqFbResetPosition — called by every showFeedback,
+       including the ones the painter re-runs — cleared it.
+       jsdom has no layout, so a real drag cannot be simulated; these drive
+       the seam the drag writes to (fbPositions) and assert the round-trip. */
+    exec("fbPositions['tbl-feedbox'] = { left: 300, top: 200 };");
+    exec('window.__snapFb = capturePartPayload();');
+    ok(c, 'the dragged position is captured into the payload',
+      val("window.__snapFb.fbPos && window.__snapFb.fbPos['tbl-feedbox'].left") === 300,
+      JSON.stringify(val("window.__snapFb.fbPos")));
+
+    /* Wipe as a reload would, then restore and repaint through the real path:
+       goTo -> repaintScreen -> restoreScreenUI -> tblShowFeedback ->
+       scqFbResetPosition, which is exactly where the position used to die. */
+    exec("window.__wipe04(); Object.keys(fbPositions).forEach(function (k) { delete fbPositions[k]; });" +
+         "document.getElementById('tbl-feedbox').style.left = '';" +
+         "document.getElementById('tbl-feedbox').style.top = '';");
+    exec('applyResumeVars(window.__snapFb);');
+    ok(c, 'and restored into fbPositions',
+      val("fbPositions['tbl-feedbox'] && fbPositions['tbl-feedbox'].top") === 200,
+      JSON.stringify(val("fbPositions['tbl-feedbox']")));
+    exec('applyResumeDom(window.__snapFb); goTo(0); goTo(1);');
+    ok(c, 'a repaint re-applies the dragged position instead of resetting it',
+      val("document.getElementById('tbl-feedbox').style.left") === '300px' &&
+      val("document.getElementById('tbl-feedbox').style.top") === '200px',
+      'left=' + val("document.getElementById('tbl-feedbox').style.left") +
+      ' top=' + val("document.getElementById('tbl-feedbox').style.top"));
+    /* bottom:auto is not cosmetic — the CSS anchors the box by bottom, so
+       without it the restored top is ignored and the box does not move. */
+    ok(c, 'and sets bottom:auto, so the restored top actually wins over the CSS',
+      val("document.getElementById('tbl-feedbox').style.bottom") === 'auto',
+      '"' + val("document.getElementById('tbl-feedbox').style.bottom") + '"');
+
+    /* A genuinely NEW feedback message must still recenter: a popup parked in
+       a corner has to come back into view. This is the half that must NOT
+       change, and it is why the guard keys on "is a painter running". */
+    exec("tblShowFeedback('wrong1', false);");
+    ok(c, 'a new feedback message still resets the position',
+      val("document.getElementById('tbl-feedbox').style.left") === '' &&
+      val("document.getElementById('tbl-feedbox').style.bottom") === '',
+      'left="' + val("document.getElementById('tbl-feedbox').style.left") + '"');
+    ok(c, 'and forgets the stored position, so it will not come back',
+      val("fbPositions['tbl-feedbox'] === undefined") === true,
+      JSON.stringify(val("fbPositions")));
   }
 
   /* ── Phase 2b: the drag-question round-trip, parts 05 / 06 ────────────
