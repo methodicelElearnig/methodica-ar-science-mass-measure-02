@@ -22,13 +22,23 @@
      ⚠️ הסקריפט שאחריו הוא רשת הביטחון, ואין לו שום תלות בקובץ JS: גם אם
      40-resume.js או 50-loader.js נכשלים בטעינה, הכיסוי נופל אחרי 800ms.
      ההסרה בנתיב הרגיל היא dropBootCover() מ-50-loader.js, שרצה מוקדם יותר
-     מזה ברוב הטעינות. -->
+     מזה ברוב הטעינות.
+     אם bootXAPI הספיק להדליק את window.__resumeInFlight (כלומר resume פעיל
+     והשחזור בדרך), הרשת ממתינה לו במקום לחשוף את מסך 0 באמצע — עד תקרה
+     קשיחה של 6 שניות, שאחריה היא חושפת בכל מקרה. הדגל נקרא הגנתית, ולכן
+     50-loader.js שנכשל בטעינה מחזיר בדיוק את התנהגות ה-800ms. -->
 <div id="boot-cover" style="position:fixed;inset:0;z-index:9999;background:#fff"></div>
 <script>
-setTimeout(function () {
-  var c = document.getElementById('boot-cover');
-  if (c && c.parentNode) c.parentNode.removeChild(c);
-}, 800);
+(function () {
+  var t0 = Date.now();
+  function tick() {
+    var c = document.getElementById('boot-cover');
+    if (!c || !c.parentNode) return;
+    if (window.__resumeInFlight && Date.now() - t0 < 6000) { setTimeout(tick, 100); return; }
+    c.parentNode.removeChild(c);
+  }
+  setTimeout(tick, 800);
+})();
 </script>
 <div id="app">
 
@@ -418,14 +428,14 @@ setTimeout(function () {
      ⚠️ ה-?v= חייב להיות זהה בכל ששת ה-index.html לכל קובץ. אי-התאמה גורמת
      לסין אחד להביא עותק שני תחת URL אחר, ושני סינים יכולים להריץ גרסאות
      שונות של אותה לוגיקה בתוך סשן אחד של לומד. -->
-<script src="../unit-js/10-identity.js?v=5"></script>
-<script src="../unit-js/20-xapi.js?v=5"></script>
-<script src="../unit-js/25-report.js?v=5"></script>
-<script src="../unit-js/40-resume.js?v=5"></script>
-<script src="../unit-js/50-loader.js?v=5"></script>
-<script src="script.js?v=4"></script>
+<script src="../unit-js/10-identity.js?v=7"></script>
+<script src="../unit-js/20-xapi.js?v=7"></script>
+<script src="../unit-js/25-report.js?v=7"></script>
+<script src="../unit-js/40-resume.js?v=7"></script>
+<script src="../unit-js/50-loader.js?v=7"></script>
+<script src="script.js?v=6"></script>
 <!-- ה-side-effects היחידים. חייב להיות אחרון, ובתג נפרד: זריקה ברמת
      top-level ב-script.js לא מפילה תג script אחר. ראו unit-js/90-boot.js. -->
-<script src="../unit-js/90-boot.js?v=5"></script>
+<script src="../unit-js/90-boot.js?v=7"></script>
 </body>
 </html>

@@ -103,6 +103,64 @@ function probe01() {
     r.log[0].opts.parentId === item('001') &&
     r.log[0].opts.questionId === item('001') + 'q1');
 
+  /* Once per question. The overlay closes via its button, a backdrop click and
+     Escape, and every route leaves the hint button live — so before the dedup
+     in xapiRequestedHint a learner who re-opened the hint sent requested.1
+     again for the same (item, q). Closing first is what makes this the real
+     re-open path rather than a no-op double call. */
+  r = run('scqCloseHint(); scqOpenHint();');
+  ok(C + ' re-opening the same hint emits nothing',
+    r.log.length === 0,
+    JSON.stringify(r.log.map(s => s.verb)));
+
+  /* ...but a different question still reports. */
+  r = run("xapiRequestedHint('002', 'q1');");
+  ok(C + ' a different question still emits its own requested.1',
+    r.log.length === 1 && r.log[0].verb === 'requested.1' &&
+    r.log[0].opts.questionId === item('002') + 'q1',
+    JSON.stringify(r.log.map(s => s.verb + ':' + (s.opts && s.opts.questionId))));
+
+  /* ── companion video must not report ─────────────────────────────────────
+     Every .mp4 in this unit is an avatar-* companion clip. xapiWireVideos used
+     to wire EVERY <video>, and each avatar screen re-sources its clip on entry
+     (video.load() + play()), which fires a pause then a play — i.e. a spurious
+     paused/played pair on every entry, including "back" and resume. Only
+     elements that opt in via data-xapi-report are wired now.
+     currentTime is forced non-zero on purpose: the listeners bail when it is 0,
+     so without this the assertion would pass on the guard rather than on the
+     allowlist, and would keep passing if the allowlist were removed. */
+  ok(C + ' the unit does have companion <video> elements',
+    w.document.querySelectorAll('video').length > 0,
+    String(w.document.querySelectorAll('video').length));
+  ok(C + ' none of them opts into xAPI video reporting',
+    w.document.querySelectorAll('video[data-xapi-report]').length === 0,
+    String(w.document.querySelectorAll('video[data-xapi-report]').length));
+
+  r = run("var _v = document.querySelector('video');" +
+          "Object.defineProperty(_v, 'currentTime', { value: 5, configurable: true });" +
+          "xapiWireVideos();" +
+          "_v.dispatchEvent(new Event('pause'));" +
+          "_v.dispatchEvent(new Event('play'));");
+  ok(C + ' a companion video emits no paused/played',
+    r.log.length === 0,
+    JSON.stringify(r.log.map(s => s.verb)));
+
+  /* A genuine content video, explicitly marked, still reports — and now
+     carries the question ids the old objectId-less payload never had. */
+  r = run("var _cv = document.createElement('video');" +
+          "_cv.setAttribute('data-xapi-report', '002');" +
+          "_cv.setAttribute('data-xapi-q', 'q1');" +
+          "Object.defineProperty(_cv, 'currentTime', { value: 7, configurable: true });" +
+          "document.body.appendChild(_cv);" +
+          "xapiWireVideos();" +
+          "_cv.dispatchEvent(new Event('pause'));" +
+          "_cv.dispatchEvent(new Event('play'));");
+  ok(C + ' a marked content video emits paused+played, with question ids',
+    r.log.length === 2 && r.log[0].verb === 'paused' && r.log[1].verb === 'played' &&
+    r.log[0].opts.questionId === item('002') + 'q1' &&
+    r.log[0].opts.parentId === item('002'),
+    JSON.stringify(r.log.map(s => s.verb + ':' + (s.opts && s.opts.questionId))));
+
   r = run('scqSelected = "b"; scqDone = false; scqAttempts = 0; scqCheck();');
   const wrong = r.log.find(s => s.verb.startsWith('answered'));
   ok(C + ' first wrong answer is "answered" (not .last)',

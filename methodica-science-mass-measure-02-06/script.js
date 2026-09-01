@@ -192,6 +192,21 @@ function makeDragQuestion(cfg) {
      כי revealCorrect() דורס אותו בפתרון הנכון — ולכן נשמר במפורש. */
   let passed = false;
 
+  /* ── חתימת התשובה שכבר נשלחה ──
+     בקוד החי check() מכבה את הכפתור, והוא חוזר רק כשהלומד גורר משהו. אחרי
+     רענון אי אפשר לשחזר את ההשבתה הזאת "כמו שהיא": הצייר מחשב את הכפתור
+     מ-allFilled, שהוא true כי התשובה השגויה של הלומד עדיין על הלוח — ולכן
+     אותה תשובה בדיוק הייתה ניתנת לשליחה חוזרת, והניסיון השני האמיתי נשרף.
+     במקום דגל disabled שלא שורד טעינה, נשמרת חתימה של מה שנשלח בפועל,
+     והכפתור פעיל רק כשהמצב הנוכחי שונה ממנה. זה מייצר את אותה התנהגות בדיוק
+     בחי ואחרי שחזור, ובלי להחזיר את הנעילה של §6א: כל גרירה משנה את החתימה
+     ומדליקה את הכפתור מחדש. */
+  let lastSubmittedSig = null;
+
+  function sig() {
+    return dragIds.map(function (d) { return d + ':' + placement[d]; }).join('|');
+  }
+
   function render() {
     dragIds.forEach(function (dragId) {
       const slot = document.getElementById('slot-' + dragId);
@@ -244,7 +259,8 @@ function makeDragQuestion(cfg) {
       return dragIds.some(function (dId) { return placement[dId] === tId; });
     });
     const btn = document.getElementById(cfg.checkBtnId);
-    if (btn && !done) btn.disabled = !allFilled;
+    /* התשובה הנוכחית זהה לזו שכבר נשלחה → אין מה לשלוח שוב (ראו lastSubmittedSig). */
+    if (btn && !done) btn.disabled = !allFilled || sig() === lastSubmittedSig;
   }
 
   function dragStart(e, dragId) {
@@ -360,6 +376,9 @@ function makeDragQuestion(cfg) {
     if (done) return;
     checked = true;
     attempts++;
+    /* לפני כל מוטציה: זו התשובה שנשלחת עכשיו. render() שבהמשך כבר יסתמך
+       עליה כדי להשאיר את הכפתור מושבת עד לשינוי הבא. */
+    lastSubmittedSig = sig();
 
     let allCorrect = true;
     targetIds.forEach(function (tId) {
@@ -473,6 +492,7 @@ function makeDragQuestion(cfg) {
   function resetInitial() {
     done = false; checked = false; attempts = 0; dragActive = null; dropHandled = false;
     lastWrongPlacement = null; showingCorrect = false; passed = false;
+    lastSubmittedSig = null;
     dragIds.forEach(function (dId) { placement[dId] = 'source'; });
     targetIds.forEach(function (tId) {
       const zone = document.getElementById(tId);
@@ -521,7 +541,8 @@ function makeDragQuestion(cfg) {
       checked: checked,
       lastWrongPlacement: lastWrongPlacement ? Object.assign({}, lastWrongPlacement) : null,
       showingCorrect: showingCorrect,
-      passed: passed
+      passed: passed,
+      lastSubmittedSig: lastSubmittedSig
     };
   }
 
@@ -538,6 +559,8 @@ function makeDragQuestion(cfg) {
     done               = !!s.done;
     checked            = !!s.checked;
     lastWrongPlacement = s.lastWrongPlacement || null;
+    /* מסמך ישן בלי המפתח הזה → null, כלומר הכפתור מחושב כמו קודם. */
+    lastSubmittedSig   = (typeof s.lastSubmittedSig === 'string') ? s.lastSubmittedSig : null;
     showingCorrect     = !!s.showingCorrect;
     passed             = !!s.passed;
   }
@@ -547,11 +570,14 @@ function makeDragQuestion(cfg) {
      xapiAnswered — כל אלה קרו בפעם הראשונה, וכפילות כאן הייתה מדווחת
      תשובה שנייה על אותה שאלה.
 
-     render() נקרא אחרון בכל מסלול. הוא זה שמחשב את כפתור הבדיקה מ-allFilled
-     — אותו predicate שהקוד החי משתמש בו — ולכן הוא מה שמונע לומד תקוע.
-     במסלול "ניסיון שגוי אחד" **לא** משביתים את הכפתור כמו ש-check() עושה:
-     שם ההשבתה נכונה כי היא רגעית ומתבטלת בגרירה הבאה, אבל אחרי טעינת
-     עמוד היא הייתה משאירה לומד עם לוח מלא וכפתור מת. */
+     render() נקרא אחרון בכל מסלול. הוא זה שמחשב את כפתור הבדיקה — אותו
+     predicate בדיוק שהקוד החי משתמש בו — ולכן הוא מה שמונע לומד תקוע.
+     במסלול "ניסיון שגוי אחד" עדיין אין כאן `disabled = true` ידני; ההשבתה
+     נגזרת מ-lastSubmittedSig בתוך render(), ולכן היא נכונה גם בחי וגם אחרי
+     טעינת עמוד: הלוח מלא, הכפתור מושבת כי התשובה לא השתנתה, וכל גרירה
+     מדליקה אותו מחדש. הניסוח הקודם כאן השבית *לא* כלום ותיאר את זה כפשרה
+     מול "לומד תקוע" — זה החזיר ללומד את היכולת לשלוח שוב בדיוק את אותה
+     תשובה ולשרוף את הניסיון השני. */
   function restoreUI() {
     /* ⚠️ render() ולא resetInitial(). תוקן 2026-08-18, שלושה באגים בשורה אחת:
        (א) resetInitial() מאפס placement ל-'source' לכל פריט — כלומר לומד
@@ -969,12 +995,45 @@ document.addEventListener('keydown', function (e) {
    tbl9-feedbox, para10-feedbox, s12-feedbox.
    ========================================================= */
 
+/* מיקומי בועיות המשוב שהלומד גרר: boxId → {left, top}.
+   הערכים הם פיקסלים של קנבס העיצוב (1280×710) ולא של המסך: ההגדלה
+   היא transform על #app, ולכן layout px אינם משתנים בין חלונות ומכשירים —
+   מיקום שנשמר במסך אחד תקף בדיוק גם באחר.
+   נלכד ב-capturePartPayload ומוחזר ב-applyResumeVars. */
+var fbPositions = {};
+
+/* מחזיר מיקום שנשמר. מחזיר true אם היה משהו להחזיר. */
+function scqFbApplyPosition(boxId) {
+  var box = document.getElementById(boxId);
+  var pos = fbPositions[boxId];
+  if (!box || !pos) return false;
+  /* bottom חייב להיות auto: ברירת המחדל ב-CSS עוגנת את הבועית ב-bottom
+     (ראו .scq-fb-box ב-styles.css), והצבת top לבדה הייתה מותירה את שתיהן
+     פעילות — בדיוק מה ש-mousedown של הגרירה עושה. */
+  box.style.left = pos.left + 'px';
+  box.style.top = pos.top + 'px';
+  box.style.bottom = 'auto';
+  return true;
+}
+
 function scqFbResetPosition(boxId) {
   const box = document.getElementById(boxId);
   if (!box) return;
+  /* צייר רץ → זו אינה הודעת משוב חדשה אלא הצגה מחדש של משוב קיים,
+     ולכן המיקום שהלומד בחר מוחזר במקום להימחק. זה התיקון לתקלה
+     שדווחה מ-QA: כל רענון וכל חזרה למסך עברו דרך showFeedback → איפוס.
+     במסלול הרגיל (משוב חדש) האיפוס **נשמר**: בועית שנגררה לפינה חייבת
+     לחזור לתצוגה כשיש משהו חדש להגיד.
+     ⚠אין כאן clamp במכוון: הפונקציה רצה לפני classList.add('visible'),
+     כלומר כשה-box עדיין display:none וה-offsetWidth שלו 0 — כל חישוב גבולות
+     כאן היה שגוי. הערכים בין כה וכה כבר clamped על ידי mousemove. */
+  if (typeof resumeIsPainting === 'function' && resumeIsPainting()) {
+    if (scqFbApplyPosition(boxId)) return;
+  }
   box.style.left = '';
   box.style.top = '';
   box.style.bottom = '';
+  delete fbPositions[boxId];
 }
 
 function scqFbMakeDraggable(boxId) {
@@ -982,15 +1041,15 @@ function scqFbMakeDraggable(boxId) {
   if (!box) return;
 
   let dragging = false;
-  let startX = 0, startY = 0, startLeft = 0, startTop = 0;
+  let startX = 0, startY = 0, startLeft = 0, startTop = 0, scale = 1;
 
   box.addEventListener('mousedown', function (e) {
     if (e.target.closest('.scq-fb-reveal-btn')) return;
     const parent = box.offsetParent || box.parentElement;
-    const boxRect = box.getBoundingClientRect();
     const parentRect = parent.getBoundingClientRect();
-    startLeft = boxRect.left - parentRect.left;
-    startTop = boxRect.top - parentRect.top;
+    scale = parentRect.width / parent.offsetWidth || 1;
+    startLeft = box.offsetLeft;
+    startTop = box.offsetTop;
     box.style.left = startLeft + 'px';
     box.style.top = startTop + 'px';
     box.style.bottom = 'auto';
@@ -1004,11 +1063,10 @@ function scqFbMakeDraggable(boxId) {
   document.addEventListener('mousemove', function (e) {
     if (!dragging) return;
     const parent = box.offsetParent || box.parentElement;
-    const parentRect = parent.getBoundingClientRect();
-    const maxLeft = Math.max(0, parentRect.width - box.offsetWidth);
-    const maxTop = Math.max(0, parentRect.height - box.offsetHeight);
-    let left = startLeft + (e.clientX - startX);
-    let top = startTop + (e.clientY - startY);
+    const maxLeft = Math.max(0, parent.offsetWidth - box.offsetWidth);
+    const maxTop = Math.max(0, parent.offsetHeight - box.offsetHeight);
+    let left = startLeft + (e.clientX - startX) / scale;
+    let top = startTop + (e.clientY - startY) / scale;
     left = Math.min(Math.max(0, left), maxLeft);
     top = Math.min(Math.max(0, top), maxTop);
     box.style.left = left + 'px';
@@ -1019,6 +1077,12 @@ function scqFbMakeDraggable(boxId) {
     if (!dragging) return;
     dragging = false;
     box.classList.remove('is-dragging');
+    /* עד כאן המיקום חי אך ורק ב-style inline של האלמנט, ולכן כל רענון
+       או ציור מחדש מחק אותו. offsetLeft/offsetTop תקפים כאן כי הבועית
+       גלויה, והערכים כבר clamped על ידי mousemove. */
+    fbPositions[boxId] = { left: box.offsetLeft, top: box.offsetTop };
+    /* מושהיה ולא סינכרונית: זה שינוי קוסמטי, לא תשובה. */
+    if (typeof scheduleResumeSave === 'function') scheduleResumeSave();
   });
 }
 
@@ -1146,6 +1210,10 @@ function capturePartPayload() {
      ה-wrong-final (רק הענף הבינוני מאפס אותו), ולכן הוא גם מה שקובע
      נכון/שגוי בציור — בדיוק כמו ב-s12Check. */
   st.s12 = { selected: s12Selected, attempts: s12Attempts, done: s12Done };
+  /* מיקומי בועיות המשוב שנגררו (ראו fbPositions). חייב לצאת מכאן
+     ולא להיכתב למסמך ממקום אחר: captureUnitState **מחליף** את
+     parts[slug] בכל שמירה. */
+  st.fbPos = Object.assign({}, fbPositions);
   return st;
 }
 
@@ -1168,6 +1236,8 @@ function capturePartPayload() {
    אפשר לענות עליו אבל מתעלם מלחיצות. */
 function applyResumeVars(st) {
   if (!st) return;
+  /* מסמך ישן בלי המפתח → המפה נשארת ריקה, וההתנהגות זהה לקודם. */
+  if (st.fbPos) Object.keys(st.fbPos).forEach(function (k) { fbPositions[k] = st.fbPos[k]; });
   if (st.qResults) {
     Object.keys(st.qResults).forEach(function (k) { XAPI_Q_RESULTS[k] = st.qResults[k]; });
   }
@@ -1222,11 +1292,23 @@ function s12RestoreUI() {
 
   if (s12Attempts >= 1) s12ShowFeedback('wrong1', false);
   /* הבחירה עצמה מוחזרת, והכפתור מחושב מ**אותו** predicate של s12Select.
-     כשאין בחירה הכפתור נשאר מושבת — וזה נכון ולא תקוע, כי לחיצה על אופציה
-     היא הדרך קדימה והיא עובדת. */
+     כשאין בחירה הכפתור נשאר מושבת, ולחיצה על אופציה היא הדרך קדימה.
+
+     ⚠️ onclick מוצב כאן במפורש, וזה לא עודף — זה התיקון ל-QA 2026-08-20 שקף 8
+     ("כפתור צדקתי דלוק אבל לא מגיב"). הכפתור הזה הוא **היחיד** ביחידה שאין לו
+     onclick ב-markup (כל 21 כפתורי הבדיקה בסינים 01/02/04 נושאים
+     onclick="sNNCheck()", ושתי שאלות הפאבריקה בסין הזה מקבלות אותו מ-restoreUI
+     של הפאבריקה). לכן רק כאן החיווט תלוי לגמרי ב-JS.
+     ומי שהיה אמור לחווט — resetScreenState6 — יוצא מוקדם על
+     `s12Attempts > 0` **לפני** שורת ה-onclick שלו. בשחזור applyResumeVars מחזיר
+     את s12Attempts לפני ה-goTo, ולכן השומר תמיד תופס: הכפתור חזר בלי handler,
+     לחיצה על מסיח הדליקה אותו (s12Select כותב disabled=false בלבד), והלומד קיבל
+     כפתור דלוק שלא מגיב — נעילה מלאה בשאלה האחרונה של מועד ב', שרק רענון נוסף
+     שחרר. ההערה הקודמת כאן טענה "וזה נכון ולא תקוע"; זה היה שגוי.
+     ההערה על הסדר ב-resetScreenState6 נשארת נכונה — אין לסמוך עליו כאן. */
   if (s12Selected) {
     const opt = document.getElementById(s12Selected);
     if (opt) { opt.classList.add('selected'); opt.setAttribute('aria-checked', 'true'); }
   }
-  if (btn) btn.disabled = !s12Selected;
+  if (btn) { btn.onclick = s12Check; btn.disabled = !s12Selected; }
 }

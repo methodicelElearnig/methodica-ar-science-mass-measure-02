@@ -405,6 +405,41 @@ function checkMetadata() {
       fs.existsSync(path.join(mdDir, slug + '.json')) &&
       (/var XAPI_METADATA_FILE = '\.\.\/metadata\/([^']+)'/.exec(js) || [])[1] === slug + '.json');
 
+    /* The feedback popup is dragged inside a CSS-scaled canvas, so the handler
+       must divide pointer deltas by the live scale and measure in layout px.
+       db67eba fixed 01/02/04/05 and MISSED 06, which then dragged at the wrong
+       rate for anyone not at exactly 100%. Sain 03 has no popup at all.
+       Asserted from source in every Sain so a partial rollout cannot recur. */
+    if (c !== '03') {
+      const drag = /function scqFbMakeDraggable\([\s\S]*?\n\}/.exec(js);
+      ok(c, 'the feedback-popup drag is scale-aware',
+        !!drag && /scale = parentRect\.width \/ parent\.offsetWidth/.test(drag[0]) &&
+        /\(e\.clientX - startX\) \/ scale/.test(drag[0]),
+        drag ? 'no scale division found' : 'scqFbMakeDraggable not found');
+      ok(c, 'and persists the dragged position on mouseup',
+        !!drag && /fbPositions\[boxId\] = \{ left: box\.offsetLeft, top: box\.offsetTop \}/.test(drag[0]));
+    }
+
+    /* ── a check button with no inline onclick must be wired by its painter ──
+       QA 2026-08-20 slide 8. resetScreenStateN guards on "question already
+       started" and returns BEFORE its `btn.onclick = sNNCheck` line, while
+       applyResumeVars restores the attempts counter before goTo — so on every
+       resume the guard fires and the JS wiring is skipped. A button survives
+       that only if the markup carries an inline onclick (all 21 in Sains
+       01/02/04 do) or its painter re-wires it (the four factory instances do).
+       This flags any NEW question that has neither; the behavioural proof for
+       s12, the one that actually broke, is in the 06 block below. */
+    const htmlSrc = fs.readFileSync(path.join(BASE, 'methodica-science-mass-measure-02-' + c, 'index.html'), 'utf8');
+    for (const m of htmlSrc.matchAll(/<button[^>]*id="([^"]*-(?:check|btn-check))"[^>]*>/g)) {
+      const inline = /onclick="/.test(m[0]);
+      if (inline) continue;                     // markup-wired: immune to the guard
+      const stem = m[1].replace(/-(?:btn-)?check$/, '');
+      // the painter for this question must assign onclick somewhere
+      const wired = new RegExp('onclick = (?:' + stem + 'Check|check)\\b').test(js);
+      ok(c, 'check button "' + m[1] + '" has no inline onclick, so a painter must wire it',
+        wired, 'neither inline nor painter-wired');
+    }
+
     // Screen map: exactly TOTAL_SCREENS keys, 0..N-1, no gaps.
     const total = parseInt(/const TOTAL_SCREENS = (\d+);/.exec(js)[1], 10);
     const block = /var SCREEN_TO_SUBCONTENT = \{([\s\S]*?)\n\};/.exec(js)[1];
@@ -983,26 +1018,49 @@ async function runResume(c) {
     /* ── The shared drag painter (screens 4 / 8 / 19) ───────────────────
        Placement is DOM parentage; screen 4 stands in for all three. */
     exec('goTo(4);');
+    /* Place EVERY item — all into one zone, so the board is complete but the
+       answer is wrong — and submit for real. s5Check is what captures the
+       signature, and an all-placed board is what makes the button assertions
+       below discriminating instead of trivially disabled. */
     exec("window.__s5item = S5_ITEM_IDS[0];" +
-         "var __z = document.getElementById('s5-zone-bruto');" +
-         "var __e = document.getElementById(window.__s5item);" +
-         "if (__e.parentElement) __e.parentElement.removeChild(__e); __z.appendChild(__e);" +
-         "s5Attempts = 1;");
+         "S5_ITEM_IDS.forEach(function (id) {" +
+         "  var e = document.getElementById(id);" +
+         "  if (e && e.parentElement) e.parentElement.removeChild(e);" +
+         "  document.getElementById('s5-zone-bruto').appendChild(e);" +
+         "});" +
+         "s5Check();");
+    ok(c, 'one wrong attempt leaves the drag question answerable',
+      val('s5Attempts') === 1 && val('s5Done') === false,
+      val('s5Attempts') + ' / ' + val('s5Done'));
+    ok(c, 'the live code disables the check button after a wrong drag answer',
+      val("document.getElementById('s5-check').disabled") === true);
     exec('window.__snapS5 = capturePartPayload();');
     ok(c, 'capture read the drag placement out of the DOM',
       val("window.__snapS5.s5.place[window.__s5item]") === 'bruto',
       String(val("window.__snapS5.s5.place[window.__s5item]")));
-    exec("var __e2 = document.getElementById(window.__s5item);" +
-         "__e2.parentElement.removeChild(__e2);" +
-         "document.getElementById('s5-source-bank').appendChild(__e2);" +
-         "s5Attempts = 0;");
+    /* Wipe everything back to the bank AND clear the signature, so whatever
+       comes back can only have come from the snapshot. */
+    exec("S5_ITEM_IDS.forEach(function (id) {" +
+         "  var e = document.getElementById(id);" +
+         "  if (e && e.parentElement) e.parentElement.removeChild(e);" +
+         "  document.getElementById('s5-source-bank').appendChild(e);" +
+         "});" +
+         "s5Attempts = 0; s5LastSubmittedSig = null;");
     exec('applyResumeVars(window.__snapS5); applyResumeDom(window.__snapS5); restoreScreenUI(4);');
     ok(c, 'restore physically re-places the drag item in its zone',
       val("document.getElementById(window.__s5item).parentElement.id") === 's5-zone-bruto',
       String(val("document.getElementById(window.__s5item).parentElement.id")));
-    ok(c, 'the interim drag restore never strands the learner',
-      val("(function(){ var b=document.getElementById('s5-check'); return b ? typeof b.disabled === 'boolean' : false; })()") === true &&
-      val("document.getElementById('s5-feedbox').classList.contains('visible')") === true);
+    /* QA 2026-08-20 slide 10 — see the Sain 04 block for the full rationale. */
+    ok(c, 'interim drag restore does NOT allow resubmitting the unchanged answer',
+      val("document.getElementById('s5-check').disabled") === true &&
+      val("document.getElementById('s5-feedbox').classList.contains('visible')") === true,
+      'disabled=' + val("document.getElementById('s5-check').disabled"));
+    exec("var __m = document.getElementById(window.__s5item);" +
+         "__m.parentElement.removeChild(__m);" +
+         "document.getElementById('s5-zone-neto').appendChild(__m);" +
+         "s5UpdateCheckBtn();");
+    ok(c, 'and moving one card re-enables it — the learner is never stranded',
+      val("document.getElementById('s5-check').disabled") === false);
   }
 
   if (c === '01') {
@@ -1253,11 +1311,25 @@ async function runResume(c) {
       val('tblAttempts') + ' / ' + val('tblDone'));
     ok(c, 'interim restore reveals the hint, as the wrong branch did',
       val("document.getElementById('tbl-hint').hidden") === false);
-    ok(c, 'interim restore leaves the learner able to RETRY (not stranded)',
-      val("document.getElementById('tbl-check').disabled") === false &&
+    /* QA 2026-08-20 slide 10 (the general defect). In live play tblCheck
+       disables צדקתי after a wrong attempt, and only an edit re-enables it.
+       The restore used to recompute the button from tblAllFilled alone — true,
+       because the learner's own wrong answer is still in the table — so the
+       IDENTICAL answer could be resubmitted and the real second attempt was
+       burned silently. tblLastSubmittedSig now survives the restore, so the
+       button comes back disabled; the pair below is the whole contract, and
+       the second half is what keeps the §6א "stranded learner" fix intact. */
+    ok(c, 'interim restore does NOT allow resubmitting the unchanged answer',
+      val("document.getElementById('tbl-check').disabled") === true &&
       val("document.getElementById('tbl-check').textContent") === 'צדקתי?',
       val("document.getElementById('tbl-check').textContent") + ' disabled=' +
       val("document.getElementById('tbl-check').disabled"));
+    exec("var _e0=document.getElementById(TBL_INPUT_IDS[0]); _e0.value='777'; tblOnInput();");
+    ok(c, 'and editing one field re-enables it — the learner is never stranded',
+      val("document.getElementById('tbl-check').disabled") === false);
+    /* Restore the original wrong answer, so the wrong-final assertions below
+       still describe the answer the learner actually submitted twice. */
+    exec("var _e1=document.getElementById(TBL_INPUT_IDS[0]); _e1.value='999'; tblOnInput();");
 
     // Now burn the second attempt to land on wrong-final.
     exec("tblCheck();");
@@ -1323,6 +1395,53 @@ async function runResume(c) {
       val("tblDdValues['tblA-dd-1']") === 'לא-נכון' &&
       val("document.getElementById('tbl-reveal-btn').textContent") === 'התשובה הנכונה',
       val("tblDdValues['tblA-dd-1']"));
+
+    /* ── the dragged feedback-popup position ─────────────────────────────
+       QA: the movable panel snapped back to its default on every refresh AND
+       on every return to the screen. The position lived only in inline
+       style.left/top, and scqFbResetPosition — called by every showFeedback,
+       including the ones the painter re-runs — cleared it.
+       jsdom has no layout, so a real drag cannot be simulated; these drive
+       the seam the drag writes to (fbPositions) and assert the round-trip. */
+    exec("fbPositions['tbl-feedbox'] = { left: 300, top: 200 };");
+    exec('window.__snapFb = capturePartPayload();');
+    ok(c, 'the dragged position is captured into the payload',
+      val("window.__snapFb.fbPos && window.__snapFb.fbPos['tbl-feedbox'].left") === 300,
+      JSON.stringify(val("window.__snapFb.fbPos")));
+
+    /* Wipe as a reload would, then restore and repaint through the real path:
+       goTo -> repaintScreen -> restoreScreenUI -> tblShowFeedback ->
+       scqFbResetPosition, which is exactly where the position used to die. */
+    exec("window.__wipe04(); Object.keys(fbPositions).forEach(function (k) { delete fbPositions[k]; });" +
+         "document.getElementById('tbl-feedbox').style.left = '';" +
+         "document.getElementById('tbl-feedbox').style.top = '';");
+    exec('applyResumeVars(window.__snapFb);');
+    ok(c, 'and restored into fbPositions',
+      val("fbPositions['tbl-feedbox'] && fbPositions['tbl-feedbox'].top") === 200,
+      JSON.stringify(val("fbPositions['tbl-feedbox']")));
+    exec('applyResumeDom(window.__snapFb); goTo(0); goTo(1);');
+    ok(c, 'a repaint re-applies the dragged position instead of resetting it',
+      val("document.getElementById('tbl-feedbox').style.left") === '300px' &&
+      val("document.getElementById('tbl-feedbox').style.top") === '200px',
+      'left=' + val("document.getElementById('tbl-feedbox').style.left") +
+      ' top=' + val("document.getElementById('tbl-feedbox').style.top"));
+    /* bottom:auto is not cosmetic — the CSS anchors the box by bottom, so
+       without it the restored top is ignored and the box does not move. */
+    ok(c, 'and sets bottom:auto, so the restored top actually wins over the CSS',
+      val("document.getElementById('tbl-feedbox').style.bottom") === 'auto',
+      '"' + val("document.getElementById('tbl-feedbox').style.bottom") + '"');
+
+    /* A genuinely NEW feedback message must still recenter: a popup parked in
+       a corner has to come back into view. This is the half that must NOT
+       change, and it is why the guard keys on "is a painter running". */
+    exec("tblShowFeedback('wrong1', false);");
+    ok(c, 'a new feedback message still resets the position',
+      val("document.getElementById('tbl-feedbox').style.left") === '' &&
+      val("document.getElementById('tbl-feedbox').style.bottom") === '',
+      'left="' + val("document.getElementById('tbl-feedbox').style.left") + '"');
+    ok(c, 'and forgets the stored position, so it will not come back',
+      val("fbPositions['tbl-feedbox'] === undefined") === true,
+      JSON.stringify(val("fbPositions")));
   }
 
   /* ── Phase 2b: the drag-question round-trip, parts 05 / 06 ────────────
@@ -1341,6 +1460,63 @@ async function runResume(c) {
            'attempts' in window.__snapA && 'done' in window.__snapA &&
            'showingCorrect' in window.__snapA && 'passed' in window.__snapA`) === true,
       String(val('JSON.stringify(Object.keys(window.__snapA || {}))')));
+
+    /* ── interim (one wrong attempt) through the factory ─────────────────
+       QA 2026-08-20 slide 10. render() used to compute the check button from
+       "all targets filled" alone, which is true after a wrong attempt because
+       the learner's own answer is still on the board — so a reload handed back
+       a live button and the identical answer could be resubmitted, burning the
+       real second attempt. lastSubmittedSig now round-trips, so the restored
+       button is disabled until something actually moves.
+       Only 05/dqA runs this: 06 carries a byte-identical copy of the factory,
+       and dqA is the instance whose target ids are known here. */
+    if (c === '05') {
+      /* A complete but wrong board: every target filled, assignment reversed. */
+      exec(`(function () {
+        var drags = Object.keys(dqA.getState().placement);
+        var targets = ['dqA-target-1','dqA-target-2','dqA-target-3','dqA-target-4'];
+        var pl = {};
+        drags.forEach(function (d) { pl[d] = 'source'; });
+        targets.forEach(function (t, i) { pl[drags[drags.length - 1 - i]] = t; });
+        dqA.setState({ placement: pl, attempts: 0, done: false, checked: false,
+                       lastWrongPlacement: null, showingCorrect: false, passed: false });
+      })();`);
+      exec('dqACheck();');
+      ok(c, 'dqA: one wrong attempt, still answerable',
+        val('dqA.getState().attempts') === 1 && val('dqA.getState().done') === false,
+        val('dqA.getState().attempts') + ' / ' + val('dqA.getState().done'));
+      ok(c, 'dqA: the live code disables the check button after a wrong answer',
+        val("document.getElementById('dqA-btn-check').disabled") === true);
+
+      exec('window.__snapI = capturePartPayload();');
+      exec(`dqA.setState({ placement: {}, attempts: 0, done: false, checked: false,
+                           lastWrongPlacement: null, showingCorrect: false, passed: false });
+            dqA.reset();`);
+      exec('applyResumeVars(window.__snapI); restoreScreenUI(' + screen + ');');
+      ok(c, 'dqA: interim restore does NOT allow resubmitting the unchanged answer',
+        val("document.getElementById('dqA-btn-check').disabled") === true,
+        'disabled=' + val("document.getElementById('dqA-btn-check').disabled"));
+      /* Move one card back to the bank: the board is no longer complete AND the
+         signature changed. Then put it somewhere else, so the board is complete
+         again with a genuinely different answer — that is the case that must
+         re-enable, and the one that proves nobody is stranded. */
+      exec(`(function () {
+        var st = dqA.getState();
+        var drags = Object.keys(st.placement);
+        var moved = drags.filter(function (d) { return st.placement[d] !== 'source'; })[0];
+        var free  = drags.filter(function (d) { return st.placement[d] === 'source'; })[0];
+        var slot  = st.placement[moved];
+        st.placement[moved] = 'source';
+        st.placement[free]  = slot;
+        dqA.setState(st);
+        /* setState only writes the closure; restoreUI is what repaints, and
+           render() inside it is where the button predicate actually runs. */
+        dqA.restoreUI();
+      })();`);
+      ok(c, 'dqA: a different complete answer re-enables it — never stranded',
+        val("document.getElementById('dqA-btn-check').disabled") === false,
+        'disabled=' + val("document.getElementById('dqA-btn-check').disabled"));
+    }
 
     /* Force the wrong-final state: two attempts with nothing placed correctly.
        window[P+'Check'] is the live entry point the markup calls. */
@@ -1446,6 +1622,31 @@ async function runResume(c) {
     ok(c, 'the para10 hint stays visible on a clean screen after a resume',
       val("document.getElementById('para10-hint').hidden") === false,
       'hidden=' + val("document.getElementById('para10-hint').hidden"));
+
+    /* ── QA 2026-08-20 slide 8: "צדקתי is lit but does not respond" ──────
+       s12-check is the only check button in the unit with no inline onclick in
+       the markup, so after a reload its handler is genuinely absent until JS
+       wires it. resetScreenState6 would — but it returns early on
+       `s12Attempts > 0`, and applyResumeVars restores that counter before goTo,
+       so the guard always fires on a resume. s12RestoreUI then set only
+       `disabled`. The learner got a button that lit up on selecting an option
+       (s12Select writes disabled=false) and did nothing on click: a hard lock
+       on the last question of מועד ב, escapable only by another refresh.
+       Setting onclick=null below is a faithful stand-in for the post-reload
+       DOM precisely because this button carries no inline handler. */
+    exec("s12Done = false; s12Attempts = 1; s12Selected = null;");
+    exec('window.__snapS12 = capturePartPayload();');
+    exec("document.getElementById('s12-check').onclick = null;");
+    exec('applyResumeVars(window.__snapS12); goTo(6);');
+    ok(c, 's12: an interim restore leaves the check button with a handler',
+      val("!!document.getElementById('s12-check').onclick") === true,
+      'onclick=' + val("String(document.getElementById('s12-check').onclick)").slice(0, 40));
+    /* And the whole point: picking an option must produce a button that works. */
+    exec("s12Select(document.querySelector('#s11 .s12-opt:not(.locked)').id);");
+    ok(c, 's12: after picking an option the button is enabled AND responds',
+      val("document.getElementById('s12-check').disabled") === false &&
+      val("(function(){ var n=s12Attempts; document.getElementById('s12-check').click(); return s12Attempts !== n; })()") === true,
+      'disabled=' + val("document.getElementById('s12-check').disabled"));
   }
 
   if (c === '02') {
