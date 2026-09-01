@@ -44,19 +44,17 @@ function shortId(u) { return String(u || '').replace(/\/+$/, '').split('/').pop(
    ה-State) במקום xapi-720-i.js. כלומר הדגל הזה משנה גם את הדיווחיות, לא רק
    את השחזור — ראו 50-loader.js.
 
-   ── מה מיושם כרגע (שלב 1) ──
+   ── מה מיושם ──
    מסמך state יחידתי אחד (unit-js/40-resume.js), מצביע נחיתה בין סינים, מצביע
    מסך בתוך הסין, ויומן ה-completed שעבר מ-sessionStorage לתוך המסמך — כלומר
    הוא שורד סגירת לשונית, מה ש-40-ledger.js לא יכול היה.
 
-   ── מה עוד לא, ומה זה אומר בפועל (שלב 2) ──
-   ארבעת ה-hooks הפר-סיניים קיימים, אבל רק capturePartPayload מחזיר תוכן;
-   applyResumeVars / applyResumeDom / restoreScreenUI הם stubs. לכן **מצב
-   התשובות אינו משוחזר**: לומד שחוזר נוחת על המסך הנכון, אבל המסך נקי.
-   ומכיוון ש-stationProgress* ו-XAPI_Q_RESULTS לא משוחזרים, גם הניתוב קדימה
-   שנגזר מהם (getPracticeScore בסין 01, getBasicPracticeScore /
-   getStandardPracticeScore בסין 02, getMoedBScore בסין 06) עלול לשלוח לומד
-   שעמד בסף אל התרגול המחזק. זו רגרסיה מוכרת ומכוונת לשלב הזה — לא באג
-   שהתגלה. אין לפרוס לייצור לפני שלב 2.
-   ראו RESUME.md בלומדת methodica-math-scale-01 לעיצוב המלא. */
+   ⚠️ ההערה שהייתה כאן תיארה את שלב 2 כלא-בנוי ("applyResumeVars /
+   applyResumeDom / restoreScreenUI הם stubs", "אין לפרוס לייצור לפני שלב 2").
+   זה **מיושן**: שלב 2 הושלם ב-2026-08-18/19 בכל ששת הסינים, מצב התשובות כן
+   משוחזר, ו-stationProgress ו-XAPI_Q_RESULTS חוזרים יחד איתו — ולכן גם הניתוב
+   קדימה שנגזר מהם (getPracticeScore בסין 01, getBasicPracticeScore /
+   getStandardPracticeScore בסין 02, getMoedBScore בסין 06) נכון אחרי resume.
+   applyResumeDom נשאר ריק בסינים 03/05/06 כי אין בהם ערכים שיושבים רק ב-DOM,
+   לא כי הוא לא מומש. ראו RESUME.md §6 להיסטוריה המלאה. */
 var RESUME_ENABLED = true;

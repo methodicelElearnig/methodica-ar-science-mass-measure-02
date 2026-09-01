@@ -723,6 +723,7 @@ let sq5Done = false;
 let sq5Phase = 'before';
 let sq5LastAnswer = null;
 let sq5ShowingCorrect = false;
+let sq5LastSubmittedSig = null;
 
 function sq5AllSelected() {
   return sq5Selected.r1 !== null && sq5Selected.r2 !== null &&
@@ -752,7 +753,7 @@ function sq5Select(rowNum, val) {
   const activeBtn = document.getElementById('sq5-r' + rowNum + '-' + val);
   if (activeBtn) activeBtn.classList.add('selected');
   const checkBtn = document.getElementById('sq5-check');
-  checkBtn.disabled = !sq5AllSelected();
+  checkBtn.disabled = !sq5AllSelected() || sq5Sig() === sq5LastSubmittedSig;
 }
 
 function sq5ShowFeedback(kind, isCorrect) {
@@ -850,6 +851,7 @@ function sq5Reveal() {
 function sq5Check() {
   if (sq5Done || !sq5AllSelected()) return;
   sq5Attempts++;
+  sq5LastSubmittedSig = sq5Sig();
   const allCorrect = ['r1', 'r2', 'r3', 'r4'].every(function (r) {
     return sq5Selected[r] === TF_SQ5_CORRECT[r];
   });
@@ -1209,6 +1211,7 @@ let dd8Done = false;
 let dd8Attempts = 0;
 let dd8LastAnswer = null;
 let dd8ShowingCorrect = false;
+let dd8LastSubmittedSig = null;
 
 function dd8Toggle(ddId) {
   const opts = document.getElementById(ddId + '-opts');
@@ -1233,7 +1236,7 @@ function dd8Select(ddId, val) {
   if (opts) opts.hidden = true;
   if (btn) { btn.setAttribute('aria-expanded', 'false'); btn.classList.remove('wrong', 'correct'); }
   const allSelected = DD8_IDS.every(function (id) { return dd8Values[id] !== ''; });
-  document.getElementById('dd8-check').disabled = !allSelected;
+  document.getElementById('dd8-check').disabled = !allSelected || dd8Sig() === dd8LastSubmittedSig;
 }
 
 function dd8CloseAllDropdowns() {
@@ -1320,6 +1323,7 @@ function dd8Check() {
   if (dd8Done) return;
   dd8CloseAllDropdowns();
   dd8Attempts++;
+  dd8LastSubmittedSig = dd8Sig();
   const allCorrect = DD8_IDS.every(function (id) { return dd8Values[id] === DD8_CORRECT[id]; });
   xapiAnswered('006', 'q1', allCorrect, allCorrect || dd8Attempts >= 2, xapiFieldsAnswer(DD8_IDS, dd8Values));
 
@@ -1409,6 +1413,7 @@ let drag9Attempts = 0;
 let drag9DragId = null;
 let drag9LastAnswer = null;
 let drag9ShowingCorrect = false;
+let drag9LastSubmittedSig = null;
 const TEXTS_DRAG9 = {
   correct: { title: 'מצוין!', body: 'ככל שהגוף גדול ומסיבי יותר, כך משתמשים בדרך כלל ביחידת מסה גדולה יותר.' },
   wrong1: { title: 'התשובה אינה נכונה.', body: 'לא נורא, גם מטעויות לומדים. ננסה שוב?' },
@@ -1426,7 +1431,8 @@ function drag9AllPlaced() {
 }
 
 function drag9UpdateCheckBtn() {
-  document.getElementById('drag9-check').disabled = !drag9AllPlaced();
+  document.getElementById('drag9-check').disabled =
+    !drag9AllPlaced() || drag9Sig() === drag9LastSubmittedSig;
 }
 
 function drag9ClearZoneStates() {
@@ -1589,6 +1595,7 @@ function drag9RevealCorrect() {
 function drag9Check() {
   if (drag9Done) return;
   drag9Attempts++;
+  drag9LastSubmittedSig = drag9Sig();
 
   let allCorrect = true;
   DRAG9_ZONES.forEach(function (zoneId) {
@@ -1961,19 +1968,22 @@ function capturePartPayload() {
   st.sq5 = {
     sel: Object.assign({}, sq5Selected),
     att: sq5Attempts, done: sq5Done, phase: sq5Phase,
-    last: sq5LastAnswer, showing: sq5ShowingCorrect
+    last: sq5LastAnswer, showing: sq5ShowingCorrect,
+    sig: sq5LastSubmittedSig
   };
   st.dd8 = {
     vals: Object.assign({}, dd8Values),
     att: dd8Attempts, done: dd8Done,
-    last: dd8LastAnswer, showing: dd8ShowingCorrect
+    last: dd8LastAnswer, showing: dd8ShowingCorrect,
+    sig: dd8LastSubmittedSig
   };
   /* drag9 מחזיק את המיקום **רק ב-DOM** (הפריט יושב פיזית בתוך האזור), ולכן
      הוא נקרא משם — אותה נגזרת בדיוק שה-wrong-final עושה ל-drag9LastAnswer. */
   st.drag9 = {
     place: captureDrag9Placement(),
     att: drag9Attempts, done: drag9Done,
-    last: drag9LastAnswer, showing: drag9ShowingCorrect
+    last: drag9LastAnswer, showing: drag9ShowingCorrect,
+    sig: drag9LastSubmittedSig
   };
   return st;
 }
@@ -1985,6 +1995,27 @@ function captureMcq(screenSel, selected, attempts, done, phase) {
     if (el.classList.contains('wrong') && el.dataset.id) wrong.push(el.dataset.id);
   });
   return { sel: (selected || []).slice(), att: attempts, done: done, phase: phase, wrong: wrong };
+}
+
+/* ── חתימת התשובה שכבר נשלחה ──
+   בקוד החי sNNCheck() מכבה את כפתור "צדקתי", והוא חוזר רק כשהלומד משנה משהו.
+   אחרי רענון אי אפשר לשחזר את ההשבתה הזאת "כמו שהיא": הצייר מחשב את הכפתור
+   מאותו predicate של "הכל מלא", שהוא true כי התשובה השגויה של הלומד
+   עדיין על המסך — ולכן אותה תשובה בדיוק הייתה ניתנת לשליחה חוזרת, והניסיון
+   השני האמיתי נשרף. במקום דגל disabled שלא שורד טעינה, נשמרת חתימה של מה
+   שנשלח בפועל, והכפתור פעיל רק כשהמצב הנוכחי שונה ממנה — אותה התנהגות
+   בדיוק בחי ואחרי שחזור, ובלי להחזיר את הנעילה של §6א. */
+function sq5Sig() {
+  return ['r1', 'r2', 'r3', 'r4'].map(function (r) { return r + ':' + sq5Selected[r]; }).join('|');
+}
+
+function dd8Sig() {
+  return DD8_IDS.map(function (id) { return id + ':' + dd8Values[id]; }).join('|');
+}
+
+function drag9Sig() {
+  var pl = captureDrag9Placement();
+  return DRAG9_ITEM_IDS.map(function (id) { return id + ':' + pl[id]; }).join('|');
 }
 
 function captureDrag9Placement() {
@@ -2046,6 +2077,7 @@ function applyResumeVars(st) {
     sq5Phase = st.sq5.phase || 'before';
     sq5LastAnswer = st.sq5.last || null;
     sq5ShowingCorrect = !!st.sq5.showing;
+    sq5LastSubmittedSig = (typeof st.sq5.sig === 'string') ? st.sq5.sig : null;
   }
   if (st.dd8) {
     if (st.dd8.vals) Object.keys(st.dd8.vals).forEach(function (k) { dd8Values[k] = st.dd8.vals[k]; });
@@ -2053,12 +2085,14 @@ function applyResumeVars(st) {
     dd8Done = !!st.dd8.done;
     dd8LastAnswer = st.dd8.last || null;
     dd8ShowingCorrect = !!st.dd8.showing;
+    dd8LastSubmittedSig = (typeof st.dd8.sig === 'string') ? st.dd8.sig : null;
   }
   if (st.drag9) {
     drag9Attempts = st.drag9.att || 0;
     drag9Done = !!st.drag9.done;
     drag9LastAnswer = st.drag9.last || null;
     drag9ShowingCorrect = !!st.drag9.showing;
+    drag9LastSubmittedSig = (typeof st.drag9.sig === 'string') ? st.drag9.sig : null;
   }
 }
 
@@ -2233,7 +2267,7 @@ function sq5RestoreUI() {
   });
   if (sq5Attempts >= 1) sq5ShowFeedback('wrong1', false);
   /* אותו predicate של הזרימה החיה: הכפתור פעיל רק כשכל ארבע השורות נבחרו. */
-  if (checkBtn) { checkBtn.textContent = 'צדקתי?'; checkBtn.onclick = sq5Check; checkBtn.disabled = !sq5AllSelected(); }
+  if (checkBtn) { checkBtn.textContent = 'צדקתי?'; checkBtn.onclick = sq5Check; checkBtn.disabled = !sq5AllSelected() || sq5Sig() === sq5LastSubmittedSig; }
 }
 
 /* מסך 8 — שש רשימות נפתחות. */
@@ -2261,7 +2295,7 @@ function dd8RestoreUI() {
   if (dd8Attempts >= 1) { dd8MarkDropdowns(); dd8ShowFeedback('wrong1', false); dd8EnableHint(); }
   /* אותו predicate של dd8Select: פעיל כשכל השש מולאו. */
   var checkBtn = document.getElementById('dd8-check');
-  if (checkBtn) checkBtn.disabled = !DD8_IDS.every(function (id) { return dd8Values[id] !== ''; });
+  if (checkBtn) checkBtn.disabled = !DD8_IDS.every(function (id) { return dd8Values[id] !== ''; }) || dd8Sig() === dd8LastSubmittedSig;
 }
 
 /* מסך 9 — גרירה לארבעה אזורים. המיקום עצמו הוחזר כבר ב-applyResumeDom;

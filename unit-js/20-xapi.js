@@ -187,10 +187,31 @@ function xapiAnswered(item, qKey, correct, isLast, answer) {
   } catch (e) { console.error('[xAPI] answered ' + item + '/' + qKey, e); }
 }
 
+/* מפתחות ה-(item/qKey) שכבר נשלח עבורם 'requested.1' בטעינת העמוד הזאת.
+   אותו מפתח בדיוק ש-xapiAnswered משתמש בו ל-XAPI_Q_RESULTS. */
+var XAPI_HINTS_SENT = {};
+
 /* בקשת רמז. ⚠️ להציב רק בענף "הרמז נפתח כרגע". רמזים כאן הם לרוב overlay
    ש-hidden שלו מתהפך, ומיקום הקריאה על ה-toggle היה מדווח בקשה שנייה בכל
-   סגירה. ראו REPORT-XAPI.md §4. */
+   סגירה. ראו REPORT-XAPI.md §4.
+
+   ── דה-דופליקציה: פעם אחת לכל שאלה ──
+   ההערה הישנה כאן טענה ש"הפונקציה פותחת בלבד ולכן אין סיכון לדיווח כפול".
+   זה כיסה רק כניסה חוזרת מנתיב הסגירה. ה-overlay נסגר בשלוש דרכים (כפתור
+   הסגירה, קליק על הרקע, ו-Escape), וכולן משאירות את כפתור הרמז חי — ובפאבריקה
+   המשותפת הוא אפילו מופעל מחדש במפורש ב-closeHint. לכן לומד שפותח רמז פעמיים
+   דיווח 'requested.1' פעמיים.
+   הבדיקה כאן ולא באתרי הקריאה: יש 23 אתרים בחמישה סינים, וכולם עוברים דרך
+   הפונקציה הזאת.
+   ── היקף: טעינת עמוד ──
+   המפה נמחקת ברענון, ולכן לומד שמרענן ופותח שוב את אותו רמז ידווח שוב. זו
+   החלטה מכוונת (החלופה היא להחזיק את המפתחות במסמך ה-state). בשחזור עצמו אין
+   סיכון: applyExecutionState מחליף את sendStatement720 ב-no-op כל עוד
+   _restoring דלוק. */
 function xapiRequestedHint(item, qKey) {
+  var _k = item + '/' + qKey;
+  if (XAPI_HINTS_SENT[_k]) return;
+  XAPI_HINTS_SENT[_k] = true;
   if (!window.XAPI_USING_G || typeof sendStatement720 !== 'function') return;
   try { sendStatement720('requested.1', 'question', null, xapiQ(item, qKey)); } catch (e) {}
 }
@@ -216,13 +237,30 @@ function xapiCompleteUnit(result) {
   } catch (e) { console.error('[xAPI] completed unit', e); }
 }
 
-/* played/paused ל-<video> של HTML5. בלומדה הזאת יש וידאו דמות בכמה סינים. */
+/* played/paused ל-<video> של HTML5 — **רק לווידאו תוכן**, לפי סימון מפורש.
+   ── למה allowlist ולא כל ה-<video> ──
+   הגרסה הקודמת בחרה querySelectorAll('video') בלי שום סינון. כל 18 קובצי ה-mp4
+   ביחידה הזאת הם avatar-* — קליפים של הדמות המלווה, כלומר עיטור ולא תוכן —
+   ותשעה מהם (סינים 01/02/05/06) חוברו ודיווחו. סינים 03/04 שתקו רק כי אין בהם
+   <video> כלל, לא בגלל סינון.
+   זה גם לא היה דיווח שקט: כל מסך דמות מריץ video.load() + play() בכניסה
+   (למשל -01/script.js:940), וה-load() על אלמנט מתנגן מפיק אירוע pause ואחריו
+   play — כלומר זוג paused/played מזויף בכל כניסה למסך, כולל חזרה ושחזור.
+   מעכשיו מחוברים רק אלמנטים שנושאים data-xapi-report, וערכו הוא סיומת הפריט
+   (למשל data-xapi-report="003" data-xapi-q="q1"). כרגע אין ביחידה אף אלמנט
+   כזה, ולכן הדיווח כבוי בפועל — המנגנון נשאר מוכן לווידאו תוכן אמיתי.
+   ── objectId ──
+   הגרסה הקודמת שלחה objectType 'question' בלי objectId ובלי questionId, ולכן
+   לא היה לאמירות האלה שום שאלה להיתלות בה. עכשיו הן נושאות xapiQ() כמו כל
+   אמירה אחרת מסוג question. */
 function xapiWireVideos() {
   if (!window.XAPI_USING_G || typeof sendStatement720 !== 'function') return;
-  document.querySelectorAll('video').forEach(function (v) {
+  document.querySelectorAll('video[data-xapi-report]').forEach(function (v) {
     if (v.__xapiWired) return; v.__xapiWired = true;
+    var item = v.getAttribute('data-xapi-report');
+    var qKey = v.getAttribute('data-xapi-q') || 'q1';
     var pausedOnce = false;
-    v.addEventListener('pause', function () { if (v.ended || v.currentTime === 0) return; pausedOnce = true; try { sendStatement720('paused', 'question', null, { time: v.currentTime }); } catch (e) {} });
-    v.addEventListener('play', function () { if (!pausedOnce) return; try { sendStatement720('played', 'question', null, { time: v.currentTime }); } catch (e) {} });
+    v.addEventListener('pause', function () { if (v.ended || v.currentTime === 0) return; pausedOnce = true; try { sendStatement720('paused', 'question', null, Object.assign({ time: v.currentTime }, xapiQ(item, qKey))); } catch (e) {} });
+    v.addEventListener('play', function () { if (!pausedOnce) return; try { sendStatement720('played', 'question', null, Object.assign({ time: v.currentTime }, xapiQ(item, qKey))); } catch (e) {} });
   });
 }

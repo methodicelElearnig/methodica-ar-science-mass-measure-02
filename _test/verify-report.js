@@ -983,26 +983,49 @@ async function runResume(c) {
     /* ── The shared drag painter (screens 4 / 8 / 19) ───────────────────
        Placement is DOM parentage; screen 4 stands in for all three. */
     exec('goTo(4);');
+    /* Place EVERY item — all into one zone, so the board is complete but the
+       answer is wrong — and submit for real. s5Check is what captures the
+       signature, and an all-placed board is what makes the button assertions
+       below discriminating instead of trivially disabled. */
     exec("window.__s5item = S5_ITEM_IDS[0];" +
-         "var __z = document.getElementById('s5-zone-bruto');" +
-         "var __e = document.getElementById(window.__s5item);" +
-         "if (__e.parentElement) __e.parentElement.removeChild(__e); __z.appendChild(__e);" +
-         "s5Attempts = 1;");
+         "S5_ITEM_IDS.forEach(function (id) {" +
+         "  var e = document.getElementById(id);" +
+         "  if (e && e.parentElement) e.parentElement.removeChild(e);" +
+         "  document.getElementById('s5-zone-bruto').appendChild(e);" +
+         "});" +
+         "s5Check();");
+    ok(c, 'one wrong attempt leaves the drag question answerable',
+      val('s5Attempts') === 1 && val('s5Done') === false,
+      val('s5Attempts') + ' / ' + val('s5Done'));
+    ok(c, 'the live code disables the check button after a wrong drag answer',
+      val("document.getElementById('s5-check').disabled") === true);
     exec('window.__snapS5 = capturePartPayload();');
     ok(c, 'capture read the drag placement out of the DOM',
       val("window.__snapS5.s5.place[window.__s5item]") === 'bruto',
       String(val("window.__snapS5.s5.place[window.__s5item]")));
-    exec("var __e2 = document.getElementById(window.__s5item);" +
-         "__e2.parentElement.removeChild(__e2);" +
-         "document.getElementById('s5-source-bank').appendChild(__e2);" +
-         "s5Attempts = 0;");
+    /* Wipe everything back to the bank AND clear the signature, so whatever
+       comes back can only have come from the snapshot. */
+    exec("S5_ITEM_IDS.forEach(function (id) {" +
+         "  var e = document.getElementById(id);" +
+         "  if (e && e.parentElement) e.parentElement.removeChild(e);" +
+         "  document.getElementById('s5-source-bank').appendChild(e);" +
+         "});" +
+         "s5Attempts = 0; s5LastSubmittedSig = null;");
     exec('applyResumeVars(window.__snapS5); applyResumeDom(window.__snapS5); restoreScreenUI(4);');
     ok(c, 'restore physically re-places the drag item in its zone',
       val("document.getElementById(window.__s5item).parentElement.id") === 's5-zone-bruto',
       String(val("document.getElementById(window.__s5item).parentElement.id")));
-    ok(c, 'the interim drag restore never strands the learner',
-      val("(function(){ var b=document.getElementById('s5-check'); return b ? typeof b.disabled === 'boolean' : false; })()") === true &&
-      val("document.getElementById('s5-feedbox').classList.contains('visible')") === true);
+    /* QA 2026-08-20 slide 10 — see the Sain 04 block for the full rationale. */
+    ok(c, 'interim drag restore does NOT allow resubmitting the unchanged answer',
+      val("document.getElementById('s5-check').disabled") === true &&
+      val("document.getElementById('s5-feedbox').classList.contains('visible')") === true,
+      'disabled=' + val("document.getElementById('s5-check').disabled"));
+    exec("var __m = document.getElementById(window.__s5item);" +
+         "__m.parentElement.removeChild(__m);" +
+         "document.getElementById('s5-zone-neto').appendChild(__m);" +
+         "s5UpdateCheckBtn();");
+    ok(c, 'and moving one card re-enables it — the learner is never stranded',
+      val("document.getElementById('s5-check').disabled") === false);
   }
 
   if (c === '01') {
@@ -1253,11 +1276,25 @@ async function runResume(c) {
       val('tblAttempts') + ' / ' + val('tblDone'));
     ok(c, 'interim restore reveals the hint, as the wrong branch did',
       val("document.getElementById('tbl-hint').hidden") === false);
-    ok(c, 'interim restore leaves the learner able to RETRY (not stranded)',
-      val("document.getElementById('tbl-check').disabled") === false &&
+    /* QA 2026-08-20 slide 10 (the general defect). In live play tblCheck
+       disables צדקתי after a wrong attempt, and only an edit re-enables it.
+       The restore used to recompute the button from tblAllFilled alone — true,
+       because the learner's own wrong answer is still in the table — so the
+       IDENTICAL answer could be resubmitted and the real second attempt was
+       burned silently. tblLastSubmittedSig now survives the restore, so the
+       button comes back disabled; the pair below is the whole contract, and
+       the second half is what keeps the §6א "stranded learner" fix intact. */
+    ok(c, 'interim restore does NOT allow resubmitting the unchanged answer',
+      val("document.getElementById('tbl-check').disabled") === true &&
       val("document.getElementById('tbl-check').textContent") === 'צדקתי?',
       val("document.getElementById('tbl-check').textContent") + ' disabled=' +
       val("document.getElementById('tbl-check').disabled"));
+    exec("var _e0=document.getElementById(TBL_INPUT_IDS[0]); _e0.value='777'; tblOnInput();");
+    ok(c, 'and editing one field re-enables it — the learner is never stranded',
+      val("document.getElementById('tbl-check').disabled") === false);
+    /* Restore the original wrong answer, so the wrong-final assertions below
+       still describe the answer the learner actually submitted twice. */
+    exec("var _e1=document.getElementById(TBL_INPUT_IDS[0]); _e1.value='999'; tblOnInput();");
 
     // Now burn the second attempt to land on wrong-final.
     exec("tblCheck();");
@@ -1341,6 +1378,63 @@ async function runResume(c) {
            'attempts' in window.__snapA && 'done' in window.__snapA &&
            'showingCorrect' in window.__snapA && 'passed' in window.__snapA`) === true,
       String(val('JSON.stringify(Object.keys(window.__snapA || {}))')));
+
+    /* ── interim (one wrong attempt) through the factory ─────────────────
+       QA 2026-08-20 slide 10. render() used to compute the check button from
+       "all targets filled" alone, which is true after a wrong attempt because
+       the learner's own answer is still on the board — so a reload handed back
+       a live button and the identical answer could be resubmitted, burning the
+       real second attempt. lastSubmittedSig now round-trips, so the restored
+       button is disabled until something actually moves.
+       Only 05/dqA runs this: 06 carries a byte-identical copy of the factory,
+       and dqA is the instance whose target ids are known here. */
+    if (c === '05') {
+      /* A complete but wrong board: every target filled, assignment reversed. */
+      exec(`(function () {
+        var drags = Object.keys(dqA.getState().placement);
+        var targets = ['dqA-target-1','dqA-target-2','dqA-target-3','dqA-target-4'];
+        var pl = {};
+        drags.forEach(function (d) { pl[d] = 'source'; });
+        targets.forEach(function (t, i) { pl[drags[drags.length - 1 - i]] = t; });
+        dqA.setState({ placement: pl, attempts: 0, done: false, checked: false,
+                       lastWrongPlacement: null, showingCorrect: false, passed: false });
+      })();`);
+      exec('dqACheck();');
+      ok(c, 'dqA: one wrong attempt, still answerable',
+        val('dqA.getState().attempts') === 1 && val('dqA.getState().done') === false,
+        val('dqA.getState().attempts') + ' / ' + val('dqA.getState().done'));
+      ok(c, 'dqA: the live code disables the check button after a wrong answer',
+        val("document.getElementById('dqA-btn-check').disabled") === true);
+
+      exec('window.__snapI = capturePartPayload();');
+      exec(`dqA.setState({ placement: {}, attempts: 0, done: false, checked: false,
+                           lastWrongPlacement: null, showingCorrect: false, passed: false });
+            dqA.reset();`);
+      exec('applyResumeVars(window.__snapI); restoreScreenUI(' + screen + ');');
+      ok(c, 'dqA: interim restore does NOT allow resubmitting the unchanged answer',
+        val("document.getElementById('dqA-btn-check').disabled") === true,
+        'disabled=' + val("document.getElementById('dqA-btn-check').disabled"));
+      /* Move one card back to the bank: the board is no longer complete AND the
+         signature changed. Then put it somewhere else, so the board is complete
+         again with a genuinely different answer — that is the case that must
+         re-enable, and the one that proves nobody is stranded. */
+      exec(`(function () {
+        var st = dqA.getState();
+        var drags = Object.keys(st.placement);
+        var moved = drags.filter(function (d) { return st.placement[d] !== 'source'; })[0];
+        var free  = drags.filter(function (d) { return st.placement[d] === 'source'; })[0];
+        var slot  = st.placement[moved];
+        st.placement[moved] = 'source';
+        st.placement[free]  = slot;
+        dqA.setState(st);
+        /* setState only writes the closure; restoreUI is what repaints, and
+           render() inside it is where the button predicate actually runs. */
+        dqA.restoreUI();
+      })();`);
+      ok(c, 'dqA: a different complete answer re-enables it — never stranded',
+        val("document.getElementById('dqA-btn-check').disabled") === false,
+        'disabled=' + val("document.getElementById('dqA-btn-check').disabled"));
+    }
 
     /* Force the wrong-final state: two attempts with nothing placed correctly.
        window[P+'Check'] is the live entry point the markup calls. */

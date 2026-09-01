@@ -168,6 +168,16 @@ const TEXTS_TBL = {
 
 let tblLastAnswer = null;
 let tblShowingCorrect = false;
+/* ── חתימת התשובה שכבר נשלחה ──
+   בקוד החי tblCheck() מכבה את כפתור "צדקתי", והוא חוזר רק כשהלומד משנה
+   שדה או רשימה. אחרי רענון אי אפשר לשחזר את ההשבתה הזאת "כמו שהיא":
+   tblRestoreUI קורא ל-tblOnInput, שמחשב את הכפתור מ-tblAllFilled — והוא true כי
+   התשובה השגויה של הלומד עדיין בטבלה. לכן אותה תשובה בדיוק הייתה ניתנת
+   לשליחה חוזרת, והניסיון השני האמיתי נשרף. במקום דגל disabled שלא שורד
+   טעינה, נשמרת חתימה של מה שנשלח בפועל.
+   החתימה מכסה גם את השדות וגם את הרשימות — שינוי בכל אחד מהם
+   מדליק את הכפתור מחדש, ולכן אין כאן לומד תקוע. */
+let tblLastSubmittedSig = null;
 
 function tblAllFilled() {
   const inputsFilled = TBL_INPUT_IDS.every(function (id) {
@@ -178,9 +188,18 @@ function tblAllFilled() {
   return inputsFilled && ddsFilled;
 }
 
+function tblSig() {
+  var dd = TBL_DD_IDS.map(function (id) { return id + ':' + tblDdValues[id]; }).join('|');
+  var inp = TBL_INPUT_IDS.map(function (id) {
+    var el = document.getElementById(id);
+    return id + ':' + (el ? el.value.trim() : '');
+  }).join('|');
+  return dd + '#' + inp;
+}
+
 function tblOnInput() {
   const btn = document.getElementById('tbl-check');
-  if (btn) btn.disabled = !tblAllFilled();
+  if (btn) btn.disabled = !tblAllFilled() || tblSig() === tblLastSubmittedSig;
 }
 
 function tblDdToggle(ddId) {
@@ -311,6 +330,7 @@ function tblReveal() {
 function tblCheck() {
   if (tblDone || !tblAllFilled()) return;
   tblAttempts++;
+  tblLastSubmittedSig = tblSig();
 
   const inputsCorrect = TBL_INPUT_IDS.every(function (id) {
     const el = document.getElementById(id);
@@ -589,7 +609,8 @@ function capturePartPayload() {
     attempts: tblAttempts,
     phase: tblPhase,
     lastAnswer: tblLastAnswer,
-    showingCorrect: tblShowingCorrect
+    showingCorrect: tblShowingCorrect,
+    sig: tblLastSubmittedSig
   };
   st.inputs = {};
   TBL_INPUT_IDS.forEach(function (id) {
@@ -617,6 +638,8 @@ function applyResumeVars(st) {
     tblPhase          = st.tbl.phase || 'before';
     tblLastAnswer     = st.tbl.lastAnswer || null;
     tblShowingCorrect = !!st.tbl.showingCorrect;
+    /* מסמך ישן בלי המפתח → null, כלומר הכפתור מחושב כמו קודם. */
+    tblLastSubmittedSig = (typeof st.tbl.sig === 'string') ? st.tbl.sig : null;
   }
 }
 

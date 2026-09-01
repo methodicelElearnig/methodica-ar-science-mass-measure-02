@@ -669,6 +669,7 @@ let s5Attempts = 0;
 let s5DragId = null;
 let s5LastAnswer = null;
 let s5ShowingCorrect = false;
+let s5LastSubmittedSig = null;
 
 function s5AllPlaced() {
   const sourceBank = document.getElementById('s5-source-bank');
@@ -680,7 +681,8 @@ function s5AllPlaced() {
 }
 
 function s5UpdateCheckBtn() {
-  document.getElementById('s5-check').disabled = !s5AllPlaced();
+  document.getElementById('s5-check').disabled =
+    !s5AllPlaced() || dragSig('s5', S5_ITEM_IDS) === s5LastSubmittedSig;
 }
 
 function s5ClearZoneStates() {
@@ -838,6 +840,7 @@ function s5Reveal() {
 function s5Check() {
   if (s5Done) return;
   s5Attempts++;
+  s5LastSubmittedSig = dragSig('s5', S5_ITEM_IDS);
 
   let allCorrect = true;
   ['bruto', 'neto', 'tara'].forEach(function (zoneId) {
@@ -1216,6 +1219,7 @@ let s9HintShown = false;
 let s9DragId = null;
 let s9LastAnswer = null;
 let s9ShowingCorrect = false;
+let s9LastSubmittedSig = null;
 
 function s9AllPlaced() {
   const sourceBank = document.getElementById('s9-source-bank');
@@ -1227,7 +1231,8 @@ function s9AllPlaced() {
 }
 
 function s9UpdateCheckBtn() {
-  document.getElementById('s9-check').disabled = !s9AllPlaced();
+  document.getElementById('s9-check').disabled =
+    !s9AllPlaced() || dragSig('s9', S9_ITEM_IDS) === s9LastSubmittedSig;
 }
 
 function s9ClearZoneStates() {
@@ -1404,6 +1409,7 @@ function s9Reveal() {
 function s9Check() {
   if (s9Done) return;
   s9Attempts++;
+  s9LastSubmittedSig = dragSig('s9', S9_ITEM_IDS);
 
   let allCorrect = true;
   S9_ZONE_IDS.forEach(function (zoneId) {
@@ -2797,13 +2803,14 @@ let s18Attempts = 0;
 let s18Phase = 'before';
 let s18LastAnswer = null;
 let s18ShowingCorrect = false;
+let s18LastSubmittedSig = null;
 
 function s18OnInput() {
   const allFilled = S18_IDS.every(function (id) {
     const el = document.getElementById(id);
     return el && el.value.trim() !== '';
   });
-  document.getElementById('s18-check').disabled = !allFilled;
+  document.getElementById('s18-check').disabled = !allFilled || s18Sig() === s18LastSubmittedSig;
 }
 
 function s18ShowFeedback(kind, isCorrect) {
@@ -2884,6 +2891,7 @@ function s18Reveal() {
 function s18Check() {
   if (s18Done) return;
   s18Attempts++;
+  s18LastSubmittedSig = s18Sig();
   const allCorrect = S18_IDS.every(function (id) {
     const el = document.getElementById(id);
     return el && parseFloat(el.value) === parseFloat(S18_ANSWERS[id]);
@@ -3020,6 +3028,7 @@ let s19Attempts = 0;
 let s19Phase = 'before';
 let s19LastAnswer = null;
 let s19ShowingCorrect = false;
+let s19LastSubmittedSig = null;
 
 function s19DdToggle(ddId) {
   const opts = document.getElementById(ddId + '-opts');
@@ -3048,7 +3057,7 @@ function s19DdSelect(ddId, val) {
 
 function s19OnChange() {
   const allSelected = S19_IDS.every(function (id) { return s19DdValues[id] !== ''; });
-  document.getElementById('s19-check').disabled = !allSelected;
+  document.getElementById('s19-check').disabled = !allSelected || s19Sig() === s19LastSubmittedSig;
 }
 
 function s19ShowFeedback(kind, isCorrect) {
@@ -3131,6 +3140,7 @@ function s19Check() {
   if (s19Done) return;
   s19CloseAllDropdowns();
   s19Attempts++;
+  s19LastSubmittedSig = s19Sig();
   const allCorrect = S19_IDS.every(function (id) { return s19DdValues[id] === S19_CORRECT[id]; });
   xapiAnswered('013', 'q1', allCorrect, allCorrect || s19Attempts >= 2, xapiFieldsAnswer(S19_IDS, s19DdValues));
 
@@ -3256,6 +3266,7 @@ let s20HintShown = false;
 let s20DragId = null;
 let s20LastAnswer = null;
 let s20ShowingCorrect = false;
+let s20LastSubmittedSig = null;
 
 function s20AllPlaced() {
   const sb = document.getElementById('s20-source-bank');
@@ -3267,7 +3278,8 @@ function s20AllPlaced() {
 }
 
 function s20UpdateCheckBtn() {
-  document.getElementById('s20-check').disabled = !s20AllPlaced();
+  document.getElementById('s20-check').disabled =
+    !s20AllPlaced() || dragSig('s20', S20_ITEM_IDS) === s20LastSubmittedSig;
 }
 
 function s20ClearZoneStates() {
@@ -3425,6 +3437,7 @@ function s20Reveal() {
 function s20Check() {
   if (s20Done) return;
   s20Attempts++;
+  s20LastSubmittedSig = dragSig('s20', S20_ITEM_IDS);
 
   let allCorrect = true;
   ['bruto', 'neto', 'tara'].forEach(function (zoneId) {
@@ -4006,6 +4019,7 @@ function capturePartPayload() {
   st.s18 = {
     att: s18Attempts, done: s18Done, phase: s18Phase,
     last: s18LastAnswer, showing: s18ShowingCorrect,
+    sig: s18LastSubmittedSig,
     inputs: {}
   };
   S18_IDS.forEach(function (id) {
@@ -4015,7 +4029,8 @@ function capturePartPayload() {
   st.s19 = {
     vals: Object.assign({}, s19DdValues),
     att: s19Attempts, done: s19Done, phase: s19Phase,
-    last: s19LastAnswer, showing: s19ShowingCorrect
+    last: s19LastAnswer, showing: s19ShowingCorrect,
+    sig: s19LastSubmittedSig
   };
 
   /* ── קבוצה ד — שלושת מסכי הגרירה שנכתבו ביד (4, 8, 19).
@@ -4034,9 +4049,9 @@ function capturePartPayload() {
     matches: s11Matches, done: s11Done
   };
 
-  st.s5  = { place: captureDragPlacement('s5',  S5_ITEM_IDS),  att: s5Attempts,  done: s5Done,  last: s5LastAnswer,  showing: s5ShowingCorrect };
-  st.s9  = { place: captureDragPlacement('s9',  S9_ITEM_IDS),  att: s9Attempts,  done: s9Done,  last: s9LastAnswer,  showing: s9ShowingCorrect,  hint: s9HintShown };
-  st.s20 = { place: captureDragPlacement('s20', S20_ITEM_IDS), att: s20Attempts, done: s20Done, last: s20LastAnswer, showing: s20ShowingCorrect, hint: s20HintShown };
+  st.s5  = { place: captureDragPlacement('s5',  S5_ITEM_IDS),  att: s5Attempts,  done: s5Done,  last: s5LastAnswer,  showing: s5ShowingCorrect,  sig: s5LastSubmittedSig };
+  st.s9  = { place: captureDragPlacement('s9',  S9_ITEM_IDS),  att: s9Attempts,  done: s9Done,  last: s9LastAnswer,  showing: s9ShowingCorrect,  hint: s9HintShown,  sig: s9LastSubmittedSig };
+  st.s20 = { place: captureDragPlacement('s20', S20_ITEM_IDS), att: s20Attempts, done: s20Done, last: s20LastAnswer, showing: s20ShowingCorrect, hint: s20HintShown, sig: s20LastSubmittedSig };
   return st;
 }
 
@@ -4050,6 +4065,35 @@ function captureDragPlacement(prefix, itemIds) {
     out[id] = (pid.indexOf(zonePrefix) === 0) ? pid.slice(zonePrefix.length) : 'source';
   });
   return out;
+}
+
+/* ── חתימת התשובה שכבר נשלחה ──
+   בקוד החי sNNCheck() מכבה את כפתור "צדקתי", והוא חוזר רק כשהלומד משנה משהו.
+   אחרי רענון אי אפשר לשחזר את ההשבתה הזאת "כמו שהיא": הצייר מחשב את הכפתור
+   מ-sNNAllPlaced/allFilled, שהוא true כי התשובה השגויה של הלומד עדיין על
+   המסך — ולכן אותה תשובה בדיוק הייתה ניתנת לשליחה חוזרת, והניסיון השני
+   האמיתי נשרף. במקום דגל disabled שלא שורד טעינה, נשמרת חתימה של מה שנשלח
+   בפועל, והכפתור פעיל רק כשהמצב הנוכחי שונה ממנה — אותה התנהגות בדיוק בחי
+   ואחרי שחזור, ובלי להחזיר את הנעילה של §6א: כל שינוי מדליק את הכפתור. */
+function dragSig(prefix, itemIds) {
+  var pl = captureDragPlacement(prefix, itemIds);
+  return itemIds.map(function (id) { return id + ':' + pl[id]; }).join('|');
+}
+
+/* אותו רעיון לשדות קלט ולרשימות נפתחות. */
+function fieldsSig(ids, valFn) {
+  return ids.map(function (id) { return id + ':' + valFn(id); }).join('|');
+}
+
+function s18Sig() {
+  return fieldsSig(S18_IDS, function (id) {
+    var el = document.getElementById(id);
+    return el ? el.value.trim() : '';
+  });
+}
+
+function s19Sig() {
+  return fieldsSig(S19_IDS, function (id) { return s19DdValues[id]; });
 }
 
 /* אילו אופציות מסומנות כרגע כשגויות. קיים בשביל מסך 13 בלבד (ראו למעלה). */
@@ -4103,15 +4147,17 @@ function applyResumeVars(st) {
     s11Flipped = [];      // אין "שני קלפים באוויר" אחרי טעינה
     s11Locked  = false;   // ראו ההערה ב-capturePartPayload
   }
-  if (st.s5)  { s5Attempts  = st.s5.att  || 0; s5Done  = !!st.s5.done;  s5LastAnswer  = st.s5.last  || null; s5ShowingCorrect  = !!st.s5.showing; }
-  if (st.s9)  { s9Attempts  = st.s9.att  || 0; s9Done  = !!st.s9.done;  s9LastAnswer  = st.s9.last  || null; s9ShowingCorrect  = !!st.s9.showing;  s9HintShown  = !!st.s9.hint; }
-  if (st.s20) { s20Attempts = st.s20.att || 0; s20Done = !!st.s20.done; s20LastAnswer = st.s20.last || null; s20ShowingCorrect = !!st.s20.showing; s20HintShown = !!st.s20.hint; }
+  /* sig: מסמך ישן בלי המפתח → null, כלומר הכפתור מחושב כמו קודם. */
+  if (st.s5)  { s5Attempts  = st.s5.att  || 0; s5Done  = !!st.s5.done;  s5LastAnswer  = st.s5.last  || null; s5ShowingCorrect  = !!st.s5.showing;  s5LastSubmittedSig  = (typeof st.s5.sig  === 'string') ? st.s5.sig  : null; }
+  if (st.s9)  { s9Attempts  = st.s9.att  || 0; s9Done  = !!st.s9.done;  s9LastAnswer  = st.s9.last  || null; s9ShowingCorrect  = !!st.s9.showing;  s9HintShown  = !!st.s9.hint;  s9LastSubmittedSig  = (typeof st.s9.sig  === 'string') ? st.s9.sig  : null; }
+  if (st.s20) { s20Attempts = st.s20.att || 0; s20Done = !!st.s20.done; s20LastAnswer = st.s20.last || null; s20ShowingCorrect = !!st.s20.showing; s20HintShown = !!st.s20.hint; s20LastSubmittedSig = (typeof st.s20.sig === 'string') ? st.s20.sig : null; }
   if (st.s18) {
     s18Attempts = st.s18.att || 0;
     s18Done = !!st.s18.done;
     s18Phase = st.s18.phase || 'before';
     s18LastAnswer = st.s18.last || null;
     s18ShowingCorrect = !!st.s18.showing;
+    s18LastSubmittedSig = (typeof st.s18.sig === 'string') ? st.s18.sig : null;
   }
   if (st.s19) {
     /* מוטציה לפי מפתח: s19DdSelect כותב לתוך האובייקט הקיים. */
@@ -4121,6 +4167,7 @@ function applyResumeVars(st) {
     s19Phase = st.s19.phase || 'before';
     s19LastAnswer = st.s19.last || null;
     s19ShowingCorrect = !!st.s19.showing;
+    s19LastSubmittedSig = (typeof st.s19.sig === 'string') ? st.s19.sig : null;
   }
   if (st.flip) {
     scr3Card1Flipped = !!st.flip.scr3a;

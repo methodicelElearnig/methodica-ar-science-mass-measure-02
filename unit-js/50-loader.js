@@ -16,6 +16,18 @@
 function bootXAPI() {
   var CDN = 'https://lomdot.education.gov.il/metodica/720active/common/';
 
+  /* ── מחזיקים את כיסוי האתחול, **לפני** טעינת ה-CDN ──
+     הדגל נדלק כאן ולא בשלב א', וזה העיקר: שלב א' רץ אחרי שני הסקריפטים
+     הסידרתיים מה-CDN, ובקאש קר הם לוקחים יותר מ-800ms — כלומר רשת הביטחון
+     ב-markup הייתה חושפת את מסך 0 עוד לפני שמישהו ידע שיש מה לשחזר, וההבזק
+     חוזר בדיוק בתרחיש שבגללו התיקון נעשה. כאן, לעומת זאת, אנחנו רצים
+     סינכרונית מ-90-boot.js בזמן הפרסור הראשוני, הרבה לפני 800ms.
+     זו הערכה אופטימית ("כנראה יש מה לשחזר") שכל נתיב יציאה מכבה: שער 1
+     למטה, ענף "אין payload" בשלב א', ה-catch-ים, ו-dropBootCover עצמה. */
+  if (typeof RESUME_ENABLED !== 'undefined' && RESUME_ENABLED) {
+    try { window.__resumeInFlight = true; } catch (e) {}
+  }
+
   /* ── שער 1: התפר הפר-סיני חייב להיות מוגדר ──
      בלי XAPI_METADATA_FILE, getXAPIParameters מקבל undefined, לא מצליח להביא
      מטא-דאטה, ו-jsXAPI_MetadataReady לעולם לא נדלק — כלומר pollMetadataReady
@@ -123,7 +135,10 @@ function bootXAPI() {
                  ה-query string נגרר כמו בכל מעבר — בלעדיו ה-registration
                  אובד וכל הסינים מדווחים כלום (REPORT-XAPI.md §6).
                  הכיסוי **לא** מוסר כאן במכוון: העמוד עוזב, והוא מסתיר את
-                 ההצצה בסין 01 שהלומד רואה היום בכל קפיצה כזאת. */
+                 ההצצה בסין 01 שהלומד רואה היום בכל קפיצה כזאת.
+                 __resumeInFlight נדלק כדי שרשת הביטחון ב-markup לא תחשוף את
+                 מסך 0 אם הניווט עצמו איטי — ראו ההערה שם. */
+              window.__resumeInFlight = true;
               window.location.replace('../' + _saved.part + '/index.html' + window.location.search);
               return;
             }
@@ -145,7 +160,10 @@ function bootXAPI() {
                טעינה **ללא** התקדמות שמורה — כלומר גם לכל לומד בפעם הראשונה."
                לומד חדש מקבל מסמך ריק, ולכן parts[] ריק, ולכן הכיסוי נופל כאן —
                ברגע המוקדם ביותר האפשרי, בלי להמתין ל-pollMetadataReady.
-               התיקון של הדמות (אם היה) כבר צויר סינכרונית שורה מעל. */
+               התיקון של הדמות (אם היה) כבר צויר סינכרונית שורה מעל.
+               dropBootCover מכבה גם את __resumeInFlight שהודלק בראש
+               bootXAPI, ולכן רשת הביטחון חוזרת להתנהגות ה-800ms הרגילה.
+               ויש payload → הדגל נשאר דלוק, והכיסוי מוחזק עד שלב ב'. */
             if (!_payload) dropBootCover();
           } catch (e) {
             console.error('[resume] read', e);

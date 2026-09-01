@@ -178,6 +178,21 @@ function makeDragQuestion(cfg) {
      כי revealCorrect() דורס אותו בפתרון הנכון — ולכן נשמר במפורש. */
   let passed = false;
 
+  /* ── חתימת התשובה שכבר נשלחה ──
+     בקוד החי check() מכבה את הכפתור, והוא חוזר רק כשהלומד גורר משהו. אחרי
+     רענון אי אפשר לשחזר את ההשבתה הזאת "כמו שהיא": הצייר מחשב את הכפתור
+     מ-allFilled, שהוא true כי התשובה השגויה של הלומד עדיין על הלוח — ולכן
+     אותה תשובה בדיוק הייתה ניתנת לשליחה חוזרת, והניסיון השני האמיתי נשרף.
+     במקום דגל disabled שלא שורד טעינה, נשמרת חתימה של מה שנשלח בפועל,
+     והכפתור פעיל רק כשהמצב הנוכחי שונה ממנה. זה מייצר את אותה התנהגות בדיוק
+     בחי ואחרי שחזור, ובלי להחזיר את הנעילה של §6א: כל גרירה משנה את החתימה
+     ומדליקה את הכפתור מחדש. */
+  let lastSubmittedSig = null;
+
+  function sig() {
+    return dragIds.map(function (d) { return d + ':' + placement[d]; }).join('|');
+  }
+
   function render() {
     dragIds.forEach(function (dragId) {
       const slot = document.getElementById('slot-' + dragId);
@@ -230,7 +245,8 @@ function makeDragQuestion(cfg) {
       return dragIds.some(function (dId) { return placement[dId] === tId; });
     });
     const btn = document.getElementById(cfg.checkBtnId);
-    if (btn && !done) btn.disabled = !allFilled;
+    /* התשובה הנוכחית זהה לזו שכבר נשלחה → אין מה לשלוח שוב (ראו lastSubmittedSig). */
+    if (btn && !done) btn.disabled = !allFilled || sig() === lastSubmittedSig;
   }
 
   function dragStart(e, dragId) {
@@ -346,6 +362,9 @@ function makeDragQuestion(cfg) {
     if (done) return;
     checked = true;
     attempts++;
+    /* לפני כל מוטציה: זו התשובה שנשלחת עכשיו. render() שבהמשך כבר יסתמך
+       עליה כדי להשאיר את הכפתור מושבת עד לשינוי הבא. */
+    lastSubmittedSig = sig();
 
     let allCorrect = true;
     targetIds.forEach(function (tId) {
@@ -459,6 +478,7 @@ function makeDragQuestion(cfg) {
   function resetInitial() {
     done = false; checked = false; attempts = 0; dragActive = null; dropHandled = false;
     lastWrongPlacement = null; showingCorrect = false; passed = false;
+    lastSubmittedSig = null;
     dragIds.forEach(function (dId) { placement[dId] = 'source'; });
     targetIds.forEach(function (tId) {
       const zone = document.getElementById(tId);
@@ -508,7 +528,8 @@ function makeDragQuestion(cfg) {
       checked: checked,
       lastWrongPlacement: lastWrongPlacement ? Object.assign({}, lastWrongPlacement) : null,
       showingCorrect: showingCorrect,
-      passed: passed
+      passed: passed,
+      lastSubmittedSig: lastSubmittedSig
     };
   }
 
@@ -525,6 +546,8 @@ function makeDragQuestion(cfg) {
     done               = !!s.done;
     checked            = !!s.checked;
     lastWrongPlacement = s.lastWrongPlacement || null;
+    /* מסמך ישן בלי המפתח הזה → null, כלומר הכפתור מחושב כמו קודם. */
+    lastSubmittedSig   = (typeof s.lastSubmittedSig === 'string') ? s.lastSubmittedSig : null;
     showingCorrect     = !!s.showingCorrect;
     passed             = !!s.passed;
   }
@@ -534,11 +557,14 @@ function makeDragQuestion(cfg) {
      xapiAnswered — כל אלה קרו בפעם הראשונה, וכפילות כאן הייתה מדווחת
      תשובה שנייה על אותה שאלה.
 
-     render() נקרא אחרון בכל מסלול. הוא זה שמחשב את כפתור הבדיקה מ-allFilled
-     — אותו predicate שהקוד החי משתמש בו — ולכן הוא מה שמונע לומד תקוע.
-     במסלול "ניסיון שגוי אחד" **לא** משביתים את הכפתור כמו ש-check() עושה:
-     שם ההשבתה נכונה כי היא רגעית ומתבטלת בגרירה הבאה, אבל אחרי טעינת
-     עמוד היא הייתה משאירה לומד עם לוח מלא וכפתור מת. */
+     render() נקרא אחרון בכל מסלול. הוא זה שמחשב את כפתור הבדיקה — אותו
+     predicate בדיוק שהקוד החי משתמש בו — ולכן הוא מה שמונע לומד תקוע.
+     במסלול "ניסיון שגוי אחד" עדיין אין כאן `disabled = true` ידני; ההשבתה
+     נגזרת מ-lastSubmittedSig בתוך render(), ולכן היא נכונה גם בחי וגם אחרי
+     טעינת עמוד: הלוח מלא, הכפתור מושבת כי התשובה לא השתנתה, וכל גרירה
+     מדליקה אותו מחדש. הניסוח הקודם כאן השבית *לא* כלום ותיאר את זה כפשרה
+     מול "לומד תקוע" — זה החזיר ללומד את היכולת לשלוח שוב בדיוק את אותה
+     תשובה ולשרוף את הניסיון השני. */
   function restoreUI() {
     /* ⚠️ render() ולא resetInitial(). תוקן 2026-08-18, שלושה באגים בשורה אחת:
        (א) resetInitial() מאפס placement ל-'source' לכל פריט — כלומר לומד
