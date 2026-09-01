@@ -1292,11 +1292,23 @@ function s12RestoreUI() {
 
   if (s12Attempts >= 1) s12ShowFeedback('wrong1', false);
   /* הבחירה עצמה מוחזרת, והכפתור מחושב מ**אותו** predicate של s12Select.
-     כשאין בחירה הכפתור נשאר מושבת — וזה נכון ולא תקוע, כי לחיצה על אופציה
-     היא הדרך קדימה והיא עובדת. */
+     כשאין בחירה הכפתור נשאר מושבת, ולחיצה על אופציה היא הדרך קדימה.
+
+     ⚠️ onclick מוצב כאן במפורש, וזה לא עודף — זה התיקון ל-QA 2026-08-20 שקף 8
+     ("כפתור צדקתי דלוק אבל לא מגיב"). הכפתור הזה הוא **היחיד** ביחידה שאין לו
+     onclick ב-markup (כל 21 כפתורי הבדיקה בסינים 01/02/04 נושאים
+     onclick="sNNCheck()", ושתי שאלות הפאבריקה בסין הזה מקבלות אותו מ-restoreUI
+     של הפאבריקה). לכן רק כאן החיווט תלוי לגמרי ב-JS.
+     ומי שהיה אמור לחווט — resetScreenState6 — יוצא מוקדם על
+     `s12Attempts > 0` **לפני** שורת ה-onclick שלו. בשחזור applyResumeVars מחזיר
+     את s12Attempts לפני ה-goTo, ולכן השומר תמיד תופס: הכפתור חזר בלי handler,
+     לחיצה על מסיח הדליקה אותו (s12Select כותב disabled=false בלבד), והלומד קיבל
+     כפתור דלוק שלא מגיב — נעילה מלאה בשאלה האחרונה של מועד ב', שרק רענון נוסף
+     שחרר. ההערה הקודמת כאן טענה "וזה נכון ולא תקוע"; זה היה שגוי.
+     ההערה על הסדר ב-resetScreenState6 נשארת נכונה — אין לסמוך עליו כאן. */
   if (s12Selected) {
     const opt = document.getElementById(s12Selected);
     if (opt) { opt.classList.add('selected'); opt.setAttribute('aria-checked', 'true'); }
   }
-  if (btn) btn.disabled = !s12Selected;
+  if (btn) { btn.onclick = s12Check; btn.disabled = !s12Selected; }
 }

@@ -420,6 +420,26 @@ function checkMetadata() {
         !!drag && /fbPositions\[boxId\] = \{ left: box\.offsetLeft, top: box\.offsetTop \}/.test(drag[0]));
     }
 
+    /* ── a check button with no inline onclick must be wired by its painter ──
+       QA 2026-08-20 slide 8. resetScreenStateN guards on "question already
+       started" and returns BEFORE its `btn.onclick = sNNCheck` line, while
+       applyResumeVars restores the attempts counter before goTo — so on every
+       resume the guard fires and the JS wiring is skipped. A button survives
+       that only if the markup carries an inline onclick (all 21 in Sains
+       01/02/04 do) or its painter re-wires it (the four factory instances do).
+       This flags any NEW question that has neither; the behavioural proof for
+       s12, the one that actually broke, is in the 06 block below. */
+    const htmlSrc = fs.readFileSync(path.join(BASE, 'methodica-science-mass-measure-02-' + c, 'index.html'), 'utf8');
+    for (const m of htmlSrc.matchAll(/<button[^>]*id="([^"]*-(?:check|btn-check))"[^>]*>/g)) {
+      const inline = /onclick="/.test(m[0]);
+      if (inline) continue;                     // markup-wired: immune to the guard
+      const stem = m[1].replace(/-(?:btn-)?check$/, '');
+      // the painter for this question must assign onclick somewhere
+      const wired = new RegExp('onclick = (?:' + stem + 'Check|check)\\b').test(js);
+      ok(c, 'check button "' + m[1] + '" has no inline onclick, so a painter must wire it',
+        wired, 'neither inline nor painter-wired');
+    }
+
     // Screen map: exactly TOTAL_SCREENS keys, 0..N-1, no gaps.
     const total = parseInt(/const TOTAL_SCREENS = (\d+);/.exec(js)[1], 10);
     const block = /var SCREEN_TO_SUBCONTENT = \{([\s\S]*?)\n\};/.exec(js)[1];
@@ -1602,6 +1622,31 @@ async function runResume(c) {
     ok(c, 'the para10 hint stays visible on a clean screen after a resume',
       val("document.getElementById('para10-hint').hidden") === false,
       'hidden=' + val("document.getElementById('para10-hint').hidden"));
+
+    /* ── QA 2026-08-20 slide 8: "צדקתי is lit but does not respond" ──────
+       s12-check is the only check button in the unit with no inline onclick in
+       the markup, so after a reload its handler is genuinely absent until JS
+       wires it. resetScreenState6 would — but it returns early on
+       `s12Attempts > 0`, and applyResumeVars restores that counter before goTo,
+       so the guard always fires on a resume. s12RestoreUI then set only
+       `disabled`. The learner got a button that lit up on selecting an option
+       (s12Select writes disabled=false) and did nothing on click: a hard lock
+       on the last question of מועד ב, escapable only by another refresh.
+       Setting onclick=null below is a faithful stand-in for the post-reload
+       DOM precisely because this button carries no inline handler. */
+    exec("s12Done = false; s12Attempts = 1; s12Selected = null;");
+    exec('window.__snapS12 = capturePartPayload();');
+    exec("document.getElementById('s12-check').onclick = null;");
+    exec('applyResumeVars(window.__snapS12); goTo(6);');
+    ok(c, 's12: an interim restore leaves the check button with a handler',
+      val("!!document.getElementById('s12-check').onclick") === true,
+      'onclick=' + val("String(document.getElementById('s12-check').onclick)").slice(0, 40));
+    /* And the whole point: picking an option must produce a button that works. */
+    exec("s12Select(document.querySelector('#s11 .s12-opt:not(.locked)').id);");
+    ok(c, 's12: after picking an option the button is enabled AND responds',
+      val("document.getElementById('s12-check').disabled") === false &&
+      val("(function(){ var n=s12Attempts; document.getElementById('s12-check').click(); return s12Attempts !== n; })()") === true,
+      'disabled=' + val("document.getElementById('s12-check').disabled"));
   }
 
   if (c === '02') {
