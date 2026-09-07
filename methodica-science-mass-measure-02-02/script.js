@@ -43,7 +43,7 @@ window.lomdaState = {
     const video = document.createElement('video');
     video.muted = true;
     video.preload = 'auto';
-    video.src = 'assets/videos/' + name;
+    video.src = '../unit-assets/video/' + name;
   });
 })();
 
@@ -113,8 +113,8 @@ function resetScreenState0() {
   const video = document.getElementById('s0-avatar-img');
   if (video) {
     video.src = (window.lomdaState.selectedCharacter === 'green')
-      ? 'assets/videos/avatar-green-come-in.mp4'
-      : 'assets/videos/avatar-orange-come-in.mp4';
+      ? '../unit-assets/video/avatar-green-come-in.mp4'
+      : '../unit-assets/video/avatar-orange-come-in.mp4';
     video.load();
     video.play().catch(function () {});
   }
@@ -1144,8 +1144,8 @@ function resetScreenState6() {
   const video = document.getElementById('s6-avatar-img');
   if (video) {
     video.src = (window.lomdaState.selectedCharacter === 'green')
-      ? 'assets/videos/avatar-green-clapping-hands.mp4'
-      : 'assets/videos/avatar-orange-clapping-hands.mp4';
+      ? '../unit-assets/video/avatar-green-clapping-hands.mp4'
+      : '../unit-assets/video/avatar-orange-clapping-hands.mp4';
     video.load();
     video.play().catch(function () {});
   }

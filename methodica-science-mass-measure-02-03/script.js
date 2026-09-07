@@ -39,7 +39,7 @@ window.lomdaState = {
     : ['avatar-orange-dancing.gif'];
   files.forEach(function (name) {
     const img = new Image();
-    img.src = 'assets/images/' + name;
+    img.src = '../unit-assets/img/' + name;   /* the list above is dancing GIFs only, and they live at unit level */
   });
 })();
 
@@ -97,8 +97,8 @@ function resetScreenState0() {
   const img = document.getElementById('s0-avatar-img');
   if (img) {
     img.src = (window.lomdaState.selectedCharacter === 'green')
-      ? 'assets/images/avatar-green-dancing.gif'
-      : 'assets/images/avatar-orange-dancing.gif';
+      ? '../unit-assets/img/avatar-green-dancing.gif'
+      : '../unit-assets/img/avatar-orange-dancing.gif';
   }
 }
 

@@ -44,7 +44,7 @@ window.lomdaState = {
     const video = document.createElement('video');
     video.muted = true;
     video.preload = 'auto';
-    video.src = 'assets/videos/' + name;
+    video.src = '../unit-assets/video/' + name;
   });
 })();
 
@@ -944,8 +944,8 @@ function resetScreenState5() {
   const video = document.getElementById('s6-avatar-img');
   if (video) {
     video.src = (window.lomdaState.selectedCharacter === 'green')
-      ? 'assets/videos/avatar-green-come-in.mp4'
-      : 'assets/videos/avatar-orange-come-in.mp4';
+      ? '../unit-assets/video/avatar-green-come-in.mp4'
+      : '../unit-assets/video/avatar-orange-come-in.mp4';
     video.load();
     video.play().catch(function () {});
   }
@@ -973,8 +973,8 @@ function resetScreenState6() {
   const video = document.getElementById('s7-avatar-img');
   if (video) {
     video.src = (window.lomdaState.selectedCharacter === 'green')
-      ? 'assets/videos/avatar-green-questioning.mp4'
-      : 'assets/videos/avatar-orange-questioning.mp4';
+      ? '../unit-assets/video/avatar-green-questioning.mp4'
+      : '../unit-assets/video/avatar-orange-questioning.mp4';
     video.load();
     video.play().catch(function () {});
   }
@@ -1251,8 +1251,8 @@ function s9UpdateAvatar() {
   const video = document.getElementById('s9-avatar-img');
   if (video) {
     video.src = (window.lomdaState.selectedCharacter === 'green')
-      ? 'assets/videos/avatar-green-questioning.mp4'
-      : 'assets/videos/avatar-orange-questioning.mp4';
+      ? '../unit-assets/video/avatar-green-questioning.mp4'
+      : '../unit-assets/video/avatar-orange-questioning.mp4';
     video.load();
     video.play().catch(function () {});
   }
@@ -2340,8 +2340,8 @@ function resetScreenState14() {
   const video = document.getElementById('s15-avatar-img');
   if (video) {
     video.src = (window.lomdaState.selectedCharacter === 'green')
-      ? 'assets/videos/avatar-green-clapping-hands.mp4'
-      : 'assets/videos/avatar-orange-clapping-hands.mp4';
+      ? '../unit-assets/video/avatar-green-clapping-hands.mp4'
+      : '../unit-assets/video/avatar-orange-clapping-hands.mp4';
     video.load();
     video.play().catch(function () {});
   }

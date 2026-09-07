@@ -38,7 +38,7 @@ window.lomdaState = {
   const videoFiles = isGreen ? ['avatar-green-warming-muscles.mp4'] : ['avatar-orange-warming-muscles.mp4'];
   imageFiles.forEach(function (name) {
     const img = new Image();
-    img.src = 'assets/images/' + name;
+    img.src = '../unit-assets/img/' + name;   /* the list above is dancing GIFs only, and they live at unit level */
   });
   videoFiles.forEach(function (name) {
     const video = document.createElement('video');
@@ -779,8 +779,8 @@ function resetScreenState4() {
   const img = document.getElementById('s4t-avatar-img');
   if (img) {
     img.src = (window.lomdaState.selectedCharacter === 'green')
-      ? 'assets/images/avatar-green-dancing.gif'
-      : 'assets/images/avatar-orange-dancing.gif';
+      ? '../unit-assets/img/avatar-green-dancing.gif'
+      : '../unit-assets/img/avatar-orange-dancing.gif';
   }
 }
 /* "סיימתי" — נקודת סיום היחידה במסלול ההצלחה במועד א'.
