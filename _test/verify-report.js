@@ -16,6 +16,13 @@ const path = require('path');
 const { JSDOM } = require('jsdom');
 
 const BASE = process.argv[2] || path.join(__dirname, "..");
+
+/* BASE is the CONTENT under test and may be a deployment package. This harness's own
+   files are not content: a package correctly contains no _test/, so resolving the stub
+   from BASE made `node _test/verify-report.js ../../deployments/<date>` throw at load
+   (readdirSync on a directory that is absent by design) rather than run. The stub
+   belongs to the harness, so it is resolved from here, and a package run works. */
+const HARNESS_DIR = __dirname;
 const COMPONENTS = ['01', '02', '03', '04', '05', '06'];
 
 /* Which screen each component is linked INTO via #screen=N by the "חזרה"
@@ -1837,7 +1844,7 @@ function checkLibraryLetter() {
 
   /* The stub filename is what the gate tests during a browser walk, so it must
      carry a letter the gate accepts too. */
-  const stubs = fs.readdirSync(path.join(BASE, '_test')).filter(f => /^xapi-720-[a-z]\.js$/.test(f));
+  const stubs = fs.readdirSync(HARNESS_DIR).filter(f => /^xapi-720-[a-z]\.js$/.test(f));
   ok('lib', 'exactly one local stub library exists', stubs.length === 1, stubs.join(','));
   const stubLetter = stubs.length === 1 ? stubs[0].match(/xapi-720-([a-z])\.js/)[1] : null;
   ok('lib', 'the stub letter is also inside the gate regex',
@@ -1848,7 +1855,12 @@ function checkLibraryLetter() {
 
   /* No lingering reference to the previous letter's stub path. */
   for (const rel of ['_test/README.md', 'docs-and-tools/RESUME.md', 'unit-js/50-loader.js']) {
-    const txt = fs.readFileSync(path.join(BASE, rel), 'utf8');
+    /* Two of these three are dev docs, which a package contains by design: only
+       unit-js/ ships. Skipping what is absent is what lets this suite also run against
+       a cut package; on the working tree all three are present and all three are checked. */
+    const abs = path.join(BASE, rel);
+    if (!fs.existsSync(abs)) continue;
+    const txt = fs.readFileSync(abs, 'utf8');
     const stale = [...txt.matchAll(/_test\/xapi-720-([a-z])\.js/g)].map(m => m[1]).filter(l => l !== letter);
     ok('lib', rel + ' has no stale stub-path letter', stale.length === 0, stale.join(','));
   }
@@ -1942,7 +1954,7 @@ async function checkStateDiagnostics() {
     if (fs.existsSync(p)) { try { exec(fs.readFileSync(p, 'utf8')); } catch (e) {} }
   }
   // Load the stub the way the loader would on localhost.
-  exec(fs.readFileSync(path.join(BASE, '_test', 'xapi-720-k.js'), 'utf8'));
+  exec(fs.readFileSync(path.join(HARNESS_DIR, 'xapi-720-k.js'), 'utf8'));
 
   ok('diag', 'stateLastResult720 is exposed',
     val('typeof window.stateLastResult720') === 'function');
@@ -2052,7 +2064,7 @@ async function checkItemClosesAfterResume() {
       const p = path.resolve(dir, src.split('?')[0]);
       if (fs.existsSync(p)) { try { exec(fs.readFileSync(p, 'utf8')); } catch (e) {} }
     }
-    exec(fs.readFileSync(path.join(BASE, '_test', 'xapi-720-k.js'), 'utf8'));
+    exec(fs.readFileSync(path.join(HARNESS_DIR, 'xapi-720-k.js'), 'utf8'));
     exec('window.XAPI_USING_G = true;');
     exec('_resumeReady = true; _unitState = emptyUnitState(); window.__reset();');
     const closed = () => JSON.parse(val('JSON.stringify(window.__stmts())'))
