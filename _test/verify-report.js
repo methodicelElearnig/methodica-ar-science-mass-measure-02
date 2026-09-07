@@ -2013,6 +2013,76 @@ function checkSlugCase() {
   }
 }
 
+/* ── An item answered BEFORE a reload must still close after it ──────────
+   xapi-720-k.js gates an item's 'completed' on xapiItemAnswered[itemId], a map it fills ONLY
+   from an 'answered' passing through in the SAME page load:
+
+       if (sttmContext?.expectsAnswer && !xapiItemAnswered[_cid]) {
+           console.log("[XAPI] item left unanswered — deferring 'completed': " + _cid);
+           return;          // "deferring" is a DROP — there is no queue, flush or retry
+
+   A resume deliberately re-sends no answers, so without xapiSeedAnsweredFromResume()
+   (unit-js/20-xapi.js, called at the end of applyExecutionState) the close below is silently
+   dropped — while sendStatementOnce, having called the sender, still marks the ledger sent.
+   The statement is then lost for good: the lomda never asks again and the library has no
+   retry. The trigger is the ordinary path — answer, leave, come back, continue.
+
+   Found live against Kata on 07.09.26 in methodica-math-ratio-01, whose call site is identical
+   to this unit's. It runs against the STUB rather than the inline recorders the rest of this
+   file uses, because only the stub models the library's guard — with a bare recorder the whole
+   class is invisible, which is how it survived every assertion here. */
+async function checkItemClosesAfterResume() {
+  const c = '01';
+  const dir = path.join(BASE, 'methodica-science-mass-measure-02-' + c);
+
+  const openWindow = () => {
+    const dom = new JSDOM(fs.readFileSync(path.join(dir, 'index.html'), 'utf8'), {
+      url: 'http://localhost:8777/methodica-science-mass-measure-02-' + c +
+           '/index.html?slxapi=1&registration=r1&xapiLib=../_test/xapi-720-k.js',
+      runScripts: 'dangerously', pretendToBeVisual: true,
+    });
+    const w = dom.window;
+    const { exec, val } = makeRunner(w);
+    w.console.error = w.console.warn = w.console.log = function () {};
+    w.fetch = function () { return Promise.resolve({ ok: true }); };
+    w.HTMLMediaElement.prototype.load = function () {};
+    w.HTMLMediaElement.prototype.play = function () { return Promise.resolve(); };
+    w.HTMLMediaElement.prototype.pause = function () {};
+    for (const src of [...w.document.querySelectorAll('script[src]')].map(s => s.getAttribute('src'))) {
+      const p = path.resolve(dir, src.split('?')[0]);
+      if (fs.existsSync(p)) { try { exec(fs.readFileSync(p, 'utf8')); } catch (e) {} }
+    }
+    exec(fs.readFileSync(path.join(BASE, '_test', 'xapi-720-k.js'), 'utf8'));
+    exec('window.XAPI_USING_G = true;');
+    exec('_resumeReady = true; _unitState = emptyUnitState(); window.__reset();');
+    const closed = () => JSON.parse(val('JSON.stringify(window.__stmts())'))
+      .filter(s => s.verb === 'completed').map(s => s.objectId);
+    return { dom, exec, val, closed };
+  };
+
+  /* Session one: report item 002's question through the real reporting function, which is
+     what writes XAPI_Q_RESULTS, and keep the payload the document would have held. */
+  const a = openWindow();
+  a.exec("xapiAnswered('002', 'q1', true, true, 'x');");
+  const payload = a.val('JSON.stringify(capturePartPayload())');
+  a.dom.window.close();
+
+  /* Session two: a fresh window, so a fresh library with an empty xapiItemAnswered — which is
+     the whole point — replaying that payload and landing inside item 002 (screen 3). */
+  const b = openWindow();
+  b.exec('applyExecutionState(' + payload + ', 3);');
+  ok('reclose', 'the replay itself closes nothing', b.closed().length === 0,
+    b.closed().join(','));
+
+  /* Screen 4 is item 003, so this crossing closes 002 — the item answered in session one. */
+  b.exec('goTo(4);');
+  const closed = b.closed();
+  ok('reclose', 'an item answered before the reload still closes after it',
+    closed.length === 1 && /-01-002\/$/.test(String(closed[0])),
+    'closed ' + closed.length + ': ' + closed.join(','));
+  b.dom.window.close();
+}
+
 (async () => {
   checkMetadata();
   checkVersionQueries();
@@ -2020,6 +2090,7 @@ function checkSlugCase() {
   checkLibraryLetter();
   checkCommitmentFlush();
   await checkStateDiagnostics();
+  await checkItemClosesAfterResume();
   for (const c of COMPONENTS) await run(c);
   for (const [c, screen] of Object.entries(INBOUND_HASH)) await runHashLanding(c, screen);
   for (const c of COMPONENTS) await runResume(c);

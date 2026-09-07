@@ -536,6 +536,10 @@ function applyExecutionState(st, screenOverride) {
     window.sendStatement720 = _origSend;
     _restoring = false;
   }
+  /* לפני שמשהו יכול לסגור פריט: לספר לספרייה על התשובות ששוחזרו זה עתה ולא שודרו
+     מחדש בכוונה, אחרת ה-'completed' שלהן נזרק. ראו xapiSeedAnsweredFromResume()
+     ב-../unit-js/20-xapi.js. */
+  try { xapiSeedAnsweredFromResume(); } catch (e) {}
   xapiCurrentItem = null;
   try { xapiOnScreen(currentScreen); } catch (e) {}
 }

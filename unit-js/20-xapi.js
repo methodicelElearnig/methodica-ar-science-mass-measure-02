@@ -90,6 +90,47 @@ function _xapiIsEval(item) {
   return (typeof XAPI_EVAL_ITEMS !== 'undefined') && !!XAPI_EVAL_ITEMS[item];
 }
 
+/* ── חימוש מחדש של זיכרון ה-'answered' של הספרייה אחרי שחזור ────────────────
+   xapi-720-k.js חוסמת 'completed' של פריט על סמך xapiItemAnswered[itemId] — מפה
+   שהיא ממלאת רק מ-'answered' שעבר דרכה באותה טעינת דף:
+
+       if (sttmContext?.expectsAnswer && !xapiItemAnswered[_cid]) {
+           console.log("[XAPI] item left unanswered — deferring 'completed': " + _cid);
+           return;          // "deferring" הוא זריקה — אין תור, אין flush, אין ניסיון חוזר
+
+   בתוך אותה הפעלה השער נכון: הוא מונע מלומד שיוצא משאלה אחורה דרך goBack() לשדר
+   'completed' חסר תוצאה, שהיה חוסם אחר כך את האמיתי והמנוקד. אבל שחזור מכוון לא
+   משדר מחדש את התשובות שהוא משחזר, ולכן בלי הזריעה שלמטה הספרייה מתייחסת לכל
+   פריט שנענה בעבר כאילו לא נענה ומוחקת את ה-'completed' שלו — בזמן
+   ש-sendStatementOnce, שכבר קרא לשולח, מסמן ביומן שנשלח. הלומדה לא תשאל שוב,
+   הספרייה לא תנסה שוב, וה-statement אבד לתמיד.
+
+   אומת חי מול Kata ב-07.09.26 ביחידת הייחוס methodica-math-ratio-01: היומן אמר
+   "נשלח" בזמן ש-xapiCompletedObjects של הספרייה עדיין היה ריק.
+
+   הזריעה מחזירה את הספרייה למצב שבו הייתה אילו הלומד לא היה יוצא. היא לא משדרת
+   כלום בעצמה — רק פותחת את השער, וה-'completed' שנשלח אחריה נושא את התוצאה
+   המפורשת ש-xapiItemResult() מספק, כך ששום דבר לא תלוי בניקוד של הספרייה עצמה.
+
+   רק פריטים עם תשובה רשומה נזרעים, כך שפריט שהלומד לא ענה עליו עדיין נדחה
+   וההגנה של goBack נשמרת.
+
+   ⚠️ חייב לרוץ אחרי applyResumeVars (שממלא מחדש את XAPI_Q_RESULTS) ולפני שאפשר
+   לחצות גבול פריט. applyExecutionState קורא לזה כפעולה האחרונה שלו. */
+function xapiSeedAnsweredFromResume(){
+  if (!window.XAPI_USING_G) return;
+  /* no-op שקט כאן היה מחזיר את הבאג בלי שאיש ישים לב, ולכן אומרים זאת: המפה היא
+     גלובל רגיל היום, והייתה מפסיקה להיות נגישה אילו הספרייה תעביר אותה ל-const/let. */
+  if (!window.xapiItemAnswered) {
+    console.warn('[xAPI] xapiItemAnswered unreachable - item "completed" will be dropped after a resume');
+    return;
+  }
+  Object.keys(XAPI_Q_RESULTS).forEach(function(k){
+    var item = k.split('/')[0];
+    if (item) window.xapiItemAnswered[xapiItemId(item)] = true;
+  });
+}
+
 /* זוגות initialized/completed ברמת הפריט, מונעים מ-goTo(). דפדוף בתוך אותו
    פריט לא משדר כלום; הפריט נסגר כשהלומד נכנס למסך ששייך לפריט אחר. */
 function xapiOnScreen(screen) {
