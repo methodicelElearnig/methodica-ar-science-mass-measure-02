@@ -1,7 +1,7 @@
 /* ─── Fonts ──────────────────────────────────────────────── */
 @font-face {
   font-family: 'Assistant';
-  src: url('assets/fonts/assistant-hebrew.woff2') format('woff2');
+  src: url('../../unit-assets/fonts/assistant-hebrew.woff2') format('woff2');
   font-weight: 400 800;
   font-style: normal;
   font-display: swap;
@@ -9,7 +9,7 @@
 }
 @font-face {
   font-family: 'Assistant';
-  src: url('assets/fonts/assistant-latin.woff2') format('woff2');
+  src: url('../../unit-assets/fonts/assistant-latin.woff2') format('woff2');
   font-weight: 400 800;
   font-style: normal;
   font-display: swap;
