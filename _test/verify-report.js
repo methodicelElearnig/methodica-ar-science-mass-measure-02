@@ -505,6 +505,29 @@ function checkVersionQueries() {
   }
   const files = Object.keys(seen);
   ok('ver', 'shared files are referenced', files.length >= 6, 'found=' + files.length);
+
+  /* PER-COMPONENT files need a cache-buster too, and until 2026-09-07 none of them had
+     one: the loop above only ever looked at ../unit-js/ and ../unit-css/, so styles.css
+     was referenced bare in all six index.html and nothing noticed.
+
+     That is not cosmetic. The 2026-09-07 hoist rewrote every styles.css to reach the
+     fonts at ../unit-assets/fonts/ and deleted the per-component copies. A learner
+     holding a cached bare styles.css would keep asking for assets/fonts/, which no
+     longer exists -- and a missing @font-face is silent: the unit simply renders in a
+     fallback face. Exactly the failure the reference unit shipped once already. */
+  for (const c of COMPONENTS) {
+    const html = fs.readFileSync(path.join(BASE, 'methodica-science-mass-measure-02-' + c, 'index.html'), 'utf8');
+    for (const [label, re] of [['styles.css', /href="styles\.css(\?v=\d+)?"/],
+                               ['script.js',  /src="script\.js(\?v=\d+)?"/]]) {
+      const m = html.match(re);
+      ok('ver', c + '/' + label + ' carries a ?v=', !!(m && m[1]), m ? m[0] : 'not referenced');
+    }
+  }
+  {
+    const sub = fs.readFileSync(path.join(BASE, 'methodica-science-mass-measure-02-05',
+      'plane-mass-simulation', 'index.html'), 'utf8');
+    ok('ver', 'the sub-app stylesheet carries a ?v=', /href="style\.css\?v=\d+"/.test(sub));
+  }
   for (const f of files) {
     const versions = new Set(seen[f].map(s => s.split(':')[1]));
     ok('ver', f + ' has one ?v= across all six', versions.size === 1 && seen[f].length === 6,
@@ -2095,9 +2118,137 @@ async function checkItemClosesAfterResume() {
   b.dom.window.close();
 }
 
+/* ══════════════ The asset contract ══════════════
+   Every failure mode in this section is SILENT in a browser. A missing font renders in a
+   fallback face that looks plausible; a missing <img> renders as nothing at all. There is
+   no exception and no console message beyond a 404 nobody is watching.
+
+   Nothing else in this file could see any of it: the JSDOM instances here are built with
+   default `resources`, so jsdom never fetches <link rel=stylesheet>, <img> or <video> — it
+   only hand-executes <script src>. Before this section existed, moving every asset in the
+   unit broke exactly zero assertions.
+
+   That is not hypothetical. The reference unit methodica-math-ratio-01 shipped this bug:
+   all six of its stylesheets reached the fonts as ../assets/fonts/ while the fonts sat in
+   <component>/assets/fonts/, so the whole unit rendered in a fallback typeface and nothing
+   noticed.
+
+   Two rules specific to THIS unit:
+
+   1. Depth. A component's styles.css is at <component>/styles.css and reaches the fonts as
+      ../unit-assets/fonts/. The sub-app's style.css is one level deeper, at
+      <component>/plane-mass-simulation/style.css, and needs ../../. CSS url() resolves from
+      the STYLESHEET's directory, not the document's.
+
+   2. Case. This unit spells the video directory three ways — assets/videos/ (01, 02, now
+      hoisted), assets/video/ (05) and assets/Video/ (06). Each component is internally
+      consistent, so production is fine, but Windows is case-insensitive and would hide a
+      mismatch that 404s on the CDN. fs.existsSync is therefore NOT enough: every segment is
+      checked against the real directory listing. */
+
+/* Resolve `url` from `fromDir` and confirm every segment exists with EXACTLY that case.
+   Returns '' when it resolves, or the segment that does not match. */
+function resolveExact(fromDir, url) {
+  const clean = url.split('?')[0].split('#')[0];
+  let dir = fromDir;
+  const segs = clean.split('/').filter(s => s !== '' && s !== '.');
+  for (let i = 0; i < segs.length; i++) {
+    if (segs[i] === '..') { dir = path.dirname(dir); continue; }
+    let names;
+    try { names = fs.readdirSync(dir); } catch (e) { return segs.slice(0, i + 1).join('/'); }
+    if (!names.includes(segs[i])) return segs.slice(0, i + 1).join('/');
+    dir = path.join(dir, segs[i]);
+  }
+  return '';
+}
+
+const ASSET_RE = /\.(png|jpe?g|gif|svg|mp4|webm|woff2?|ttf)$/i;
+
+function checkAssetContract() {
+  /* ── the shared roots ── */
+  const ua = path.join(BASE, 'unit-assets');
+  for (const [sub, n] of [['fonts', 2], ['img', 2], ['video', 8]]) {
+    const d = path.join(ua, sub);
+    const files = fs.existsSync(d) ? fs.readdirSync(d).filter(f => ASSET_RE.test(f)) : [];
+    ok('assets', 'unit-assets/' + sub + ' holds ' + n + ' file(s)', files.length === n,
+      files.length + ': ' + files.join(','));
+  }
+
+  /* ── no component may re-grow its own copy of the hoisted fonts ── */
+  for (const c of COMPONENTS) {
+    const f = path.join(BASE, 'methodica-science-mass-measure-02-' + c, 'assets', 'fonts');
+    const faces = fs.existsSync(f)
+      ? fs.readdirSync(f).filter(x => /^assistant-/i.test(x)) : [];
+    ok('assets', c + ' has no local copy of the Assistant faces', faces.length === 0,
+      faces.join(','));
+  }
+
+  /* ── every asset reference in every shipped html/js/css resolves, with exact case ── */
+  const skipDirs = ['.git', '_test', 'docs-and-tools', 'metadata-from', 'node_modules'];
+  const files = [];
+  (function walk(d) {
+    for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+      const p = path.join(d, e.name);
+      if (e.isDirectory()) { if (!skipDirs.includes(e.name)) walk(p); }
+      else if (/\.(html|js|css)$/.test(e.name) && e.name !== 'index_dev.html') files.push(p);
+    }
+  })(BASE);
+
+  let refs = 0;
+  for (const f of files) {
+    const txt = fs.readFileSync(f, 'utf8');
+    const found = new Set();
+    for (const re of [/url\(\s*['"]?([^'")]+)['"]?\s*\)/g, /(?:src|href)="([^"]+)"/g,
+                      /'((?:\.\.\/)*(?:unit-)?assets\/[^']+)'/g]) {
+      for (const m of txt.matchAll(re)) {
+        const u = m[1].trim();
+        if (/^data:|^https?:|^\/\/|^#/.test(u)) continue;
+        if (!ASSET_RE.test(u.split('?')[0])) continue;
+        found.add(u);
+      }
+    }
+    for (const u of found) {
+      refs++;
+      const bad = resolveExact(path.dirname(f), u);
+      ok('assets', path.relative(BASE, f).replace(/\\/g, '/') + ' -> ' + u,
+        bad === '', bad ? 'no such path (exact case): ' + bad : '');
+    }
+  }
+  /* A floor, not a target: this guards against the sweep silently matching nothing
+     (a regex edit, a renamed folder) and reporting a clean run over zero references.
+     Counted per (file, url) pair with duplicates within a file collapsed, so it is
+     well below the raw number of occurrences. */
+  ok('assets', 'the sweep actually found references', refs > 100, String(refs));
+
+  /* ── the preload bases, which a blanket rewrite gets wrong in both directions ──
+     03/05/06 preload ONLY the dancing GIFs, which are now at unit level. 01 preloads
+     avatar-<color>.png and -workout.gif, which stayed in the component. The two lines
+     look identical; swapping either is a silent 404 that costs a preload, not a render. */
+  for (const c of ['03', '05', '06']) {
+    const s = fs.readFileSync(path.join(BASE, 'methodica-science-mass-measure-02-' + c, 'script.js'), 'utf8');
+    ok('assets', c + ' preloads the dancing GIF from unit-assets',
+      /img\.src = '\.\.\/unit-assets\/img\/' \+ name;/.test(s));
+  }
+  const s01 = fs.readFileSync(path.join(BASE, 'methodica-science-mass-measure-02-01', 'script.js'), 'utf8');
+  ok('assets', '01 still preloads its OWN images from assets/images/',
+    /img\.src = 'assets\/images\/' \+ name;/.test(s01));
+
+  /* ── the two font depths ── */
+  for (const c of COMPONENTS) {
+    const css = fs.readFileSync(path.join(BASE, 'methodica-science-mass-measure-02-' + c, 'styles.css'), 'utf8');
+    const n = (css.match(/url\('\.\.\/unit-assets\/fonts\//g) || []).length;
+    ok('assets', c + '/styles.css reaches the fonts with one ../', n === 2, String(n));
+  }
+  const sub = path.join(BASE, 'methodica-science-mass-measure-02-05', 'plane-mass-simulation', 'style.css');
+  const subCss = fs.readFileSync(sub, 'utf8');
+  ok('assets', 'the sub-app reaches the fonts with two ../ (it sits one level deeper)',
+    (subCss.match(/url\('\.\.\/\.\.\/unit-assets\/fonts\//g) || []).length === 2);
+}
+
 (async () => {
   checkMetadata();
   checkVersionQueries();
+  checkAssetContract();
   checkSlugCase();
   checkLibraryLetter();
   checkCommitmentFlush();
