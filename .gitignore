@@ -10,6 +10,7 @@ kata-api-key.txt
 # לוגים של סקריפטי המטא-דאטה
 send-metadata.log
 retrieve-metadata.log
+rename-to-iri.log
 
 # תמונת מצב שנשלפת מהקטלוג לצורך diff מול metadata/ — לא מקור אמת
 metadata-from/

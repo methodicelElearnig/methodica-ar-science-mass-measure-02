@@ -62,13 +62,22 @@ its `$Valid*` lists; any Title-Case table you encounter in older notes is stale.
 
 | Metadata | Rebuilt from KATA |
 |---|---|
-| `id` (full URL) | component `hostedContentRef` minus `/index.html`; the unit's `id` and each item's `id` are derived from that same prefix. Falls back to `-IdBase` with a warning if no component has one. |
+| `id` (full URL) | component `hostedContentRef` minus `/index.html`; the unit's `id` and each item's `id` are derived from that same prefix. Falls back to the component's own `uniqueKey` (an IRI since 2026-09-15), then to `-IdBase` with a warning. |
 | unit `title` (string) | `title.Hebrew` (`$TitleLangKey`) |
 | component `learningUnitId` | the unit's `id` URL (KATA returns the bare key) |
 | component `manufacture` | the `$Manufacture` constant, `'methodica'` — KATA returns the provider display name (`מתודיקה`) instead. Set `$Manufacture = $null` to pass KATA's value through. |
 | `recommendedAfterFail` | each key expanded back to `<prefix>/<key>/` |
-| item `id` | `<component id>/<item uniqueKey>` |
+| item `id` | the item's `uniqueKey` verbatim when it is already an absolute IRI (the case since 2026-09-15); otherwise the legacy `<component id>/<item uniqueKey>` |
 | `questions[]` | verbatim, minus each question's `order` |
+
+> ⚠️ **Component and item ids are rebuilt from different sources, and they disagree today.**
+> Item ids now come from the item's own `uniqueKey` (`…/metodica/**720active**/…`), while
+> component ids still come from `hostedContentRef` (`…/metodica/**720**/…`, no trailing
+> slash). So `metadata-from/` currently shows a `720` component id above a `720active`
+> item id, and neither matches the canonical `metadata/` component id byte-for-byte.
+> This is the pre-existing `720` vs `720active` divergence, not a retrieval bug — the
+> catalogue's `uniqueKey` is correct and matches `metadata/`. Settle which CDN path is
+> real before treating `metadata-from/` as a diff source for component ids.
 
 **Dropped**, because the metadata format has no place for them — use `-KeepRaw` if you
 need them: unit `kind`, `providerName`, `providerLogoUrl`, `componentCount`, `createdAt`,

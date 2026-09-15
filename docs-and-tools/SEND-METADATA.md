@@ -67,7 +67,8 @@ this is controlled from the **CONFIG** block at the top of the file.
 
 | Metadata | Sent to API |
 |---|---|
-| `id` (full URL) | `uniqueKey` = last path segment (slug), e.g. `methodica-science-mass-measure-02-01`. Trailing slashes are trimmed first, so `…/foo/` yields `foo`, not `""`. |
+| unit `id` (full URL) | `uniqueKey` = last path segment (slug), e.g. `methodica-science-mass-measure-02`. Trailing slashes are trimmed first, so `…/foo/` yields `foo`, not `""`. The **unit** keeps a slug — 720 v2.5 §2.7 exempts the content unit, and Kata does not warn on it. |
+| component / item `id` (full URL) | `uniqueKey` = **the IRI verbatim**, unchanged. Since 2026-09-15 (see below) these are no longer reduced to a slug. |
 | unit `title` (string) | `title` object `{ "Hebrew": "…" }` (`$TitleLangKey`) |
 | unit — (no manufacture) | `manufacture` = `'methodica'` (`$UnitManufacture`) |
 | unit `targetSector` / `targetAudience` | passed through, but **validated** against `$ValidTargetSector` / `$ValidTargetAudience` first — a bad value stops the run instead of 422-ing after the unit was already created |
@@ -75,7 +76,7 @@ this is controlled from the **CONFIG** block at the top of the file.
 | component `masteryLevel` | forwarded when present and non-null; absent stays absent rather than being defaulted. (All six components in this unit are `null`, so no key is emitted.) |
 | component `id` | also becomes `hostedContentRef` = component id + `/index.html` |
 | component `manufacture` | dropped (owning group is derived from the API key) |
-| component `recommendedAfterFail` | URLs reduced to component keys and applied in a **second pass** — see below |
+| component `recommendedAfterFail` | the component IRIs, verbatim, applied in a **second pass** — see below |
 | item — (no order) | `order` = 1-based position in `subContent[]` |
 | `questions[]` | passed through unchanged |
 
@@ -85,6 +86,35 @@ These references can point at components created later in the same run, which KA
 rejects at create time (`"… is not a component"`). So `New-ComponentBody` deliberately
 omits the field, and after every component exists the script issues one `PATCH` per
 component that has any — logged as `LINKED`. Forward references are therefore fine.
+
+### Identifier format — IRIs, and the route that follows from them
+
+**Changed 2026-09-15.** Component and item `uniqueKey`s are the **full IRI** from
+`metadata/`, not a slug. 720 v2.5 p.11 requires it, and Kata now says so directly: any
+slug-keyed row comes back carrying
+
+```json
+{ "code": "identifier_not_iri", "field": "uniqueKey",
+  "message": "uniqueKey should be an absolute IRI … Advisory for now." }
+```
+
+This forces the **route**, not just the payload. An IRI contains `/`, and a URL path
+segment cannot — the server decodes `%2F` before routing, so `/api/v1/components/{key}`
+returns `404` for every encoding of an IRI. All component and item calls therefore use
+the query-string routes Kata shipped in the same release, with `Enc` (`[uri]::EscapeDataString`)
+applied to every key:
+
+| | route |
+|---|---|
+| component GET / PATCH | `/api/v1/component?componentKey=…` |
+| item create | `/api/v1/component/items?componentKey=…` |
+| item GET / PATCH | `/api/v1/component/item?componentKey=…&itemKey=…` |
+| component create | `/api/v1/content-units/{unitSlug}/components` — unchanged, the key is in the body |
+| everything unit-level | unchanged — the unit key is still a slug |
+
+The one-time migration that renamed the existing rows is `rename-to-iri.ps1` (it also
+reverts, with `-Revert`). `hostedContentRef` is unaffected and still derives from the
+component `id`.
 
 ### The unit slug is guarded
 
@@ -167,9 +197,11 @@ git diff --no-index metadata metadata-from
 Two mappings are best-guesses and isolated to single config points, so a first-call
 `422` is a one-line fix:
 
-1. **`uniqueKey` = URL slug.** If the catalog wants the full URL or a different
-   format, change `Get-Slug` / the uniqueKey logic. (`GET /api/v1/content/next-unique-key?entityType=…`
-   shows the catalog's expected format.)
+1. ~~**`uniqueKey` = URL slug.**~~ **Settled 2026-09-15 — the catalog wants the full URL.**
+   Kata now reports `identifier_not_iri` on any component or item key that is a bare slug
+   ("uniqueKey should be an absolute IRI … per Ministry 720 v2.5 p.11 … Advisory for now"),
+   so component and item keys are sent as the IRI verbatim and only the **unit** still goes
+   through `Get-Slug`. See "Identifier format" below.
 2. **Unit `title` is an object** `{ "Hebrew": "…" }`. If rejected, adjust the
    title builder in `New-UnitBody`.
 
@@ -182,7 +214,10 @@ against, and picking the right code is a content decision — flagged, not guess
 ## Verify the result
 
 - `GET /api/v1/content-units/methodica-science-mass-measure-02` returns the unit with
-  its components; spot-check `GET /api/v1/components/methodica-science-mass-measure-02-01`
-  and one item.
+  its components; spot-check one component and one item through the query routes, e.g.
+  `GET /api/v1/component?componentKey=<url-encoded component IRI>`. The old
+  `/api/v1/components/{key}` form `404`s on an IRI key — that is expected, not a fault.
+- Every component and item should report `warnings: []`. A row still carrying
+  `identifier_not_iri` was keyed with a slug.
 - In the Kata UI: **יחידות תוכן** (`/author`).
 - Re-run once — every entity should report `UPDATED` (not duplicated).
