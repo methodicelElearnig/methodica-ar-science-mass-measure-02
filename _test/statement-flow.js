@@ -421,7 +421,8 @@ function probeDevNav() {
   let b = boot('03');
   ok(C + ' production boot: DEV_NAV is false', b.val('DEV_NAV') === false, String(b.val('DEV_NAV')));
   ok(C + ' production: the first-screen "חזרה" is hidden',
-    b.val("document.getElementById('s0-back').hidden") === true);
+    b.val("document.getElementById('s0-back').hidden") === true &&
+    b.val("getComputedStyle(document.getElementById('s0-back')).display") === 'none');
   let r = b.run('s1Continue();');
   ok(C + ' production: the last click reports the component once and moves no pointer',
     r.log.filter(s => s.type === 'onlinelesson' && s.verb === 'completed').length === 1 &&
@@ -437,7 +438,8 @@ function probeDevNav() {
   b = boot('03', '?dev=1');
   ok(C + ' ?dev=1 alone: DEV_NAV is true', b.val('DEV_NAV') === true, String(b.val('DEV_NAV')));
   ok(C + ' ?dev=1: the first-screen "חזרה" is shown',
-    b.val("document.getElementById('s0-back').hidden") === false);
+    b.val("document.getElementById('s0-back').hidden") === false &&
+    b.val("getComputedStyle(document.getElementById('s0-back')).display") !== 'none');
   r = b.run('s1Continue();');
   ok(C + ' ?dev=1: the last click still reports the component once',
     r.log.filter(s => s.type === 'onlinelesson' && s.verb === 'completed').length === 1);
@@ -449,7 +451,8 @@ function probeDevNav() {
   ok(C + ' ?dev=1&registration: DEV_NAV is false — a launch URL never opens navigation',
     b.val('DEV_NAV') === false, String(b.val('DEV_NAV')));
   ok(C + ' ?dev=1&registration: the "חזרה" stays hidden',
-    b.val("document.getElementById('s0-back').hidden") === true);
+    b.val("document.getElementById('s0-back').hidden") === true &&
+    b.val("getComputedStyle(document.getElementById('s0-back')).display") === 'none');
   r = b.run('s1Continue();');
   ok(C + ' ?dev=1&registration: the last click moves nothing',
     b.val('_unitState.part') === HERE, String(b.val('_unitState.part')));

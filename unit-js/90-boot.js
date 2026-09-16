@@ -37,7 +37,10 @@
 function hideCrossPartBack() {
   if (DEV_NAV) return;
   var b = document.getElementById('s0-back');
-  if (b) { b.hidden = true; b.setAttribute('aria-hidden', 'true'); }
+  /* Inline display:none as well as the attribute: the button's own rule (.btn-back { display:flex })
+     is an author rule and beats the UA's [hidden] { display:none } — seen live on 16/09, the
+     button stayed on screen with hidden === true. */
+  if (b) { b.hidden = true; b.style.display = 'none'; b.setAttribute('aria-hidden', 'true'); }
 }
 
 (function boot() {
