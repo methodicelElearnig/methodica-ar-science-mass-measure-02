@@ -62,7 +62,7 @@ its `$Valid*` lists; any Title-Case table you encounter in older notes is stale.
 
 | Metadata | Rebuilt from KATA |
 |---|---|
-| `id` (full URL) | component `hostedContentRef` minus `/index.html`; the unit's `id` and each item's `id` are derived from that same prefix. Falls back to the component's own `uniqueKey` (an IRI since 2026-09-15), then to `-IdBase` with a warning. |
+| `id` (full URL) | the entity's own `uniqueKey`, which **is** the id since the 2026-09-15 IRI migration — for components, items and the URL prefix alike. Falls back to component `hostedContentRef` minus `/index.html` for a pre-migration row (with a warning), then to `-IdBase`. ⚠️ Until 2026-09-16 `hostedContentRef` came first, which put a `720` content path where a `720active` identifier belongs and produced `id` DRIFT rows that were not drift. |
 | unit `title` (string) | `title.Hebrew` (`$TitleLangKey`) |
 | component `learningUnitId` | the unit's `id` URL (KATA returns the bare key) |
 | component `manufacture` | the `$Manufacture` constant, `'methodica'` — KATA returns the provider display name (`מתודיקה`) instead. Set `$Manufacture = $null` to pass KATA's value through. |
@@ -70,14 +70,22 @@ its `$Valid*` lists; any Title-Case table you encounter in older notes is stale.
 | item `id` | the item's `uniqueKey` verbatim when it is already an absolute IRI (the case since 2026-09-15); otherwise the legacy `<component id>/<item uniqueKey>` |
 | `questions[]` | verbatim, minus each question's `order` |
 
-> ⚠️ **Component and item ids are rebuilt from different sources, and they disagree today.**
-> Item ids now come from the item's own `uniqueKey` (`…/metodica/**720active**/…`), while
-> component ids still come from `hostedContentRef` (`…/metodica/**720**/…`, no trailing
-> slash). So `metadata-from/` currently shows a `720` component id above a `720active`
-> item id, and neither matches the canonical `metadata/` component id byte-for-byte.
-> This is the pre-existing `720` vs `720active` divergence, not a retrieval bug — the
-> catalogue's `uniqueKey` is correct and matches `metadata/`. Settle which CDN path is
-> real before treating `metadata-from/` as a diff source for component ids.
+> **Every id now comes from its `uniqueKey`** (2026-09-16). Since the IRI migration the
+> `uniqueKey` **is** the identifier, so component ids, item ids and the URL prefix are all
+> taken from it, and `metadata-from/` matches `metadata/` byte-for-byte.
+>
+> ⚠️ **What this block used to warn about, and why it was the retriever's fault.** Component
+> ids were rebuilt from `hostedContentRef` while item ids came from `uniqueKey`, so a file
+> held a `720` component id above `720active` item ids and neither matched `metadata/`. That
+> was read as "the `720` vs `720active` divergence, not a retrieval bug", and it was exactly
+> a retrieval bug: `hostedContentRef` is a CONTENT address and an id is an IDENTIFIER, and
+> 720 v2.5 p.11 frees an identifier from resolving. The divergence itself is correct by
+> design — **identifiers and the shared library → `720active`, unit content hosting → `720`**.
+> The measured effect: mass-measure-01's `verify-metadata.ps1` went from 11 drift rows to 6,
+> the six being genuine and pre-existing.
+>
+> `hostedContentRef` remains the fallback for a catalogue row that predates the migration and
+> still carries a bare slug; taking that path now emits a warning.
 
 **Dropped**, because the metadata format has no place for them — use `-KeepRaw` if you
 need them: unit `kind`, `providerName`, `providerLogoUrl`, `componentCount`, `createdAt`,

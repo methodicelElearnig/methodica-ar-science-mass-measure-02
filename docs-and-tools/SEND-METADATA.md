@@ -74,7 +74,7 @@ this is controlled from the **CONFIG** block at the top of the file.
 | unit `targetSector` / `targetAudience` | passed through, but **validated** against `$ValidTargetSector` / `$ValidTargetAudience` first — a bad value stops the run instead of 422-ing after the unit was already created |
 | component `relativeDifficulty` / `depthLevel` / `cognitiveLevel` | read **from the metadata**. Precedence is `$ComponentOverrides` > metadata value > fallback (component `order` for `relativeDifficulty`, `$DefaultDepthLevel` for `depthLevel`) |
 | component `masteryLevel` | forwarded when present and non-null; absent stays absent rather than being defaulted. (All six components in this unit are `null`, so no key is emitted.) |
-| component `id` | also becomes `hostedContentRef` = component id + `/index.html` |
+| component `id` | `uniqueKey` only. `hostedContentRef` is built from `$ContentBaseUrl` in the CONFIG block and is **not** derived from the id — an id lives under `720active/` and the content is served from `720/`, so deriving one from the other wrote a launch URL that serves 0 bytes (fixed 2026-09-16). |
 | component `manufacture` | dropped (owning group is derived from the API key) |
 | component `recommendedAfterFail` | the component IRIs, verbatim, applied in a **second pass** — see below |
 | item — (no order) | `order` = 1-based position in `subContent[]` |
