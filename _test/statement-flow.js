@@ -145,21 +145,32 @@ function probe01() {
     r.log.length === 0,
     JSON.stringify(r.log.map(s => s.verb)));
 
-  /* A genuine content video, explicitly marked, still reports — and now
-     carries the question ids the old objectId-less payload never had. */
+  /* A genuine content video, explicitly marked, still reports — and carries the ITEM as its
+     object. 15.09.26: this asserted opts.questionId, which is what the unit PASSED and not
+     what was SENT. The library resolves object.id from objectId, else from a questionId but
+     only for answered/selected/requested, else from METADATA.id — so played/paused went out
+     against the component while this assertion passed. That is the whole reason
+     720-common-lib/_test/video-object-id.js exists: it loads the real library and asserts on
+     the emitted statement. What can be checked HERE is the unit's half of the contract, so
+     that is what this now checks — objectId, the only key the library honours for these verbs. */
   r = run("var _cv = document.createElement('video');" +
           "_cv.setAttribute('data-xapi-report', '002');" +
-          "_cv.setAttribute('data-xapi-q', 'q1');" +
           "Object.defineProperty(_cv, 'currentTime', { value: 7, configurable: true });" +
           "document.body.appendChild(_cv);" +
           "xapiWireVideos();" +
           "_cv.dispatchEvent(new Event('pause'));" +
           "_cv.dispatchEvent(new Event('play'));");
-  ok(C + ' a marked content video emits paused+played, with question ids',
+  ok(C + ' a marked content video emits paused+played against the ITEM',
     r.log.length === 2 && r.log[0].verb === 'paused' && r.log[1].verb === 'played' &&
-    r.log[0].opts.questionId === item('002') + 'q1' &&
-    r.log[0].opts.parentId === item('002'),
-    JSON.stringify(r.log.map(s => s.verb + ':' + (s.opts && s.opts.questionId))));
+    r.log[0].opts.objectId === item('002') &&
+    r.log[1].opts.objectId === item('002'),
+    JSON.stringify(r.log.map(s => s.verb + ':' + (s.opts && s.opts.objectId))));
+
+  /* The id must be the item, never the question — a video is not answered. */
+  ok(C + ' the video object is the item, not a question id',
+    r.log.length === 2 && r.log.every(s => s.opts && !s.opts.questionId &&
+      !/\/q\d+$/.test(String(s.opts.objectId))),
+    JSON.stringify(r.log.map(s => s.opts && s.opts.questionId)));
 
   r = run('scqSelected = "b"; scqDone = false; scqAttempts = 0; scqCheck();');
   const wrong = r.log.find(s => s.verb.startsWith('answered'));

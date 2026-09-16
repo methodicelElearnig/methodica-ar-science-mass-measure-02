@@ -288,20 +288,28 @@ function xapiCompleteUnit(result) {
    (למשל -01/script.js:940), וה-load() על אלמנט מתנגן מפיק אירוע pause ואחריו
    play — כלומר זוג paused/played מזויף בכל כניסה למסך, כולל חזרה ושחזור.
    מעכשיו מחוברים רק אלמנטים שנושאים data-xapi-report, וערכו הוא סיומת הפריט
-   (למשל data-xapi-report="003" data-xapi-q="q1"). כרגע אין ביחידה אף אלמנט
+   (למשל data-xapi-report="003"). כרגע אין ביחידה אף אלמנט
    כזה, ולכן הדיווח כבוי בפועל — המנגנון נשאר מוכן לווידאו תוכן אמיתי.
-   ── objectId ──
-   הגרסה הקודמת שלחה objectType 'question' בלי objectId ובלי questionId, ולכן
-   לא היה לאמירות האלה שום שאלה להיתלות בה. עכשיו הן נושאות xapiQ() כמו כל
-   אמירה אחרת מסוג question. */
+   ── objectId: הפריט, לא השאלה (15.09.26) ──
+   דווח על ידי צוות הבדיקות: האמירות האלה נשלחו מול הסין. נשיאת xapiQ() מעולם
+   לא הספיקה. הספרייה בונה את object.id מ-sttmContext.objectId, אחרת מ-questionId
+   אבל רק ל-answered/selected/requested, ואחרת מ-window.METADATA.id. played/paused
+   אינם באף אחת מהרשימות, ולכן ה-questionId וה-parentId נזרקו ונשלח מזהה הרכיב
+   (xapi-720-k.js, בלוק ה-object). מעכשיו מועבר objectId: xapiItemId(item) — אותו
+   helper שמעגן item initialized/completed.
+   xapiQ() ו-data-xapi-q ירדו מהמסלול הזה: האובייקט הוא הפריט, ופריט וידאו לא חייב
+   לשאת שאלה בכלל (לפריט 006 של mass-measure-01 אין).
+   ⚠️ ב"דוגמאות XAPI" של משרד החינוך, §6 ו-§7, מופיע ב-object מזהה רכיב. אנחנו
+   הולכים לפי צוות הבדיקות, כי אמירת וידאו ברמת רכיב לא יכולה לומר איזה סרטון.
+   אישור בכתב מ-MOE עדיין פתוח — לשאול אותו יחד עם אותה שאלה לגבי 'requested'. */
 function xapiWireVideos() {
   if (!window.XAPI_USING_G || typeof sendStatement720 !== 'function') return;
   document.querySelectorAll('video[data-xapi-report]').forEach(function (v) {
     if (v.__xapiWired) return; v.__xapiWired = true;
     var item = v.getAttribute('data-xapi-report');
-    var qKey = v.getAttribute('data-xapi-q') || 'q1';
+    var ctx  = { objectId: xapiItemId(item) };   // הפריט שהווידאו שייך לו
     var pausedOnce = false;
-    v.addEventListener('pause', function () { if (v.ended || v.currentTime === 0) return; pausedOnce = true; try { sendStatement720('paused', 'question', null, Object.assign({ time: v.currentTime }, xapiQ(item, qKey))); } catch (e) {} });
-    v.addEventListener('play', function () { if (!pausedOnce) return; try { sendStatement720('played', 'question', null, Object.assign({ time: v.currentTime }, xapiQ(item, qKey))); } catch (e) {} });
+    v.addEventListener('pause', function () { if (v.ended || v.currentTime === 0) return; pausedOnce = true; try { sendStatement720('paused', 'question', null, Object.assign({ time: v.currentTime }, ctx)); } catch (e) {} });
+    v.addEventListener('play', function () { if (!pausedOnce) return; try { sendStatement720('played', 'question', null, Object.assign({ time: v.currentTime }, ctx)); } catch (e) {} });
   });
 }

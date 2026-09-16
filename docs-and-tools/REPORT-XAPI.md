@@ -112,7 +112,7 @@ https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/
 | `initialized` / `completed` (פריט) | `xapiOnScreen()`, בכל חציית גבול בין פריטים |
 | `answered` / `answered.last` | בכל `sNNCheck`. רק `answered.last` נכנס למכנה |
 | `requested.1` | **רק** בענף שבו הרמז נפתח, ו**פעם אחת לכל שאלה** בטעינת עמוד |
-| `paused` / `played` | **רק** ל-`<video>` שנושא `data-xapi-report` — כרגע אף אחד |
+| `paused` / `played` | **רק** ל-`<video>` שנושא `data-xapi-report` — כרגע אף אחד. ה-object הוא **הפריט** |
 | `completed` (רכיב) | בפונקציית הניתוב שעוזבת את הסין — **גם במסלולי כשל** |
 | `completed` (יחידה) | בשלוש נקודות הסיום; היומן מבטיח דיווח אחד |
 
@@ -129,8 +129,21 @@ Escape) וכולן משאירות את כפתור הרמז חי, ובפאברי�
 זה גם לא היה שקט: כל מסך דמות מריץ `video.load()` + `play()` בכניסה, וה-`load()`
 על אלמנט מתנגן מפיק `pause` ואחריו `play` — זוג `paused`/`played` מזויף בכל
 כניסה, כולל חזרה ושחזור (אומת ב-`_test/statement-flow.js`). מעכשיו מחוברים רק
-אלמנטים עם `data-xapi-report="<פריט>"` (+ `data-xapi-q`, ברירת מחדל `q1`),
-והם גם נושאים `questionId`/`parentId` — מה שה-payload הקודם לא נשא כלל.
+אלמנטים עם `data-xapi-report="<פריט>"`, והם נושאים `objectId` — מה שה-payload
+הקודם לא נשא כלל.
+
+**ה-object הוא הפריט (תיקון 2026-09-15).** עד התאריך הזה נשלח כאן
+`Object.assign({ time }, xapiQ(item, qKey))`, והפסקה הזאת אמרה שהאמירות נושאות
+`questionId`/`parentId`. הן אכן נשאו — אבל הספרייה זרקה את שניהם. היא בונה את
+`object.id` מ-`sttmContext.objectId`, אחרת מ-`questionId` **אבל רק ל-**
+`answered`/`selected`/`requested`, ואחרת מ-`METADATA.id`; `played`/`paused` אינם
+באף אחת מהרשימות, ולכן כל אמירת וידאו יצאה מול **הרכיב**. זה מה שדיווח צוות
+הבדיקות, וזה תוקן בכל שש היחידות. `data-xapi-q` ירד: האובייקט הוא הפריט, ופריט
+וידאו לא חייב לשאת שאלה כלל.
+
+⚠️ ב"דוגמאות XAPI" של משרד החינוך, §6 ו-§7, מופיע ב-object מזהה **רכיב**.
+אנחנו הולכים לפי צוות הבדיקות; אישור בכתב מ-MOE עדיין פתוח — יחד עם אותה
+שאלה לגבי `requested`.
 
 `xapiOnScreen(n)` יושב בסוף כל `goTo()` — **אחרי** `classList.add('active')`,
 כדי שקריאת רשת לא תעכב את ה-paint, ובלי לשנות את הסדר
