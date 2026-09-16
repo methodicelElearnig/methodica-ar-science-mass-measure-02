@@ -119,8 +119,8 @@ v4 מוחק אותו, ו-`script.js` חדש מול `40-resume.js` מיושן ק�
 | טריגר | קריאה | מצב |
 |---|---|---|
 | החלפת מסך | `scheduleResumeSave()` בסוף כל `goTo()` | מושהה |
-| מעבר קדימה | `writeForwardState(dest, hash)` | סינכרוני |
-| מעבר אחורה | `goBackToPreviousPart(fallback, hash)` | סינכרוני, fail-closed |
+| מעבר קדימה — **רק תחת `?dev=1`** (2026-09-16) | `writeForwardState(dest, hash)` | סינכרוני |
+| מעבר אחורה — **רק תחת `?dev=1`** (2026-09-16) | `goBackToPreviousPart(fallback, hash)` | סינכרוני, fail-closed; בייצור no-op |
 | `completed` דווח | `markSent()` בתוך `sendCompletedOnce` | סינכרוני |
 | יציאה מהעמוד | `beforeunload` / `pagehide` / `visibilitychange` | סינכרוני |
 
@@ -135,7 +135,16 @@ v4 מוחק אותו, ו-`script.js` חדש מול `40-resume.js` מיושן ק�
 
 ---
 
-## 5. כפתור "חזרה" — חובה שיעבור דרך `goBackToPreviousPart`
+## 5. כפתור "חזרה" בין-סיני — מוסתר בייצור, ועובר דרך `goBackToPreviousPart` תחת `?dev=1`
+
+> ⚠️ **2026-09-16 — הניווט בין סינים שייך לפלטפורמה.** Kata משגרת כל רכיב בנפרד
+> (registration לרכיב) ומנתבת לפי ה-`completed`. כפתור "חזרה" של המסך הראשון
+> (`#s0-back`, סינים 02–06) **מוסתר** ב-`90-boot.js` אלא אם `DEV_NAV`, ו-
+> `goBackToPreviousPart` חוזרת מיד בלי הדגל. גם קפיצת ה-resume לסין השמור
+> בלואדר הוסרה: הרכיב שהושג הוא הרכיב שמוצג, ומשוחזרת המשבצת שלו בלבד.
+> `DEV_NAV` = `?dev=1` **וגם** אין `?registration` (`unit-js/10-identity.js`).
+> כל מה שמתחת מתאר את ההתנהגות שחיה היום רק ב-walkthrough מקומי. ראו
+> REPORT-XAPI.md §10.
 
 מרגע שיש מצביע נחיתה, כפתור חזרה שמנווט ב-`location.href` ישיר **נראה שבור**:
 הלואדר של היעד רואה מצביע שעדיין מכוון קדימה ומקפיץ את הלומד מיד חזרה. לכן כל

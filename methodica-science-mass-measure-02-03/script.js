@@ -127,15 +127,15 @@ function s1Continue() {
      contentType=task-inquiry-or-project ואין לו שאלות בכלל. לכן מדווח
      success בלי score: אין מה לדרג, אבל חשוב לרשום שהלומד עבר בו.
      ‎(דיווח score כאן היה ממציא ניקוד שאף אחד לא מדד.) */
-  xapiCompleteComponent({ success: true });
+  xapiEndComponent({ success: true }, document.getElementById('s1-continue'));
 
-  /* קישור בין סינים: מסך אחרון בסיין 3 -> מסך ראשון בסיין 4 (+ ?slxapi, §6).
-     writeForwardState מזיז את מצביע הנחיתה של מסמך ה-resume ליעד ורושם את
-     קשת החזרה (סין 04 חוזר לכאן, למסך 2 = '#screen=1'). בלי הזזת המצביע,
-     כפתור "חזרה" בסין 04 היה מגיע לכאן והלואדר כאן היה מקפיץ אותו מיד
-     חזרה ל-04 — ping-pong. ראו unit-js/40-resume.js. */
-  writeForwardState('methodica-science-mass-measure-02-04', '#screen=1');
-  window.location.href = '../methodica-science-mass-measure-02-04/index.html' + window.location.search;
+  /* המעבר לסין 04 שהיה כאן חי רק ב-walkthrough מקומי (DEV_NAV,
+     unit-js/10-identity.js). בייצור Kata מקבלת את ה-completed ומנתבת;
+     הרכיב נעצר בלחיצה הזאת והכפתור מושבת (2026-09-16). */
+  if (DEV_NAV) {
+    writeForwardState('methodica-science-mass-measure-02-04', '#screen=1');
+    window.location.href = '../methodica-science-mass-measure-02-04/index.html' + window.location.search;
+  }
 }
 
 /* ─── Dev mode: postMessage bridge ─────────────────────── */

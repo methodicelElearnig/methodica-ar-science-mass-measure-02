@@ -444,6 +444,10 @@ function previousPartHref(fallbackSlug, fallbackHash) {
    שולח completed מחדש בכל סבב). אם הכתיבה לא נחתה, להישאר במקום היא
    הכשל הבטוח; ניווט על כתיבה שנכשלה הוא בדיוק מה שמחזיר את ה-ping-pong. */
 function goBackToPreviousPart(fallbackSlug, fallbackHash) {
+  /* 2026-09-16: ניווט בין סינים שייך לפלטפורמה. בייצור הפונקציה לא עושה דבר;
+     הכפתור שקורא לה מוסתר ב-90-boot.js, וזה הגיבוי למקרה שהוא מגיע בכל זאת
+     (מקלדת, DOM ישן). פתוח רק תחת DEV_NAV — ראו unit-js/10-identity.js. */
+  if (!DEV_NAV) return;
   var href = previousPartHref(fallbackSlug, fallbackHash);
   var edge = _incomingEdge();
   var destSlug = (edge && edge.from) || fallbackSlug;

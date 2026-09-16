@@ -22,17 +22,28 @@
         אין צורך לגדר אותו ב-RESUME_ENABLED — flushResumeSave בודק את הדגל
         בעצמו, ולכן ה-handlers פשוט אינרטיים כשה-resume כבוי.
      3. initReportModal() — כפתור הדגל, ה-select המותאם, שלושת הדיאלוגים.
-     4. bootXAPI() אחרון. הוא טוען שני סקריפטים מה-CDN, מדווח את ה-initialized
-        של הרכיב, ובמסלול ה-resume עשוי לעשות window.location.replace() לסין
-        אחר — ואז שום דבר אחריו לא היה רץ.
+     4. hideCrossPartBack() — "חזרה" של המסך הראשון מנווט לסין הקודם, וזה שייך
+        לפלטפורמה (2026-09-16). מוסתר אלא אם DEV_NAV (10-identity.js);
+        goBackToPreviousPart עצמו גם נעצר בלי הדגל, כך שהכפתור המוסתר הוא
+        הנוחות והפונקציה היא הגיבוי.
+     5. bootXAPI() אחרון. הוא טוען שני סקריפטים מה-CDN ומדווח את ה-initialized
+        של הרכיב. (קפיצת ה-resume לסין אחר שהייתה בו הוסרה ב-2026-09-16 —
+        הרכיב שהושג הוא הרכיב שמוצג.)
 
-   שלוש הראשונות עטופות ב-try/catch כל אחת בנפרד, כדי שכשל באחת לא ימנע את
+   הראשונות עטופות ב-try/catch כל אחת בנפרד, כדי שכשל באחת לא ימנע את
    האחרות. bootXAPI() עוטף כבר את עצמו פנימה.
 
    אין צורך ב-DOMContentLoaded: התג הזה יושב מיד לפני </body>, ולכן ה-DOM שלם. */
+function hideCrossPartBack() {
+  if (DEV_NAV) return;
+  var b = document.getElementById('s0-back');
+  if (b) { b.hidden = true; b.setAttribute('aria-hidden', 'true'); }
+}
+
 (function boot() {
   try { initResumeResetHatch(); }    catch (e) { console.error('[boot] initResumeResetHatch', e); }
   try { initResumeLeaveHandlers(); } catch (e) { console.error('[boot] initResumeLeaveHandlers', e); }
   try { initReportModal(); }         catch (e) { console.error('[boot] initReportModal', e); }
+  try { hideCrossPartBack(); }       catch (e) { console.error('[boot] hideCrossPartBack', e); }
   bootXAPI();
 })();

@@ -1,8 +1,9 @@
 'use strict';
 /* ═══════════════════ xAPI — loader / init ═══════════════════
-   משותף לששת הסינים. Definition-only. bootXAPI() נקרא אחרון מ-90-boot.js,
-   כי זה השלב שעשוי לנווט הלאה: כשמסמך ה-resume מצביע על סין אחר הוא עושה
-   window.location.replace() ושום דבר אחריו לא ירוץ.
+   משותף לששת הסינים. Definition-only. bootXAPI() נקרא אחרון מ-90-boot.js.
+   (עד 2026-09-16 זה היה גם השלב שעשוי לנווט הלאה — כשמסמך ה-resume הצביע על
+   סין אחר הוא עשה window.location.replace(). הקפיצה הזאת הוסרה: הפלטפורמה
+   משגרת רכיב, והרכיב שהושג הוא הרכיב שמוצג. ראו REPORT-XAPI.md §10.)
 
    התפרים הפר-סיניים:
      XAPI_METADATA_FILE   חובה — '../metadata/<component>.json'
@@ -11,7 +12,7 @@
                           בו לטעינת מטא-דאטת היחידה.
 
    מקור: methodica-math-scale-01-vadimr-1/unit-js/50-loader.js. בלוק ה-resume
-   hop הוחזר ב-2026-08-17 יחד עם unit-js/40-resume.js. */
+   hop הוחזר ב-2026-08-17 יחד עם unit-js/40-resume.js, והוסר ב-2026-09-16. */
 
 function bootXAPI() {
   var CDN = 'https://lomdot.education.gov.il/metodica/720active/common/';
@@ -129,19 +130,12 @@ function bootXAPI() {
         if (RESUME_ENABLED) {
           try {
             _saved = readUnitState();
-            if (_saved.part && _saved.part !== currentPartSlug()) {
-              /* replace() ולא href: משאיר את הסין שננטש מחוץ ל-back-stack,
-                 שם לחיצת Back הייתה נוחתת על URL שמיד מקפיץ קדימה.
-                 ה-query string נגרר כמו בכל מעבר — בלעדיו ה-registration
-                 אובד וכל הסינים מדווחים כלום (REPORT-XAPI.md §6).
-                 הכיסוי **לא** מוסר כאן במכוון: העמוד עוזב, והוא מסתיר את
-                 ההצצה בסין 01 שהלומד רואה היום בכל קפיצה כזאת.
-                 __resumeInFlight נדלק כדי שרשת הביטחון ב-markup לא תחשוף את
-                 מסך 0 אם הניווט עצמו איטי — ראו ההערה שם. */
-              window.__resumeInFlight = true;
-              window.location.replace('../' + _saved.part + '/index.html' + window.location.search);
-              return;
-            }
+            /* 2026-09-16: קפיצת ה-resume לסין השמור (_saved.part !== currentPartSlug()
+               → location.replace) הוסרה. הפלטפורמה משגרת רכיב מסוים, והרכיב
+               שהושג הוא הרכיב שמוצג; ה-registration של Kata הוא לרכיב, ולכן
+               _saved.part יכול להיות שונה מהסין הנוכחי רק בעקבות מעבר פנימי
+               ישן. משוחזרת **המשבצת של הסין הזה** בלבד. ראו 10-identity.js
+               (DEV_NAV) ו-REPORT-XAPI.md §10. */
             /* הדמות — הסיבה שכל השלב הזה קיים. עד v4 היא ישבה רק
                ב-localStorage, ולכן המשך ממחשב אחר צבע כתום לומד שבחר ירוק.
                נקרא ללא תנאי ולא רק כשיש payload: לומד עם מסמך שאין בו

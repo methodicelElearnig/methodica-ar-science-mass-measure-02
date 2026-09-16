@@ -76,7 +76,7 @@
           <button class="btn-continue" dir="rtl" onclick="s0Continue()">המשך</button>
         </div>
         <div class="bar-back">
-          <button class="btn-back" dir="rtl" onclick="s0Back()">חזרה</button>
+          <button class="btn-back" id="s0-back" dir="rtl" onclick="s0Back()">חזרה</button>
         </div>
       </div>
     </div>
@@ -130,7 +130,7 @@
     <div class="bottom-bar">
       <div class="bottom-bar-inner">
         <div class="bar-actions">
-          <button class="btn-continue s2-btn-continue-wide" dir="rtl" onclick="s1Continue()">חזרתי, אפשר להמשיך</button>
+          <button class="btn-continue s2-btn-continue-wide" id="s1-continue" dir="rtl" onclick="s1Continue()">חזרתי, אפשר להמשיך</button>
         </div>
         <div class="bar-back">
           <button class="btn-back" dir="rtl" onclick="goTo(0)">חזרה</button>
@@ -229,14 +229,14 @@
      ⚠️ ה-?v= חייב להיות זהה בכל ששת ה-index.html לכל קובץ. אי-התאמה גורמת
      לסין אחד להביא עותק שני תחת URL אחר, ושני סינים יכולים להריץ גרסאות
      שונות של אותה לוגיקה בתוך סשן אחד של לומד. -->
-<script src="../unit-js/10-identity.js?v=7"></script>
-<script src="../unit-js/20-xapi.js?v=8"></script>
+<script src="../unit-js/10-identity.js?v=8"></script>
+<script src="../unit-js/20-xapi.js?v=9"></script>
 <script src="../unit-js/25-report.js?v=7"></script>
-<script src="../unit-js/40-resume.js?v=8"></script>
-<script src="../unit-js/50-loader.js?v=7"></script>
-<script src="script.js?v=5"></script>
+<script src="../unit-js/40-resume.js?v=9"></script>
+<script src="../unit-js/50-loader.js?v=8"></script>
+<script src="script.js?v=6"></script>
 <!-- ה-side-effects היחידים. חייב להיות אחרון, ובתג נפרד: זריקה ברמת
      top-level ב-script.js לא מפילה תג script אחר. ראו unit-js/90-boot.js. -->
-<script src="../unit-js/90-boot.js?v=7"></script>
+<script src="../unit-js/90-boot.js?v=8"></script>
 </body>
 </html>

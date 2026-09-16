@@ -21,10 +21,13 @@ function ok(name, cond, extra) {
   else { fail++; failures.push(name + (extra ? '  -> ' + extra : '')); }
 }
 
-function boot(comp) {
+/* `query` is the URL's query string, '' by default — i.e. a PRODUCTION boot: no ?dev=1, so
+   DEV_NAV is false and nothing may navigate between components. probeDevNav() passes
+   '?dev=1' and '?dev=1&registration=r1' to exercise the flag's two conditions. */
+function boot(comp, query) {
   const dir = path.join(BASE, 'methodica-science-mass-measure-02-' + comp);
   const dom = new JSDOM(fs.readFileSync(path.join(dir, 'index.html'), 'utf8'), {
-    url: 'http://localhost:8777/methodica-science-mass-measure-02-' + comp + '/index.html',
+    url: 'http://localhost:8777/methodica-science-mass-measure-02-' + comp + '/index.html' + (query || ''),
     runScripts: 'dangerously', pretendToBeVisual: true,
   });
   const w = dom.window;
@@ -215,7 +218,7 @@ function probe01() {
 // ── component 02: the 4-part true/false item, and the two-set score ──────
 function probe02() {
   const C = '02';
-  const { w, run } = boot(C);
+  const { w, run, val } = boot(C);
 
   let r = run("sq5Selected = {r1:'true', r2:'true', r3:'false', r4:'false'};" +
               "sq5Done = false; sq5Attempts = 0; sq5Check();");
@@ -229,43 +232,61 @@ function probe02() {
     qs[2].result.success === false && qs[3].result.success === true,
     qs.map(s => s.result.success).join(','));
 
-  /* success requires BOTH stated gates — basic >= 4/5 AND standard 2/2. That is
-     the rule the source unit uses (methodica-math-scale-01-02:
-     `getBasicPracticeScore() >= 3 && getAdvancedPracticeScore() >= 2`), and
-     REPORT-XAPI.md §5 there states it explicitly. Three cases pin it: passing
-     only the basic gate, only the standard gate, and both. */
-  const setProgress = (basicPass, standardPass) =>
-    "stationProgress2.q2='success'; stationProgress2.q3='success';" +
-    "stationProgress2.q4='success'; stationProgress2.q5=" +
-      (basicPass ? "'success'" : "'fail'") + ";" +
-    "stationProgress2.q6='fail';" +
-    "stationProgress3.q8='success'; stationProgress3.q9=" +
-      (standardPass ? "'success'" : "'fail'") + ";";
+  /* ── The two gates, as ruled (Nimrod Rotem, Monday 12890230271, confirmed 16.09.26) ──
+     Fewer than 4 of the 5 basic questions ENDS the component on screen 5: completed with
+     success:false, score = basic/5, and the two harder exercises are never shown. 4 or more
+     proceeds to them, and there success needs 2/2 with score = standard/2 (the denominators
+     are Vadim's decision of the same day). Until 16.09.26 this probe locked the opposite —
+     a hidden double gate with an unconditional hop to 03 — and REPORT-XAPI.md §7.4 has the
+     history. Each case boots fresh: the 'done' ledger is per page. */
+  const setBasic = (n) => ['q2', 'q3', 'q4', 'q5', 'q6']
+    .map((k, i) => "stationProgress2." + k + "='" + (i < n ? 'success' : 'fail') + "';").join('');
+  const setStandard = (n) => ['q8', 'q9']
+    .map((k, i) => "stationProgress3." + k + "='" + (i < n ? 'success' : 'fail') + "';").join('');
+  const compOf = (log) => log.find(s => s.type === 'onlinelesson' && s.verb === 'completed');
 
-  // basic 4/5, standard 1/2 -> the standard gate blocks it
-  r = run(setProgress(true, false) + 'drag9Continue();');
-  let comp = r.log.find(s => s.type === 'onlinelesson');
-  ok(C + ' basic gate alone is NOT enough for success',
-    comp && comp.result.success === false, comp && JSON.stringify(comp.result));
-  ok(C + ' score spans all 7 exercises (5 of 7)',
-    comp && Math.abs(comp.result.score.scaled - 5 / 7) < 1e-9,
-    comp && String(comp.result.score.scaled));
+  // (a) 3 of 5 -> the component ends HERE
+  r = run(setBasic(3) + 'goTo(5); sq6Done = true; sq6Continue();');
+  let comp = compOf(r.log);
+  ok(C + ' 3 of 5 basic -> completed on screen 5, success:false, scaled 3/5',
+    comp && comp.result.success === false && Math.abs(comp.result.score.scaled - 0.6) < 1e-9,
+    comp ? JSON.stringify(comp.result) : 'no component completed');
+  ok(C + ' ...the learner stays on screen 5 — the harder exercises are never shown',
+    val('currentScreen') === 5, 'currentScreen=' + val('currentScreen'));
+  ok(C + ' ...the bar button is disabled after the report',
+    val("document.getElementById('sq6-check').disabled") === true);
+  ok(C + ' ...and the ledger blocks a second report from the same page',
+    run('sq6Continue();').log.filter(s => s.type === 'onlinelesson').length === 0);
 
-  // basic 3/5, standard 2/2 -> the basic gate blocks it
+  // (b) 4 of 5 -> proceeds to the harder exercises, reporting nothing yet
   const b = boot(C);
-  r = b.run(setProgress(false, true) + 'drag9Continue();');
-  comp = r.log.find(s => s.type === 'onlinelesson');
-  ok(C + ' standard gate alone is NOT enough for success',
-    comp && comp.result.success === false, comp && JSON.stringify(comp.result));
+  r = b.run(setBasic(4) + 'goTo(5); sq6Continue();');
+  ok(C + ' 4 of 5 basic -> no component completed, screen 6 reached',
+    !compOf(r.log) && b.val('currentScreen') === 6,
+    'currentScreen=' + b.val('currentScreen') + ' log=' + JSON.stringify(r.log.map(s => s.verb)));
 
-  // both gates met -> success
+  // (c) 1 of 2 hard -> success:false, and the basic questions do NOT enter this denominator
+  r = b.run(setStandard(1) + 'drag9Continue();');
+  comp = compOf(r.log);
+  ok(C + ' 1 of 2 hard -> success:false, scaled 1/2 (basic 4/5 is not in the denominator)',
+    comp && comp.result.success === false && Math.abs(comp.result.score.scaled - 0.5) < 1e-9,
+    comp ? JSON.stringify(comp.result) : 'no component completed');
+  ok(C + ' ...drag9-check is disabled after the report',
+    b.val("document.getElementById('drag9-check').disabled") === true);
+
+  // (d) 2 of 2 hard -> success:true, scaled 1
   const b2 = boot(C);
-  r = b2.run(setProgress(true, true) + 'drag9Continue();');
-  comp = r.log.find(s => s.type === 'onlinelesson');
-  ok(C + ' both gates met -> success, 6 of 7',
-    comp && comp.result.success === true &&
-    Math.abs(comp.result.score.scaled - 6 / 7) < 1e-9,
-    comp && JSON.stringify(comp.result));
+  r = b2.run(setBasic(4) + setStandard(2) + 'drag9Continue();');
+  comp = compOf(r.log);
+  ok(C + ' 2 of 2 hard -> success:true, scaled 1',
+    comp && comp.result.success === true && comp.result.score.scaled === 1,
+    comp ? JSON.stringify(comp.result) : 'no component completed');
+
+  /* Production: the last click reports and stops. No hop, no landing-pointer move —
+     Kata routes on the statement. (probeDevNav covers the ?dev=1 walkthrough.) */
+  ok(C + ' production: drag9Continue moved no landing pointer',
+    b2.val('_unitState.part') === 'methodica-science-mass-measure-02-02',
+    String(b2.val('_unitState.part')));
 
   w.close(); b.w.close(); b2.w.close();
 }
@@ -305,11 +326,14 @@ function probe05() {
   const { w: w2, run: run2, exec: exec2, val: val2 } = boot(C);
   exec2("setUnitResult('lomda_moedA_partA_result','pass');" +
         "setUnitResult('lomda_moedA_partB_result','pass');");
+  /* 2026-09-16: on the SUCCESS path the component `completed` moved from here to the
+     finale's "סיימתי" (s4Finish). Kata removes the component on `completed` (v2.7 p.23),
+     so reporting at the routing decision would have hidden screen 4 before the learner saw
+     it. The failure path above still reports here, because there the component ENDS here. */
   r = run2('dqB.onContinue();');
-  comp = r.log.find(s => s.type === 'onlinelesson' && s.verb === 'completed');
-  ok(C + ' SUCCESS path reports success with scaled 1',
-    comp && comp.result.success === true && comp.result.score.scaled === 1,
-    comp && JSON.stringify(comp.result));
+  ok(C + ' SUCCESS path reports NOTHING at the routing decision, and shows the finale',
+    !r.log.some(s => s.type === 'onlinelesson') && val2('currentScreen') === 4,
+    'currentScreen=' + val2('currentScreen') + ' log=' + JSON.stringify(r.log.map(s => s.verb)));
 
   /* The reason v4 exists: a learner continuing the same registration on a
      second computer has an EMPTY localStorage, and before v4 that made
@@ -323,13 +347,19 @@ function probe05() {
          "applyUnitProfile(_unitState); return window.lomdaState.selectedCharacter; })()") === 'green');
 
   r = run2('s4Finish();');
-  const unit = r.log.find(s => s.opts && s.opts.objectId === w2.XAPI_UNIT_ID);
-  ok(C + ' "סיימתי" reports the UNIT completed at the unit id',
-    unit && unit.verb === 'completed' && unit.result.success === true,
-    JSON.stringify(r.log.map(s => s.verb + ':' + (s.opts && s.opts.objectId))));
+  comp = r.log.find(s => s.type === 'onlinelesson' && s.verb === 'completed');
+  ok(C + ' "סיימתי" reports the COMPONENT completed — success, scaled 1 — as the last click',
+    comp && comp.result.success === true && comp.result.score.scaled === 1 &&
+    !(comp.opts && (comp.opts.objectId || comp.opts.scope)),
+    JSON.stringify(r.log.map(s => s.verb + ':' + JSON.stringify(s.opts))));
+  ok(C + ' no unit-level statement leaves this page (removed 2026-09-16)',
+    !r.log.some(s => s.opts && (s.opts.objectId === w2.XAPI_UNIT_ID || s.opts.scope === 'unit')),
+    JSON.stringify(r.log.map(s => s.opts)));
+  ok(C + ' the finale button is disabled after the report',
+    val2("document.getElementById('s4-finish').disabled") === true);
 
   r = run2('s4Finish();');
-  ok(C + ' the ledger suppresses a repeat unit completed', r.log.length === 0,
+  ok(C + ' the ledger suppresses a repeat component completed', r.log.length === 0,
     JSON.stringify(r.log.map(s => s.verb)));
   w.close(); w2.close();
 }
@@ -337,7 +367,7 @@ function probe05() {
 // ── component 06: three graded questions, two terminal endings ───────────
 function probe06() {
   const C = '06';
-  const { w, run, exec } = boot(C);
+  const { w, run, exec, val } = boot(C);
 
   let r = run("s12Selected = S12_CORRECT_ID; s12Done = false; s12Attempts = 0; s12Check();");
   const a = r.log.find(s => s.verb.startsWith('answered'));
@@ -345,26 +375,85 @@ function probe06() {
     a && /-001\/q3$/.test(a.opts.questionId) && a.result.success === true,
     a && a.opts.questionId);
 
+  /* 2026-09-16: the component `completed` used to fire HERE, at the routing decision,
+     "so it is recorded even if the learner never clicks סיימתי". Kata removes the component
+     on `completed` (v2.7 p.23), so that would have hidden the finale. It now fires from the
+     finale's own button — the learner's last click. */
   exec("setUnitResult('lomda_moedB_partA_step1_result','pass');" +
        "setUnitResult('lomda_moedB_partB_result','pass');");
   r = run('s12Continue();');
-  const comp = r.log.find(s => s.type === 'onlinelesson' && s.verb === 'completed');
-  ok(C + ' component completed fires at the routing decision',
-    comp && comp.result.success === true, comp && JSON.stringify(comp.result));
+  ok(C + ' the routing decision reports nothing and shows the success finale (screen 8)',
+    !r.log.some(s => s.type === 'onlinelesson') && val('currentScreen') === 8,
+    'currentScreen=' + val('currentScreen') + ' log=' + JSON.stringify(r.log.map(s => s.verb)));
 
   r = run('s14Finish();');
-  const unit = r.log.find(s => s.opts && s.opts.objectId === w.XAPI_UNIT_ID);
-  ok(C + ' success ending reports the unit completed (success)',
-    unit && unit.result.success === true, JSON.stringify(r.log.map(s => s.verb)));
+  let comp = r.log.find(s => s.type === 'onlinelesson' && s.verb === 'completed');
+  ok(C + ' success ending: "סיימתי" reports the COMPONENT completed, success:true, scaled 1/3 (q3 only)',
+    comp && comp.result.success === true && Math.abs(comp.result.score.scaled - 1 / 3) < 1e-9 &&
+    !(comp.opts && (comp.opts.objectId || comp.opts.scope)),
+    JSON.stringify(r.log.map(s => s.verb + ':' + JSON.stringify(s.result) + ':' + JSON.stringify(s.opts))));
+  ok(C + ' no unit-level statement (removed 2026-09-16)',
+    !r.log.some(s => s.opts && (s.opts.objectId === w.XAPI_UNIT_ID || s.opts.scope === 'unit')));
+  ok(C + ' the finale button is disabled after the report',
+    val("document.getElementById('s14-finish').disabled") === true);
 
-  // The other ending, in a fresh page, must report success:false.
-  const { w: w2, run: run2 } = boot(C);
-  const r2 = run2('s13Finish();');
-  const unit2 = r2.log.find(s => s.opts && s.opts.objectId === w2.XAPI_UNIT_ID);
-  ok(C + ' failure ending reports the unit completed with success:false',
-    unit2 && unit2.result.success === false,
-    unit2 && JSON.stringify(unit2.result));
+  // The other ending, in a fresh page, must report the component with success:false.
+  const { w: w2, run: run2, val: val2 } = boot(C);
+  const r2 = run2('s12Continue(); s13Finish();');
+  comp = r2.log.find(s => s.type === 'onlinelesson' && s.verb === 'completed');
+  ok(C + ' failure ending: "סיימתי" reports the COMPONENT completed with success:false, scaled 0',
+    comp && comp.result.success === false && comp.result.score.scaled === 0 &&
+    val2('currentScreen') === 7,
+    (comp ? JSON.stringify(comp.result) : 'no component completed') + ' screen=' + val2('currentScreen'));
+  ok(C + ' ...and no unit-level statement there either',
+    !r2.log.some(s => s.opts && (s.opts.objectId === w2.XAPI_UNIT_ID || s.opts.scope === 'unit')));
   w.close(); w2.close();
+}
+
+/* ── the platform owns routing (2026-09-16) ──
+   DEV_NAV (unit-js/10-identity.js) is true only with ?dev=1 AND no ?registration. Production
+   boots have neither; a Kata launch always has a registration. Both halves are asserted, on
+   component 03 — the simplest last-click (`s1Continue`) and a first-screen "חזרה". */
+function probeDevNav() {
+  const C = 'nav';
+  const HERE = 'methodica-science-mass-measure-02-03';
+
+  let b = boot('03');
+  ok(C + ' production boot: DEV_NAV is false', b.val('DEV_NAV') === false, String(b.val('DEV_NAV')));
+  ok(C + ' production: the first-screen "חזרה" is hidden',
+    b.val("document.getElementById('s0-back').hidden") === true);
+  let r = b.run('s1Continue();');
+  ok(C + ' production: the last click reports the component once and moves no pointer',
+    r.log.filter(s => s.type === 'onlinelesson' && s.verb === 'completed').length === 1 &&
+    b.val('_unitState.part') === HERE,
+    'part=' + b.val('_unitState.part') + ' log=' + JSON.stringify(r.log.map(s => s.verb)));
+  ok(C + ' production: the button is disabled afterwards',
+    b.val("document.getElementById('s1-continue').disabled") === true);
+  b.exec("goBackToPreviousPart('methodica-science-mass-measure-02-02', '#screen=8');");
+  ok(C + ' production: goBackToPreviousPart is inert',
+    b.val('_unitState.part') === HERE, String(b.val('_unitState.part')));
+  b.w.close();
+
+  b = boot('03', '?dev=1');
+  ok(C + ' ?dev=1 alone: DEV_NAV is true', b.val('DEV_NAV') === true, String(b.val('DEV_NAV')));
+  ok(C + ' ?dev=1: the first-screen "חזרה" is shown',
+    b.val("document.getElementById('s0-back').hidden") === false);
+  r = b.run('s1Continue();');
+  ok(C + ' ?dev=1: the last click still reports the component once',
+    r.log.filter(s => s.type === 'onlinelesson' && s.verb === 'completed').length === 1);
+  ok(C + ' ?dev=1: ...and the hop is armed — the landing pointer moves to 04',
+    b.val('_unitState.part') === 'methodica-science-mass-measure-02-04', String(b.val('_unitState.part')));
+  b.w.close();
+
+  b = boot('03', '?dev=1&registration=r1');
+  ok(C + ' ?dev=1&registration: DEV_NAV is false — a launch URL never opens navigation',
+    b.val('DEV_NAV') === false, String(b.val('DEV_NAV')));
+  ok(C + ' ?dev=1&registration: the "חזרה" stays hidden',
+    b.val("document.getElementById('s0-back').hidden") === true);
+  r = b.run('s1Continue();');
+  ok(C + ' ?dev=1&registration: the last click moves nothing',
+    b.val('_unitState.part') === HERE, String(b.val('_unitState.part')));
+  b.w.close();
 }
 
 /* ── conditional skip: passing component 01 bypasses the reinforcement part ──
@@ -440,7 +529,7 @@ function probeRouting() {
     href === '../methodica-science-mass-measure-02-02/index.html#screen=8', href);
 }
 
-probe01(); probe02(); probe03(); probe05(); probe06(); probeRouting();
+probe01(); probe02(); probe03(); probe05(); probe06(); probeRouting(); probeDevNav();
 if (failures.length) { console.log('FAILURES:'); failures.forEach(f => console.log('  ' + f)); }
 console.log('\n=== statement flow: ' + pass + ' passed, ' + fail + ' failed ===');
 process.exit(fail ? 1 : 0);

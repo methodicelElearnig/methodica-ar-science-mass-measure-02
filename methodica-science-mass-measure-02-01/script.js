@@ -3523,33 +3523,24 @@ function s20Continue() {
      כי הצבירה של הספרייה היא AND של "כל התשובות נכונות", מה שהיה מדווח
      success:false על 4 מתוך 5 — כלומר על מעבר. */
   var _n = getPracticeScore();
-  xapiCompleteComponent({ success: _n >= 4, score: { scaled: _n / 5 } });
+  xapiEndComponent({ success: _n >= 4, score: { scaled: _n / 5 } },
+    document.getElementById('s20-check'));
 
-  /* ── ניתוב מותנה לפי הסף שהובטח ללומד ──
-     מסך 15 מבטיח "צריך לענות נכון על 4 שאלות (80%) לפחות". מי שעמד בסף מדלג
-     על סין 02 — שהוא תרגול מחזק — ועובר ישר למשימת הכיתה בסין 03. מי שלא,
-     ממשיך לסין 02.
-
-     זה הדפוס מלומדת המקור: `methodica-math-scale-01-01` עושה בדיוק
-     `if (getQuizScore() >= 4)` ומדלג על הרכיב המחזק. הוא גם עקבי עם מה
-     שהלומדה הזאת כבר עושה בסין 05 → 06 (`moedAFullyPassed()` מדלג על מועד ב').
-     תואם גם למטא-דאטה: סין 02 הוא היחיד עם recommendedAfterFail → סין 01,
-     כלומר הקטלוג מדגמן אותו כרכיב מחזק ולא כחלק מהמסלול הראשי.
-
-     window.location.search נגרר בכל מעבר — הוא נושא את ?slxapi ואת
-     ?registration, ובלעדיו הגדרת ה-LRS אובדת מכאן והלאה (REPORT-XAPI.md §6).
-
-     writeForwardState: שני דברים במכה אחת.
-     (א) קשת החזרה — סין 03 ניתן להגעה משני מקומות, ולכן צריך לזכור מאיפה
-         הלומד באמת הגיע, אחרת כפתור "חזרה" שם ישלח את מי שדילג לתוך סין 02,
-         תוכן שהוא לא ראה. המסך שממנו יוצאים הוא 20, כלומר '#screen=19'.
-     (ב) מצביע הנחיתה של מסמך ה-resume מוזז ליעד **לפני** הניווט. בלעדיו
-         השיגור הבא היה מחזיר את הלומד לתוך סין 01 שהוא בדיוק סיים.
-     הכתיבה סינכרונית ומחמשת מחדש את ה-debounce, כדי ש-timer מיושן מה-goTo
-     האחרון לא ידרוך עליה בזמן שהעמוד עוד חי. ראו unit-js/40-resume.js. */
-  var _dest = practiceDestinationSlug();
-  writeForwardState(_dest, '#screen=19');
-  window.location.href = '../' + _dest + '/index.html' + window.location.search;
+  /* ── הניתוב שייך לפלטפורמה (2026-09-16) ──
+     עד כאן הרכיב עצמו ניתב: מי שעמד בסף (מסך 15 — "4 שאלות (80%) לפחות")
+     דילג על סין 02 המחזק ועבר ל-03, ומי שלא — ל-02. מהיום Kata מקבלת את
+     ה-completed שלמעלה ומנתבת לפי הקטלוג (סין 02 הוא היחיד עם
+     recommendedAfterFail → 01, כלומר הקטלוג כבר מדגמן אותו כמחזק). הרכיב
+     נעצר בלחיצה הזאת; הכפתור מושבת.
+     practiceDestinationSlug() נשאר כפונקציה טהורה — הוא הכלל שהיה, והוא עדיין
+     מה ש-walkthrough מקומי (DEV_NAV, unit-js/10-identity.js) משתמש בו. שם גם
+     window.location.search נגרר, כמו קודם, וזה בסדר רק כי DEV_NAV נדלק אך ורק
+     בכתובת **בלי** ?registration. */
+  if (DEV_NAV) {
+    var _dest = practiceDestinationSlug();
+    writeForwardState(_dest, '#screen=19');
+    window.location.href = '../' + _dest + '/index.html' + window.location.search;
+  }
 }
 
 /* כלל הניתוב עצמו, מופרד מהניווט. מופרד כדי שיהיה ניתן לבדיקה בלי לנווט

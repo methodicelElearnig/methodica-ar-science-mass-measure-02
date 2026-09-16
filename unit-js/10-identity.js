@@ -58,3 +58,22 @@ function shortId(u) { return String(u || '').replace(/\/+$/, '').split('/').pop(
    applyResumeDom נשאר ריק בסינים 03/05/06 כי אין בהם ערכים שיושבים רק ב-DOM,
    לא כי הוא לא מומש. ראו RESUME.md §6 להיסטוריה המלאה. */
 var RESUME_ENABLED = true;
+
+/* ── ניווט בין סינים: כבוי בייצור, פתוח רק ל-walkthrough מקומי (2026-09-16) ──
+   הפלטפורמה (Kata) היא שמחליטה מה הרכיב הבא. היא משגרת כל רכיב בנפרד
+   (launcher/context מקבל מפתח רכיב ומחזיר launchUrl + registration לרכיב הזה),
+   קוראת את ה-completed שלנו ומנתבת לפי הקטלוג. ה-registration של Kata הוא
+   **לרכיב**, וכל מעבר פנימי גרר את window.location.search — כלומר לומד שעבר
+   01→02→03 בתוך היחידה דיווח את שלושת הרכיבים תחת ה-registration של 01.
+   לכן כל ניווט בין סינים (קדימה מהמסך האחרון, "חזרה" מהמסך הראשון, קפיצת
+   ה-resume בלואדר) מותנה בדגל הזה, והוא true רק כשמתקיימים **שניהם**:
+     1. ?dev=1 בכתובת — רק index_dev.html והמפתח מציבים אותו;
+     2. **אין** ?registration — כל שיגור של Kata נושא registration, ולכן כתובת
+        שיש בה registration היא סשן אמיתי של לומד, וגם ?dev=1 לא פותח בה ניווט.
+   ה-completed של הרכיב לעולם אינו מותנה בדגל: הוא נשלח בלחיצה האחרונה במסך
+   האחרון, והכפתור מושבת אחריה. ראו REPORT-XAPI.md §10. */
+var DEV_NAV = false;
+try {
+  var _devQ = new URLSearchParams(location.search);
+  DEV_NAV = _devQ.get('dev') === '1' && !_devQ.has('registration');
+} catch (e) {}

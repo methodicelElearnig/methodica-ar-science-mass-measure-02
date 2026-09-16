@@ -385,13 +385,16 @@ function tblContinue() {
      בינארי. התוצאה נלקחת מ-XAPI_Q_RESULTS ולא מחושבת מחדש, כדי שהציון יהיה
      בהכרח זהה למה שדווח ב-answered. */
   var _ok = !!XAPI_Q_RESULTS['001/q1'];
-  xapiCompleteComponent({ success: _ok, score: { scaled: _ok ? 1 : 0 } });
+  xapiEndComponent({ success: _ok, score: { scaled: _ok ? 1 : 0 } },
+    document.getElementById('tbl-check'));
 
-  /* קישור בין סינים: מסך אחרון בסיין 4 -> מסך ראשון בסיין 5 (+ ?slxapi, §6).
-     writeForwardState מזיז את מצביע הנחיתה ליעד ורושם את קשת החזרה (סין 05
-     חוזר לכאן, למסך 2 = '#screen=1'). ראו unit-js/40-resume.js. */
-  writeForwardState('methodica-science-mass-measure-02-05', '#screen=1');
-  window.location.href = '../methodica-science-mass-measure-02-05/index.html' + window.location.search;
+  /* המעבר לסין 05 שהיה כאן חי רק ב-walkthrough מקומי (DEV_NAV,
+     unit-js/10-identity.js). בייצור Kata מקבלת את ה-completed ומנתבת;
+     הרכיב נעצר בלחיצה הזאת והכפתור מושבת (2026-09-16). */
+  if (DEV_NAV) {
+    writeForwardState('methodica-science-mass-measure-02-05', '#screen=1');
+    window.location.href = '../methodica-science-mass-measure-02-05/index.html' + window.location.search;
+  }
 }
 
 function tblOpenHint() {

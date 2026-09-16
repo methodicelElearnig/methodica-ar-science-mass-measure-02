@@ -895,14 +895,18 @@ function getMoedBScore() {
   }).length;
 }
 
-function s12Continue() {
-  /* xAPI: מדווח כאן ולא במסכי הסיום, כי כאן תוצאת הרכיב מוכרעת — ואז היא
-     נרשמת גם אם הלומד לא ילחץ "סיימתי". */
-  xapiCompleteComponent({
-    success: moedBFullyPassed(),
-    score: { scaled: getMoedBScore() / 3 }
-  });
+/* תוצאת הרכיב — מחושבת פעם אחת, מדווחת מהכפתור האחרון. */
+function moedBComponentResult() {
+  return { success: moedBFullyPassed(), score: { scaled: getMoedBScore() / 3 } };
+}
 
+function s12Continue() {
+  /* xAPI: עד 2026-09-16 ה-completed של הרכיב נשלח **כאן**, "כי כאן תוצאת
+     הרכיב מוכרעת — ואז היא נרשמת גם אם הלומד לא ילחץ 'סיימתי'". זה התהפך:
+     Kata מסירה את הרכיב מהמסך ברגע שמגיע completed (הנחיות 2.7 עמ' 23), ולכן
+     שליחה כאן הייתה מעלימה את מסך הסיום לפני שהלומד רואה אותו. ה-completed
+     עבר ל-s13Finish / s14Finish — הלחיצה האחרונה. העלות המכוונת: לומד שסוגר
+     את הלשונית במסך הסיום בלי ללחוץ אינו נרשם. ראו REPORT-XAPI.md §10. */
   if (moedBFullyPassed()) {
     goTo(8); // מסך 9 — הצלחה
   } else {
@@ -949,11 +953,11 @@ function resetScreenState7() {
     video.play().catch(function () {});
   }
 }
-/* "סיימתי" — נקודת סיום היחידה במסלול שבו לא נצלח אף מועד.
-   ‎success:false — הלומד השלים את היחידה אבל לא עמד בסף שלה.
-   מדווח בכל מקרה: יחידה שלא דווחה היא ניסיון שלא נרשם כלל. */
+/* "סיימתי" — סיום הרכיב במסלול שבו לא נצלח אף מועד. מדווח את ה-completed של
+   **הרכיב** (success:false) כלחיצה האחרונה, ומשבית את הכפתור. אין יותר completed
+   ברמת היחידה (2026-09-16) — הפלטפורמה גוזרת את מצב היחידה בעצמה. */
 function s13Finish() {
-  xapiCompleteUnit({ success: false });
+  xapiEndComponent(moedBComponentResult(), document.getElementById('s13-finish'));
 }
 
 function resetScreenState8() {
@@ -964,9 +968,9 @@ function resetScreenState8() {
       : '../unit-assets/img/avatar-orange-dancing.gif';
   }
 }
-/* "סיימתי" — נקודת סיום היחידה במסלול ההצלחה במועד ב'. */
+/* "סיימתי" — סיום הרכיב במסלול ההצלחה במועד ב'. אותו דיווח, אותו כלל. */
 function s14Finish() {
-  xapiCompleteUnit({ success: true });
+  xapiEndComponent(moedBComponentResult(), document.getElementById('s14-finish'));
 }
 
 /* ─── Dev mode: postMessage bridge ─────────────────────── */

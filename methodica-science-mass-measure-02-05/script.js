@@ -400,7 +400,7 @@ function makeDragQuestion(cfg) {
       passed = true;
       saveResult(true);
       showFeedback('correct');
-      if (btn) { btn.textContent = 'המשך'; btn.disabled = false; btn.onclick = cfg.onContinue; }
+      if (btn) { btn.textContent = 'המשך'; btn.disabled = false; btn.onclick = function () { cfg.onContinue(btn); }; }
     } else if (attempts >= 2) {
       done = true;
       passed = false;
@@ -416,7 +416,7 @@ function makeDragQuestion(cfg) {
         revealCorrect();
         showFeedback('wrongFinal');
       }
-      if (btn) { btn.textContent = 'המשך'; btn.disabled = false; btn.onclick = cfg.onContinue; }
+      if (btn) { btn.textContent = 'המשך'; btn.disabled = false; btn.onclick = function () { cfg.onContinue(btn); }; }
     } else {
       showFeedback('wrong1');
       checked = false;
@@ -501,7 +501,7 @@ function makeDragQuestion(cfg) {
 
   function restoreFinal() {
     const btn = document.getElementById(cfg.checkBtnId);
-    if (btn) { btn.textContent = 'המשך'; btn.disabled = false; btn.onclick = cfg.onContinue; }
+    if (btn) { btn.textContent = 'המשך'; btn.disabled = false; btn.onclick = function () { cfg.onContinue(btn); }; }
     const hintBtn = document.getElementById(cfg.hintBtnId);
     if (hintBtn) hintBtn.hidden = true;
     render();
@@ -613,7 +613,7 @@ function makeDragQuestion(cfg) {
         showFeedback('wrongFinal');
       }
       if (hintBtn) hintBtn.hidden = true;
-      if (btn) { btn.textContent = 'המשך'; btn.disabled = false; btn.onclick = cfg.onContinue; }
+      if (btn) { btn.textContent = 'המשך'; btn.disabled = false; btn.onclick = function () { cfg.onContinue(btn); }; }
       render();
       return;
     }
@@ -715,37 +715,31 @@ const dqB = makeDragQuestion({
      המצאת נתון. */
   xapiItem: '001',
   xapiQuestions: ['q2', 'q3'],
-  onContinue: function () {
-    /* xAPI: תוצאת הרכיב מדווחת **לפני** ההסתעפות, ולכן בשני המסלולים.
-       שאלת השיא (מועד א') היא שני חלקים ושניהם חייבים לעבור — זה בדיוק
-       מה ש-moedAFullyPassed() בודק, ולכן המכנה 2 והסף 2.
-       ⚠️ הדיווח במסלול הכשל אינו אופציונלי: לומד שלא צלח את מועד א' חייב
-       להיות מדווח, אחרת כל הניסיון שלו לא נרשם. ניתובו לסין 6 הוא ההמשך
-       הלימודי, לא תחליף לדיווח. ראו REPORT-XAPI.md §5. */
-    var _parts = ['lomda_moedA_partA_result', 'lomda_moedA_partB_result'];
-    var _passed = 0;
-    try {
-      _passed = _parts.filter(function (k) {
-        return getUnitResult(k) === 'pass';
-      }).length;
-    } catch (e) { /* localStorage חסום — נשאר 0 */ }
-    xapiCompleteComponent({
-      success: moedAFullyPassed(),
-      score: { scaled: _passed / 2 }
-    });
+  onContinue: function (btn) {
+    /* xAPI: שאלת השיא (מועד א') היא שני חלקים ושניהם חייבים לעבור — זה בדיוק
+       מה ש-moedAFullyPassed() בודק, ולכן המכנה 2 והסף 2 (moedAComponentResult).
 
+       ── מתי מדווחים (2026-09-16) ──
+       Kata מסירה את הרכיב מהמסך ברגע שמגיע completed (הנחיות 2.7 עמ' 23), ולכן
+       הוא חייב להיות הפעולה האחרונה של הלומד ברכיב:
+       • מסלול ההצלחה: יש עוד מסך — מסך הסיום (4) עם "סיימתי". ה-completed
+         עבר לשם (s4Finish). עד היום הוא נשלח כאן, "לפני ההסתעפות", וזה היה
+         מעלים את מסך הסיום לפני שהלומד רואה אותו.
+       • מסלול הכשל: הרכיב נגמר **כאן** — אין מסך נוסף (עד היום עבר לסין 06;
+         מהיום Kata מנתבת). לכן כאן מדווחים ועוצרים. הדיווח במסלול הזה אינו
+         אופציונלי: לומד שלא צלח חייב להיות מדווח, אחרת כל הניסיון לא נרשם.
+       btn מגיע מ-makeDragQuestion — הכפתור שנלחץ — כדי שיושבת אחרי הדיווח. */
     if (moedAFullyPassed()) {
       /* עברו את שני חלקי משימת השיא בהצלחה מלאה — מדלגים על כל
          סיין 6 (מועד ב') ועוברים ישר למסך המעבר של הצלחה */
       goTo(4);
     } else {
-      /* לא עברו בהצלחה מלאה — ממשיכים לסיין 6 (מועד ב') (+ ?slxapi, §6).
-         writeForwardState מזיז את מצביע הנחיתה ליעד ורושם את קשת החזרה (סין
-         06 חוזר לכאן, למסך 4 = '#screen=3'). ראו unit-js/40-resume.js.
-         מוצב רק בענף הזה במכוון: הענף השני נשאר בתוך הסין (goTo), ושם
-         scheduleResumeSave שבסוף goTo הוא מה שמעדכן את המצב. */
-      writeForwardState('methodica-science-mass-measure-02-06', '#screen=3');
-      window.location.href = '../methodica-science-mass-measure-02-06/index.html' + window.location.search;
+      xapiEndComponent(moedAComponentResult(), btn);
+      /* המעבר לסין 06 שהיה כאן חי רק ב-walkthrough מקומי (DEV_NAV). */
+      if (DEV_NAV) {
+        writeForwardState('methodica-science-mass-measure-02-06', '#screen=3');
+        window.location.href = '../methodica-science-mass-measure-02-06/index.html' + window.location.search;
+      }
     }
   },
   labels: {
@@ -783,14 +777,24 @@ function resetScreenState4() {
       : '../unit-assets/img/avatar-orange-dancing.gif';
   }
 }
-/* "סיימתי" — נקודת סיום היחידה במסלול ההצלחה במועד א'.
-   הלומד שהגיע לכאן צלח את שאלת השיא בפעם הראשונה ודילג על סין 6 כליל.
+/* תוצאת הרכיב — משמשת את שני המסלולים (s4Finish, וענף הכשל של dqB). */
+function moedAComponentResult() {
+  var _parts = ['lomda_moedA_partA_result', 'lomda_moedA_partB_result'];
+  var _passed = 0;
+  try {
+    _passed = _parts.filter(function (k) {
+      return getUnitResult(k) === 'pass';
+    }).length;
+  } catch (e) { /* localStorage חסום — נשאר 0 */ }
+  return { success: moedAFullyPassed(), score: { scaled: _passed / 2 } };
+}
 
-   ליחידה שלוש נקודות סיום (כאן, וסין 06 מסכים 8 ו-9), ולכן ה-completed של
-   היחידה עובר דרך היומן — הוא מבטיח דיווח אחד לכל ניסיון גם אם הלומד מגיע
-   לנקודת סיום אחרת אחרי חזרה אחורה. ראו unit-js/40-resume.js. */
+/* "סיימתי" — סיום הרכיב במסלול ההצלחה במועד א'. הלומד שהגיע לכאן צלח את
+   שאלת השיא בפעם הראשונה ודילג על סין 6 כליל. זו הלחיצה האחרונה ברכיב, ולכן
+   ה-completed של **הרכיב** נשלח מכאן (2026-09-16; עד אז נשלח ב-dqB לפני מסך
+   הסיום). אין יותר completed ברמת היחידה — הפלטפורמה גוזרת את מצב היחידה. */
 function s4Finish() {
-  xapiCompleteUnit({ success: true });
+  xapiEndComponent(moedAComponentResult(), document.getElementById('s4-finish'));
 }
 
 /* ─── Dev mode: postMessage bridge ─────────────────────── */

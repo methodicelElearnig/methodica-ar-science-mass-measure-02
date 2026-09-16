@@ -651,12 +651,23 @@ async function runResume(c) {
 
   /* A failed write must leave the pointer where it was. Navigating on a failed
      write is what reintroduces the ping-pong that re-sends 'completed' every
-     cycle, so goBackToPreviousPart retries once and then stays put. */
+     cycle, so goBackToPreviousPart retries once and then stays put.
+     2026-09-16: goBackToPreviousPart is a no-op unless DEV_NAV, so this boot
+     (no ?dev=1) would pass the assertion without exercising the write at all.
+     DEV_NAV is a var — force it for this one probe, then restore. */
   exec("_unitState = emptyUnitState(); _unitState.part = 'here'; window.__fail = true;");
+  exec("window.__devNavWas = DEV_NAV; DEV_NAV = true;");
   exec("try { goBackToPreviousPart('fallback', '#screen=9'); } catch (e) {}");
-  ok(c, 'a failed back-write rolls the landing pointer back',
+  ok(c, 'a failed back-write rolls the landing pointer back (dev navigation)',
     val('_unitState.part') === 'here', String(val('_unitState.part')));
-  exec('window.__fail = false;');
+  exec('window.__fail = false; DEV_NAV = window.__devNavWas;');
+
+  /* And in production the same call does nothing at all — not even a write. */
+  exec("_unitState = emptyUnitState(); _unitState.part = 'here'; window.__store = null;");
+  exec("try { goBackToPreviousPart('fallback', '#screen=9'); } catch (e) {}");
+  ok(c, 'without DEV_NAV, goBackToPreviousPart touches neither the pointer nor the store',
+    val('_unitState.part') === 'here' && val('window.__store') === null,
+    'part=' + val('_unitState.part') + ' store=' + val('window.__store'));
 
   // ── The restore ────────────────────────────────────────────────────────
   /* Exactly one item 'initialized' for the landing screen, and nothing else:
@@ -2245,8 +2256,52 @@ function checkAssetContract() {
     (subCss.match(/url\('\.\.\/\.\.\/unit-assets\/fonts\//g) || []).length === 2);
 }
 
+/* ══════════════ The platform owns routing (2026-09-16) ══════════════
+   Kata launches each component and routes on our `completed`. So, in production source:
+   no hop between components outside an `if (DEV_NAV)` block, no unit-level statement,
+   no resume hop in the loader, a gated goBackToPreviousPart, and a DEV_NAV that needs
+   ?dev=1 AND the absence of ?registration. The behavioural half is statement-flow.js →
+   probeDevNav(). Comments are stripped first: the history is allowed to name what went. */
+function checkPlatformRouting() {
+  const strip = (s) => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"])\/\/[^\n]*/g, '$1');
+  const files = ['unit-js/10-identity.js', 'unit-js/20-xapi.js', 'unit-js/40-resume.js',
+                 'unit-js/50-loader.js', 'unit-js/90-boot.js']
+    .concat(COMPONENTS.map(c => 'methodica-science-mass-measure-02-' + c + '/script.js'));
+  for (const rel of files) {
+    const src = strip(fs.readFileSync(path.join(BASE, rel), 'utf8'));
+    ok('routing', rel + ': no unit-level statement',
+      !/xapiCompleteUnit\s*\(|scope:\s*'unit'/.test(src));
+    for (const m of src.matchAll(/location\.(href|replace)\s*[=(][^\n]*index\.html/g)) {
+      const before = src.slice(Math.max(0, m.index - 500), m.index);
+      ok('routing', rel + ': the hop at offset ' + m.index + ' sits inside if (DEV_NAV) { … }',
+        /if\s*\(\s*DEV_NAV\s*\)\s*\{[^}]*$/.test(before), m[0].slice(0, 80));
+    }
+  }
+  const id = fs.readFileSync(path.join(BASE, 'unit-js/10-identity.js'), 'utf8');
+  ok('routing', 'DEV_NAV needs ?dev=1 AND no ?registration',
+    /get\('dev'\)\s*===\s*'1'\s*&&\s*!_devQ\.has\('registration'\)/.test(id));
+  const ld = strip(fs.readFileSync(path.join(BASE, 'unit-js/50-loader.js'), 'utf8'));
+  ok('routing', '50-loader.js: the resume hop to _saved.part is gone',
+    !/_saved\.part\s*!==\s*currentPartSlug\(\)/.test(ld) && !/location\.replace\(/.test(ld));
+  const rs = strip(fs.readFileSync(path.join(BASE, 'unit-js/40-resume.js'), 'utf8'));
+  ok('routing', '40-resume.js: goBackToPreviousPart returns unless DEV_NAV',
+    /function goBackToPreviousPart[^{]*\{\s*if \(!DEV_NAV\) return;/.test(rs));
+  const xa = strip(fs.readFileSync(path.join(BASE, 'unit-js/20-xapi.js'), 'utf8'));
+  ok('routing', '20-xapi.js: xapiEndComponent reports then disables the button',
+    /function xapiEndComponent\(result, btn\)[\s\S]{0,200}xapiCompleteComponent\(result\)[\s\S]{0,120}btn\.disabled = true/.test(xa));
+  for (const c of COMPONENTS.filter(c => c !== '01')) {
+    const html = fs.readFileSync(path.join(BASE, 'methodica-science-mass-measure-02-' + c, 'index.html'), 'utf8');
+    ok('routing', c + ': the first-screen "חזרה" carries id="s0-back" so 90-boot.js can hide it',
+      /id="s0-back"/.test(html));
+  }
+  const bt = strip(fs.readFileSync(path.join(BASE, 'unit-js/90-boot.js'), 'utf8'));
+  ok('routing', '90-boot.js: hideCrossPartBack runs at boot and honours DEV_NAV',
+    /function hideCrossPartBack\(\)\s*\{\s*if \(DEV_NAV\) return;/.test(bt) && /hideCrossPartBack\(\);/.test(bt));
+}
+
 (async () => {
   checkMetadata();
+  checkPlatformRouting();
   checkVersionQueries();
   checkAssetContract();
   checkSlugCase();

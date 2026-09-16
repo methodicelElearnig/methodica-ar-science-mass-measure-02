@@ -1103,7 +1103,25 @@ function sq6UnlockOptions() {
   });
 }
 
-function sq6Continue() { goTo(6); }
+/* ── השער של הרכיב (הכרעת נמרוד רותם, Monday 12890230271, אושר 16.09.26) ──
+   פחות מ-4 מתוך 5 בשאלות הבסיס → הרכיב **נגמר כאן**: שני התרגילים הקשים
+   (מסכים 7-8) לא מוצגים, נשלח completed עם success:false, והפלטפורמה מנתבת
+   (recommendedAfterFail של הרכיב מצביע לסין 01). 4 ומעלה → ממשיכים לשניים
+   הקשים, ושם ההצלחה דורשת 2/2 (drag9Continue). ללומד לא מוצג שום טקסט חדש —
+   "מאחורי הקלעים", כפי שהוכרע. מסך 1 מבטיח בדיוק את זה ("ענו נכון על 4
+   שאלות ומעלה (80%) כדי להתקדם"), ולכן הטקסט שם נשאר.
+   הציון במסלול הזה: מתוך 5 — מה שהלומד הובטח ומה שראה (הכרעת 16.09.26).
+   getBasicPracticeScore קורא מ-stationProgress2, שמשוחזר ב-resume, ולכן השער
+   נכון גם אחרי טעינה מחדש. הכפתור מושבת אחרי הדיווח (xapiEndComponent). */
+function sq6Continue() {
+  var _b = getBasicPracticeScore();
+  if (_b < 4) {
+    xapiEndComponent({ success: false, score: { scaled: _b / 5 } },
+      document.getElementById('sq6-check'));
+    return;
+  }
+  goTo(6);
+}
 
 function sq6OpenHint() {
   /* xAPI: requested.1 — אחרי הגארדים ומיד לפני החשיפה, כדי לא
@@ -1659,16 +1677,16 @@ function drag9Check() {
      חמש שאלות התרגול הבסיסי (מסכים 1-5)  — stationProgress2
      שני התרגילים ברמה גבוהה (מסכים 7-8)  — stationProgress3
 
-   ה-score נושא את כל שבעת התרגילים, כי זו כל העבודה שהלומד עשה בסין.
-
-   ה-success דורש **את שני הספים**: 4 מתוך 5 בבסיסיות (מסך 1 — "ענו נכון על
-   4 שאלות ומעלה (80%) כדי להתקדם") **וגם** 2 מתוך 2 בתרגילים הקשים.
-
-   זה הדפוס מלומדת המקור, לא הכרעה מקומית: `methodica-math-scale-01-02`
-   מדווח בדיוק כך ב-routeAfterAdvancedPractice() —
-   `success: getBasicPracticeScore() >= 3 && getAdvancedPracticeScore() >= 2`,
-   ‎`score: { scaled: n / 7 }` — ו-REPORT-XAPI.md §5 שם מתעד את הכלל:
-   "success requires **both** stated gates". */
+   ── הכלל מ-2026-09-16 (הכרעת נמרוד רותם על ה-success, הכרעת ודים על המכנה) ──
+   לרכיב שני שערים, וכל אחד מהם מדווח בנקודה שלו:
+     • sq6Continue (סוף מסך 5): פחות מ-4/5 בבסיס → הרכיב נגמר, success:false,
+       score = basic/5. השניים הקשים לא מוצגים כלל.
+     • drag9Continue (סוף מסך 8): success = 2/2 בקשים, score = standard/2.
+       מי שהגיע לכאן כבר עמד בשער הבסיס, ולכן הבסיס אינו נכנס למכנה הזה.
+   עד 2026-09-16 היה כאן שער כפול סמוי — success דרש 4/5 **וגם** 2/2 בעוד
+   שהניתוב לסין 03 היה ללא תנאי והלומד מעולם לא נאמר לו על השער השני
+   (REPORT-XAPI.md §7.4). הוכרע: השער נשאר, אבל הוא עוצר באמת, והפלטפורמה
+   מנתבת. ‎`methodica-math-scale-01-02` עדיין נושא את הדפוס הישן. */
 function getBasicPracticeScore() {
   return ['q2', 'q3', 'q4', 'q5', 'q6'].filter(function (k) {
     return stationProgress2[k] === 'success';
@@ -1685,19 +1703,19 @@ function drag9Continue() {
   /* xAPI: סוגר את הפריט הפתוח ומדווח את תוצאת הרכיב. נשלח גם כשהלומד לא
      עמד בסף — רכיב שלא נצלח חייב להיות מדווח, אחרת כל הניסיון לא נרשם;
      ניתוב לומד שנכשל הוא תפקיד הפלטפורמה דרך recommendedAfterFail, שמצביע
-     כאן בחזרה לסין 01. */
-  var _basic = getBasicPracticeScore();
+     כאן בחזרה לסין 01. זו הלחיצה האחרונה ברכיב; הכפתור מושבת אחריה. */
   var _standard = getStandardPracticeScore();
-  xapiCompleteComponent({
-    success: _basic >= 4 && _standard >= 2,
-    score: { scaled: (_basic + _standard) / 7 }
-  });
+  xapiEndComponent({
+    success: _standard === 2,
+    score: { scaled: _standard / 2 }
+  }, document.getElementById('drag9-check'));
 
-  /* קישור בין סינים: מסך אחרון בסיין 2 -> מסך ראשון בסיין 3 (+ ?slxapi, §6).
-     רושם את קשת החזרה: סין 03 ניתן להגעה גם מסין 01 (בדילוג), ולכן כפתור
-     "חזרה" שם צריך לדעת מאיפה הלומד באמת הגיע. המסך שממנו יוצאים הוא 9. */
-  writeForwardState('methodica-science-mass-measure-02-03', '#screen=8');
-  window.location.href = '../methodica-science-mass-measure-02-03/index.html' + window.location.search;
+  /* המעבר לסין 03 שהיה כאן חי רק ב-walkthrough מקומי (DEV_NAV,
+     unit-js/10-identity.js). בייצור Kata היא שמנתבת. */
+  if (DEV_NAV) {
+    writeForwardState('methodica-science-mass-measure-02-03', '#screen=8');
+    window.location.href = '../methodica-science-mass-measure-02-03/index.html' + window.location.search;
+  }
 }
 
 function drag9OpenHint() {
@@ -1973,9 +1991,9 @@ var XAPI_METADATA_FILE = '../metadata/methodica-science-mass-measure-02-02.json'
    ולכן השניים נשארים צמודים לשלב 2. במצב הנוכחי המסך פשוט טרי וניתן
    לענות עליו שוב.
 
-   ⚠️ הנגזרת המוכרת של שלב 1: stationProgress* ו-XAPI_Q_RESULTS אינם
-   משוחזרים, ולכן הניתוב קדימה שנגזר מהם עלול לשלוח לומד שעמד בסף אל
-   התרגול המחזק. ראו unit-js/10-identity.js. */
+   (ההערה שעמדה כאן על "שלב 1" — שלפיה stationProgress* ו-XAPI_Q_RESULTS
+   אינם משוחזרים — הייתה מיושנת מ-2026-08-19; ראו unit-js/10-identity.js.
+   שניהם משוחזרים למטה, ולכן גם השער ב-sq6Continue נכון אחרי resume.) */
 function capturePartPayload() {
   var st = { currentScreen: currentScreen };
 
@@ -2191,7 +2209,22 @@ function restoreScreenUI(n) {
     if (n === 2) restoreMcqUI(MCQ_SQ3, '#s2', 'sq3', sq3OptEl, sq3Selected, sq3Attempts, sq3Done, sq3Phase, sq3LockOptions, sq3ShowFeedback, sq3SetBarDone, sq3Continue, sq3Check, __mcqWrong.sq3);
     if (n === 3) restoreMcqUI(MCQ_SQ4, '#s3', 'sq4', sq4OptEl, sq4Selected, sq4Attempts, sq4Done, sq4Phase, sq4LockOptions, sq4ShowFeedback, sq4SetBarDone, sq4Continue, sq4Check, __mcqWrong.sq4);
     if (n === 4) sq5RestoreUI();
-    if (n === 5) restoreMcqUI(MCQ_SQ6, '#s5', 'sq6', sq6OptEl, sq6Selected, sq6Attempts, sq6Done, sq6Phase, sq6LockOptions, sq6ShowFeedback, sq6SetBarDone, sq6Continue, sq6Check, __mcqWrong.sq6);
+    if (n === 5) {
+      restoreMcqUI(MCQ_SQ6, '#s5', 'sq6', sq6OptEl, sq6Selected, sq6Attempts, sq6Done, sq6Phase, sq6LockOptions, sq6ShowFeedback, sq6SetBarDone, sq6Continue, sq6Check, __mcqWrong.sq6);
+      /* מסך 5 יכול להיות סוף הרכיב (השער ב-sq6Continue). הצייר הגנרי כותב
+         'המשך' על שאלה שנפתרה; כאן התווית החיה היא 'סיום'. ואם ה-completed של
+         הרכיב כבר נשלח (היומן), הכפתור נשאר מושבת — לחיצה שנייה לא הייתה
+         מדווחת בכל מקרה, אבל כפתור פעיל היה מבטיח משהו שלא יקרה. */
+      if (sq6Done) {
+        var _sq6Btn = document.getElementById('sq6-check');
+        if (_sq6Btn) {
+          _sq6Btn.textContent = 'סיום';
+          if (typeof alreadySent === 'function' && alreadySent('done', currentPartSlug())) {
+            _sq6Btn.disabled = true; _sq6Btn.setAttribute('aria-disabled', 'true');
+          }
+        }
+      }
+    }
     if (n === 7) dd8RestoreUI();
     if (n === 8) drag9RestoreUI();
   } catch (e) { console.error('[resume] restoreScreenUI', e); }

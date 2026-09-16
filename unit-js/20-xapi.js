@@ -268,14 +268,20 @@ function xapiCompleteComponent(result) {
   } catch (e) { console.error('[xAPI] completed component', e); }
 }
 
-/* ה-completed של היחידה. נשלח פעם אחת בלבד לכל ניסיון, מהמסך המסיים.
-   ליחידה הזאת יש שלוש נקודות סיום (סין 05 מסך 5, וסין 06 מסכים 8 ו-9), ולכן
-   היומן הוא מה שמונע שלושה דיווחי יחידה. */
-function xapiCompleteUnit(result) {
-  try {
-    sendCompletedOnce('done', 'unit', 'onlinelesson', result || null,
-      { objectId: window.XAPI_UNIT_ID });
-  } catch (e) { console.error('[xAPI] completed unit', e); }
+/* סיום הרכיב מהכפתור האחרון: מדווח, ואז עוצר. Kata מסירה את הרכיב מהמסך
+   כשמגיע ה-completed (הנחיות 2.7 עמ' 23 — "הפלטפורמה מסירה את הרכיב מהמסך"),
+   ולכן ה-completed חייב להיות **הפעולה האחרונה** של הלומד ברכיב, אחרי כל
+   משוב וכל מסך מסכם. מחוץ ל-Kata (QA על ה-CDN, הרצה מקומית) אין מי שיסיר את
+   הרכיב, והכפתור המושבת הוא הסימן היחיד שהלחיצה נרשמה. ללומד לא מוצג טקסט
+   חדש — כך הוכרע (16.09.26).
+   הניווט לסין הבא שהיה כאן עד 2026-09-16 חי רק תחת DEV_NAV (10-identity.js).
+
+   ⚠️ אין יותר completed ברמת היחידה. xapiCompleteUnit הוסר ב-2026-09-16: הנחיות
+   2.5/2.7 מגדירות את object כ"ID של הפריט או רכיב התוכן" בלבד, והפלטפורמה
+   גוזרת את מצב היחידה בעצמה. ראו REPORT-XAPI.md §10. */
+function xapiEndComponent(result, btn) {
+  xapiCompleteComponent(result);
+  if (btn) { btn.disabled = true; btn.setAttribute('aria-disabled', 'true'); }
 }
 
 /* played/paused ל-<video> של HTML5 — **רק לווידאו תוכן**, לפי סימון מפורש.

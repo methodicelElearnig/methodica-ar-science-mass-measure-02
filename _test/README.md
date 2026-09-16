@@ -29,7 +29,8 @@
 | שליחה בלי יעד | כל עוד `REPORT_FORM_ACTION` הוא `null`: לא נשלח POST, נכתבת שגיאה שמזכירה את שם הקבוע, ומסך התודה כן מוצג — הלומד לעולם לא נחסם |
 | יומן ה-`completed` | fail-open בפעם הראשונה, dedupe בשנייה, מפתח אחר כן נשלח, והיומן נכתב ל-`sessionStorage` |
 | sweep ניווט | `goTo()` על כל 47 המסכים; `currentScreen` עוקב; מספר ה-`.screen` ב-DOM שווה ל-`TOTAL_SCREENS` |
-| נחיתה על `#screen=N` | חמשת הסינים שיש קישור "חזרה" אליהם (01@19, 02@8, 03@1, 04@1, 05@3) נוחתים על המסך הנכון ולא על מסך 0 |
+| נחיתה על `#screen=N` | חמשת הסינים שיש קישור "חזרה" אליהם (01@19, 02@8, 03@1, 04@1, 05@3) נוחתים על המסך הנכון ולא על מסך 0. מ-2026-09-16 הקישור הזה חי רק תחת `?dev=1`; הנחיתה עצמה עדיין נבדקת |
+| הפלטפורמה מנתבת (`routing`, 2026-09-16) | סריקת מקור: אין `xapiCompleteUnit(` ואין `scope: 'unit'`; כל `location.href/replace` אל `index.html` יושב בתוך `if (DEV_NAV) {}`; קפיצת ה-resume בלואדר נעלמה; `goBackToPreviousPart` חוזרת בלי `DEV_NAV`; `DEV_NAV` דורש `?dev=1` **וגם** אין `?registration`; `#s0-back` קיים בסינים 02–06 ו-`hideCrossPartBack` רץ ב-boot. ההתנהגות: `statement-flow.js` → `probeDevNav` (ייצור / `?dev=1` / `?dev=1&registration`) ו-`probe02` (השער של סין 02, ארבעת המסלולים) |
 
 ## הרצה
 
