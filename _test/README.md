@@ -6,7 +6,7 @@
 
 `verify-report.js` טוען את `index.html`, `script.js` וכל `unit-js/*.js`
 **האמיתיים** של ששת הסינים ב-jsdom, מריץ את תגי ה-script בסדר המסמך מהדיסק,
-ומאמת ~1,251 טענות. הוא לא קורא לקוד — הוא מריץ אותו.
+ומאמת ~1,335 טענות. הוא לא קורא לקוד — הוא מריץ אותו.
 
 ⚠️ **חוזה הנכסים (asset contract).** jsdom לעולם לא מושך גיליונות סגנון, תמונות
 או וידאו — הוא מריץ רק תגי `<script src>`. עד 2026-09-07 היה אפשר להעביר את כל
@@ -30,6 +30,7 @@
 | יומן ה-`completed` | fail-open בפעם הראשונה, dedupe בשנייה, מפתח אחר כן נשלח, והיומן נכתב ל-`sessionStorage` |
 | sweep ניווט | `goTo()` על כל 47 המסכים; `currentScreen` עוקב; מספר ה-`.screen` ב-DOM שווה ל-`TOTAL_SCREENS` |
 | נחיתה על `#screen=N` | חמשת הסינים שיש קישור "חזרה" אליהם (01@19, 02@8, 03@1, 04@1, 05@3) נוחתים על המסך הנכון ולא על מסך 0. מ-2026-09-16 הקישור הזה חי רק תחת `?dev=1`; הנחיתה עצמה עדיין נבדקת |
+| מסמך לכל סין (`shape` / `isolation` / `retake` / `character`, 2026-09-16) | `emptyUnitState()` הוא בדיוק `{v:5, component, payload, done, doneItems, ui, results}`; מסמך v4 מהוגר (payload = המשבצת של הסין, היומנים/הדמות/התוצאות נשמרים, `part`/`prev`/`parts` נזרקים); `v` אחר נזרק; מסמך של סין אחר נזרק עם `console.warn`; `RESUME_STATE_ID` נושא את ה-slug. **בידוד:** שני סינים תחת שני registration → שני מסמכים, בלי זכר לשני. **ביצוע מחדש:** מסמך חסר + קאש מהניסיון הקודם → כל השערים null, היומן ריק, `completed` נשלח שוב, הדמות כן מאומצת. **הדמות:** ארבעת הצעדים של `adoptUnitCharacter`, "לא מוחק את הקאש", שלב ב' שומר, `?resetState` לא מאמץ. סריקת מקור: אין `.prev`/`.parts[`/`.part`, אין `applyUnitProfile`, לכל מפתח ב-`RESULT_KEYS` יש כותב |
 | הפלטפורמה מנתבת (`routing`, 2026-09-16) | סריקת מקור: אין `xapiCompleteUnit(` ואין `scope: 'unit'`; כל `location.href/replace` אל `index.html` יושב בתוך `if (DEV_NAV) {}`; קפיצת ה-resume בלואדר נעלמה; `goBackToPreviousPart` חוזרת בלי `DEV_NAV`; `DEV_NAV` דורש `?dev=1` **וגם** אין `?registration`; `#s0-back` קיים בסינים 02–06 ו-`hideCrossPartBack` רץ ב-boot. ההתנהגות: `statement-flow.js` → `probeDevNav` (ייצור / `?dev=1` / `?dev=1&registration`) ו-`probe02` (השער של סין 02, ארבעת המסלולים) |
 
 ## הרצה

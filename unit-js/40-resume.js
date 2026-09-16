@@ -4,36 +4,38 @@
    ול-initResumeLeaveHandlers(), ו-50-loader.js מריץ את השחזור עצמו.
    העיצוב המלא: RESUME.md בלומדת methodica-math-scale-01 (המקור לדפוס הזה).
 
-   ── מסמך אחד — אבל לא "ליחידה" במודל של Kata ──
-   אומת מול Documentation/KATA/KATA-API.md (2026-08-17). דיוק שחשוב למי שיקרא
-   את זה אחר כך: **ל-Kata אין מושג של "יחידה" במסמך ה-state.** המודל שלה הוא
-   "מסמך אטום אחד לכל זוג לומד–רכיב" (KATA-API.md §3).
+   ── מסמך אחד לכל {לומד, רכיב} — כמו במודל של Kata ──
+   אומת מול Documentation/KATA/KATA-API.md ומול הערת צוות Kata (2026-09-16):
+   ה-registration שלפיו נשמר ונשלף ה-State מייצג זוג {user, component}, ולכן
+   לכל רכיב של היחידה יש ללומד registration שונה — ומסמך שונה. הכתובת היא
+   `?registration` **בלבד** (או studentId+componentKey; שליחת שניהם היא 400).
+   הפלטפורמה משגרת כל רכיב בנפרד (`POST /launcher/context` מקבל componentId
+   יחיד ומחזיר registrationId יחיד), ומאז 2026-09-16 שום סין לא מנווט לסין
+   אחר ולא מעתיק את ה-query שלו הלאה — ולכן כל סין קורא וכותב **את המסמך
+   שלו בלבד**.
 
-   מה שכן עובד, ולמה: הכתובת היא `?registration` **בלבד** (או לחלופין
-   studentId+componentKey; שליחת שניהם היא 400). הפלטפורמה משגרת רכיב אחד —
-   `POST /launcher/context` מקבל componentId יחיד ומחזיר registrationId יחיד —
-   וכל מעבר בין סינים מעתיק את window.location.search מילה במילה. לכן ששת
-   הסינים מציגים את אותו registration ולמעשה חולקים את **המסמך של הרכיב
-   שהושגר** (סין 01), ולא מסמך יחידתי שכזה קיים.
+   v5 (2026-09-16): המסמך עצמו הותאם למודל הזה. אין בו יותר `part` (מצביע
+   נחיתה), `prev` (קשתות חזרה) ו-`parts{}` (payload של כל הסינים) — יש
+   `component` (של מי המסמך) ו-`payload` (של הסין הזה). מסמך שה-`component`
+   שלו אינו הסין הנוכחי נזרק עם console.warn: registration משותף לשני רכיבים
+   הוא תקלה בצד הפלטפורמה, ולעולם לא מחילים payload של סין אחר.
 
-   זה נסבל כי Kata מאמתת את הכתובת מול השיגורים של **הקבוצה** ולא מול הרכיב
-   הקורא (404 = "no state yet, or the target doesn't match any launch owned by
-   your group"), ולכן סין 04 מורשה לקרוא את המסמך שנפתח בשיגור של סין 01.
-
-   ⚠️ הסיכון שנשאר, ועכשיו מאופיין במדויק: אם הפלטפורמה תשגר אי-פעם סין אחר
-   ישירות (deep launch), הוא יקבל registration אחר → מסמך אחר → התקדמות
-   מפוצלת לשניים. זו שאלה לשותף הפלטפורמה, לא משהו שהקוד כאן יכול לגדר.
+   הפלטפורמה רשאית לנקות את ה-State של רכיב מסוים בכניסה חוזרת (ביצוע מחדש
+   של רכיב הערכה). מסמך חסר (404) הוא לכן "ניסיון חדש": payload ריק, יומן
+   `done` ריק (ה-completed יישלח שוב — זו הכוונה), ו-`results` ריק שגובר על
+   הקאש ב-localStorage מהניסיון הקודם (ראו סדר העדיפויות ב-getters).
 
    (window.XAPI_UNIT_ID ו-RESUME_STATE_ID מכתיבים רק את מפתח ה-fallback
-   ב-localStorage, שנכנס לתמונה כשאין ?slxapi תקין.)
+   ב-localStorage, שנכנס לתמונה כשאין ?slxapi תקין. RESUME_STATE_ID כולל את
+   ה-slug של הסין, כדי שגם ה-fallback הזה יהיה מסמך לכל סין — בלי זה סיור
+   ?dev=1 בין סינים היה קורא בסין 02 את המסמך של 01.)
 
    ── עוד שלוש עובדות מהמסמך, שנוגעות ישירות לקוד כאן ──
    • **עמידות:** Kata "never acknowledges a write that wasn't durably saved".
      כלומר ה-true שחוזר מ-saveState720 הוא הבטחה אמיתית, וזה מה שמצדיק את
-     בדיקת ה-!== false ב-persistUnitState ואת הסירוב לנווט אחורה על כתיבה
-     שנכשלה.
-   • **גודל:** תקרה של ~1MB (מעליה 413). המסמך כאן זעיר — מצביע מסך לכל סין
-     ושני יומנים — ולכן אין חשש, גם אחרי שלב 2.
+     בדיקת ה-!== false ב-persistUnitState.
+   • **גודל:** תקרה של ~1MB (מעליה 413). המסמך כאן זעיר — payload של סין
+     אחד ושני יומנים — ולכן אין חשש.
    • **שמירה בזמן:** ברירת המחדל היא ~12 חודשים מהעדכון האחרון, ואחריה GET
      מחזיר 404. לומד שחוזר אחרי יותר מזה מתחיל מאפס, בשקט. readUnitState
      מטפל ב-404/null כמו ב"מסמך חדש", ולכן זה מתנהג נכון ולא נופל.
@@ -52,20 +54,22 @@
      restoreScreenUI(n)     מצייר מסך שנענה     ← שלב 2, כרגע stub
    ═══════════════════════════════════════════════════════════════════ */
 
-/* v4 (2026-08-20): נוספו שתי מחלקות מצב ברמת היחידה — `ui` (הדמות הנבחרת)
-   ו-`results` (תוצאות מועד א/ב). עד v3 הן ישבו **רק** ב-localStorage, ולכן
-   לומד שהמשיך את אותו רישום ממחשב אחר קיבל דמות כתומה במקום ירוקה (כל אתרי
-   האווטאר הם טרנרי דו-כיווני, ולכן null נופל לכתום) ונותב לתוך סין 06 גם
-   כשעבר את מועד א' במלואו. עכשיו המסמך הוא מקור האמת, ו-localStorage הוא
-   קאש סינכרוני בלבד.
+/* v4 (2026-08-20): נוספו `ui` (הדמות) ו-`results` (תוצאות מועד א/ב) — עד אז
+   ישבו רק ב-localStorage, ולומד שהמשיך ממחשב אחר קיבל דמות כתומה ונותב
+   לסין 06 גם כשעבר את מועד א'. המסמך הוא מקור האמת, localStorage קאש.
 
-   הקפיצה מ-3 ל-4 מוחקת מסמכים קיימים (readUnitState זורק כל v שאינו הנוכחי).
-   זה מכוון ומאושר: השדה נקי. ⚠️ בגלל זה **חייבים** לקדם את כל ה-?v= של
-   unit-js/*.js ושל script.js בששת ה-index.html באותו commit — 40-resume.js
-   מיושן בקאש שקורא מסמך v4 מוחק אותו, ו-script.js חדש מול 40-resume.js
-   מיושן קורא ל-setters שלא קיימים. */
-var RESUME_STATE_VERSION = 4;
-var RESUME_STATE_ID      = 'execution-state';
+   v5 (2026-09-16): מסמך לכל סין — `component` + `payload` במקום
+   `part`/`parts{}`/`prev{}` (ראו הכותרת). **יש מיגרציה** מ-v4, ב-migrateState:
+   payload = parts[slug של הסין הזה]; היומנים, הדמות והתוצאות נשמרים כפי שהם.
+   כל v אחר נזרק. לומד באמצע סין ביום ההעלאה לא מאבד דבר.
+
+   ⚠️ גם כך **חייבים** לקדם את כל ה-?v= של unit-js/*.js ושל script.js בששת
+   ה-index.html באותו commit — 40-resume.js מיושן בקאש שקורא מסמך v5 מוחק
+   אותו, ו-script.js חדש מול 40-resume.js מיושן קורא ל-setters שלא קיימים. */
+var RESUME_STATE_VERSION = 5;
+/* כולל את ה-slug: מפתח ה-fallback ב-localStorage (ומפת ה-debounce בספרייה)
+   לכל סין בנפרד. currentPartSlug היא הצהרת פונקציה למטה — hoisted. */
+var RESUME_STATE_ID      = 'execution-state::' + currentPartSlug();
 
 /* לא נדלק עד הקריאה הראשונה שהצליחה (או ה-catch שלה). כל נתיבי הכתיבה
    בודקים אותו, כדי שכלום לא ייכתב לפני שידוע מה כבר יש במסמך. */
@@ -74,7 +78,7 @@ var _resumeReady       = false;
 /* דלוק רק בתוך applyExecutionState. מדכא כתיבות ואת היומן — ראו שם. */
 var _restoring         = false;
 
-/* מונע מ-handlers של יציאה לדרוך על מצביע הנחיתה שנכתב רגע לפני ניווט. */
+/* מונע מ-handlers של יציאה לדרוך על השמירה שנכתבה רגע לפני ניווט (dev בלבד). */
 var _leavingToNextPart = false;
 
 /* המסמך כולו, כפי שנקרא/נכתב לאחרונה. לעולם לא נשאר null אחרי
@@ -93,8 +97,8 @@ var _resetRequested = false;
 
    ⚠️ toLowerCase() אינו קוסמטי. ה-slug נגזר מ-location.pathname, כלומר
    מהאופן שבו הלומד *הגיע* לדף. URL שנבדל רק באות רישית היה מייצר מפתח שני
-   לאותו סין — שתי רשומות נפרדות תחת parts[] — ומשם: התקדמות מפוצלת, יומן
-   `done` שמחמיץ, ולכן completed כפול. הנרמול חוסם את זה בשורש.
+   לאותו סין — מסמך שה-component שלו "לא תואם" ונזרק, ומפתח יומן אחר — ומשם:
+   התקדמות שנעלמת, יומן `done` שמחמיץ, ולכן completed כפול. הנרמול חוסם את זה בשורש.
    בדיקת רגרסיה ב-_test/verify-report.js אוסרת אות רישית בנתיבים האלה. */
 function currentPartSlug() {
   var p = window.location.pathname.replace(/\/index\.html.*$/, '').replace(/\/+$/, '');
@@ -108,16 +112,15 @@ function itemLedgerKey(item) { return currentPartSlug() + '#' + item; }
 function emptyUnitState() {
   return {
     v: RESUME_STATE_VERSION,
-    part: currentPartSlug(),   // על איזה סין הלומד אמור לנחות
-    parts: {},                 // slug → ה-payload של אותו סין (כולל currentScreen)
-    prev:  {},                 // slug → {from, hash}: מאיפה נכנסו אליו, ולאיזה מסך לחזור
-    done:  {},                 // slug של רכיב (או 'unit') → ה-completed שלו נשלח
-    doneItems: {},             // '<slug>#<itemId>' → ה-completed של הפריט נשלח
-    /* ── מצב ברמת היחידה (v4) ──
-       שתי המחלקות האלה **אינן** פר-סין ולכן הן לא יושבות ב-parts[]:
-       captureUnitState מחליף את משבצת הסין הנוכחי בכל שמירה, וכל מה שהיה
-       יושב שם היה נמחק בכל מעבר. */
-    ui:      { character: null },   // 'green' | 'orange' | null — נבחר במסך 1 של סין 01
+    component: currentPartSlug(),  // של מי המסמך — נבדק בכל קריאה; מסמך של סין אחר נזרק
+    payload: null,                 // capturePartPayload() של הסין הזה (כולל currentScreen)
+    done:  {},                     // slug של הרכיב → ה-completed שלו נשלח
+    doneItems: {},                 // '<slug>#<itemId>' → ה-completed של הפריט נשלח
+    /* ── `ui` ו-`results` — העותק של הסין הזה ──
+       הדמות נבחרת בסין 01 ומגיעה לסינים הבאים דרך הקאש ב-localStorage
+       (adoptUnitCharacter מעתיק אותה למסמך של הסין בכניסה הראשונה). התוצאות
+       נכתבות ונקראות באותו סין (05 קורא את של 05, 06 את של 06). */
+    ui:      { character: null },   // 'green' | 'orange' | null
     results: {}                     // resultKey → 'pass' | 'fail' (שערי מועד א/ב)
   };
 }
@@ -134,9 +137,27 @@ var RESULT_KEYS = [
   'lomda_moedB_partB_result'
 ];
 
-/* תמיד מחזיר מסמך שמיש. אין כאן מיגרציה — לא מ-v2 ולא מ-v3. כל v שאינו
-   הנוכחי נזרק, וזה מאושר: השדה נקי בזמן קפיצת v4 (ראו ההערה על
-   RESUME_STATE_VERSION). מסמך v3 שכן יימצא בשטח יאבד את ההתקדמות שבו. */
+/* מיגרציה של צעד אחד בלבד (v4 → v5), מכנית וניתנת לבדיקה ב-jsdom. מסמך
+   מהגרסה הנוכחית חוזר כמו שהוא; כל גרסה אחרת → null (נזרק). */
+function migrateState(old) {
+  if (!old) return null;
+  if (old.v === RESUME_STATE_VERSION) return old;
+  if (old.v !== RESUME_STATE_VERSION - 1) return null;
+  var slug = currentPartSlug();
+  return {
+    v: RESUME_STATE_VERSION,
+    component: slug,
+    payload: (old.parts && old.parts[slug]) || null,
+    done: old.done || {},
+    doneItems: old.doneItems || {},
+    ui: old.ui || { character: null },
+    results: old.results || {}
+  };
+}
+
+/* תמיד מחזיר מסמך שמיש. מסמך v4 מהוגר; מסמך של סין אחר (component לא תואם)
+   נזרק עם אזהרה — registration משותף לשני רכיבים הוא תקלת פלטפורמה, ולא
+   מחילים payload זר; 404/null = ניסיון חדש (ראו הכותרת). */
 function readUnitState() {
   var doc = null;
   try {
@@ -148,33 +169,32 @@ function readUnitState() {
     }
     doc = (typeof window.loadState720 === 'function') ? window.loadState720(RESUME_STATE_ID) : null;
   } catch (e) { console.error('[resume] read', e); doc = null; }
-  if (doc && doc.v !== RESUME_STATE_VERSION) doc = null;
+  doc = migrateState(doc);
+  if (doc && doc.component && doc.component !== currentPartSlug()) {
+    console.warn('[resume] document belongs to "' + doc.component + '", not "' + currentPartSlug() + '" — discarded');
+    doc = null;
+  }
   if (!doc) doc = emptyUnitState();
-  doc.parts     = doc.parts     || {};
-  doc.prev      = doc.prev      || {};
+  doc.component = currentPartSlug();
+  doc.payload   = doc.payload   || null;
   doc.done      = doc.done      || {};
   doc.doneItems = doc.doneItems || {};
   /* חייבים להיות אובייקטים קיימים ולא undefined: **קיומם** הוא מה שאומר
      ל-getters "המסמך הוא הסמכות, אל תיפול ל-localStorage". בלי זה מסמך
-     שאופס היה מחזיר את הדמות והתוצאות מהקאש המיושן — כלומר איפוס שאינו
-     איפוס. */
+     שאופס (או שנוקה ע"י הפלטפורמה לביצוע מחדש) היה מחזיר את הדמות והתוצאות
+     מהקאש המיושן — כלומר איפוס שאינו איפוס. */
   doc.ui        = doc.ui        || { character: null };
   doc.results   = doc.results   || {};
   _unitState = doc;
   return doc;
 }
 
-/* **מחליף** את המשבצת של הסין הזה ולא ממזג לתוכה — מיזוג היה משאיר מפתחות
-   מיושנים בחיים.
-   `part` לא נוגעים בו במכוון: רק writeForwardState ו-goBackToPreviousPart
-   מזיזים את מצביע הנחיתה. שמירה שהייתה מאפסת אותו ל-slug הנוכחי הייתה
-   מבטלת את מה שהם כתבו רגע לפני, וה-timer המושהה שהשאיר ה-goTo() האחרון
-   היה נורה בתוך הניווט ומחזיר את הלומד לסין שהוא בדיוק עזב. */
+/* **מחליף** את ה-payload ולא ממזג לתוכו — מיזוג היה משאיר מפתחות מיושנים בחיים. */
 function captureUnitState() {
   var doc = _unitState || emptyUnitState();
   doc.v = RESUME_STATE_VERSION;
-  if (!doc.part) doc.part = currentPartSlug();
-  doc.parts[currentPartSlug()] = capturePartPayload();
+  doc.component = currentPartSlug();
+  doc.payload = capturePartPayload();
   _unitState = doc;
   return doc;
 }
@@ -303,20 +323,37 @@ function drainPendingUnitState() {
   }
 }
 
-/* מיישר את הדמות שבזיכרון לפי המסמך. מחזיר אם היה שינוי — הקורא צריך לדעת,
-   כי מסך שכבר צויר עם הצבע הקודם חייב להיצבע מחדש לפני שהכיסוי מוסר.
+/* הדמות בכניסה לסין — ארבעה צעדים (החלטה 2026-09-16): (1) המסמך של הסין
+   הזה; (2) אם null — הקאש ב-localStorage (הבחירה מסין 01 באותו דפדפן);
+   (3) אם נמצא — מועתק למסמך של הסין הזה: ל-doc ישירות, כדי ש-getUnitCharacter
+   יחזיר אותו כבר בין שלב א' לשלב ב', ולתור _pendingProfile, כדי
+   ש-drainPendingUnitState ישמור אותו בשלב ב' (שלב א' עדיין לא כותב);
+   (4) אם אין — הקורא נשאר עם ברירת המחדל.
 
-   על נתיב השחזור אין צורך בציור נוסף: applyExecutionState קורא ל-goTo(),
-   ושם resetScreenState(n) פותר את ה-src **לפני** classList.add('active')
-   (כלל 1 ב-CLAUDE.md), ולכן ה-paint הראשון של מסך היעד כבר נכון. */
-function applyUnitProfile(doc) {
-  if (!doc || !doc.ui) return false;
-  var c = doc.ui.character || null;
+   **לעולם לא מוחק את הקאש.** הקודם (applyUnitProfile) פירש null במסמך
+   כ"אין דמות" ומחק את הבחירה — ותחת מסמך לכל סין כל סין ≥02 נפתח עם null,
+   כך שהדמות אבדה בכל שיגור של Kata, ועם ה-fallback גם לסינים שאחריו.
+
+   מחזיר אם השתנה משהו — מסך שכבר צויר בצבע הקודם חייב להיצבע מחדש לפני
+   שהכיסוי מוסר. על נתיב השחזור אין צורך בציור נוסף: applyExecutionState
+   קורא ל-goTo(), ושם resetScreenState(n) פותר את ה-src **לפני**
+   classList.add('active') (כלל 1 ב-CLAUDE.md). */
+function adoptUnitCharacter(doc) {
+  var c = (doc && doc.ui && doc.ui.character) || null;
+  if (!c && !_resetRequested) {   /* איפוס לא מאמץ כלום, גם אם הקאש התמלא שוב */
+    c = _lsGet(UI_CHARACTER_KEY);
+    if (c && doc) {
+      doc.ui = doc.ui || {};
+      doc.ui.character = c;
+      _pendingProfile = { character: c };
+    }
+  }
   var cur = window.lomdaState ? (window.lomdaState.selectedCharacter || null) : null;
-  if (c === cur) return false;
-  if (window.lomdaState) window.lomdaState.selectedCharacter = c;
-  if (c) _lsSet(UI_CHARACTER_KEY, c); else _lsDel(UI_CHARACTER_KEY);
-  return true;
+  if (c) {
+    if (window.lomdaState) window.lomdaState.selectedCharacter = c;
+    _lsSet(UI_CHARACTER_KEY, c);
+  }
+  return c !== cur;
 }
 
 /* ═══════════════════ כיסוי האתחול ═══════════════════
@@ -385,21 +422,18 @@ function sendCompletedOnce(ledger, key, objectType, result, opts) {
    הפתרון הוא **מפת קשתות, לא מחסנית**: ניווט קדימה כותב את הקשת, וניווט
    אחורה רק קורא. אין אינווריאנטה שכתיבה חלקית יכולה לשבור, ואין מה לסנכרן.
 
-   ── שתי שכבות, במכוון ──
-   1. `prev` שבמסמך — עמיד, שורד סגירת לשונית, וזה מקור האמת.
-   2. מפת הקשתות ב-sessionStorage — זמינה **סינכרונית** מרגע טעינת ה-script.
-      זה לא יתירות מיותרת: המסמך מגיע רק אחרי שתי סקריפטים מה-CDN וה-poll
-      על המטא-דאטה, ובלומדה הזאת כפתור "חזרה" גלוי מיד. לומד שילחץ עליו
-      בשנייה הראשונה היה נופל ל-fallback המקובע — כלומר בדיוק הבאג שהקשתות
-      נועדו לפתור. השכבה הזאת מכסה את החלון הזה.
-   3. הארגומנטים המקובעים — ההתנהגות שהייתה לפני הקשתות, למקרה ששתי
-      השכבות לא זמינות (אחסון חסום, הספרייה לא נטענה).
+   ── שכבה אחת + fallback (מ-2026-09-16 הכול dev בלבד) ──
+   1. מפת הקשתות ב-sessionStorage — זמינה סינכרונית מרגע טעינת ה-script.
+   2. הארגומנטים המקובעים — כשהאחסון חסום או שאין קשת.
+   השכבה שהייתה במסמך (`prev`) הוסרה יחד עם מצביע הנחיתה: המסמך הוא של סין
+   אחד, ואין בו מה להצביע על סין אחר. הניווט עצמו רץ רק תחת DEV_NAV
+   (10-identity.js); בייצור הפלטפורמה משגרת כל רכיב בנפרד.
 
    הקשת נושאת גם את ה-hash של מסך היעד, כי המסך האחרון שונה בין המקורות
    (מסין 01 חוזרים למסך 20, מסין 02 למסך 9).
 
-   sessionStorage ולא localStorage בשכבה 2: הקשת שייכת לניסיון הנוכחי. קשת
-   שנשארת מניסיון קודם עלולה לשלוח לומד למסלול שהוא לא עבר בפעם הזאת. */
+   sessionStorage ולא localStorage: הקשת שייכת לניסיון הנוכחי. קשת שנשארת
+   מניסיון קודם עלולה לשלוח לומד למסלול שהוא לא עבר בפעם הזאת. */
 var NAV_EDGE_KEY = 'lomda_nav_edges::methodica-science-mass-measure-02';
 
 function _readEdges() {
@@ -421,12 +455,9 @@ function recordForwardEdge(destSlug, returnHash) {
   } catch (e) { /* אחסון חסום — ה-fallback בכפתור החזרה יטפל */ }
 }
 
-/* הקשת הנכנסת לסין הנוכחי, לפי סדר העדיפויות שלמעלה. */
+/* הקשת הנכנסת לסין הנוכחי — מהמפה ב-sessionStorage בלבד. */
 function _incomingEdge() {
-  var here = currentPartSlug();
-  var fromDoc = _unitState && _unitState.prev && _unitState.prev[here];
-  if (fromDoc && fromDoc.from) return fromDoc;
-  return _readEdges()[here] || null;
+  return _readEdges()[currentPartSlug()] || null;
 }
 
 /* פתרון הקשת ל-URL. מופרד מהניווט עצמו במכוון: כך ההחלטה ניתנת לבדיקה בלי
@@ -439,53 +470,31 @@ function previousPartHref(fallbackSlug, fallbackHash) {
   return '../' + slug + '/index.html' + window.location.search + hash;
 }
 
-/* ניווט אחורה. מצביע את המסמך על היעד **לפני** הניווט — זה מה שמונע
-   מהלואדר של היעד לראות אי-התאמה ולקפוץ מיד חזרה לכאן (ping-pong שהיה
-   שולח completed מחדש בכל סבב). אם הכתיבה לא נחתה, להישאר במקום היא
-   הכשל הבטוח; ניווט על כתיבה שנכשלה הוא בדיוק מה שמחזיר את ה-ping-pong. */
+/* ניווט אחורה — dev בלבד. שומר את הסין הזה סינכרונית (כדי שסיור ?dev=1
+   יחזיר אותו למקום שבו עמד) ומנווט. אין יותר מצביע נחיתה לכתוב, ולכן אין
+   כתיבה שיכולה להיכשל ולעצור את הניווט. */
 function goBackToPreviousPart(fallbackSlug, fallbackHash) {
   /* 2026-09-16: ניווט בין סינים שייך לפלטפורמה. בייצור הפונקציה לא עושה דבר;
      הכפתור שקורא לה מוסתר ב-90-boot.js, וזה הגיבוי למקרה שהוא מגיע בכל זאת
      (מקלדת, DOM ישן). פתוח רק תחת DEV_NAV — ראו unit-js/10-identity.js. */
   if (!DEV_NAV) return;
   var href = previousPartHref(fallbackSlug, fallbackHash);
-  var edge = _incomingEdge();
-  var destSlug = (edge && edge.from) || fallbackSlug;
-
-  if (RESUME_ENABLED && _resumeReady && destSlug) {
-    var doc = captureUnitState();
-    var here = doc.part;
-    doc.part = destSlug;
-    if (!persistUnitState(doc) && !persistUnitState(doc)) {
-      console.error('[resume] back: state write failed, staying put');
-      doc.part = here;
-      return;
-    }
+  if (RESUME_ENABLED && _resumeReady) {
+    flushResumeSave();
     armLeaving();
   }
-  /* replace() ולא href: אחרת כפתור ה-Back של הדפדפן היה מחזיר את הלומד
-     לסין שעזב, שהלואדר שלו רואה מצביע נחיתה אחר ומיד קופץ קדימה — כלומר
-     לחיצת Back אחת מרגישה כמו שהדף "נתקע". */
+  /* replace() ולא href: כפתור ה-Back של הדפדפן לא צריך לחזור לסין שעזבו. */
   window.location.replace(href);
 }
 
-/* מצביע את המסמך על הסין שהלומד עומד להיכנס אליו, כדי שהשיגור הבא ימשיך
-   קדימה ולא יחזור לתוך הסין שהוא בדיוק סיים — ורושם את קשת החזרה.
-   בניגוד ל-v2 בלומדת המקור, ה-payload של הסין שעוזבים **נשמר**
-   (captureUnitState רץ ראשון). זה כל העניין: כפתור החזרה משחזר את הסין
-   שממנו הלומד בא, והוא לא יכול לשחזר מה שנזרק. יעד שכבר בוקר שומר את
-   ה-payload שלו גם כן, כך שמעבר קדימה שוב מחזיר אותו למקום שבו הפסיק
-   ולא למסך 0. */
+/* רושם את קשת החזרה ושומר את הסין שעוזבים — dev בלבד (הקוראים רצים רק תחת
+   DEV_NAV). אין יותר מצביע נחיתה ואין זריעת payload ליעד: המסמך של היעד הוא
+   מסמך אחר, של הסין ההוא. */
 function writeForwardState(destSlug, returnHash) {
-  /* שכבה 2 תמיד, גם כשה-resume כבוי או לא מוכן — היא ההתנהגות שהייתה
-     לפני השינוי הזה, וקוד הסינים סומך עליה. */
+  /* מפת הקשתות תמיד, גם כשה-resume כבוי או לא מוכן — קוד הסינים סומך עליה. */
   recordForwardEdge(destSlug, returnHash);
   if (!RESUME_ENABLED || !_resumeReady) return;
-  var doc = captureUnitState();
-  doc.part = destSlug;
-  doc.prev[destSlug] = { from: currentPartSlug(), hash: returnHash || '' };
-  if (!doc.parts[destSlug]) doc.parts[destSlug] = { currentScreen: 0 };
-  persistUnitState(doc);
+  flushResumeSave();
   armLeaving();
 }
 
@@ -636,8 +645,7 @@ function initResumeLeaveHandlers() {
    completed לא נשלח שוב, מה שנקרא כרגרסיה קטסטרופלית למי שבודק אחר כך.
    ?resetState מתחיל מדף חלק.
 
-   מנקה את עצמו מה-URL: כל ניווט בין סינים מעתיק את window.location.search
-   מילה במילה, ולכן אם היה נשאר הוא היה מתאפס שוב בכל מעבר — וה-resume
+   מנקה את עצמו מה-URL: אחרת כל רענון של הדף היה מאפס שוב — וה-resume
    לעולם לא היה עובד. הניקוי חייב לקרות לפני שמישהו קורא את ה-query, ולכן
    90-boot.js קורא לזה ראשון; הדגל _resetRequested הוא מה שמעביר את הכוונה
    ל-readUnitState, שרץ מאוחר יותר כשה-URL כבר נקי. */

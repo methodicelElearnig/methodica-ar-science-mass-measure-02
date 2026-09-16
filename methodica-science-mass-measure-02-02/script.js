@@ -20,7 +20,7 @@ try {
      נופל אליו כל עוד מסמך ה-state לא נקרא — וזה בדיוק המצב כאן, בראש
      הטעינה, שני סקריפטים מה-CDN לפני שהמסמך זמין. זה מה שמחזיק את כלל 1
      ב-CLAUDE.md: הצבע נקבע לפני ה-paint הראשון, בלי הבהוב. המסמך מיישר
-     את הערך אחר כך ב-applyUnitProfile (unit-js/50-loader.js, שלב א'),
+     את הערך אחר כך ב-adoptUnitCharacter (unit-js/50-loader.js, שלב א'),
      מאחורי #boot-cover.
      typeof: 40-resume.js שנכשל בטעינה לא אמור להפיל את כל script.js. */
   savedCharacter = (typeof getUnitCharacter === 'function')

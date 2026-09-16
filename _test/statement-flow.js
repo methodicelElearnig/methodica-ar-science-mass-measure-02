@@ -64,10 +64,17 @@ function boot(comp, query) {
      asserted separately in verify-report.js §10(a). An in-memory store is enough
      here; the real transport is the CDN library, or _test/xapi-720-k.js for the
      browser walkthrough. */
-  w.__store = null;
-  w.loadState720 = function () { return w.__store ? JSON.parse(w.__store) : null; };
-  w.saveState720 = function (id, doc) { w.__store = JSON.stringify(doc); return true; };
-  w.saveState720Debounced = function (id, doc) { w.__store = JSON.stringify(doc); };
+  /* v5: keyed by the state id ('execution-state::<slug>'), one document per component —
+     the same sharding the real library gets from Kata's per-component registration.
+     __store stays as a view on THIS component's document so older probes read naturally. */
+  w.__stores = {};
+  w.loadState720 = function (id) { return w.__stores[id] ? JSON.parse(w.__stores[id]) : null; };
+  w.saveState720 = function (id, doc) { w.__stores[id] = JSON.stringify(doc); return true; };
+  w.saveState720Debounced = function (id, doc) { w.__stores[id] = JSON.stringify(doc); };
+  Object.defineProperty(w, '__store', {
+    get() { return w.__stores[w.RESUME_STATE_ID] || null; },
+    set(v) { if (v === null) delete w.__stores[w.RESUME_STATE_ID]; else w.__stores[w.RESUME_STATE_ID] = v; },
+  });
   exec('_resumeReady = true; _unitState = emptyUnitState();');
 
   const run = (code) => {
@@ -284,9 +291,10 @@ function probe02() {
 
   /* Production: the last click reports and stops. No hop, no landing-pointer move —
      Kata routes on the statement. (probeDevNav covers the ?dev=1 walkthrough.) */
-  ok(C + ' production: drag9Continue moved no landing pointer',
-    b2.val('_unitState.part') === 'methodica-science-mass-measure-02-02',
-    String(b2.val('_unitState.part')));
+  ok(C + ' production: drag9Continue recorded no forward edge (v5: there is no landing pointer at all)',
+    b2.val("sessionStorage.getItem('lomda_nav_edges::methodica-science-mass-measure-02')") === null &&
+    b2.val("'part' in _unitState") === false,
+    'edges=' + b2.val("sessionStorage.getItem('lomda_nav_edges::methodica-science-mass-measure-02')"));
 
   w.close(); b.w.close(); b2.w.close();
 }
@@ -344,7 +352,7 @@ function probe05() {
     val2('moedAFullyPassed()') === true, String(val2('JSON.stringify(_unitState.results)')));
   ok(C + ' the character survives a device switch too',
     val2("(function(){ _unitState.ui.character = 'green'; " +
-         "applyUnitProfile(_unitState); return window.lomdaState.selectedCharacter; })()") === 'green');
+         "adoptUnitCharacter(_unitState); return window.lomdaState.selectedCharacter; })()") === 'green');
 
   r = run2('s4Finish();');
   comp = r.log.find(s => s.type === 'onlinelesson' && s.verb === 'completed');
@@ -424,15 +432,16 @@ function probeDevNav() {
     b.val("document.getElementById('s0-back').hidden") === true &&
     b.val("getComputedStyle(document.getElementById('s0-back')).display") === 'none');
   let r = b.run('s1Continue();');
-  ok(C + ' production: the last click reports the component once and moves no pointer',
+  ok(C + ' production: the last click reports the component once and records no forward edge',
     r.log.filter(s => s.type === 'onlinelesson' && s.verb === 'completed').length === 1 &&
-    b.val('_unitState.part') === HERE,
-    'part=' + b.val('_unitState.part') + ' log=' + JSON.stringify(r.log.map(s => s.verb)));
+    b.val("sessionStorage.getItem('lomda_nav_edges::methodica-science-mass-measure-02')") === null,
+    'edges=' + b.val("sessionStorage.getItem('lomda_nav_edges::methodica-science-mass-measure-02')") + ' log=' + JSON.stringify(r.log.map(s => s.verb)));
   ok(C + ' production: the button is disabled afterwards',
     b.val("document.getElementById('s1-continue').disabled") === true);
+  const snap = JSON.stringify(b.w.__stores);
   b.exec("goBackToPreviousPart('methodica-science-mass-measure-02-02', '#screen=8');");
-  ok(C + ' production: goBackToPreviousPart is inert',
-    b.val('_unitState.part') === HERE, String(b.val('_unitState.part')));
+  ok(C + ' production: goBackToPreviousPart is inert — no write, no edge',
+    JSON.stringify(b.w.__stores) === snap && b.val("sessionStorage.getItem('lomda_nav_edges::methodica-science-mass-measure-02')") === null);
   b.w.close();
 
   b = boot('03', '?dev=1');
@@ -443,8 +452,12 @@ function probeDevNav() {
   r = b.run('s1Continue();');
   ok(C + ' ?dev=1: the last click still reports the component once',
     r.log.filter(s => s.type === 'onlinelesson' && s.verb === 'completed').length === 1);
-  ok(C + ' ?dev=1: ...and the hop is armed — the landing pointer moves to 04',
-    b.val('_unitState.part') === 'methodica-science-mass-measure-02-04', String(b.val('_unitState.part')));
+  ok(C + ' ?dev=1: ...and the hop is armed — the back edge into 04 records this component',
+    (function () { try { return JSON.parse(b.val("sessionStorage.getItem('lomda_nav_edges::methodica-science-mass-measure-02')"))['methodica-science-mass-measure-02-04'].from === HERE; } catch (e) { return false; } })(),
+    String(b.val("sessionStorage.getItem('lomda_nav_edges::methodica-science-mass-measure-02')")));
+  ok(C + ' ?dev=1: the document saved before the hop is this component\'s, with no pointer fields',
+    (function () { try { const d = JSON.parse(b.w.__store); return d.component === HERE && !('part' in d) && !('prev' in d) && !('parts' in d); } catch (e) { return false; } })(),
+    String(b.w.__store));
   b.w.close();
 
   b = boot('03', '?dev=1&registration=r1');
@@ -454,8 +467,8 @@ function probeDevNav() {
     b.val("document.getElementById('s0-back').hidden") === true &&
     b.val("getComputedStyle(document.getElementById('s0-back')).display") === 'none');
   r = b.run('s1Continue();');
-  ok(C + ' ?dev=1&registration: the last click moves nothing',
-    b.val('_unitState.part') === HERE, String(b.val('_unitState.part')));
+  ok(C + ' ?dev=1&registration: the last click records no forward edge',
+    b.val("sessionStorage.getItem('lomda_nav_edges::methodica-science-mass-measure-02')") === null, String(b.val("sessionStorage.getItem('lomda_nav_edges::methodica-science-mass-measure-02')")));
   b.w.close();
 }
 

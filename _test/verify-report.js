@@ -117,7 +117,8 @@ async function run(c) {
                     'initResumeResetHatch', 'currentPartSlug',
                     /* resume, shared (unit-js/40-resume.js) */
                     'readUnitState', 'captureUnitState', 'persistUnitState',
-                    'emptyUnitState', 'applyExecutionState', 'writeForwardState',
+                    'emptyUnitState', 'migrateState', 'adoptUnitCharacter',
+                    'applyExecutionState', 'writeForwardState',
                     'recordForwardEdge', 'previousPartHref', 'goBackToPreviousPart',
                     'scheduleResumeSave', 'flushResumeSave', 'initResumeLeaveHandlers',
                     /* repaintScreen lives in 40-resume.js but is CALLED from every
@@ -566,13 +567,19 @@ async function runResume(c) {
 
   /* Inspectable State transport + statement log, then open the write paths. */
   exec(`
-    window.__store = null; window.__fail = false; window.__stmts = [];
-    window.loadState720 = function () { return window.__store ? JSON.parse(window.__store) : null; };
+    /* v5: keyed by the state id ('execution-state::<slug>'): one document per component.
+       __store is a view on THIS component's document. */
+    window.__stores = {}; window.__fail = false; window.__stmts = [];
+    Object.defineProperty(window, '__store', {
+      get() { return window.__stores[RESUME_STATE_ID] || null; },
+      set(v) { if (v === null) delete window.__stores[RESUME_STATE_ID]; else window.__stores[RESUME_STATE_ID] = v; },
+    });
+    window.loadState720 = function (id) { return window.__stores[id] ? JSON.parse(window.__stores[id]) : null; };
     window.__syncWrites = 0;
     window.saveState720 = function (id, doc) {
       if (window.__fail) return false;
       window.__syncWrites++;                       /* counts SYNCHRONOUS writes only */
-      window.__store = JSON.stringify(doc); return true;
+      window.__stores[id] = JSON.stringify(doc); return true;
     };
     window.saveState720Debounced = function (id, doc) { window.__pending = JSON.stringify(doc); };
     window.sendStatement720 = function (v, t, r, o) { window.__stmts.push(v + ':' + t + ':' + ((o && o.objectId) || '')); };
@@ -592,53 +599,38 @@ async function runResume(c) {
   ok(c, 'goTo armed a debounced save',
     typeof val('window.__pending') === 'string', String(val('typeof window.__pending')));
 
-  /* captureUnitState replaces this part's slot but must NOT move `part` — only
-     writeForwardState and goBackToPreviousPart may. A save that reset it would
-     undo the pointer they just wrote, and the debounced timer from the last
-     goTo would fire mid-navigation and bounce the learner back. */
-  exec("_unitState.part = 'sentinel'; captureUnitState();");
-  ok(c, 'captureUnitState writes this part\'s slot',
-    val('_unitState.parts["' + slug + '"].currentScreen') === last,
-    String(val('_unitState.parts["' + slug + '"].currentScreen')));
-  ok(c, 'captureUnitState leaves the landing pointer alone',
-    val('_unitState.part') === 'sentinel', String(val('_unitState.part')));
+  /* v5: captureUnitState fills THIS component's payload and stamps `component`. There is
+     no landing pointer to preserve any more — the document belongs to one component. */
+  exec("captureUnitState();");
+  ok(c, 'captureUnitState writes this component\'s payload',
+    val('_unitState.payload.currentScreen') === last, String(val('_unitState.payload.currentScreen')));
+  ok(c, 'captureUnitState stamps the document with this component\'s slug',
+    val('_unitState.component') === slug, String(val('_unitState.component')));
 
-  // ── The forward handoff ────────────────────────────────────────────────
-  exec("_unitState = emptyUnitState(); writeForwardState('dest-part', '#screen=7');");
-  ok(c, 'writeForwardState moves the landing pointer to the destination',
-    val('_unitState.part') === 'dest-part', String(val('_unitState.part')));
+  // ── The forward handoff (dev-only caller; the function is asserted on its own) ──
+  /* v5: no landing pointer, no prev map, no seeding of the destination — the destination's
+     document is another component's. The edge map and a synchronous save of THIS component
+     are all that remain. */
+  exec("_unitState = emptyUnitState(); window.__store = null; window.__syncWrites = 0; " +
+       "try { sessionStorage.removeItem('lomda_nav_edges::methodica-science-mass-measure-02'); } catch (e) {} " +
+       "writeForwardState('dest-part', '#screen=7');");
+  const edges = () => { try { return JSON.parse(val("sessionStorage.getItem('lomda_nav_edges::methodica-science-mass-measure-02')")) || {}; } catch (e) { return {}; } };
   ok(c, 'writeForwardState records the back edge with its return hash',
-    val('_unitState.prev["dest-part"].from') === slug &&
-    val('_unitState.prev["dest-part"].hash') === '#screen=7',
-    JSON.stringify(val('JSON.stringify(_unitState.prev)')));
-  ok(c, 'writeForwardState keeps the departing part\'s payload',
-    typeof val('_unitState.parts["' + slug + '"]') === 'object',
-    String(val('typeof _unitState.parts["' + slug + '"]')));
-  ok(c, 'an unvisited destination is seeded at screen 0',
-    val('_unitState.parts["dest-part"].currentScreen') === 0,
-    String(val('_unitState.parts["dest-part"].currentScreen')));
-  ok(c, 'the forward write landed synchronously',
-    val('JSON.parse(window.__store).part') === 'dest-part',
-    String(val('JSON.parse(window.__store).part')));
-
-  /* A destination already visited keeps its screen — going forward again must
-     resume where the learner left off, not replay from screen 0. */
-  exec("_unitState.parts['dest-part'] = { currentScreen: 4 }; writeForwardState('dest-part', '#screen=7');");
-  ok(c, 'a visited destination is not reset to screen 0',
-    val('_unitState.parts["dest-part"].currentScreen') === 4,
-    String(val('_unitState.parts["dest-part"].currentScreen')));
+    !!edges()['dest-part'] && edges()['dest-part'].from === slug && edges()['dest-part'].hash === '#screen=7',
+    JSON.stringify(edges()));
+  ok(c, 'writeForwardState saves this component synchronously',
+    val('window.__syncWrites') === 1 && val('JSON.parse(window.__store).component') === slug,
+    'writes=' + val('window.__syncWrites') + ' store=' + val('window.__store'));
+  ok(c, 'the saved document has no landing pointer, no prev map, no parts map (v5)',
+    val("(function(){ var d = JSON.parse(window.__store); return !('part' in d) && !('prev' in d) && !('parts' in d) && ('payload' in d) && ('component' in d); })()") === true,
+    String(val('Object.keys(JSON.parse(window.__store)).join()')));
 
   // ── The back edge ──────────────────────────────────────────────────────
-  /* The document is authoritative; the sessionStorage edge map is the
-     synchronously-available fallback for the window before the document
-     arrives; the hardcoded arguments are the last resort. */
-  exec("_unitState = emptyUnitState(); _unitState.prev['" + slug + "'] = { from: 'from-doc', hash: '#screen=2' };");
+  /* v5: the sessionStorage edge map is the only layer; the hardcoded arguments are the
+     last resort. The document carries no prev map any more. */
+  exec("_unitState = emptyUnitState();");
   exec("try { sessionStorage.setItem('lomda_nav_edges::methodica-science-mass-measure-02', JSON.stringify({'" + slug + "': { from: 'from-session', hash: '#screen=3' } })); } catch (e) {}");
-  ok(c, 'previousPartHref prefers the document over sessionStorage',
-    /\.\.\/from-doc\/index\.html.*#screen=2$/.test(String(val("previousPartHref('fallback','#screen=9')"))),
-    String(val("previousPartHref('fallback','#screen=9')")));
-  exec("_unitState.prev = {};");
-  ok(c, 'previousPartHref falls back to the sessionStorage edge',
+  ok(c, 'previousPartHref follows the sessionStorage edge',
     /\.\.\/from-session\/index\.html.*#screen=3$/.test(String(val("previousPartHref('fallback','#screen=9')"))),
     String(val("previousPartHref('fallback','#screen=9')")));
   exec("try { sessionStorage.removeItem('lomda_nav_edges::methodica-science-mass-measure-02'); } catch (e) {}");
@@ -649,25 +641,23 @@ async function runResume(c) {
     /\?slxapi=1&registration=r1#screen=9$/.test(String(val("previousPartHref('fallback','#screen=9')"))),
     String(val("previousPartHref('fallback','#screen=9')")));
 
-  /* A failed write must leave the pointer where it was. Navigating on a failed
-     write is what reintroduces the ping-pong that re-sends 'completed' every
-     cycle, so goBackToPreviousPart retries once and then stays put.
-     2026-09-16: goBackToPreviousPart is a no-op unless DEV_NAV, so this boot
-     (no ?dev=1) would pass the assertion without exercising the write at all.
-     DEV_NAV is a var — force it for this one probe, then restore. */
-  exec("_unitState = emptyUnitState(); _unitState.part = 'here'; window.__fail = true;");
+  /* v5: dev navigation saves this component synchronously and navigates. There is no pointer
+     write that could fail, so nothing holds the learner in place any more. jsdom cannot
+     navigate — location.replace is reported as "not implemented" and nothing else happens. */
+  exec("_unitState = emptyUnitState(); window.__store = null; window.__syncWrites = 0;");
   exec("window.__devNavWas = DEV_NAV; DEV_NAV = true;");
   exec("try { goBackToPreviousPart('fallback', '#screen=9'); } catch (e) {}");
-  ok(c, 'a failed back-write rolls the landing pointer back (dev navigation)',
-    val('_unitState.part') === 'here', String(val('_unitState.part')));
-  exec('window.__fail = false; DEV_NAV = window.__devNavWas;');
+  ok(c, 'dev back navigation saves this component synchronously first',
+    val('window.__syncWrites') === 1 && val('JSON.parse(window.__store).component') === slug,
+    'writes=' + val('window.__syncWrites') + ' store=' + val('window.__store'));
+  exec('DEV_NAV = window.__devNavWas;');
 
   /* And in production the same call does nothing at all — not even a write. */
-  exec("_unitState = emptyUnitState(); _unitState.part = 'here'; window.__store = null;");
+  exec("_unitState = emptyUnitState(); window.__store = null; window.__syncWrites = 0;");
   exec("try { goBackToPreviousPart('fallback', '#screen=9'); } catch (e) {}");
-  ok(c, 'without DEV_NAV, goBackToPreviousPart touches neither the pointer nor the store',
-    val('_unitState.part') === 'here' && val('window.__store') === null,
-    'part=' + val('_unitState.part') + ' store=' + val('window.__store'));
+  ok(c, 'without DEV_NAV, goBackToPreviousPart writes nothing',
+    val('window.__store') === null && val('window.__syncWrites') === 0,
+    'store=' + val('window.__store') + ' writes=' + val('window.__syncWrites'));
 
   // ── The restore ────────────────────────────────────────────────────────
   /* Exactly one item 'initialized' for the landing screen, and nothing else:
@@ -1723,7 +1713,7 @@ async function runResume(c) {
   const slugFor = 'methodica-science-mass-measure-02-' + c;
   const storedDone = (expr) =>
     val('(function(){ try { return ' +
-        'JSON.parse(window.__store).parts["' + slugFor + '"].' + expr + '; } ' +
+        'JSON.parse(window.__store).payload.' + expr + '; } ' +
         'catch (e) { return "__NO_STORE__"; } })()');
 
   if (c === '01') {
@@ -1990,6 +1980,8 @@ async function checkStateDiagnostics() {
   // Load the stub the way the loader would on localhost.
   exec(fs.readFileSync(path.join(HARNESS_DIR, 'xapi-720-k.js'), 'utf8'));
 
+  ok('diag', 'RESUME_STATE_ID carries the component slug (one fallback slot per component)',
+    val('RESUME_STATE_ID') === 'execution-state::methodica-science-mass-measure-02-01', String(val('RESUME_STATE_ID')));
   ok('diag', 'stateLastResult720 is exposed',
     val('typeof window.stateLastResult720') === 'function');
 
@@ -1997,26 +1989,26 @@ async function checkStateDiagnostics() {
 
   /* A first read with nothing stored is `absent` and is SUCCESS, not failure.
      This is the case -j could not distinguish from a broken deployment. */
-  exec('window.loadState720("execution-state");');
+  exec('window.loadState720(RESUME_STATE_ID);');
   ok('diag', 'a first read reports absent, and absent counts as ok',
     val("window.stateLastResult720().reason") === 'absent' &&
     val("window.stateLastResult720().ok") === true,
     JSON.stringify(val("JSON.stringify(window.stateLastResult720())")));
 
-  exec('window.saveState720("execution-state", { v: 3 });');
+  exec('window.saveState720(RESUME_STATE_ID, { v: 3 });');
   ok('diag', 'a successful write reports ok with a 2xx status',
     val("window.stateLastResult720().reason") === 'ok' &&
     val("window.stateLastResult720().status") >= 200 &&
     val("window.stateLastResult720().status") < 300);
 
-  exec('window.loadState720("execution-state");');
+  exec('window.loadState720(RESUME_STATE_ID);');
   ok('diag', 'a read of a stored document reports ok',
     val("window.stateLastResult720().reason") === 'ok');
 
   /* Each documented status maps to its own name — the whole point of the change. */
   for (const [status, reason] of [[401, 'auth'], [413, 'too-large'], [412, 'stale'],
                                   [400, 'bad-address'], [422, 'validation'], [500, 'http-500']]) {
-    exec('window.__failWrites(' + status + '); window.saveState720("execution-state", {});');
+    exec('window.__failWrites(' + status + '); window.saveState720(RESUME_STATE_ID, {});');
     ok('diag', 'status ' + status + ' reports reason "' + reason + '"',
       val("window.stateLastResult720().reason") === reason &&
       val("window.stateLastResult720().ok") === false,
@@ -2299,9 +2291,202 @@ function checkPlatformRouting() {
     /function hideCrossPartBack\(\)\s*\{\s*if \(DEV_NAV\) return;/.test(bt) && /hideCrossPartBack\(\);/.test(bt));
 }
 
+/* ── One document per component (v5, 2026-09-16) ──────────────────────────
+   Kata's registration is per {learner, component} and the platform may clear one
+   component's document on a re-take. The document is therefore flat — `component` +
+   `payload` — migrated from v4 in place, never applied when it names another component,
+   and the character travels 01 → 02..06 through the same-browser mirror only.
+   Groups: shape / isolation / retake / character. The store below is keyed by
+   registration + state id, exactly as two Kata launches would be. */
+async function checkPerComponentState() {
+  const stores = {};
+  const warns = [];
+  const bootS = (c, query) => {
+    const dir = path.join(BASE, 'methodica-science-mass-measure-02-' + c);
+    const dom = new JSDOM(fs.readFileSync(path.join(dir, 'index.html'), 'utf8'), {
+      url: 'http://localhost:8777/methodica-science-mass-measure-02-' + c + '/index.html' + query,
+      runScripts: 'dangerously', pretendToBeVisual: true,
+    });
+    const w = dom.window;
+    const { exec, val } = makeRunner(w);
+    w.console.error = w.console.log = function () {};
+    w.console.warn = function (m) { warns.push(String(m)); };
+    w.fetch = function () { return Promise.resolve({ ok: true }); };
+    w.HTMLMediaElement.prototype.load = function () {};
+    w.HTMLMediaElement.prototype.play = function () { return Promise.resolve(); };
+    w.HTMLMediaElement.prototype.pause = function () {};
+    for (const src of [...w.document.querySelectorAll('script[src]')].map(s => s.getAttribute('src'))) {
+      const p = path.resolve(dir, src.split('?')[0]);
+      if (fs.existsSync(p)) { try { exec(fs.readFileSync(p, 'utf8')); } catch (e) {} }
+    }
+    const reg = new URL(w.location.href).searchParams.get('registration') || '';
+    w.__key = (id) => reg + '::' + id;
+    w.loadState720 = function (id) { const k = w.__key(id); return stores[k] ? JSON.parse(stores[k]) : null; };
+    w.saveState720 = function (id, doc) { stores[w.__key(id)] = JSON.stringify(doc); return true; };
+    w.saveState720Debounced = w.saveState720;
+    w.__stmts = [];
+    w.sendStatement720 = function (v, t, r, o) { w.__stmts.push({ v, t, r, o }); };
+    const seed = (doc) => { stores[w.__key(w.RESUME_STATE_ID)] = JSON.stringify(doc); };
+    const stored = () => { const s = stores[w.__key(w.RESUME_STATE_ID)]; return s ? JSON.parse(s) : null; };
+    return { w, exec, val, seed, stored, slug: 'methodica-science-mass-measure-02-' + c, close: () => w.close() };
+  };
+  const q = (r, extra) => '?slxapi=1&registration=' + r + (extra || '');
+
+  // ── shape ──
+  let b = bootS('01', q('r1'));
+  ok('shape', 'emptyUnitState() has exactly the v5 fields',
+    b.val('Object.keys(emptyUnitState()).sort().join()') === 'component,done,doneItems,payload,results,ui,v',
+    String(b.val('Object.keys(emptyUnitState()).sort().join()')));
+  ok('shape', 'the version is 5', b.val('emptyUnitState().v') === 5, String(b.val('emptyUnitState().v')));
+  ok('shape', 'a fresh document names this component',
+    b.val('emptyUnitState().component') === b.slug, String(b.val('emptyUnitState().component')));
+  ok('shape', 'RESUME_STATE_ID carries the component slug',
+    b.val('RESUME_STATE_ID') === 'execution-state::' + b.slug, String(b.val('RESUME_STATE_ID')));
+  b.seed({ v: 4, part: 'x', parts: { [b.slug]: { currentScreen: 3 }, other: { currentScreen: 9 } },
+           prev: { a: 1 }, done: { a: true }, doneItems: { b: true }, ui: { character: 'green' }, results: { k: 'pass' } });
+  b.exec('readUnitState();');
+  ok('shape', 'v4 → v5 migration keeps this component\'s slot as payload',
+    b.val('_unitState.v') === 5 && b.val('_unitState.component') === b.slug && b.val('_unitState.payload.currentScreen') === 3,
+    String(b.val('JSON.stringify(_unitState)')));
+  ok('shape', 'v4 → v5 migration keeps the ledgers, the character and the results',
+    b.val('_unitState.done.a') === true && b.val('_unitState.doneItems.b') === true &&
+    b.val('_unitState.ui.character') === 'green' && b.val('_unitState.results.k') === 'pass',
+    String(b.val('JSON.stringify(_unitState)')));
+  ok('shape', 'v4 → v5 migration drops part, prev and parts',
+    b.val("'part' in _unitState") === false && b.val("'prev' in _unitState") === false && b.val("'parts' in _unitState") === false,
+    String(b.val('Object.keys(_unitState).join()')));
+  b.seed({ v: 4, part: 'x', parts: { other: { currentScreen: 9 } } });
+  b.exec('readUnitState();');
+  ok('shape', 'a v4 document with no slot for this component migrates to payload:null',
+    b.val('_unitState.payload') === null && b.val('_unitState.v') === 5, String(b.val('JSON.stringify(_unitState)')));
+  b.seed({ v: 2, parts: { [b.slug]: { currentScreen: 3 } } });
+  b.exec('readUnitState();');
+  ok('shape', 'any other version is discarded', b.val('_unitState.payload') === null && b.val('_unitState.v') === 5);
+  warns.length = 0;
+  b.seed({ v: 5, component: 'other-slug', payload: { currentScreen: 7 }, done: { z: true } });
+  b.exec('readUnitState();');
+  ok('shape', 'a document that names another component is discarded…',
+    b.val('_unitState.payload') === null && b.val('_unitState.component') === b.slug && b.val('Object.keys(_unitState.done).length') === 0,
+    String(b.val('JSON.stringify(_unitState)')));
+  ok('shape', '…with a console.warn naming both components',
+    warns.some(m => /\[resume\] document belongs to "other-slug", not "/.test(m)), JSON.stringify(warns));
+  b.exec('_resumeReady = true; readUnitState(); goTo(2);');
+  ok('shape', 'captureUnitState().payload is capturePartPayload()',
+    b.val('JSON.stringify(captureUnitState().payload) === JSON.stringify(capturePartPayload())') === true);
+  b.close();
+
+  // ── isolation ──
+  const A = bootS('01', q('r1')), B = bootS('03', q('r2'));
+  A.exec('_resumeReady = true; readUnitState(); goTo(3); flushResumeSave(); markSent("done", currentPartSlug());');
+  B.exec('readUnitState();');
+  ok('isolation', 'component B under its own registration sees an empty document',
+    B.val('_unitState.payload') === null && B.val('Object.keys(_unitState.done).length') === 0,
+    String(B.val('JSON.stringify(_unitState)')));
+  ok('isolation', 'component A\'s stored document never mentions component B',
+    JSON.stringify(A.stored()).indexOf(B.slug) === -1 && A.stored().component === A.slug && A.stored().done[A.slug] === true,
+    JSON.stringify(A.stored()));
+  ok('isolation', 'only registrations that wrote have a document',
+    Object.keys(stores).filter(k => k.indexOf('r2::') === 0).length === 0, Object.keys(stores).join());
+  warns.length = 0;
+  B.seed(A.stored());                         // A's document under B's registration: platform-side fault
+  B.exec('readUnitState();');
+  ok('isolation', 'another component\'s document under my registration is discarded, not applied',
+    B.val('_unitState.payload') === null && warns.some(m => /document belongs to "/.test(m)), JSON.stringify(warns));
+  A.close(); B.close();
+
+  // ── retake: Kata cleared the document; the same-browser mirrors still hold the last attempt ──
+  b = bootS('05', q('r5'));
+  b.exec("localStorage.setItem('lomda_moedA_partA_result', 'pass'); localStorage.setItem('lomda_moedA_partB_result', 'pass');" +
+         "localStorage.setItem('lomda_selectedCharacter', 'green'); window.lomdaState.selectedCharacter = null;");
+  b.exec('readUnitState(); window.__changed = adoptUnitCharacter(_unitState);');
+  ok('retake', 'an absent document makes every verdict null — the mirrors are not consulted',
+    b.val("getUnitResult('lomda_moedA_partA_result')") === null && b.val("getUnitResult('lomda_moedA_partB_result')") === null);
+  ok('retake', 'the moed-A gate is closed again', b.val('moedAFullyPassed()') === false);
+  ok('retake', 'the ledger is empty again, so the re-take will report completed',
+    b.val("alreadySent('done', currentPartSlug())") === false);
+  b.exec("_resumeReady = true; sendCompletedOnce('done', currentPartSlug(), 'onlinelesson', null);");
+  ok('retake', 'the re-take\'s completed goes out', b.w.__stmts.filter(s => s.v === 'completed').length === 1);
+  ok('retake', 'nothing is restored', b.val('_unitState.payload === null || _unitState.payload.currentScreen === 0') === true);
+  ok('retake', 'the character IS adopted from the mirror (decision 2026-09-16)',
+    b.val('window.lomdaState.selectedCharacter') === 'green' && b.val('_unitState.ui.character') === 'green' && b.w.__changed === true);
+  b.close();
+
+  // ── character: four steps, both stores ──
+  b = bootS('01', q('r1'));
+  b.exec("_resumeReady = true; readUnitState(); setUnitCharacter('green');");
+  ok('character', '01: the choice lands in the mirror AND in this component\'s document',
+    b.val("localStorage.getItem('lomda_selectedCharacter')") === 'green' && b.val('_unitState.ui.character') === 'green' &&
+    b.stored() && b.stored().ui.character === 'green', JSON.stringify(b.stored()));
+  b.close();
+  b = bootS('03', q('r3'));
+  b.seed({ v: 5, component: b.slug, ui: { character: 'orange' } });
+  b.exec("localStorage.setItem('lomda_selectedCharacter', 'green'); readUnitState(); adoptUnitCharacter(_unitState);");
+  ok('character', '03 step 1: the document wins over the mirror, and the mirror follows',
+    b.val('window.lomdaState.selectedCharacter') === 'orange' && b.val("localStorage.getItem('lomda_selectedCharacter')") === 'orange');
+  b.close();
+  b = bootS('03', q('r3b'));
+  b.exec("localStorage.setItem('lomda_selectedCharacter', 'green'); window.lomdaState.selectedCharacter = null; readUnitState(); window.__changed = adoptUnitCharacter(_unitState);");
+  ok('character', '03 steps 2+3: an empty document adopts the mirror into memory and into the document',
+    b.val('window.lomdaState.selectedCharacter') === 'green' && b.val('_unitState.ui.character') === 'green' &&
+    b.val('getUnitCharacter()') === 'green' && b.w.__changed === true);
+  ok('character', '03 step 3: the mirror is NOT deleted (the old applyUnitProfile did)',
+    b.val("localStorage.getItem('lomda_selectedCharacter')") === 'green');
+  ok('character', '03 step 3: nothing is written before Phase B…', b.stored() === null);
+  b.exec('_resumeReady = true; drainPendingUnitState();');
+  ok('character', '…and Phase B persists the adopted character into this component\'s document',
+    b.stored() && b.stored().ui.character === 'green' && b.stored().component === b.slug, JSON.stringify(b.stored()));
+  b.close();
+  b = bootS('03', q('r3c'));
+  b.exec("readUnitState(); window.__changed = adoptUnitCharacter(_unitState);");
+  ok('character', '03 step 4: no document, no mirror → null, default stays, nothing thrown',
+    b.val('getUnitCharacter()') === null && b.val("localStorage.getItem('lomda_selectedCharacter')") === null);
+  b.close();
+  b = bootS('03', q('r3d', '&resetState'));
+  ok('character', '?resetState: the hatch ran at boot and cleared the mirror',
+    b.val('_resetRequested') === true && b.val("localStorage.getItem('lomda_selectedCharacter')") === null);
+  b.exec("localStorage.setItem('lomda_selectedCharacter', 'green'); readUnitState(); adoptUnitCharacter(_unitState);");
+  ok('character', '?resetState: a mirror that reappears is NOT adopted — a reset adopts nothing',
+    b.val('getUnitCharacter()') === null && b.val('window.lomdaState.selectedCharacter') === null,
+    'char=' + b.val('getUnitCharacter()'));
+  b.close();
+}
+
+/* ── Source scan for the v5 shape ── */
+function checkStateShapeSource() {
+  const strip = (s) => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"])\/\/[^\n]*/g, '$1');
+  const files = ['unit-js/10-identity.js', 'unit-js/20-xapi.js', 'unit-js/40-resume.js',
+                 'unit-js/50-loader.js', 'unit-js/90-boot.js']
+    .concat(COMPONENTS.map(c => 'methodica-science-mass-measure-02-' + c + '/script.js'));
+  for (const rel of files) {
+    const src = strip(fs.readFileSync(path.join(BASE, rel), 'utf8'));
+    ok('shape', rel + ': no landing pointer, no prev map, no parts map',
+      !/\.prev\b/.test(src) && !/(?<!old)\.parts\[/.test(src) && !/\b(doc|_unitState|_saved|st)\.part\b/.test(src));
+    ok('shape', rel + ': applyUnitProfile is gone', !/applyUnitProfile/.test(src));
+  }
+  const rs = strip(fs.readFileSync(path.join(BASE, 'unit-js/40-resume.js'), 'utf8'));
+  ok('shape', '40-resume.js: RESUME_STATE_VERSION is 5', /var RESUME_STATE_VERSION = 5;/.test(rs));
+  ok('shape', '40-resume.js: RESUME_STATE_ID is per component',
+    /var RESUME_STATE_ID\s*=\s*'execution-state::' \+ currentPartSlug\(\);/.test(rs));
+  ok('shape', '40-resume.js: readUnitState migrates, then refuses another component\'s document with a warning',
+    /doc = migrateState\(doc\);[\s\S]{0,200}doc\.component !== currentPartSlug\(\)[\s\S]{0,200}console\.warn\(/.test(rs));
+  const adopt = /function adoptUnitCharacter\(doc\)\s*\{[\s\S]*?\n\}/.exec(rs);
+  ok('shape', '40-resume.js: adoptUnitCharacter never deletes the mirror',
+    !!adopt && !/_lsDel/.test(adopt[0]) && /_lsGet\(UI_CHARACTER_KEY\)/.test(adopt[0]) && /_pendingProfile = \{ character: c \}/.test(adopt[0]));
+  const ld = strip(fs.readFileSync(path.join(BASE, 'unit-js/50-loader.js'), 'utf8'));
+  ok('shape', '50-loader.js: Phase A restores payload and adopts the character',
+    /_payload = _saved\.payload;/.test(ld) && /adoptUnitCharacter\(_saved\)/.test(ld));
+  const scripts = COMPONENTS.map(c => fs.readFileSync(path.join(BASE, 'methodica-science-mass-measure-02-' + c, 'script.js'), 'utf8')).join('\n');
+  for (const k of ['lomda_moedA_partA_result', 'lomda_moedA_partB_result', 'lomda_moedB_partA_step1_result',
+                   'lomda_moedB_partA_step2_result', 'lomda_moedB_partB_result']) {
+    ok('shape', 'RESULT_KEYS entry ' + k + ' has a writer in some component', scripts.indexOf("'" + k + "'") !== -1);
+  }
+}
+
 (async () => {
   checkMetadata();
   checkPlatformRouting();
+  checkStateShapeSource();
+  await checkPerComponentState();
   checkVersionQueries();
   checkAssetContract();
   checkSlugCase();
