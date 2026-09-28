@@ -126,14 +126,14 @@ const TBL_DD_IDS = [
 const TBL_INPUT_IDS = ['tblA-input-2', 'tblB-input-1'];
 
 const TBL_DD_CORRECT = {
-  'tblA-dd-1': 'ברוטו',    /* שקית חטיפים מלאה — מושג מסה */
-  'tblA-dd-2': 'קילוגרם',  /* טרולי מלא לטיסה — יחידת מסה */
-  'tblA-dd-3': 'נטו',      /* הבגדים שבתוך הטרולי — מושג מסה */
-  'tblB-dd-1': 'ברוטו',    /* מכולה ימית מלאה בברווזי פלסטיק — מושג מסה */
-  'tblB-dd-2': 'טון',      /* מכולה ימית ריקה — יחידת מסה */
-  'tblB-dd-3': 'ברוטו',    /* בקבוק שתיה מלא — מושג מסה */
-  'tblB-dd-4': 'גרם',      /* המשקה בלבד — יחידת מסה */
-  'tblB-dd-5': 'טרה'       /* כלוב פלדה לנשיאת נמר — מושג מסה */
+  'tblA-dd-1': 'كتلة إجمالية',    /* שקית חטיפים מלאה — מושג מסה */
+  'tblA-dd-2': 'كيلوغرام',  /* טרולי מלא לטיסה — יחידת מסה */
+  'tblA-dd-3': 'كتلة صافية',      /* הבגדים שבתוך הטרולי — מושג מסה */
+  'tblB-dd-1': 'كتلة إجمالية',    /* מכולה ימית מלאה בברווזי פלסטיק — מושג מסה */
+  'tblB-dd-2': 'طن',      /* מכולה ימית ריקה — יחידת מסה */
+  'tblB-dd-3': 'كتلة إجمالية',    /* בקבוק שתיה מלא — מושג מסה */
+  'tblB-dd-4': 'غرام',      /* המשקה בלבד — יחידת מסה */
+  'tblB-dd-5': 'كتلة فارغة'       /* כלוב פלדה לנשיאת נמר — מושג מסה */
 };
 const TBL_INPUT_CORRECT = {
   'tblA-input-2': '2',   /* מזוודת הטרולי הריקה — מסה */
@@ -149,20 +149,20 @@ let tblPhase = 'before';
 
 const TEXTS_TBL = {
   correct: {
-    title: 'כל הכבוד!',
-    body: 'הצלחתם לשלב בין כל חלקי היחידה:\nסוגי המסה: ברוטו, נטו וטרה\nיחידות המסה: מ"ג, גרם, ק"ג וטון\nחישובי מסה: ברוטו = נטו + טרה'
+    title: 'كلّ الاحترام!',
+    body: 'نجحتم في الدمج بين جميع أقسام الوحدة:\nأنواع الكتلة: الإجمالية، الصافية والفارغة\nوحدات الكتلة: ملغم، غرام، كغم وطن\nحسابات الكتلة: الإجمالية = الصافية + الفارغة'
   },
   wrong1: {
-    title: 'התשובה לא נכונה.',
-    body: 'לא נורא, גם מטעויות לומדים.\nננסה שוב?'
+    title: 'الإجابة غير صحيحة.',
+    body: 'لا بأس، نتعلّم من الأخطاء أيضًا.\nهل نحاول مرة أخرى؟'
   },
   wrongPending: {
-    title: 'התשובה אינה נכונה.',
-    body: 'רוצים לראות את הפתרון הנכון?'
+    title: 'الإجابة غير صحيحة.',
+    body: 'ترغبون بعرض الحل الصحيح؟'
   },
   wrongFinal: {
-    title: 'התשובה אינה נכונה.',
-    body: 'הצלחתם לשלב בין כל חלקי היחידה:\nסוגי המסה: ברוטו, נטו וטרה\nיחידות המסה: מ"ג, גרם, ק"ג וטון\nחישובי מסה: ברוטו = נטו + טרה'
+    title: 'الإجابة غير صحيحة.',
+    body: 'نجحتم في الدمج بين جميع أقسام الوحدة:\nأنواع الكتلة: الإجمالية، الصافية والفارغة\nوحدات الكتلة: ملغم، غرام، كغم وطن\nحسابات الكتلة: الإجمالية = الصافية + الفارغة'
   }
 };
 
@@ -317,13 +317,13 @@ function tblReveal() {
   if (tblShowingCorrect) {
     tblShowMyAnswer();
     tblShowingCorrect = false;
-    if (revealBtn) revealBtn.textContent = 'התשובה הנכונה';
+    if (revealBtn) revealBtn.textContent = 'الإجابة الصحيحة';
   } else {
     tblLockAll(true);
     tblMarkAll();
     tblShowFeedback('wrongFinal', false);
     tblShowingCorrect = true;
-    if (revealBtn) revealBtn.textContent = 'התשובה שלי';
+    if (revealBtn) revealBtn.textContent = 'إجابتي';
   }
 }
 
@@ -345,7 +345,7 @@ function tblCheck() {
     tblDone = true; tblPhase = 'correct';
     tblLockAll(false); tblMarkAll();
     tblShowFeedback('correct', true);
-    tblSetBtnCheck('המשך', true, 'continue');
+    tblSetBtnCheck('متابعة', true, 'continue');
   } else if (tblAttempts < 2) {
     tblPhase = 'wrong1';
     tblMarkAll();
@@ -368,8 +368,8 @@ function tblCheck() {
     tblShowingCorrect = false;
     tblShowFeedback('wrongPending', false);
     const revealBtn = document.getElementById('tbl-reveal-btn');
-    if (revealBtn) { revealBtn.hidden = false; revealBtn.textContent = 'התשובה הנכונה'; }
-    tblSetBtnCheck('המשך', true, 'continue');
+    if (revealBtn) { revealBtn.hidden = false; revealBtn.textContent = 'الإجابة الصحيحة'; }
+    tblSetBtnCheck('متابعة', true, 'continue');
   }
 
   /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
@@ -444,13 +444,13 @@ function resetScreenState1() {
   });
 
   tblHideFeedback();
-  tblSetBtnCheck('צדקתי?', false, 'check');
+  tblSetBtnCheck('هل إجابتي صحيحة؟', false, 'check');
   const hb = document.getElementById('tbl-hint');
   if (hb) hb.hidden = true;
   document.getElementById('tbl-hint-overlay').hidden = true;
   document.getElementById('tbl-row-hint-overlay').hidden = true;
   const revealBtn = document.getElementById('tbl-reveal-btn');
-  if (revealBtn) { revealBtn.hidden = true; revealBtn.textContent = 'התשובה הנכונה'; }
+  if (revealBtn) { revealBtn.hidden = true; revealBtn.textContent = 'الإجابة الصحيحة'; }
 }
 
 /* ─── Dev mode: postMessage bridge ─────────────────────── */
@@ -756,10 +756,10 @@ function tblRestoreUI() {
       tblShowFeedback(tblShowingCorrect ? 'wrongFinal' : 'wrongPending', false);
       if (revealBtn) {
         revealBtn.hidden = false;
-        revealBtn.textContent = tblShowingCorrect ? 'התשובה שלי' : 'התשובה הנכונה';
+        revealBtn.textContent = tblShowingCorrect ? 'إجابتي' : 'الإجابة الصحيحة';
       }
     }
-    tblSetBtnCheck('המשך', true, 'continue');
+    tblSetBtnCheck('متابعة', true, 'continue');
     return;
   }
 

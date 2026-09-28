@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>סימולציית מסת מטוס</title>
+  <title>محاكاة كتلة الطائرة</title>
   <link rel="stylesheet" href="style.css?v=1" />
 </head>
 <body>
@@ -22,20 +22,20 @@
       <img class="scene-bg" src="assets/images/original-plane-empty-cropped.png" alt="" />
 
       <!-- Airplane: changes with state, absolutely positioned over background -->
-      <img class="plane-image" src="assets/images/plane-empty.png" alt="מטוס" />
+      <img class="plane-image" src="assets/images/plane-empty.png" alt="طائرة" />
 
       <!-- Active-item icons: appear on the plane once an item is loaded;
            clicking one removes that item (animates back to its card,
            reduces the weight) — an alternative to re-dragging the card. -->
       <div class="active-icons-row">
         <button type="button" class="active-icon" data-item="fuel" hidden onclick="onActiveIconClick('fuel')">
-          <img src="assets/images/fuel-card-cropped.png" alt="הסרת מיכל דלק" />
+          <img src="assets/images/fuel-card-cropped.png" alt="إزالة خزان الوقود" />
         </button>
         <button type="button" class="active-icon" data-item="passengers" hidden onclick="onActiveIconClick('passengers')">
-          <img src="assets/images/passengers-card-cropped.png" alt="הסרת נוסעים" />
+          <img src="assets/images/passengers-card-cropped.png" alt="إنزال الركّاب" />
         </button>
         <button type="button" class="active-icon" data-item="luggage" hidden onclick="onActiveIconClick('luggage')">
-          <img src="assets/images/luggage-card-cropped.png" alt="הסרת כבודה" />
+          <img src="assets/images/luggage-card-cropped.png" alt="إزالة الأمتعة" />
         </button>
       </div>
 
@@ -43,35 +43,35 @@
       <div class="cards-section">
         <div class="drag-header">
           <span>
-          גררו את הפריטים למטוס
+          اسحبوا العناصر إلى الطائرة
           </span>
         </div>
         <div class="cards-area">
           <div class="card" data-item="fuel">
-            <img src="assets/images/fuel-card-cropped.png" alt="מיכל דלק" />
-            <span>מיכל דלק</span>
+            <img src="assets/images/fuel-card-cropped.png" alt="خزّان الوقود" />
+            <span>خزّان الوقود</span>
           </div>
           <div class="card" data-item="passengers">
-            <img src="assets/images/passengers-card-cropped.png" alt="נוסעים" />
-            <span>נוסעים</span>
+            <img src="assets/images/passengers-card-cropped.png" alt="الركّاب" />
+            <span>الركّاب</span>
           </div>
           <div class="card" data-item="luggage">
-            <img src="assets/images/luggage-card-cropped.png" alt="כבודה" />
-            <span>כבודה</span>
+            <img src="assets/images/luggage-card-cropped.png" alt="الأمتعة" />
+            <span>الأمتعة</span>
           </div>
         </div>
       </div>
 
       <!-- Weight display: overlaid on the digital scale LCD area -->
       <div class="weight-display">
-        <span class="weight-label">מסה כוללת</span>
-        <span dir="rtl" class="weight-value" id="weight-value">41 טון</span>
+        <span class="weight-label">الكتلة الكلّيّة</span>
+        <span dir="rtl" class="weight-value" id="weight-value">41 طنًا</span>
       </div>
 
       <!-- Reset button: inside the scene, matches Figma position -->
       <div class="reset-area">
         <button class="reset-btn" id="reset-btn">
-          <img src="assets/images/restart-button.png" alt="איפוס" />
+          <img src="assets/images/restart-button.png" alt="إعادة ضبط" />
         </button>
       </div>
 

@@ -400,7 +400,7 @@ function makeDragQuestion(cfg) {
       passed = true;
       saveResult(true);
       showFeedback('correct');
-      if (btn) { btn.textContent = 'המשך'; btn.disabled = false; btn.onclick = function () { cfg.onContinue(btn); }; }
+      if (btn) { btn.textContent = 'متابعة'; btn.disabled = false; btn.onclick = function () { cfg.onContinue(btn); }; }
     } else if (attempts >= 2) {
       done = true;
       passed = false;
@@ -411,19 +411,19 @@ function makeDragQuestion(cfg) {
         showingCorrect = false;
         showFeedback('wrongFinalPending');
         const revealBtn = document.getElementById(cfg.revealBtnId);
-        if (revealBtn) { revealBtn.hidden = false; revealBtn.textContent = 'התשובה הנכונה'; }
+        if (revealBtn) { revealBtn.hidden = false; revealBtn.textContent = 'الإجابة الصحيحة'; }
       } else {
         revealCorrect();
         showFeedback('wrongFinal');
       }
-      if (btn) { btn.textContent = 'המשך'; btn.disabled = false; btn.onclick = function () { cfg.onContinue(btn); }; }
+      if (btn) { btn.textContent = 'متابعة'; btn.disabled = false; btn.onclick = function () { cfg.onContinue(btn); }; }
     } else {
       showFeedback('wrong1');
       checked = false;
       render();
       const hintBtn = document.getElementById(cfg.hintBtnId);
       if (hintBtn) hintBtn.hidden = false;
-      if (btn) { btn.innerHTML = '<span dir="ltr">?צדקתי</span>'; btn.disabled = true; btn.onclick = check; }
+      if (btn) { btn.innerHTML = '<span>هل إجابتي صحيحة؟</span>'; btn.disabled = true; btn.onclick = check; }
     }
 
     /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
@@ -452,12 +452,12 @@ function makeDragQuestion(cfg) {
     if (showingCorrect) {
       showMyAnswer();
       showingCorrect = false;
-      if (revealBtn) revealBtn.textContent = 'התשובה הנכונה';
+      if (revealBtn) revealBtn.textContent = 'الإجابة الصحيحة';
     } else {
       revealCorrect();
       showFeedback('wrongFinal');
       showingCorrect = true;
-      if (revealBtn) revealBtn.textContent = 'התשובה שלי';
+      if (revealBtn) revealBtn.textContent = 'إجابتي';
     }
   }
 
@@ -490,10 +490,10 @@ function makeDragQuestion(cfg) {
     document.getElementById(cfg.hintOverlayId).hidden = true;
     if (cfg.revealBtnId) {
       const revealBtn = document.getElementById(cfg.revealBtnId);
-      if (revealBtn) { revealBtn.hidden = true; revealBtn.textContent = 'התשובה הנכונה'; }
+      if (revealBtn) { revealBtn.hidden = true; revealBtn.textContent = 'الإجابة الصحيحة'; }
     }
     const btn = document.getElementById(cfg.checkBtnId);
-    if (btn) { btn.innerHTML = '<span dir="ltr">?צדקתי</span>'; btn.disabled = true; btn.onclick = check; }
+    if (btn) { btn.innerHTML = '<span>هل إجابتي صحيحة؟</span>'; btn.disabled = true; btn.onclick = check; }
     const panel = document.getElementById(cfg.panelId);
     if (panel) panel.scrollTop = 0;
     render();
@@ -501,7 +501,7 @@ function makeDragQuestion(cfg) {
 
   function restoreFinal() {
     const btn = document.getElementById(cfg.checkBtnId);
-    if (btn) { btn.textContent = 'המשך'; btn.disabled = false; btn.onclick = function () { cfg.onContinue(btn); }; }
+    if (btn) { btn.textContent = 'متابعة'; btn.disabled = false; btn.onclick = function () { cfg.onContinue(btn); }; }
     const hintBtn = document.getElementById(cfg.hintBtnId);
     if (hintBtn) hintBtn.hidden = true;
     render();
@@ -607,13 +607,13 @@ function makeDragQuestion(cfg) {
         showFeedback(showingCorrect ? 'wrongFinal' : 'wrongFinalPending');
         if (revealBtn) {
           revealBtn.hidden = false;
-          revealBtn.textContent = showingCorrect ? 'התשובה שלי' : 'התשובה הנכונה';
+          revealBtn.textContent = showingCorrect ? 'إجابتي' : 'الإجابة الصحيحة';
         }
       } else {
         showFeedback('wrongFinal');
       }
       if (hintBtn) hintBtn.hidden = true;
-      if (btn) { btn.textContent = 'המשך'; btn.disabled = false; btn.onclick = function () { cfg.onContinue(btn); }; }
+      if (btn) { btn.textContent = 'متابعة'; btn.disabled = false; btn.onclick = function () { cfg.onContinue(btn); }; }
       render();
       return;
     }
@@ -621,7 +621,7 @@ function makeDragQuestion(cfg) {
     /* ניסיון שגוי אחד, עוד לא נפתר — נשאר פתוח לניסיון נוסף. */
     showFeedback('wrong1');
     if (hintBtn) hintBtn.hidden = false;
-    if (btn) { btn.innerHTML = '<span dir="ltr">?צדקתי</span>'; btn.onclick = check; }
+    if (btn) { btn.innerHTML = '<span>هل إجابتي صحيحة؟</span>'; btn.onclick = check; }
     render();
   }
 
@@ -652,10 +652,10 @@ function makeDragQuestion(cfg) {
 }
 
 const TEXTS_DQ_A = {
-  correct: { title: 'כל הכבוד!', body: 'השלמת את הטקסט בהצלחה' },
-  wrong1: { title: 'התשובה אינה נכונה.', body: 'שננסה שוב?' },
-  wrongFinalPending: { title: 'התשובה אינה נכונה.', body: 'רוצים לראות את הפתרון הנכון?' },
-  wrongFinal: { title: 'התשובה אינה נכונה.', body: 'התשובות הנכונות מופיעות כעת.' }
+  correct: { title: 'كلّ الاحترام!', body: 'أكملت النصّ بنجاح' },
+  wrong1: { title: 'الإجابة غير صحيحة.', body: 'هل نحاول مرة أخرى؟' },
+  wrongFinalPending: { title: 'الإجابة غير صحيحة.', body: 'ترغبون بعرض الحل الصحيح؟' },
+  wrongFinal: { title: 'الإجابة غير صحيحة.', body: 'الإجابات الصحيحة تظهر الآن.' }
 };
 
 const dqA = makeDragQuestion({
@@ -674,10 +674,10 @@ const dqA = makeDragQuestion({
   labels: {
     'dqA-drag-41': '41',
     'dqA-drag-38': '38',
-    'dqA-drag-neto': 'נטו',
-    'dqA-drag-tara': 'טרה',
+    'dqA-drag-neto': 'الكتلة الصافية',
+    'dqA-drag-tara': 'الكتلة الفارغة',
     /* מסיחים מטעים — לא תשובות נכונות לאף יעד, רק כדי שהלומד יחשוב */
-    'dqA-drag-bruto': 'ברוטו',
+    'dqA-drag-bruto': 'الكتلة الإجمالية',
     'dqA-drag-53': '53',
     'dqA-drag-78': '78'
   },
@@ -693,10 +693,10 @@ const dqA = makeDragQuestion({
 function resetScreenState2() { dqA.reset(); }
 
 const TEXTS_DQ_B = {
-  correct: { title: 'כל הכבוד!', body: 'המטוס קיבל אישור המראה! הצלחתם לזהות ולחשב נכון את מושגי המסה ואת יחידות המידה המתאימות.' },
-  wrong1: { title: 'התשובה אינה נכונה.', body: 'שננסה שוב?' },
-  wrongFinalPending: { title: 'התשובה אינה נכונה.', body: 'רוצים לראות את הפתרון הנכון?' },
-  wrongFinal: { title: 'התשובה אינה נכונה.', body: 'התשובות הנכונות מופיעות כעת.' }
+  correct: { title: 'كلّ الاحترام!', body: 'حصلت الطائرة على موافقة للإقلاع! نجحتم في معرف وحساب مصطلحات الكتلة ووحدات القياس الملائمة بشكل صحيح.' },
+  wrong1: { title: 'الإجابة غير صحيحة.', body: 'هل نحاول مرة أخرى؟' },
+  wrongFinalPending: { title: 'الإجابة غير صحيحة.', body: 'ترغبون بعرض الحل الصحيح؟' },
+  wrongFinal: { title: 'الإجابة غير صحيحة.', body: 'الإجابات الصحيحة تظهر الآن.' }
 };
 
 const dqB = makeDragQuestion({
@@ -744,11 +744,11 @@ const dqB = makeDragQuestion({
   },
   labels: {
     'dqB-drag-79': '79',
-    'dqB-drag-bruto': 'ברוטו',
-    'dqB-drag-ton': 'טון',
-    'dqB-drag-tara': 'טרה',
+    'dqB-drag-bruto': 'الإجمالية',
+    'dqB-drag-ton': 'أطنان',
+    'dqB-drag-tara': 'الفارغة',
     /* מסיחים מטעים — לא תשובות נכונות לאף יעד, רק כדי שהלומד יחשוב */
-    'dqB-drag-neto': 'נטו',
+    'dqB-drag-neto': 'الصافية',
     'dqB-drag-53': '53',
     'dqB-drag-41': '41'
   },

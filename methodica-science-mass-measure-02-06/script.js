@@ -414,7 +414,7 @@ function makeDragQuestion(cfg) {
       passed = true;
       saveResult(true);
       showFeedback('correct');
-      if (btn) { btn.textContent = 'המשך'; btn.disabled = false; btn.onclick = cfg.onContinue; }
+      if (btn) { btn.textContent = 'متابعة'; btn.disabled = false; btn.onclick = cfg.onContinue; }
     } else if (attempts >= 2) {
       done = true;
       passed = false;
@@ -425,19 +425,19 @@ function makeDragQuestion(cfg) {
         showingCorrect = false;
         showFeedback('wrongFinalPending');
         const revealBtn = document.getElementById(cfg.revealBtnId);
-        if (revealBtn) { revealBtn.hidden = false; revealBtn.textContent = 'התשובה הנכונה'; }
+        if (revealBtn) { revealBtn.hidden = false; revealBtn.textContent = 'الإجابة الصحيحة'; }
       } else {
         revealCorrect();
         showFeedback('wrongFinal');
       }
-      if (btn) { btn.textContent = 'המשך'; btn.disabled = false; btn.onclick = cfg.onContinue; }
+      if (btn) { btn.textContent = 'متابعة'; btn.disabled = false; btn.onclick = cfg.onContinue; }
     } else {
       showFeedback('wrong1');
       checked = false;
       render();
       const hintBtn = document.getElementById(cfg.hintBtnId);
       if (hintBtn) hintBtn.hidden = false;
-      if (btn) { btn.innerHTML = '<span dir="ltr">?צדקתי</span>'; btn.disabled = true; btn.onclick = check; }
+      if (btn) { btn.innerHTML = '<span>هل إجابتي صحيحة؟</span>'; btn.disabled = true; btn.onclick = check; }
     }
 
     /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
@@ -466,12 +466,12 @@ function makeDragQuestion(cfg) {
     if (showingCorrect) {
       showMyAnswer();
       showingCorrect = false;
-      if (revealBtn) revealBtn.textContent = 'התשובה הנכונה';
+      if (revealBtn) revealBtn.textContent = 'الإجابة الصحيحة';
     } else {
       revealCorrect();
       showFeedback('wrongFinal');
       showingCorrect = true;
-      if (revealBtn) revealBtn.textContent = 'התשובה שלי';
+      if (revealBtn) revealBtn.textContent = 'إجابتي';
     }
   }
 
@@ -504,10 +504,10 @@ function makeDragQuestion(cfg) {
     document.getElementById(cfg.hintOverlayId).hidden = true;
     if (cfg.revealBtnId) {
       const revealBtn = document.getElementById(cfg.revealBtnId);
-      if (revealBtn) { revealBtn.hidden = true; revealBtn.textContent = 'התשובה הנכונה'; }
+      if (revealBtn) { revealBtn.hidden = true; revealBtn.textContent = 'الإجابة الصحيحة'; }
     }
     const btn = document.getElementById(cfg.checkBtnId);
-    if (btn) { btn.innerHTML = '<span dir="ltr">?צדקתי</span>'; btn.disabled = true; btn.onclick = check; }
+    if (btn) { btn.innerHTML = '<span>هل إجابتي صحيحة؟</span>'; btn.disabled = true; btn.onclick = check; }
     const panel = document.getElementById(cfg.panelId);
     if (panel) panel.scrollTop = 0;
     render();
@@ -515,7 +515,7 @@ function makeDragQuestion(cfg) {
 
   function restoreFinal() {
     const btn = document.getElementById(cfg.checkBtnId);
-    if (btn) { btn.textContent = 'המשך'; btn.disabled = false; btn.onclick = cfg.onContinue; }
+    if (btn) { btn.textContent = 'متابعة'; btn.disabled = false; btn.onclick = cfg.onContinue; }
     const hintBtn = document.getElementById(cfg.hintBtnId);
     if (hintBtn) hintBtn.hidden = true;
     render();
@@ -622,13 +622,13 @@ function makeDragQuestion(cfg) {
         showFeedback(showingCorrect ? 'wrongFinal' : 'wrongFinalPending');
         if (revealBtn) {
           revealBtn.hidden = false;
-          revealBtn.textContent = showingCorrect ? 'התשובה שלי' : 'התשובה הנכונה';
+          revealBtn.textContent = showingCorrect ? 'إجابتي' : 'الإجابة الصحيحة';
         }
       } else {
         showFeedback('wrongFinal');
       }
       if (hintBtn) hintBtn.hidden = true;
-      if (btn) { btn.textContent = 'המשך'; btn.disabled = false; btn.onclick = cfg.onContinue; }
+      if (btn) { btn.textContent = 'متابعة'; btn.disabled = false; btn.onclick = cfg.onContinue; }
       render();
       return;
     }
@@ -636,7 +636,7 @@ function makeDragQuestion(cfg) {
     /* ניסיון שגוי אחד, עוד לא נפתר — נשאר פתוח לניסיון נוסף. */
     showFeedback('wrong1');
     if (hintBtn) hintBtn.hidden = false;
-    if (btn) { btn.innerHTML = '<span dir="ltr">?צדקתי</span>'; btn.onclick = check; }
+    if (btn) { btn.innerHTML = '<span>هل إجابتي صحيحة؟</span>'; btn.onclick = check; }
     render();
   }
 
@@ -667,10 +667,10 @@ function makeDragQuestion(cfg) {
 }
 
 const TEXTS_TBL9 = {
-  correct: { title: 'מצוין!', body: 'אתם מבינים בדיוק מהו כל אחד מהמושגים: ברוטו, טרה ונטו.' },
-  wrong1: { title: 'התשובה אינה נכונה.', body: 'שננסה שוב?' },
-  wrongFinalPending: { title: 'התשובה לא נכונה.', body: 'רוצים לראות את הפתרון הנכון?' },
-  wrongFinal: { title: 'התשובה לא נכונה.', body: 'נסו לחזור ולהיזכר מהו כל אחד מהמושגים: ברוטו, טרה ונטו.' }
+  correct: { title: 'ممتاز!', body: 'أنتم تفهمون بالضبط كل واحد من المصطلحات: الكتلة الإجمالية، الصافية والفارغة.' },
+  wrong1: { title: 'الإجابة غير صحيحة.', body: 'هل نحاول مرة أخرى؟' },
+  wrongFinalPending: { title: 'الإجابة غير صحيحة.', body: 'ترغبون بعرض الحل الصحيح؟' },
+  wrongFinal: { title: 'الإجابة غير صحيحة.', body: 'حاوِلوا أن تتذكّروا كل واحد من المصطلحات: الكتلة الإجمالية، الصافية والفارغة.' }
 };
 
 const tbl9Q = makeDragQuestion({
@@ -687,10 +687,10 @@ const tbl9Q = makeDragQuestion({
   xapiQuestions: ['q1'],
   onContinue: function () { goTo(3); },
   labels: {
-    'tbl9-drag-bruto': 'ברוטו',
-    'tbl9-drag-neto': 'נטו',
-    'tbl9-drag-tara': 'טרה',
-    'tbl9-drag-masa': 'מסה'
+    'tbl9-drag-bruto': 'الإجمالية',
+    'tbl9-drag-neto': 'الصافية',
+    'tbl9-drag-tara': 'الفارغة',
+    'tbl9-drag-masa': 'الكتلة'
   },
   correctMap: {
     'tbl9-target-bruto': 'tbl9-drag-bruto',
@@ -708,10 +708,10 @@ function resetScreenState2() {
    ========================================================= */
 
 const TEXTS_PARA10 = {
-  correct: { title: 'כל הכבוד!', body: 'השלמת את הטקסט בהצלחה' },
-  wrong1: { title: 'התשובה אינה נכונה.', body: 'שננסה שוב?' },
-  wrongFinalPending: { title: 'התשובה לא נכונה.', body: 'רוצים לראות את הפתרון הנכון?' },
-  wrongFinal: { title: 'התשובה לא נכונה.', body: 'התשובות הנכונות מוצגות כעת.' }
+  correct: { title: 'كلّ الاحترام!', body: 'أكملت النصّ بنجاح' },
+  wrong1: { title: 'الإجابة غير صحيحة.', body: 'هل نحاول مرة أخرى؟' },
+  wrongFinalPending: { title: 'الإجابة غير صحيحة.', body: 'ترغبون بعرض الحل الصحيح؟' },
+  wrongFinal: { title: 'الإجابة غير صحيحة.', body: 'الإجابات الصحيحة تظهر الآن.' }
 };
 
 const para10Q = makeDragQuestion({
@@ -728,18 +728,18 @@ const para10Q = makeDragQuestion({
   xapiQuestions: ['q2'],
   onContinue: function () { goTo(4); },
   labels: {
-    'para10-drag-bruto': 'ברוטו',
-    'para10-drag-neto': 'נטו',
-    'para10-drag-tara-1': 'טרה',
-    'para10-drag-tara-2': 'טרה',
-    'para10-drag-masa': 'מסה',
-    'para10-drag-shinua': 'שינוע',
-    'para10-drag-psholet': 'פסולת',
-    'para10-drag-nmuka': 'נמוכה',
-    'para10-drag-ton': 'טון',
-    'para10-drag-kilogram': 'קילוגרם',
-    'para10-drag-ariza': 'אריזה',
-    'para10-drag-tochn': 'תוכן'
+    'para10-drag-bruto': 'الإجمالية',
+    'para10-drag-neto': 'الصافية',
+    'para10-drag-tara-1': 'الفارغة',
+    'para10-drag-tara-2': 'الفارغة',
+    'para10-drag-masa': 'كتلة',
+    'para10-drag-shinua': 'نقل',
+    'para10-drag-psholet': 'النفايات',
+    'para10-drag-nmuka': 'أصغر',
+    'para10-drag-ton': 'طن',
+    'para10-drag-kilogram': 'كيلوغرام',
+    'para10-drag-ariza': 'عبوة',
+    'para10-drag-tochn': 'محتوى'
   },
   correctMap: {
     'para10-target-1': 'para10-drag-neto',
@@ -790,9 +790,9 @@ function s10bContinue() { goTo(6); }
 
 const S12_CORRECT_ID = 's12-opt-c';
 const TEXTS_S12 = {
-  correct: { title: 'נכון מאוד.', body: 'במקרה זה שני הטיעונים נכונים. מצד אחד יש יתרון לשימוש בפלסטיק (פחות מסה לשינוע ופחות פליטות פחמן דו-חמצני), ומצד שני, קיים גם חיסרון שהוא מייצר יותר פסולת בסביבה.' },
-  wrong1: { title: 'התשובה אינה נכונה.', body: 'ננסה שוב?' },
-  wrongFinal: { title: 'התשובה אינה נכונה.', body: 'במקרה זה שני הטיעונים נכונים. מצד אחד יש יתרון לשימוש בפלסטיק (פחות מסה לשינוע ופחות פליטות פחמן דו-חמצני), ומצד שני, קיים גם חיסרון שהוא מייצר יותר פסולת בסביבה.' }
+  correct: { title: 'صحيح جدًا.', body: 'في هذه الحالة، كلا الادّعاءين صحيحان. من جهة، هناك أفضلية لاستخدام البلاستيك (كتلة أقل للنقل، وانبعاثات ثاني أكسيد الكربون أقل)، ومن جهة أخرى، هناك أيضًا جانب سلبي وهو أنه يُنتج نفايات أكثر في البيئة.' },
+  wrong1: { title: 'الإجابة غير صحيحة.', body: 'هل نحاول مرة أخرى؟' },
+  wrongFinal: { title: 'الإجابة غير صحيحة.', body: 'في هذه الحالة، كلا الادّعاءين صحيحان. من جهة، هناك أفضلية لاستخدام البلاستيك (كتلة أقل للنقل، وانبعاثات ثاني أكسيد الكربون أقل)، ومن جهة أخرى، هناك أيضًا جانب سلبي وهو أنه يُنتج نفايات أكثر في البيئة.' }
 };
 
 let s12Selected = null;
@@ -842,7 +842,7 @@ function s12Check() {
       if (!o.classList.contains('correct')) o.classList.add('locked');
     });
     s12ShowFeedback('correct', true);
-    if (btn) { btn.textContent = 'המשך'; btn.disabled = false; btn.onclick = s12Continue; }
+    if (btn) { btn.textContent = 'متابعة'; btn.disabled = false; btn.onclick = s12Continue; }
   } else if (s12Attempts >= 2) {
     s12Done = true;
     if (typeof setUnitResult === 'function') setUnitResult('lomda_moedB_partB_result', 'fail');
@@ -855,7 +855,7 @@ function s12Check() {
       if (!o.classList.contains('correct') && !o.classList.contains('wrong')) o.classList.add('locked');
     });
     s12ShowFeedback('wrongFinal', false);
-    if (btn) { btn.textContent = 'המשך'; btn.disabled = false; btn.onclick = s12Continue; }
+    if (btn) { btn.textContent = 'متابعة'; btn.disabled = false; btn.onclick = s12Continue; }
   } else {
     const wrongEl = document.getElementById(s12Selected);
     if (wrongEl) wrongEl.classList.add('wrong');
@@ -933,7 +933,7 @@ function resetScreenState6() {
   });
   document.getElementById('s12-feedbox').classList.remove('visible');
   const btn = document.getElementById('s12-check');
-  if (btn) { btn.innerHTML = '<span dir="ltr">?צדקתי</span>'; btn.disabled = true; btn.onclick = s12Check; }
+  if (btn) { btn.innerHTML = '<span>هل إجابتي صحيحة؟</span>'; btn.disabled = true; btn.onclick = s12Check; }
   document.getElementById('s12-hint-overlay').hidden = true;
 }
 
@@ -1290,7 +1290,7 @@ function s12RestoreUI() {
       });
       s12ShowFeedback('wrongFinal', false);
     }
-    if (btn) { btn.textContent = 'המשך'; btn.disabled = false; btn.onclick = s12Continue; }
+    if (btn) { btn.textContent = 'متابعة'; btn.disabled = false; btn.onclick = s12Continue; }
     return;
   }
 

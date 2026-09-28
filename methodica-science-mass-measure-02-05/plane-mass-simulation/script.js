@@ -36,7 +36,7 @@ function calculateWeight() {
 
 function updateWeightDisplay() {
   const el = document.getElementById('weight-value');
-  if (el) el.textContent = calculateWeight() + ' טון';
+  if (el) el.textContent = calculateWeight() + ' طنًا';
 }
 
 function updatePlaneImage() {

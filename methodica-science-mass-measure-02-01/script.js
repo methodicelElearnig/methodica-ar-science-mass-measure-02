@@ -197,16 +197,16 @@ const SCQ = {
   maxAttempts: 2,
   feedback: {
     correct: {
-      title: 'מצוין!',
-      body: 'כדי לדעת אם בתיבה יש אוצר, לא מספיק לדעת את המסה הכוללת שלה. צריך לדעת גם מה המסה של התיבה עצמה.\nרק כך אפשר להפריד בין מסת התיבה למסת התכולה שבתוכה.\n <strong>על הרעיון הזה בדיוק נלמד ביחידה.</strong>'
+      title: 'ممتاز!',
+      body: 'لمعرفة ما إذا كان الصندوق يحتوي على كنز، لا يكفي معرفة كتلته الإجمالية. يجب أيضًا معرفة ما كتلة الـصندوق نفسها.\nبهذه الطريقة فقط يمكن الفصل بين كتلة الصندوق وكتلة المحتوى الموجود بداخله.\n<strong>سنتعلم عن هذا المبدأ بالضبط في هذه الوحدة.</strong>'
     },
     wrong1: {
-      title: 'התשובה אינה נכונה.',
-      body: 'לא נורא, גם מטעויות לומדים.\nננסה שוב?'
+      title: 'الإجابة غير صحيحة.',
+      body: 'لا بأس، نتعلّم من الأخطاء أيضًا.\nهل نحاول مرة أخرى؟'
     },
     wrong2: {
-      title: 'התשובה לא נכונה.',
-      body: 'כדי לדעת אם בתיבה יש אוצר, לא מספיק לדעת את המסה הכוללת שלה. צריך לדעת גם מה המסה של התיבה עצמה.\nרק כך אפשר להפריד בין מסת התיבה למסת התכולה שבתוכה.\n <strong>על הרעיון הזה בדיוק נלמד ביחידה.</strong>'
+      title: 'الإجابة غير صحيحة.',
+      body: 'لمعرفة ما إذا كان الصندوق يحتوي على كنز، لا يكفي معرفة كتلته الإجمالية. يجب أيضًا معرفة ما كتلة الـصندوق نفسها.\nبهذه الطريقة فقط يمكن الفصل بين كتلة الصندوق وكتلة المحتوى الموجود بداخله.\n<strong>سنتعلم عن هذا المبدأ بالضبط في هذه الوحدة.</strong>'
     }
   }
 };
@@ -238,7 +238,7 @@ function scqSelect(id) {
     document.getElementById('scq-feedbox').classList.remove('visible');
   }
   const checkBtn = document.getElementById('scq-check');
-  checkBtn.textContent = 'צדקתי?';
+  checkBtn.textContent = 'هل إجابتي صحيحة؟';
   checkBtn.disabled = false;
   checkBtn.onclick = scqCheck;
 }
@@ -275,7 +275,7 @@ function scqCheck() {
     scqDone = true;
     scqLockOptions();
     scqShowFeedback('correct', true);
-    scqSetBarDone('המשך', function () { advanceScreen(); });
+    scqSetBarDone('متابعة', function () { advanceScreen(); });
     /* resume: מחויבות התשובה. הענף הזה חוזר לפני הזנב — ראו ההערה שם. */
     try { flushResumeSave(); } catch (e) {}
     return;
@@ -290,7 +290,7 @@ function scqCheck() {
     scqPhase = 'wrong1';
     scqShowFeedback('wrong1', false);
     const checkBtn = document.getElementById('scq-check');
-    checkBtn.textContent = 'צדקתי?';
+    checkBtn.textContent = 'هل إجابتي صحيحة؟';
     checkBtn.disabled = true;
     checkBtn.onclick = scqCheck;
     document.getElementById('scq-hint').hidden = false;
@@ -300,7 +300,7 @@ function scqCheck() {
     scqDone = true;
     scqLockOptions();
     scqShowFeedback('wrong2', false);
-    scqSetBarDone('המשך', function () { advanceScreen(); });
+    scqSetBarDone('متابعة', function () { advanceScreen(); });
   }
 
   /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
@@ -361,7 +361,7 @@ function resetScreenState1() {
   });
   document.getElementById('scq-feedbox').classList.remove('visible');
   const checkBtn = document.getElementById('scq-check');
-  checkBtn.textContent = 'צדקתי?';
+  checkBtn.textContent = 'هل إجابتي صحيحة؟';
   checkBtn.disabled = true;
   checkBtn.onclick = scqCheck;
   const hintBtn = document.getElementById('scq-hint');
@@ -444,16 +444,16 @@ const SCQ4 = {
   maxAttempts: 2,
   feedback: {
     correct: {
-      title: 'מצוין!',
-      body: 'אם מחסירים את מסת המלפפונים מהמסה הכוללת, מקבלים את מסת הצנצנת: 500 גרם.\nלמסה של האריזה או המיכל בלבד, ללא התכולה, יש שם מיוחד: <b>טָרָה</b>.'
+      title: 'ممتاز!',
+      body: 'إذا طرحنا كتلة الخيار من الكتلة الإجمالية، نحصل على كتلة المرطبان: 500 غرام.\nلـكتلة الغلاف أو الوعاء فقط، بدون المحتوى، يوجد اسم خاص: <b>الكتلة الفارغة</b>.'
     },
     wrong1: {
-      title: 'התשובה אינה נכונה.',
-      body: 'לא נורא, גם מטעויות לומדים.\nננסה שוב?'
+      title: 'الإجابة غير صحيحة.',
+      body: 'لا بأس، نتعلّم من الأخطاء أيضًا.\nهل نحاول مرة أخرى؟'
     },
     wrong2: {
-      title: 'התשובה לא נכונה.',
-      body: 'אם מחסירים את מסת המלפפונים מהמסה הכוללת, מקבלים את מסת הצנצנת: 500 גרם.\nלמסה של האריזה או המיכל בלבד, ללא התכולה, יש שם מיוחד: <b>טָרָה</b>.'
+      title: 'الإجابة غير صحيحة.',
+      body: 'إذا طرحنا كتلة الخيار من الكتلة الإجمالية، نحصل على كتلة المرطبان: 500 غرام.\nلـكتلة الغلاف أو الوعاء فقط، بدون المحتوى، يوجد اسم خاص: <b>الكتلة الفارغة</b>.'
     }
   }
 };
@@ -484,7 +484,7 @@ function scq4Select(id) {
     document.getElementById('scq4-feedbox').classList.remove('visible');
   }
   const checkBtn = document.getElementById('scq4-check');
-  checkBtn.textContent = 'צדקתי?';
+  checkBtn.textContent = 'هل إجابتي صحيحة؟';
   checkBtn.disabled = false;
   checkBtn.onclick = scq4Check;
 }
@@ -532,7 +532,7 @@ function scq4Check() {
     scq4Done = true;
     scq4LockOptions();
     scq4ShowFeedback('correct', true);
-    scq4SetBarDone('המשך', function () { scq4Continue(); });
+    scq4SetBarDone('متابعة', function () { scq4Continue(); });
     /* resume: מחויבות התשובה. הענף הזה חוזר לפני הזנב — ראו ההערה שם. */
     try { flushResumeSave(); } catch (e) {}
     return;
@@ -545,7 +545,7 @@ function scq4Check() {
     scq4Phase = 'wrong1';
     scq4ShowFeedback('wrong1', false);
     const checkBtn = document.getElementById('scq4-check');
-    checkBtn.textContent = 'צדקתי?';
+    checkBtn.textContent = 'هل إجابتي صحيحة؟';
     checkBtn.disabled = true;
     checkBtn.onclick = scq4Check;
     // הרמז נחשף רק אחרי ניסיון ראשון שגוי (לפי הלומדה הקודמת)
@@ -558,7 +558,7 @@ function scq4Check() {
     scq4Done = true;
     scq4LockOptions();
     scq4ShowFeedback('wrong2', false);
-    scq4SetBarDone('המשך', function () { scq4Continue(); });
+    scq4SetBarDone('متابعة', function () { scq4Continue(); });
   }
 
   /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
@@ -619,7 +619,7 @@ function resetScreenState3() {
   });
   document.getElementById('scq4-feedbox').classList.remove('visible');
   const checkBtn = document.getElementById('scq4-check');
-  checkBtn.textContent = 'צדקתי?';
+  checkBtn.textContent = 'هل إجابتي صحيحة؟';
   checkBtn.disabled = true;
   checkBtn.onclick = scq4Check;
   const hintBtn = document.getElementById('scq4-hint');
@@ -647,20 +647,20 @@ const S5_ITEM_IDS = ['s5i1', 's5i2', 's5i3', 's5i4', 's5i5', 's5i6', 's5i7', 's5
 
 const TEXTS5 = {
   correct: {
-    title: 'מצוין!',
-    body: 'ברוטו = המסה הכוללת\nנטו = מסת התכולה בלבד\nטרה = מסת האריזה'
+    title: 'ممتاز!',
+    body: 'الإجمالية = الكتلة الكلّيّة\nالصافية = كتلة المحتوى فقط\nالفارغة = كتلة الغلاف أو العبوة'
   },
   wrong: {
-    title: 'התשובה אינה נכונה.',
-    body: 'זכרו:\nברוטו = המסה הכוללת\nנטו = מסת התכולה בלבד\nטרה = מסת האריזה\nשננסה שוב?'
+    title: 'الإجابة غير صحيحة.',
+    body: 'تذكروا:\nالإجمالية = الكتلة الكلّيّة\nالصافية = كتلة المحتوى فقط\nالفارغة = كتلة الغلاف\nهل نحاول مجددًا؟'
   },
   wrongPending: {
-    title: 'התשובה אינה נכונה.',
-    body: 'רוצים לראות את הפתרון הנכון?'
+    title: 'الإجابة غير صحيحة.',
+    body: 'ترغبون بعرض الحل الصحيح؟'
   },
   wrongFinal: {
-    title: 'התשובה אינה נכונה.',
-    body: 'זכרו:\nברוטו = המסה הכוללת\nנטו = מסת התכולה בלבד\nטרה = מסת האריזה\nהנה הסידור הנכון.'
+    title: 'الإجابة غير صحيحة.',
+    body: 'تذكروا:\nالإجمالية = الكتلة الكلّيّة\nالصافية = كتلة المحتوى فقط\nالفارغة = كتلة الغلاف أو العبوة\nفيما يلي الترتيب الصحيح.'
   }
 };
 
@@ -828,12 +828,12 @@ function s5Reveal() {
   if (s5ShowingCorrect) {
     s5ShowMyAnswer();
     s5ShowingCorrect = false;
-    if (revealBtn) revealBtn.textContent = 'התשובה הנכונה';
+    if (revealBtn) revealBtn.textContent = 'الإجابة الصحيحة';
   } else {
     s5RevealCorrect();
     s5ShowFeedback('wrongFinal', false);
     s5ShowingCorrect = true;
-    if (revealBtn) revealBtn.textContent = 'התשובה שלי';
+    if (revealBtn) revealBtn.textContent = 'إجابتي';
   }
 }
 
@@ -864,7 +864,7 @@ function s5Check() {
   if (allCorrect) {
     s5Done = true;
     s5ShowFeedback('correct', true);
-    checkBtn.textContent = 'המשך';
+    checkBtn.textContent = 'متابعة';
     checkBtn.disabled = false;
     checkBtn.onclick = s5Continue;
   } else if (s5Attempts < 2) {
@@ -882,8 +882,8 @@ function s5Check() {
     s5ShowingCorrect = false;
     s5ShowFeedback('wrongPending', false);
     const revealBtn = document.getElementById('s5-reveal-btn');
-    if (revealBtn) { revealBtn.hidden = false; revealBtn.textContent = 'התשובה הנכונה'; }
-    checkBtn.textContent = 'המשך';
+    if (revealBtn) { revealBtn.hidden = false; revealBtn.textContent = 'الإجابة الصحيحة'; }
+    checkBtn.textContent = 'متابعة';
     checkBtn.disabled = false;
     checkBtn.onclick = s5Continue;
   }
@@ -902,7 +902,7 @@ function resetScreenState4() {
   const checkBtn = document.getElementById('s5-check');
   if (s5Done) {
     // resume-state: התשובה כבר נענתה נכון — משאירים הצבה/משוב כפי שהיו
-    checkBtn.textContent = 'המשך';
+    checkBtn.textContent = 'متابعة';
     checkBtn.disabled = false;
     checkBtn.onclick = s5Continue;
     return;
@@ -929,11 +929,11 @@ function resetScreenState4() {
   s5ClearZoneStates();
   document.getElementById('s5-feedbox').classList.remove('visible');
 
-  checkBtn.textContent = 'צדקתי?';
+  checkBtn.textContent = 'هل إجابتي صحيحة؟';
   checkBtn.disabled = true;
   checkBtn.onclick = s5Check;
   const revealBtn = document.getElementById('s5-reveal-btn');
-  if (revealBtn) { revealBtn.hidden = true; revealBtn.textContent = 'התשובה הנכונה'; }
+  if (revealBtn) { revealBtn.hidden = true; revealBtn.textContent = 'الإجابة الصحيحة'; }
 }
 
 /* =========================================================
@@ -1010,16 +1010,16 @@ const SCQ8 = {
   maxAttempts: 2,
   feedback: {
     correct: {
-      title: 'מצוין!',
-      body: 'המספר 150 לבדו לא מספיק.\nכדי להבין את המסה צריך לדעת גם מהי <b>יחידת המידה</b>.'
+      title: 'ممتاز!',
+      body: 'العدد 150 لوحده لا يكفي.\nلكي نفهم الكتلة يجب علينا معرفة <b>وحدة القياس</b> أيضًا.'
     },
     wrong1: {
-      title: 'התשובה אינה נכונה.',
-      body: 'לא נורא, גם מטעויות לומדים.\nננסה שוב?'
+      title: 'الإجابة غير صحيحة.',
+      body: 'لا بأس، نتعلّم من الأخطاء أيضًا.\nهل نحاول مرة أخرى؟'
     },
     wrong2: {
-      title: 'התשובה לא נכונה.',
-      body: 'המספר 150 לבדו לא מספיק.\nכדי להבין את המסה צריך לדעת גם את יחידת המידה.'
+      title: 'الإجابة غير صحيحة.',
+      body: 'العدد 150 لوحده لا يكفي.\nلكي نفهم الكتلة يجب علينا معرفة وحدة القياس أيضًا.'
     }
   }
 };
@@ -1049,7 +1049,7 @@ function scq8Select(id) {
     document.getElementById('scq8-feedbox').classList.remove('visible');
   }
   const checkBtn = document.getElementById('scq8-check');
-  checkBtn.textContent = 'צדקתי?';
+  checkBtn.textContent = 'هل إجابتي صحيحة؟';
   checkBtn.disabled = false;
   checkBtn.onclick = scq8Check;
 }
@@ -1086,7 +1086,7 @@ function scq8Check() {
     scq8Done = true;
     scq8LockOptions();
     scq8ShowFeedback('correct', true);
-    scq8SetBarDone('המשך', function () { scq8Continue(); });
+    scq8SetBarDone('متابعة', function () { scq8Continue(); });
     /* resume: מחויבות התשובה. הענף הזה חוזר לפני הזנב — ראו ההערה שם. */
     try { flushResumeSave(); } catch (e) {}
     return;
@@ -1099,7 +1099,7 @@ function scq8Check() {
     scq8Phase = 'wrong1';
     scq8ShowFeedback('wrong1', false);
     const checkBtn = document.getElementById('scq8-check');
-    checkBtn.textContent = 'צדקתי?';
+    checkBtn.textContent = 'هل إجابتي صحيحة؟';
     checkBtn.disabled = true;
     checkBtn.onclick = scq8Check;
     // הרמז נחשף רק אחרי ניסיון ראשון שגוי (לפי הלומדה הקודמת)
@@ -1111,7 +1111,7 @@ function scq8Check() {
     scq8Done = true;
     scq8LockOptions();
     scq8ShowFeedback('wrong2', false);
-    scq8SetBarDone('המשך', function () { scq8Continue(); });
+    scq8SetBarDone('متابعة', function () { scq8Continue(); });
   }
 
   /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
@@ -1167,7 +1167,7 @@ function resetScreenState7() {
   });
   document.getElementById('scq8-feedbox').classList.remove('visible');
   const checkBtn = document.getElementById('scq8-check');
-  checkBtn.textContent = 'צדקתי?';
+  checkBtn.textContent = 'هل إجابتي صحيحة؟';
   checkBtn.disabled = true;
   checkBtn.onclick = scq8Check;
   const hintBtn = document.getElementById('scq8-hint');
@@ -1196,20 +1196,20 @@ const S9_ZONE_IDS = ['ton', 'kg', 'gram', 'mg'];
 
 const TEXTS9 = {
   correct: {
-    title: 'מצוין!',
-    body: 'לגופים שונים מתאימות יחידות מידה שונות.\nגרגר מלח גס נמדד בדרך כלל במיליגרמים (מ"ג), תפוח נמדד בדרך כלל בגרמים (ג\'), צב ענק נמדד בדרך כלל בקילוגרמים (ק"ג) וקטר נמדד בדרך כלל בטונות.'
+    title: 'ممتاز!',
+    body: 'توجد للأغراض المختلفة وحدات قياس مختلفة.\nحبة الملح الخشن تقاس عادةً بالميليغرام (ملغم)، وتُقاس التفاحة عادةً بالغرام (غ)، وتُقاس السلحفاة العملاقة عادةً بالكيلوغرام (كغم) وتُقاس المقطورة عادةً بالأطنان.'
   },
   wrong: {
-    title: 'התשובה אינה נכונה.',
-    body: 'לא נורא, גם מטעויות לומדים.\nננסה שוב?'
+    title: 'الإجابة غير صحيحة.',
+    body: 'لا بأس، نتعلّم من الأخطاء أيضًا.\nهل نحاول مرة أخرى؟'
   },
   wrongPending: {
-    title: 'התשובה אינה נכונה.',
-    body: 'רוצים לראות את הפתרון הנכון?'
+    title: 'الإجابة غير صحيحة.',
+    body: 'ترغبون بعرض الحل الصحيح؟'
   },
   wrong2: {
-    title: 'התשובה אינה נכונה.',
-    body: 'לגופים שונים מתאימות יחידות מידה שונות.\nגרגר מלח גס נמדד בדרך כלל במיליגרמים (מ"ג), תפוח נמדד בדרך כלל בגרמים (ג\'), צב ענק נמדד בדרך כלל בקילוגרמים (ק"ג) וקטר נמדד בדרך כלל בטונות.'
+    title: 'الإجابة غير صحيحة.',
+    body: 'توجد للأغراض المختلفة وحدات قياس مختلفة.\nحبة الملح الخشن تقاس عادةً بالميليغرام (ملغم)، وتُقاس التفاحة عادةً بالغرام (غ)، وتُقاس السلحفاة العملاقة عادةً بالكيلوغرام (كغم) وتُقاس المقطورة عادةً بالأطنان.'
   }
 };
 
@@ -1397,12 +1397,12 @@ function s9Reveal() {
   if (s9ShowingCorrect) {
     s9ShowMyAnswer();
     s9ShowingCorrect = false;
-    if (revealBtn) revealBtn.textContent = 'התשובה הנכונה';
+    if (revealBtn) revealBtn.textContent = 'الإجابة الصحيحة';
   } else {
     s9RevealCorrect();
     s9ShowFeedback('wrong2', false);
     s9ShowingCorrect = true;
-    if (revealBtn) revealBtn.textContent = 'התשובה שלי';
+    if (revealBtn) revealBtn.textContent = 'إجابتي';
   }
 }
 
@@ -1437,7 +1437,7 @@ function s9Check() {
       if (el) { el.draggable = false; el.classList.add('s9-locked'); }
     });
     s9ShowFeedback('correct', true);
-    checkBtn.textContent = 'המשך';
+    checkBtn.textContent = 'متابعة';
     checkBtn.disabled = false;
     checkBtn.onclick = s9Continue;
   } else if (s9Attempts < 2) {
@@ -1457,8 +1457,8 @@ function s9Check() {
     s9ShowingCorrect = false;
     s9ShowFeedback('wrongPending', false);
     const revealBtn = document.getElementById('s9-reveal-btn');
-    if (revealBtn) { revealBtn.hidden = false; revealBtn.textContent = 'התשובה הנכונה'; }
-    checkBtn.textContent = 'המשך';
+    if (revealBtn) { revealBtn.hidden = false; revealBtn.textContent = 'الإجابة الصحيحة'; }
+    checkBtn.textContent = 'متابعة';
     checkBtn.disabled = false;
     checkBtn.onclick = s9Continue;
   }
@@ -1495,7 +1495,7 @@ function resetScreenState8() {
   s9UpdateAvatar();
   if (s9Done) {
     // resume-state: התשובה כבר נענתה נכון — משאירים הצבה/משוב כפי שהיו
-    checkBtn.textContent = 'המשך';
+    checkBtn.textContent = 'متابعة';
     checkBtn.disabled = false;
     checkBtn.onclick = s9Continue;
     if (s9HintShown) hintBtn.hidden = false;
@@ -1526,12 +1526,12 @@ function resetScreenState8() {
   document.getElementById('s9-feedbox').classList.remove('visible');
   document.getElementById('s9-hint-overlay').hidden = true;
 
-  checkBtn.textContent = 'צדקתי?';
+  checkBtn.textContent = 'هل إجابتي صحيحة؟';
   checkBtn.disabled = true;
   checkBtn.onclick = s9Check;
   hintBtn.hidden = true;
   const revealBtn = document.getElementById('s9-reveal-btn');
-  if (revealBtn) { revealBtn.hidden = true; revealBtn.textContent = 'התשובה הנכונה'; }
+  if (revealBtn) { revealBtn.hidden = true; revealBtn.textContent = 'الإجابة الصحيحة'; }
 }
 
 /* =========================================================
@@ -1543,16 +1543,16 @@ const SCQ10 = {
   maxAttempts: 2,
   feedback: {
     correct: {
-      title: 'מצוין!',
-      body: 'אפשר למדוד כל גוף בכל יחידת מסה, אבל לא תמיד זה יהיה נוח.\nלדוגמה, במקום לומר שמסתו של קטר היא 150 טון, אפשר לומר שמסתו היא 150,000,000 גרם.\n\nשתי המדידות נכונות, אך הרבה יותר נוח להשתמש ביחידת המידה המתאימה למסת הגוף.\nלכן, נשתמש ביחידות מסה שונות: מיליגרם, גרם, קילוגרם וטון.'
+      title: 'ممتاز!',
+      body: 'يمكن قياس كل جسم بأي وحدة كتلة، لكن لن يكون ذلك مريحًا دائمًا.\nعلى سبيل المثال، بدلًا من القول إن كتلة المقطورة هي 150 طنًا، يمكن القول إن كتلتها هي 150,000,000 غرام.\n\nكِلا القياسين صحيحان، لكن من الأنسب أن نستخدم وحدة القياس الملائمة لكتلة الجسم.\nلذلك، سنستخدم وحدات كتلة مختلفة: ميليغرام، غرام، كيلوغرام وطن.'
     },
     wrong1: {
-      title: 'התשובה אינה נכונה.',
-      body: 'לא נורא, גם מטעויות לומדים.\nננסה שוב?'
+      title: 'الإجابة غير صحيحة.',
+      body: 'لا بأس، نتعلّم من الأخطاء أيضًا.\nهل نحاول مرة أخرى؟'
     },
     wrong2: {
-      title: 'התשובה לא נכונה.',
-      body: 'אפשר למדוד כל גוף בכל יחידת מסה, אבל לא תמיד זה יהיה נוח.\nלדוגמה, במקום לומר שמסתו של קטר היא 150 טון, אפשר לומר שמסתו היא 150,000,000 גרם.\n\nשתי המדידות נכונות, אך הרבה יותר נוח להשתמש ביחידת המידה המתאימה למסת הגוף.\nלכן, נשתמש ביחידות מסה שונות: מיליגרם, גרם, קילוגרם וטון.'
+      title: 'الإجابة غير صحيحة.',
+      body: 'يمكن قياس كل جسم بأي وحدة كتلة، لكن لن يكون ذلك مريحًا دائمًا.\nعلى سبيل المثال، بدلًا من القول إن كتلة المقطورة هي 150 طنًا، يمكن القول إن كتلتها هي 150,000,000 غرام.\n\nكِلا القياسين صحيحان، لكن من الأنسب أن نستخدم وحدة القياس الملائمة لكتلة الجسم.\nلذلك، سنستخدم وحدات كتلة مختلفة: ميليغرام، غرام، كيلوغرام وطن.'
     }
   }
 };
@@ -1582,7 +1582,7 @@ function scq10Select(id) {
     document.getElementById('scq10-feedbox').classList.remove('visible');
   }
   const checkBtn = document.getElementById('scq10-check');
-  checkBtn.textContent = 'צדקתי?';
+  checkBtn.textContent = 'هل إجابتي صحيحة؟';
   checkBtn.disabled = false;
   checkBtn.onclick = scq10Check;
 }
@@ -1619,7 +1619,7 @@ function scq10Check() {
     scq10Done = true;
     scq10LockOptions();
     scq10ShowFeedback('correct', true);
-    scq10SetBarDone('המשך', function () { scq10Continue(); });
+    scq10SetBarDone('متابعة', function () { scq10Continue(); });
     /* resume: מחויבות התשובה. הענף הזה חוזר לפני הזנב — ראו ההערה שם. */
     try { flushResumeSave(); } catch (e) {}
     return;
@@ -1632,7 +1632,7 @@ function scq10Check() {
     scq10Phase = 'wrong1';
     scq10ShowFeedback('wrong1', false);
     const checkBtn = document.getElementById('scq10-check');
-    checkBtn.textContent = 'צדקתי?';
+    checkBtn.textContent = 'هل إجابتي صحيحة؟';
     checkBtn.disabled = true;
     checkBtn.onclick = scq10Check;
     // הרמז נחשף רק אחרי ניסיון ראשון שגוי (לפי הלומדה הקודמת)
@@ -1644,7 +1644,7 @@ function scq10Check() {
     scq10Done = true;
     scq10LockOptions();
     scq10ShowFeedback('wrong2', false);
-    scq10SetBarDone('המשך', function () { scq10Continue(); });
+    scq10SetBarDone('متابعة', function () { scq10Continue(); });
   }
 
   /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
@@ -1700,7 +1700,7 @@ function resetScreenState9() {
   });
   document.getElementById('scq10-feedbox').classList.remove('visible');
   const checkBtn = document.getElementById('scq10-check');
-  checkBtn.textContent = 'צדקתי?';
+  checkBtn.textContent = 'هل إجابتي صحيحة؟';
   checkBtn.disabled = true;
   checkBtn.onclick = scq10Check;
   const hintBtn = document.getElementById('scq10-hint');
@@ -1736,12 +1736,12 @@ document.addEventListener('keydown', function (e) {
    ל-600ms) כדי לאפשר ללומד להמשיך ללחוץ על הזוג הבא מהר יותר.
    ========================================================= */
 
-const S11_PAIR_LETTERS = ['א', 'ב', 'ג'];
+const S11_PAIR_LETTERS = ['أ', 'ب', 'ت'];
 
 const S11_PAIRS = [
-  { pairId: 0, texts: ['1 טון', '1000 קילוגרם'] },
-  { pairId: 1, texts: ['1 קילוגרם', '1000 גרם'] },
-  { pairId: 2, texts: ['1 גרם', '1000 מיליגרם'] }
+  { pairId: 0, texts: ['1 طن', '1000 كيلوغرام'] },
+  { pairId: 1, texts: ['1 كيلوغرام', '1000 غرام'] },
+  { pairId: 2, texts: ['1 غرام', '1000 ميليغرام'] }
 ];
 
 let s11Cards = [];
@@ -1781,7 +1781,7 @@ function s11Init() {
 
 function s11UpdatePairsCounter() {
   const el = document.getElementById('s11-pairs-counter');
-  if (el) el.textContent = 'זוגות שנמצאו: ' + s11Matches + ' מתוך 3';
+  if (el) el.textContent = 'الأزواج التي تم إيجادها: ' + s11Matches + ' من أصل 3';
 }
 
 function s11RenderBoard() {
@@ -1795,7 +1795,7 @@ function s11RenderBoard() {
     el.setAttribute('data-idx', String(idx));
     el.setAttribute('role', 'button');
     el.setAttribute('tabindex', '0');
-    el.setAttribute('aria-label', 'קלף');
+    el.setAttribute('aria-label', 'بطاقة');
     el.innerHTML =
       '<div class="s11-card-inner">' +
         '<div class="s11-card-face s11-card-back"><span class="s11-card-qmark">?</span></div>' +
@@ -1950,16 +1950,16 @@ const SCQ13 = {
   maxAttempts: 2,
   feedback: {
     correct: {
-      title: 'מצוין!',
-      body: 'נטו הוא המסה של התכולה בלבד, ללא האריזה או המיכל.\nבמקרה זה, הנטו הוא המים שבתוך הבקבוק.'
+      title: 'ممتاز!',
+      body: 'الكتلة الصافية هي كتلة المحتوى فقط، بدون الغلاف أو العبوة.\nفي هذه الحالة، الكتلة الصافية هي الماء الموجود في القنينة.'
     },
     wrong1: {
-      title: 'התשובה אינה נכונה.',
-      body: 'לא נורא, גם מטעויות לומדים.\nננסה שוב?'
+      title: 'الإجابة غير صحيحة.',
+      body: 'لا بأس، نتعلّم من الأخطاء أيضًا.\nهل نحاول مرة أخرى؟'
     },
     wrong2: {
-      title: 'התשובה אינה נכונה.',
-      body: 'נטו הוא המסה של התכולה בלבד, ללא האריזה או המיכל.\nבמקרה זה, הנטו הוא המים שבתוך הבקבוק.'
+      title: 'الإجابة غير صحيحة.',
+      body: 'الكتلة الصافية هي كتلة المحتوى فقط، بدون الغلاف أو العبوة.\nفي هذه الحالة، الكتلة الصافية هي الماء الموجود في القنينة.'
     }
   }
 };
@@ -1989,7 +1989,7 @@ function scq13Select(id) {
     document.getElementById('scq13-feedbox').classList.remove('visible');
   }
   const checkBtn = document.getElementById('scq13-check');
-  checkBtn.textContent = 'צדקתי?';
+  checkBtn.textContent = 'هل إجابتي صحيحة؟';
   checkBtn.disabled = false;
   checkBtn.onclick = scq13Check;
 }
@@ -2026,7 +2026,7 @@ function scq13Check() {
     scq13Done = true;
     scq13LockOptions();
     scq13ShowFeedback('correct', true);
-    scq13SetBarDone('המשך', function () { scq13Continue(); });
+    scq13SetBarDone('متابعة', function () { scq13Continue(); });
     /* resume: מחויבות התשובה. הענף הזה חוזר לפני הזנב — ראו ההערה שם. */
     try { flushResumeSave(); } catch (e) {}
     return;
@@ -2039,7 +2039,7 @@ function scq13Check() {
     scq13Phase = 'wrong1';
     scq13ShowFeedback('wrong1', false);
     const checkBtn = document.getElementById('scq13-check');
-    checkBtn.textContent = 'צדקתי?';
+    checkBtn.textContent = 'هل إجابتي صحيحة؟';
     checkBtn.disabled = true;
     checkBtn.onclick = scq13Check;
     const hintBtn = document.getElementById('scq13-hint');
@@ -2051,7 +2051,7 @@ function scq13Check() {
     scq13Done = true;
     scq13LockOptions();
     scq13ShowFeedback('wrong2', false);
-    scq13SetBarDone('המשך', function () { scq13Continue(); });
+    scq13SetBarDone('متابعة', function () { scq13Continue(); });
   }
 
   /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
@@ -2107,7 +2107,7 @@ function resetScreenState12() {
   });
   document.getElementById('scq13-feedbox').classList.remove('visible');
   const checkBtn = document.getElementById('scq13-check');
-  checkBtn.textContent = 'צדקתי?';
+  checkBtn.textContent = 'هل إجابتي صحيحة؟';
   checkBtn.disabled = true;
   checkBtn.onclick = scq13Check;
   const hintBtn = document.getElementById('scq13-hint');
@@ -2135,16 +2135,16 @@ const MCQ14 = {
   maxAttempts: 2,
   feedback: {
     correct: {
-      title: 'מצוין!',
-      body: 'טרה = האריזה או המיכל הריק בלבד.'
+      title: 'ممتاز!',
+      body: 'الكتلة الفارغة = الغلاف أو العبوة فقط.'
     },
     wrong1: {
-      title: 'התשובה אינה נכונה.',
-      body: 'ננסה שוב?'
+      title: 'الإجابة غير صحيحة.',
+      body: 'هل نحاول مرة أخرى؟'
     },
     wrong2: {
-      title: 'התשובה לא נכונה.',
-      body: 'טרה = האריזה או המיכל הריק בלבד.'
+      title: 'الإجابة غير صحيحة.',
+      body: 'الكتلة الفارغة = الغلاف أو العبوة فقط.'
     }
   }
 };
@@ -2181,7 +2181,7 @@ function scq14Toggle(id) {
   }
   if (scq14Selected.length > 0) scq14Phase = 'selected';
   const checkBtn = document.getElementById('scq14-check');
-  checkBtn.textContent = 'צדקתי?';
+  checkBtn.textContent = 'هل إجابتي صحيحة؟';
   checkBtn.disabled = scq14Selected.length === 0;
   checkBtn.onclick = scq14Check;
 }
@@ -2223,7 +2223,7 @@ function scq14Check() {
     });
     scq14LockOptions();
     scq14ShowFeedback('correct', true);
-    scq14SetBarDone('המשך', function () { scq14Continue(); });
+    scq14SetBarDone('متابعة', function () { scq14Continue(); });
     /* resume: מחויבות התשובה. הענף הזה חוזר לפני הזנב — ראו ההערה שם. */
     try { flushResumeSave(); } catch (e) {}
     return;
@@ -2241,7 +2241,7 @@ function scq14Check() {
     scq14Phase = 'wrong1';
     scq14ShowFeedback('wrong1', false);
     const checkBtn = document.getElementById('scq14-check');
-    checkBtn.textContent = 'צדקתי?';
+    checkBtn.textContent = 'هل إجابتي صحيحة؟';
     checkBtn.disabled = true;
     checkBtn.onclick = scq14Check;
     const hintBtn = document.getElementById('scq14-hint');
@@ -2257,7 +2257,7 @@ function scq14Check() {
     scq14Done = true;
     scq14LockOptions();
     scq14ShowFeedback('wrong2', false);
-    scq14SetBarDone('המשך', function () { scq14Continue(); });
+    scq14SetBarDone('متابعة', function () { scq14Continue(); });
   }
 
   /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
@@ -2313,7 +2313,7 @@ function resetScreenState13() {
   });
   document.getElementById('scq14-feedbox').classList.remove('visible');
   const checkBtn = document.getElementById('scq14-check');
-  checkBtn.textContent = 'צדקתי?';
+  checkBtn.textContent = 'هل إجابتي صحيحة؟';
   checkBtn.disabled = true;
   checkBtn.onclick = scq14Check;
   const hintBtn = document.getElementById('scq14-hint');
@@ -2402,16 +2402,16 @@ const SCQ16 = {
   maxAttempts: 2,
   feedback: {
     correct: {
-      title: 'מצוין!',
-      body: 'ברוטו הוא המסה הכוללת את המתנה עצמה ואת האריזה.'
+      title: 'ممتاز!',
+      body: 'الكتلة الإجمالية هي الكتلة الكلّيّة التي تشمل الهدية نفسها والغلاف.'
     },
     wrong1: {
-      title: 'התשובה אינה נכונה.',
-      body: 'ננסה שוב?'
+      title: 'الإجابة غير صحيحة.',
+      body: 'هل نحاول مرة أخرى؟'
     },
     wrong2: {
-      title: 'התשובה אינה נכונה.',
-      body: 'ברוטו הוא המסה הכוללת את המתנה עצמה ואת האריזה.'
+      title: 'الإجابة غير صحيحة.',
+      body: 'الكتلة الإجمالية هي الكتلة الكلّيّة التي تشمل الهدية نفسها والغلاف.'
     }
   }
 };
@@ -2441,7 +2441,7 @@ function scq16Select(id) {
     document.getElementById('scq16-feedbox').classList.remove('visible');
   }
   const checkBtn = document.getElementById('scq16-check');
-  checkBtn.textContent = 'צדקתי?';
+  checkBtn.textContent = 'هل إجابتي صحيحة؟';
   checkBtn.disabled = false;
   checkBtn.onclick = scq16Check;
 }
@@ -2478,7 +2478,7 @@ function scq16Check() {
     scq16Done = true;
     scq16LockOptions();
     scq16ShowFeedback('correct', true);
-    scq16SetBarDone('המשך', function () { scq16Continue(); });
+    scq16SetBarDone('متابعة', function () { scq16Continue(); });
     stationProgress.q16 = 'success';
     updateQuestionNav('s16');
     /* resume: מחויבות התשובה. הענף הזה חוזר לפני הזנב — ראו ההערה שם. */
@@ -2493,7 +2493,7 @@ function scq16Check() {
     scq16Phase = 'wrong1';
     scq16ShowFeedback('wrong1', false);
     const checkBtn = document.getElementById('scq16-check');
-    checkBtn.textContent = 'צדקתי?';
+    checkBtn.textContent = 'هل إجابتي صحيحة؟';
     checkBtn.disabled = true;
     checkBtn.onclick = scq16Check;
     const hintBtn = document.getElementById('scq16-hint');
@@ -2505,7 +2505,7 @@ function scq16Check() {
     scq16Done = true;
     scq16LockOptions();
     scq16ShowFeedback('wrong2', false);
-    scq16SetBarDone('המשך', function () { scq16Continue(); });
+    scq16SetBarDone('متابعة', function () { scq16Continue(); });
     stationProgress.q16 = 'fail';
     updateQuestionNav('s16');
   }
@@ -2564,7 +2564,7 @@ function resetScreenState15() {
   });
   document.getElementById('scq16-feedbox').classList.remove('visible');
   const checkBtn = document.getElementById('scq16-check');
-  checkBtn.textContent = 'צדקתי?';
+  checkBtn.textContent = 'هل إجابتي صحيحة؟';
   checkBtn.disabled = true;
   checkBtn.onclick = scq16Check;
   const hintBtn = document.getElementById('scq16-hint');
@@ -2592,16 +2592,16 @@ const SCQ17 = {
   maxAttempts: 2,
   feedback: {
     correct: {
-      title: 'מצוין!',
-      body: 'טרה היא המסה של האריזה או המיכל בלבד.\n במקרה זה, הטרה היא הסלסילה ללא הפירות שבתוכה.'
+      title: 'ممتاز!',
+      body: 'الكتلة الفارغة هي كتلة الغلاف أو العبوة فقط.\nفي هذه الحالة، الكتلة الفارغة هي السلة بدون الفواكه بداخلها.'
     },
     wrong1: {
-      title: 'התשובה אינה נכונה.',
-      body: 'ננסה שוב?'
+      title: 'الإجابة غير صحيحة.',
+      body: 'هل نحاول مرة أخرى؟'
     },
     wrong2: {
-      title: 'התשובה לא נכונה.',
-      body: 'טרה היא המסה של האריזה או המיכל בלבד.\n במקרה זה, הטרה היא הסלסילה ללא הפירות שבתוכה.'
+      title: 'الإجابة غير صحيحة.',
+      body: 'الكتلة الفارغة هي كتلة الغلاف أو العبوة فقط.\nفي هذه الحالة، الكتلة الفارغة هي السلة بدون الفواكه بداخلها.'
     }
   }
 };
@@ -2631,7 +2631,7 @@ function scq17Select(id) {
     document.getElementById('scq17-feedbox').classList.remove('visible');
   }
   const checkBtn = document.getElementById('scq17-check');
-  checkBtn.textContent = 'צדקתי?';
+  checkBtn.textContent = 'هل إجابتي صحيحة؟';
   checkBtn.disabled = false;
   checkBtn.onclick = scq17Check;
 }
@@ -2668,7 +2668,7 @@ function scq17Check() {
     scq17Done = true;
     scq17LockOptions();
     scq17ShowFeedback('correct', true);
-    scq17SetBarDone('המשך', function () { scq17Continue(); });
+    scq17SetBarDone('متابعة', function () { scq17Continue(); });
     stationProgress.q17 = 'success';
     updateQuestionNav('s17');
     /* resume: מחויבות התשובה. הענף הזה חוזר לפני הזנב — ראו ההערה שם. */
@@ -2683,7 +2683,7 @@ function scq17Check() {
     scq17Phase = 'wrong1';
     scq17ShowFeedback('wrong1', false);
     const checkBtn = document.getElementById('scq17-check');
-    checkBtn.textContent = 'צדקתי?';
+    checkBtn.textContent = 'هل إجابتي صحيحة؟';
     checkBtn.disabled = true;
     checkBtn.onclick = scq17Check;
     const hintBtn = document.getElementById('scq17-hint');
@@ -2695,7 +2695,7 @@ function scq17Check() {
     scq17Done = true;
     scq17LockOptions();
     scq17ShowFeedback('wrong2', false);
-    scq17SetBarDone('המשך', function () { scq17Continue(); });
+    scq17SetBarDone('متابعة', function () { scq17Continue(); });
     stationProgress.q17 = 'fail';
     updateQuestionNav('s17');
   }
@@ -2754,7 +2754,7 @@ function resetScreenState16() {
   });
   document.getElementById('scq17-feedbox').classList.remove('visible');
   const checkBtn = document.getElementById('scq17-check');
-  checkBtn.textContent = 'צדקתי?';
+  checkBtn.textContent = 'هل إجابتي صحيحة؟';
   checkBtn.disabled = true;
   checkBtn.onclick = scq17Check;
   const hintBtn = document.getElementById('scq17-hint');
@@ -2781,20 +2781,20 @@ const S18_IDS = ['s18-input-1', 's18-input-2', 's18-input-3', 's18-input-4'];
 const S18_ANSWERS = { 's18-input-1': '750', 's18-input-2': '50', 's18-input-3': '6', 's18-input-4': '4' };
 const TEXTS18 = {
   correct: {
-    title: 'התשובה נכונה.',
-    body: 'כדי להשלים את הנתונים השתמשנו בקשר בין מושגי המסה:\nנטו + טרה = ברוטו'
+    title: 'الإجابة صحيحة.',
+    body: 'لإكمال المعطيات استخدمنا العلاقة بين مصطلحات الكتلة:\nالكتلة الصافية + الكتلة الفارغة = الكتلة الإجمالية'
   },
   wrong1: {
-    title: 'התשובה אינה נכונה.',
-    body: 'נסו לחשב שוב את התשובות שסומנו כשגויות'
+    title: 'الإجابة غير صحيحة.',
+    body: 'حاولوا مجددًا حساب الإجابات التي تم تحديدها كإجابات خاطئة'
   },
   wrongPending: {
-    title: 'התשובה אינה נכונה.',
-    body: 'רוצים לראות את הפתרון הנכון?'
+    title: 'الإجابة غير صحيحة.',
+    body: 'ترغبون بعرض الحل الصحيح؟'
   },
   wrong2: {
-    title: 'התשובה אינה נכונה.',
-    body: 'כדי להשלים את הנתונים השתמשנו בקשר בין מושגי המסה:\nנטו + טרה = ברוטו'
+    title: 'الإجابة غير صحيحة.',
+    body: 'لإكمال المعطيات استخدمنا العلاقة بين مصطلحات الكتلة:\nالكتلة الصافية + الكتلة الفارغة = الكتلة الإجمالية'
   }
 };
 
@@ -2878,13 +2878,13 @@ function s18Reveal() {
   if (s18ShowingCorrect) {
     s18ShowMyAnswer();
     s18ShowingCorrect = false;
-    if (revealBtn) revealBtn.textContent = 'התשובה הנכונה';
+    if (revealBtn) revealBtn.textContent = 'الإجابة الصحيحة';
   } else {
     s18ClearInputStateClasses();
     s18LockInputs(true);
     s18ShowFeedback('wrong2', false);
     s18ShowingCorrect = true;
-    if (revealBtn) revealBtn.textContent = 'התשובה שלי';
+    if (revealBtn) revealBtn.textContent = 'إجابتي';
   }
 }
 
@@ -2905,7 +2905,7 @@ function s18Check() {
     s18LockInputs(false);
     s18MarkInputs();
     s18ShowFeedback('correct', true);
-    s18SetBarDone('המשך', function () { s18Continue(); });
+    s18SetBarDone('متابعة', function () { s18Continue(); });
     stationProgress.q18 = 'success';
     updateQuestionNav('s18');
   } else if (s18Attempts < 2) {
@@ -2932,8 +2932,8 @@ function s18Check() {
     s18ShowingCorrect = false;
     s18ShowFeedback('wrongPending', false);
     const revealBtn = document.getElementById('s18-reveal-btn');
-    if (revealBtn) { revealBtn.hidden = false; revealBtn.textContent = 'התשובה הנכונה'; }
-    s18SetBarDone('המשך', function () { s18Continue(); });
+    if (revealBtn) { revealBtn.hidden = false; revealBtn.textContent = 'الإجابة الصحيحة'; }
+    s18SetBarDone('متابعة', function () { s18Continue(); });
     stationProgress.q18 = 'fail';
     updateQuestionNav('s18');
   }
@@ -2985,7 +2985,7 @@ function resetScreenState17() {
   });
   document.getElementById('s18-feedbox').classList.remove('visible');
   const checkBtn = document.getElementById('s18-check');
-  checkBtn.textContent = 'צדקתי?';
+  checkBtn.textContent = 'هل إجابتي صحيحة؟';
   checkBtn.disabled = true;
   checkBtn.onclick = s18Check;
   const hintBtn = document.getElementById('s18-hint');
@@ -2994,7 +2994,7 @@ function resetScreenState17() {
   document.getElementById('s18-hint-icon').src = 'assets/images/icon-hint-blue.svg';
   document.getElementById('s18-hint-overlay').hidden = true;
   const revealBtn = document.getElementById('s18-reveal-btn');
-  if (revealBtn) { revealBtn.hidden = true; revealBtn.textContent = 'התשובה הנכונה'; }
+  if (revealBtn) { revealBtn.hidden = true; revealBtn.textContent = 'الإجابة الصحيحة'; }
 }
 
 /* =========================================================
@@ -3002,24 +3002,24 @@ function resetScreenState17() {
    ========================================================= */
 
 const S19_IDS = ['s19-dd-1', 's19-dd-2', 's19-dd-3', 's19-dd-4'];
-const S19_CORRECT = { 's19-dd-1': 'קילוגרם', 's19-dd-2': 'מיליגרם', 's19-dd-3': 'טון', 's19-dd-4': 'גרם' };
+const S19_CORRECT = { 's19-dd-1': 'كيلوغرام', 's19-dd-2': 'ميليغرام', 's19-dd-3': 'طن', 's19-dd-4': 'غرام' };
 let s19DdValues = { 's19-dd-1': '', 's19-dd-2': '', 's19-dd-3': '', 's19-dd-4': '' };
 const TEXTS19 = {
   correct: {
-    title: 'מצוין!',
-    body: 'כאשר מודדים מסה, חשוב לבחור יחידת מידה מתאימה:\nגופים קטנים מאוד נמדדים בדרך כלל ב<b>מיליגרמים</b>.\nגופים קטנים עד בינוניים נמדדים ב<b>גרמים</b>.\nבעלי חיים בינוניים-גדולים, אנשים וחפצים גדולים נמדדים בדרך כלל ב<b>קילוגרמים</b>.\nכלי רכב כבדים מאוד, כמו קטרים, נמדדים לעיתים ב<b>טונות</b>.'
+    title: 'ممتاز!',
+    body: 'عند قياس الكتلة، من المهم اختيار وحدة قياس ملائمة:\nالأجسام الصغيرة جدًا تُقاس عادةً بوحدة <b>ميليغرام</b>.\nالأجسام الصغيرة حتى المتوسطة تُقاس بوحدة <b>الغرام</b>.\nالحيوانات المتوسطة-الكبيرة، الأشخاص والأغراض الكبيرة تُقاس عادةً بوحدة <b>الكيلوغرام</b>.\nالمركبات الثقيلة جدًا، مثل القاطرات، تُقاس أحيانًا بوحدة <b>الطن</b>.'
   },
   wrong1: {
-    title: 'התשובה אינה נכונה.',
-    body: 'ננסה שוב?'
+    title: 'الإجابة غير صحيحة.',
+    body: 'هل نحاول مرة أخرى؟'
   },
   wrongPending: {
-    title: 'התשובה אינה נכונה.',
-    body: 'רוצים לראות את הפתרון הנכון?'
+    title: 'الإجابة غير صحيحة.',
+    body: 'ترغبون بعرض الحل الصحيح؟'
   },
   wrong2: {
-    title: 'התשובה אינה נכונה.',
-    body: 'כאשר מודדים מסה, חשוב לבחור יחידת מידה מתאימה:\nגופים קטנים מאוד נמדדים בדרך כלל ב<b>מיליגרמים</b>.\nגופים קטנים עד בינוניים נמדדים ב<b>גרמים</b>.\nבעלי חיים בינוניים-גדולים, אנשים וחפצים גדולים נמדדים בדרך כלל ב<b>קילוגרמים</b>.\nכלי רכב כבדים מאוד, כמו קטרים, נמדדים לעיתים ב<b>טונות</b>.'
+    title: 'الإجابة غير صحيحة.',
+    body: 'عند قياس الكتلة، من المهم اختيار وحدة قياس ملائمة:\nالأجسام الصغيرة جدًا تُقاس عادةً بوحدة <b>ميليغرام</b>.\nالأجسام الصغيرة حتى المتوسطة تُقاس بوحدة <b>الغرام</b>.\nالحيوانات المتوسطة-الكبيرة، الأشخاص والأغراض الكبيرة تُقاس عادةً بوحدة <b>الكيلوغرام</b>.\nالمركبات الثقيلة جدًا، مثل القاطرات، تُقاس أحيانًا بوحدة <b>الطن</b>.'
   }
 };
 
@@ -3126,13 +3126,13 @@ function s19Reveal() {
   if (s19ShowingCorrect) {
     s19ShowMyAnswer();
     s19ShowingCorrect = false;
-    if (revealBtn) revealBtn.textContent = 'התשובה הנכונה';
+    if (revealBtn) revealBtn.textContent = 'الإجابة الصحيحة';
   } else {
     s19LockDropdowns(true);
     s19MarkDropdowns();
     s19ShowFeedback('wrong2', false);
     s19ShowingCorrect = true;
-    if (revealBtn) revealBtn.textContent = 'התשובה שלי';
+    if (revealBtn) revealBtn.textContent = 'إجابتي';
   }
 }
 
@@ -3150,7 +3150,7 @@ function s19Check() {
     s19LockDropdowns(false);
     s19MarkDropdowns();
     s19ShowFeedback('correct', true);
-    s19SetBarDone('המשך', function () { s19Continue(); });
+    s19SetBarDone('متابعة', function () { s19Continue(); });
     stationProgress.q19 = 'success';
     updateQuestionNav('s19');
   } else if (s19Attempts < 2) {
@@ -3171,8 +3171,8 @@ function s19Check() {
     s19ShowingCorrect = false;
     s19ShowFeedback('wrongPending', false);
     const revealBtn = document.getElementById('s19-reveal-btn');
-    if (revealBtn) { revealBtn.hidden = false; revealBtn.textContent = 'התשובה הנכונה'; }
-    s19SetBarDone('המשך', function () { s19Continue(); });
+    if (revealBtn) { revealBtn.hidden = false; revealBtn.textContent = 'الإجابة الصحيحة'; }
+    s19SetBarDone('متابعة', function () { s19Continue(); });
     stationProgress.q19 = 'fail';
     updateQuestionNav('s19');
   }
@@ -3225,7 +3225,7 @@ function resetScreenState18() {
   });
   document.getElementById('s19-feedbox').classList.remove('visible');
   const checkBtn = document.getElementById('s19-check');
-  checkBtn.textContent = 'צדקתי?';
+  checkBtn.textContent = 'هل إجابتي صحيحة؟';
   checkBtn.disabled = true;
   checkBtn.onclick = s19Check;
   const hintBtn = document.getElementById('s19-hint');
@@ -3233,7 +3233,7 @@ function resetScreenState18() {
   hintBtn.disabled = false;
   document.getElementById('s19-hint-overlay').hidden = true;
   const revealBtn = document.getElementById('s19-reveal-btn');
-  if (revealBtn) { revealBtn.hidden = true; revealBtn.textContent = 'התשובה הנכונה'; }
+  if (revealBtn) { revealBtn.hidden = true; revealBtn.textContent = 'الإجابة الصحيحة'; }
 }
 
 /* =========================================================
@@ -3243,20 +3243,20 @@ function resetScreenState18() {
 const S20_ITEM_IDS = ['s20i4', 's20i5', 's20i6', 's20i7', 's20i8', 's20i9'];
 const TEXTS20 = {
   correct: {
-    title: 'מצוין!',
-    body: 'נטו הוא המסה של התכולה בלבד.\nטרה היא המסה של האריזה בלבד.\nברוטו הוא המסה הכוללת: התכולה יחד עם האריזה.'
+    title: 'ممتاز!',
+    body: 'الكتلة الصافية هي كتلة المحتوى فقط.\nالكتلة الفارغة هي كتلة الغلاف لفقط.\nالكتلة الإجمالية هي الكتلة الكلّيّة: المحتوى مع الغلاف أو العبوة.'
   },
   wrong1: {
-    title: 'התשובה אינה נכונה.',
-    body: 'לא נורא, גם מטעויות לומדים.\nננסה שוב?'
+    title: 'الإجابة غير صحيحة.',
+    body: 'لا بأس، نتعلّم من الأخطاء أيضًا.\nهل نحاول مرة أخرى؟'
   },
   wrong2Pending: {
-    title: 'התשובה אינה נכונה.',
-    body: 'רוצים לראות את הפתרון הנכון?'
+    title: 'الإجابة غير صحيحة.',
+    body: 'ترغبون بعرض الحل الصحيح؟'
   },
   wrong2: {
-    title: 'התשובה אינה נכונה.',
-    body: 'ברוטו = האריזה+התכולה\nנטו = התכולה בלבד\nטרה = האריזה בלבד'
+    title: 'الإجابة غير صحيحة.',
+    body: 'الكتلة الإجمالية = الغلاف+المحتوى\nالكتلة الصافية = المحتوى فقط\nالكتلة الفارغة = الغلاف فقط'
   }
 };
 
@@ -3425,12 +3425,12 @@ function s20Reveal() {
   if (s20ShowingCorrect) {
     s20ShowMyAnswer();
     s20ShowingCorrect = false;
-    if (revealBtn) revealBtn.textContent = 'התשובה הנכונה';
+    if (revealBtn) revealBtn.textContent = 'الإجابة الصحيحة';
   } else {
     s20RevealCorrect();
     s20ShowFeedback('wrong2', false);
     s20ShowingCorrect = true;
-    if (revealBtn) revealBtn.textContent = 'התשובה שלי';
+    if (revealBtn) revealBtn.textContent = 'إجابتي';
   }
 }
 
@@ -3461,7 +3461,7 @@ function s20Check() {
   if (allCorrect) {
     s20Done = true;
     s20ShowFeedback('correct', true);
-    checkBtn.textContent = 'המשך';
+    checkBtn.textContent = 'متابعة';
     checkBtn.disabled = false;
     checkBtn.onclick = s20Continue;
     stationProgress.q20 = 'success';
@@ -3479,8 +3479,8 @@ function s20Check() {
       s20ShowingCorrect = false;
       s20ShowFeedback('wrong2Pending', false);
       const revealBtn = document.getElementById('s20-reveal-btn');
-      if (revealBtn) { revealBtn.hidden = false; revealBtn.textContent = 'התשובה הנכונה'; }
-      checkBtn.textContent = 'המשך';
+      if (revealBtn) { revealBtn.hidden = false; revealBtn.textContent = 'الإجابة الصحيحة'; }
+      checkBtn.textContent = 'متابعة';
       checkBtn.disabled = false;
       checkBtn.onclick = s20Continue;
       stationProgress.q20 = 'fail';
@@ -3595,14 +3595,14 @@ function resetScreenState19() {
   document.getElementById('s20-hint-overlay').hidden = true;
 
   const checkBtn = document.getElementById('s20-check');
-  checkBtn.textContent = 'צדקתי?';
+  checkBtn.textContent = 'هل إجابتي صحيحة؟';
   checkBtn.disabled = true;
   checkBtn.onclick = s20Check;
   const hintBtn = document.getElementById('s20-hint');
   hintBtn.hidden = true;
   hintBtn.disabled = false;
   const revealBtn = document.getElementById('s20-reveal-btn');
-  if (revealBtn) { revealBtn.hidden = true; revealBtn.textContent = 'התשובה הנכונה'; }
+  if (revealBtn) { revealBtn.hidden = true; revealBtn.textContent = 'الإجابة الصحيحة'; }
 }
 
 document.addEventListener('keydown', function (e) {
@@ -3637,7 +3637,7 @@ function zoomEnsurePopup() {
   const close = document.createElement('button');
   close.type = 'button';
   close.className = 'methodica-zoom-close';
-  close.setAttribute('aria-label', 'סגירת הגדלת תמונה');
+  close.setAttribute('aria-label', 'إغلاق تكبير الصورة');
   close.innerHTML = '<img src="assets/images/icon-fb-close.png" alt="">';
 
   const img = document.createElement('img');
@@ -3656,7 +3656,7 @@ function zoomAddTrigger(image) {
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'methodica-zoom-trigger';
-  button.setAttribute('aria-label', 'הגדלת תמונה');
+  button.setAttribute('aria-label', 'تكبير الصورة');
   button.innerHTML =
     '<span class="methodica-zoom-trigger-icon">' +
     '<img class="methodica-zoom-trigger-default" src="assets/images/magnifier-icon-default.png" alt="">' +
@@ -4347,7 +4347,7 @@ function restoreScqUI(cfg, screenSel, prefix, optEl, selected, attempts, done, p
     }
     lockOptions();
     showFeedback(phase === 'correct' ? 'correct' : 'wrong2', phase === 'correct');
-    setBarDone('המשך', continueFn);
+    setBarDone('متابعة', continueFn);
     return;
   }
 
@@ -4368,7 +4368,7 @@ function restoreScqUI(cfg, screenSel, prefix, optEl, selected, attempts, done, p
   }
   var checkBtn = document.getElementById(prefix + '-check');
   if (checkBtn) {
-    checkBtn.textContent = 'צדקתי?';
+    checkBtn.textContent = 'هل إجابتي صحيحة؟';
     checkBtn.onclick = checkFn;
     /* אחרי טעות הקוד החי משבית עד לבחירה חדשה; אחרת פעיל אם יש בחירה. */
     checkBtn.disabled = (phase === 'wrong1') || !selected;
@@ -4473,10 +4473,10 @@ function restoreDragUI(cfg) {
       cfg.showFeedback(cfg.showing ? cfg.kindFinal : cfg.kindPending, false);
       if (revealBtn) {
         revealBtn.hidden = false;
-        revealBtn.textContent = cfg.showing ? 'התשובה שלי' : 'התשובה הנכונה';
+        revealBtn.textContent = cfg.showing ? 'إجابتي' : 'الإجابة الصحيحة';
       }
     }
-    if (checkBtn) { checkBtn.textContent = 'המשך'; checkBtn.disabled = false; checkBtn.onclick = cfg.continueFn; }
+    if (checkBtn) { checkBtn.textContent = 'متابعة'; checkBtn.disabled = false; checkBtn.onclick = cfg.continueFn; }
     return;
   }
 
@@ -4514,10 +4514,10 @@ function s18RestoreUI() {
       s18ShowFeedback(s18ShowingCorrect ? 'wrong2' : 'wrongPending', false);
       if (revealBtn) {
         revealBtn.hidden = false;
-        revealBtn.textContent = s18ShowingCorrect ? 'התשובה שלי' : 'התשובה הנכונה';
+        revealBtn.textContent = s18ShowingCorrect ? 'إجابتي' : 'الإجابة الصحيحة';
       }
     }
-    s18SetBarDone('המשך', function () { s18Continue(); });
+    s18SetBarDone('متابعة', function () { s18Continue(); });
     return;
   }
 
@@ -4549,10 +4549,10 @@ function s19RestoreUI() {
       s19ShowFeedback(s19ShowingCorrect ? 'wrong2' : 'wrongPending', false);
       if (revealBtn) {
         revealBtn.hidden = false;
-        revealBtn.textContent = s19ShowingCorrect ? 'התשובה שלי' : 'התשובה הנכונה';
+        revealBtn.textContent = s19ShowingCorrect ? 'إجابتي' : 'الإجابة الصحيحة';
       }
     }
-    s19SetBarDone('המשך', function () { s19Continue(); });
+    s19SetBarDone('متابعة', function () { s19Continue(); });
     return;
   }
 
@@ -4627,7 +4627,7 @@ function restoreScq14UI() {
     });
     scq14LockOptions();
     scq14ShowFeedback(scq14Phase === 'correct' ? 'correct' : 'wrong2', scq14Phase === 'correct');
-    scq14SetBarDone('המשך', function () { scq14Continue(); });
+    scq14SetBarDone('متابعة', function () { scq14Continue(); });
     return;
   }
 
@@ -4649,7 +4649,7 @@ function restoreScq14UI() {
   }
   var btn = document.getElementById('scq14-check');
   if (btn) {
-    btn.textContent = 'צדקתי?';
+    btn.textContent = 'هل إجابتي صحيحة؟';
     btn.onclick = scq14Check;
     btn.disabled = scq14Selected.length === 0;
   }

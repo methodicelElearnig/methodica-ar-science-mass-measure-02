@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>מדידת מסה — לומדה | תכנית 720 | סיין 2</title>
+<title>قياس الكتلة - وحدة تعليمية | برنامج 720 | فصل 2</title>
 <link rel="stylesheet" href="styles.css?v=1">
 <!-- מודאל "מצאתם בעיה?" — עותק אחד לכל הסינים. נטען אחרי styles.css במכוון. -->
 <link rel="stylesheet" href="../unit-css/25-report.css?v=3">
@@ -47,27 +47,27 @@
     <div class="transition-content">
       <div class="transition-title-block">
         <p class="transition-sub">
-         אין כמו תרגול לחיזוק הלמידה</p>
+         التمرين هو أفضل طريقة لتعزيز التعلم</p>
         <h2 class="transition-title">
-          5 שאלות
+          5 أسئلة
         </h2>
         <p class="transition-sub">
-    וכבר בהתחלה יש רמז! ענו נכון על 4 שאלות ומעלה (80%) כדי להתקדם.
+    وهناك تلميح من البداية! أجيبوا بشكل صحيح عن 4 أسئلة فما فوق (%80) للمتابعة.
         </p>
       </div>
       <div class="transition-avatar-wrap">
-        <video class="transition-avatar" id="s0-avatar-img" aria-label="דמות מלווה" muted loop autoplay playsinline></video>
-        <div class="transition-bubble">לא הכל ברור? אפשר לפנות אל הצ'אט או אל המורה לחיזוק!</div>
+        <video class="transition-avatar" id="s0-avatar-img" aria-label="شخصية مرافقة" muted loop autoplay playsinline></video>
+        <div class="transition-bubble">هل هناك أمور ما زالت غير واضحة؟ يمكن التوجه إلى الدردشة أو المعلم للتوضيح!</div>
       </div>
     </div>
 
     <div class="bottom-bar">
       <div class="bottom-bar-inner">
         <div class="bar-actions">
-          <button class="btn-continue" dir="rtl" onclick="s0Continue()">המשך</button>
+          <button class="btn-continue" dir="rtl" onclick="s0Continue()">متابعة</button>
         </div>
         <div class="bar-back">
-          <button class="btn-back" id="s0-back" dir="rtl" onclick="s0Back()">חזרה</button>
+          <button class="btn-back" id="s0-back" dir="rtl" onclick="s0Back()">عودة</button>
         </div>
       </div>
     </div>
@@ -78,64 +78,64 @@
     <div class="qnav" id="sq2-qnav">
       <div class="qnav-item">
         <div class="qnav-icon qnav-future" id="sq2-qnav-icon-5"></div>
-        <span class="qnav-label" id="sq2-qnav-label-5">שאלה 5</span>
+        <span class="qnav-label" id="sq2-qnav-label-5">سؤال 5</span>
       </div>
       <div class="qnav-line" id="sq2-qnav-line-4"></div>
       <div class="qnav-item">
         <div class="qnav-icon qnav-future" id="sq2-qnav-icon-4"></div>
-        <span class="qnav-label" id="sq2-qnav-label-4">שאלה 4</span>
+        <span class="qnav-label" id="sq2-qnav-label-4">سؤال 4</span>
       </div>
       <div class="qnav-line" id="sq2-qnav-line-3"></div>
       <div class="qnav-item">
         <div class="qnav-icon qnav-future" id="sq2-qnav-icon-3"></div>
-        <span class="qnav-label" id="sq2-qnav-label-3">שאלה 3</span>
+        <span class="qnav-label" id="sq2-qnav-label-3">سؤال 3</span>
       </div>
       <div class="qnav-line" id="sq2-qnav-line-2"></div>
       <div class="qnav-item">
         <div class="qnav-icon qnav-future" id="sq2-qnav-icon-2"></div>
-        <span class="qnav-label" id="sq2-qnav-label-2">שאלה 2</span>
+        <span class="qnav-label" id="sq2-qnav-label-2">سؤال 2</span>
       </div>
       <div class="qnav-line" id="sq2-qnav-line-1"></div>
       <div class="qnav-item">
         <div class="qnav-icon qnav-current" id="sq2-qnav-icon-1"></div>
-        <span class="qnav-label qnav-label-active" id="sq2-qnav-label-1">שאלה 1</span>
+        <span class="qnav-label qnav-label-active" id="sq2-qnav-label-1">سؤال 1</span>
       </div>
     </div>
 
     <div class="scq-question">
       <div class="scq-img"><div class="scq-img-inner no-zoom">
-        <button class="img-zoom-btn" type="button" aria-label="הגדלת התמונה"
-                data-zoom-src="assets/images/פסטה וחטיף.png" data-zoom-alt="חטיף באריזה ואריזת פסטה עם תוכן">
+        <button class="img-zoom-btn" type="button" aria-label="تكبير الصورة"
+                data-zoom-src="assets/images/פסטה וחטיף.png" data-zoom-alt="قطعة تسالي في غلاف وعبوة باستا مع المحتوى">
           <svg class="img-zoom-btn__icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="8.5" cy="8.5" r="6" stroke="currentColor" stroke-width="1.6"/>
             <path d="M13 13L17.5 17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
           </svg>
         </button>
-        <img id="sq2-img" src="assets/images/פסטה וחטיף.png" alt="חטיף באריזה ואריזת פסטה עם תוכן"></div></div>
+        <img id="sq2-img" src="assets/images/פסטה וחטיף.png" alt="قطعة تسالي في غلاف وعبوة باستا مع المحتوى"></div></div>
       <div class="scq-content">
         <div class="scq-qtext">
           <div class="scq-qtext-body">
-            <p class="scq-qtitle">מהו ברוטו?</p>
-            <p class="scq-qbody">ברוטו הוא המסה של התוכן והאריזה יחד (החטיף + האריזה).<br>
+            <p class="scq-qtitle">ما هي الكتلة الإجمالية؟</p>
+            <p class="scq-qbody">الكتلة الإجمالية هي كتلة المحتوى والغلاف معًا (قطعة التسالي + الغلاف).<br>
               <b>
-              סמנו את שני הפריטים שהם ברוטו:</b></p>
+              اختاروا الغرضَين اللذَين يمثلان الكتلة الإجمالية:</b></p>
           </div>
         </div>
-        <div class="scq-answers" role="group" aria-label="בחרו את כל התשובות הנכונות">
+        <div class="scq-answers" role="group" aria-label="اختاروا جميع الإجابات الصحيحة">
           <div class="scq-opt" role="checkbox" aria-checked="false" tabindex="0" data-id="a" onclick="sq2Toggle('a')">
-            <span class="scq-opt-text">חטיף באריזתו</span>
+            <span class="scq-opt-text">قطعة التسالي في غلافها</span>
             <span class="scq-radio scq-radio-square"></span>
           </div>
           <div class="scq-opt" role="checkbox" aria-checked="false" tabindex="0" data-id="b" onclick="sq2Toggle('b')">
-            <span class="scq-opt-text">הפסטה שבתוך האריזה</span>
+            <span class="scq-opt-text">الباستا الموجودة داخل العبوة</span>
             <span class="scq-radio scq-radio-square"></span>
           </div>
           <div class="scq-opt" role="checkbox" aria-checked="false" tabindex="0" data-id="c" onclick="sq2Toggle('c')">
-            <span class="scq-opt-text">אריזת פסטה מלאה</span>
+            <span class="scq-opt-text">عبوة الباستا الممتلئة</span>
             <span class="scq-radio scq-radio-square"></span>
           </div>
           <div class="scq-opt" role="checkbox" aria-checked="false" tabindex="0" data-id="d" onclick="sq2Toggle('d')">
-            <span class="scq-opt-text">אריזת פסטה ריקה</span>
+            <span class="scq-opt-text">عبوة الباستا الفارغة</span>
             <span class="scq-radio scq-radio-square"></span>
           </div>
         </div>
@@ -152,14 +152,14 @@
     <div class="bottom-bar">
       <div class="bottom-bar-inner">
         <div class="bar-actions">
-          <button id="sq2-check" class="btn-continue" dir="rtl" onclick="sq2Check()" disabled>צדקתי?</button>
+          <button id="sq2-check" class="btn-continue" dir="rtl" onclick="sq2Check()" disabled>هل إجابتي صحيحة؟</button>
           <button id="sq2-hint" class="btn-hint" dir="rtl" onclick="sq2OpenHint()">
             <img class="scq-hint-icon" id="sq2-hint-icon" src="assets/images/icon-hint-blue.svg" alt="">
-            אפשר רמז?
+            هل يمكنني الحصول على تلميح؟
           </button>
         </div>
         <div class="bar-back">
-          <button class="btn-back" dir="rtl" onclick="goTo(0)">חזרה</button>
+          <button class="btn-back" dir="rtl" onclick="goTo(0)">عودة</button>
         </div>
       </div>
     </div>
@@ -170,66 +170,66 @@
     <div class="qnav" id="sq3-qnav">
       <div class="qnav-item">
         <div class="qnav-icon qnav-future" id="sq3-qnav-icon-5"></div>
-        <span class="qnav-label" id="sq3-qnav-label-5">שאלה 5</span>
+        <span class="qnav-label" id="sq3-qnav-label-5">سؤال 5</span>
       </div>
       <div class="qnav-line" id="sq3-qnav-line-4"></div>
       <div class="qnav-item">
         <div class="qnav-icon qnav-future" id="sq3-qnav-icon-4"></div>
-        <span class="qnav-label" id="sq3-qnav-label-4">שאלה 4</span>
+        <span class="qnav-label" id="sq3-qnav-label-4">سؤال 4</span>
       </div>
       <div class="qnav-line" id="sq3-qnav-line-3"></div>
       <div class="qnav-item">
         <div class="qnav-icon qnav-future" id="sq3-qnav-icon-3"></div>
-        <span class="qnav-label" id="sq3-qnav-label-3">שאלה 3</span>
+        <span class="qnav-label" id="sq3-qnav-label-3">سؤال 3</span>
       </div>
       <div class="qnav-line" id="sq3-qnav-line-2"></div>
       <div class="qnav-item">
         <div class="qnav-icon qnav-current" id="sq3-qnav-icon-2"></div>
-        <span class="qnav-label qnav-label-active" id="sq3-qnav-label-2">שאלה 2</span>
+        <span class="qnav-label qnav-label-active" id="sq3-qnav-label-2">سؤال 2</span>
       </div>
       <div class="qnav-line" id="sq3-qnav-line-1"></div>
       <div class="qnav-item">
         <div class="qnav-icon qnav-future" id="sq3-qnav-icon-1"></div>
-        <span class="qnav-label" id="sq3-qnav-label-1">שאלה 1</span>
+        <span class="qnav-label" id="sq3-qnav-label-1">سؤال 1</span>
       </div>
     </div>
 
     <div class="scq-question">
       <div class="scq-img"><div class="scq-img-inner no-zoom">
-        <button class="img-zoom-btn" type="button" aria-label="הגדלת התמונה"
-                data-zoom-src="assets/images/בקבוק ופיצה.png" data-zoom-alt="בקבוק ופיצה">
+        <button class="img-zoom-btn" type="button" aria-label="تكبير الصورة"
+                data-zoom-src="assets/images/בקבוק ופיצה.png" data-zoom-alt="قنينة وبيتسا">
           <svg class="img-zoom-btn__icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="8.5" cy="8.5" r="6" stroke="currentColor" stroke-width="1.6"/>
             <path d="M13 13L17.5 17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
           </svg>
         </button>
-        <img id="sq3-img" src="assets/images/בקבוק ופיצה.png" alt="בקבוק ופיצה"></div></div>
+        <img id="sq3-img" src="assets/images/בקבוק ופיצה.png" alt="قنينة وبيتسا"></div></div>
       <div class="scq-content">
         <div class="scq-qtext">
           <div class="scq-qtext-body">
-            <p class="scq-qtitle">מהו נטו?</p>
-            <p class="scq-qbody">נטו הוא המסה של התוכן בלבד (בלי המיכל או האריזה).<br>
+            <p class="scq-qtitle">ما هي الكتلة الصافية؟</p>
+            <p class="scq-qbody">الكتلة الصافية هي كتلة المحتوى فقط (بدون الغلاف أو العبوة).<br>
               <b></b>
-              סמנו את שני הפריטים שהם נטו:
+              اختاروا الغرضَين اللذَين يمثلان الكتلة الصافية:
               </b>
             </p>
           </div>
         </div>
-        <div class="scq-answers" role="group" aria-label="בחרו את כל התשובות הנכונות">
+        <div class="scq-answers" role="group" aria-label="اختاروا جميع الإجابات الصحيحة">
           <div class="scq-opt" role="checkbox" aria-checked="false" tabindex="0" data-id="a" onclick="sq3Toggle('a')">
-            <span class="scq-opt-text">בקבוק פלסטיק ריק</span>
+            <span class="scq-opt-text">قنينة البلاستيك الفارغة</span>
             <span class="scq-radio scq-radio-square"></span>
           </div>
           <div class="scq-opt" role="checkbox" aria-checked="false" tabindex="0" data-id="b" onclick="sq3Toggle('b')">
-            <span class="scq-opt-text">המים שבתוך הבקבוק</span>
+            <span class="scq-opt-text">الماء الموجود داخل القنينة</span>
             <span class="scq-radio scq-radio-square"></span>
           </div>
           <div class="scq-opt" role="checkbox" aria-checked="false" tabindex="0" data-id="c" onclick="sq3Toggle('c')">
-            <span class="scq-opt-text">קופסת קרטון של פיצה</span>
+            <span class="scq-opt-text">علبة الكرتون للبيتسا</span>
             <span class="scq-radio scq-radio-square"></span>
           </div>
           <div class="scq-opt" role="checkbox" aria-checked="false" tabindex="0" data-id="d" onclick="sq3Toggle('d')">
-            <span class="scq-opt-text">משולשי הפיצה שאוכלים</span>
+            <span class="scq-opt-text">مثلثات البيتسا التي نأكلها</span>
             <span class="scq-radio scq-radio-square"></span>
           </div>
         </div>
@@ -246,14 +246,14 @@
     <div class="bottom-bar">
       <div class="bottom-bar-inner">
         <div class="bar-actions">
-          <button id="sq3-check" class="btn-continue" dir="rtl" onclick="sq3Check()" disabled>צדקתי?</button>
+          <button id="sq3-check" class="btn-continue" dir="rtl" onclick="sq3Check()" disabled>هل إجابتي صحيحة؟</button>
           <button id="sq3-hint" class="btn-hint" dir="rtl" onclick="sq3OpenHint()">
             <img class="scq-hint-icon" id="sq3-hint-icon" src="assets/images/icon-hint-blue.svg" alt="">
-            אפשר רמז?
+            هل يمكنني الحصول على تلميح؟
           </button>
         </div>
         <div class="bar-back">
-          <button class="btn-back" dir="rtl" onclick="goTo(1)">חזרה</button>
+          <button class="btn-back" dir="rtl" onclick="goTo(1)">عودة</button>
         </div>
       </div>
     </div>
@@ -264,27 +264,27 @@
     <div class="qnav" id="sq4-qnav">
       <div class="qnav-item">
         <div class="qnav-icon qnav-future" id="sq4-qnav-icon-5"></div>
-        <span class="qnav-label" id="sq4-qnav-label-5">שאלה 5</span>
+        <span class="qnav-label" id="sq4-qnav-label-5">سؤال 5</span>
       </div>
       <div class="qnav-line" id="sq4-qnav-line-4"></div>
       <div class="qnav-item">
         <div class="qnav-icon qnav-future" id="sq4-qnav-icon-4"></div>
-        <span class="qnav-label" id="sq4-qnav-label-4">שאלה 4</span>
+        <span class="qnav-label" id="sq4-qnav-label-4">سؤال 4</span>
       </div>
       <div class="qnav-line" id="sq4-qnav-line-3"></div>
       <div class="qnav-item">
         <div class="qnav-icon qnav-current" id="sq4-qnav-icon-3"></div>
-        <span class="qnav-label qnav-label-active" id="sq4-qnav-label-3">שאלה 3</span>
+        <span class="qnav-label qnav-label-active" id="sq4-qnav-label-3">سؤال 3</span>
       </div>
       <div class="qnav-line" id="sq4-qnav-line-2"></div>
       <div class="qnav-item">
         <div class="qnav-icon qnav-future" id="sq4-qnav-icon-2"></div>
-        <span class="qnav-label" id="sq4-qnav-label-2">שאלה 2</span>
+        <span class="qnav-label" id="sq4-qnav-label-2">سؤال 2</span>
       </div>
       <div class="qnav-line" id="sq4-qnav-line-1"></div>
       <div class="qnav-item">
         <div class="qnav-icon qnav-future" id="sq4-qnav-icon-1"></div>
-        <span class="qnav-label" id="sq4-qnav-label-1">שאלה 1</span>
+        <span class="qnav-label" id="sq4-qnav-label-1">سؤال 1</span>
       </div>
     </div>
 
@@ -292,25 +292,25 @@
       <div class="scq-content">
         <div class="scq-qtext">
           <div class="scq-qtext-body">
-            <p class="scq-qtitle">יחידות מסה (גרם)</p>
-            <p class="scq-qbody">סמנו את שני הפריטים שכדאי למדוד בגרמים:</p>
+            <p class="scq-qtitle">وحدات الكتلة (غرام)</p>
+            <p class="scq-qbody">اختاروا العنصرَين اللذَين من المفضل قياسهما بالغرامات:</p>
           </div>
         </div>
-        <div class="scq-answers" role="group" aria-label="בחרו את כל התשובות הנכונות">
+        <div class="scq-answers" role="group" aria-label="اختاروا جميع الإجابات الصحيحة">
           <div class="scq-opt" role="checkbox" aria-checked="false" tabindex="0" data-id="a" onclick="sq4Toggle('a')">
-            <span class="scq-opt-text">תפוח עץ</span>
+            <span class="scq-opt-text">تفاحة</span>
             <span class="scq-radio scq-radio-square"></span>
           </div>
           <div class="scq-opt" role="checkbox" aria-checked="false" tabindex="0" data-id="b" onclick="sq4Toggle('b')">
-            <span class="scq-opt-text">קטר רכבת</span>
+            <span class="scq-opt-text">مقطورة قطار</span>
             <span class="scq-radio scq-radio-square"></span>
           </div>
           <div class="scq-opt" role="checkbox" aria-checked="false" tabindex="0" data-id="c" onclick="sq4Toggle('c')">
-            <span class="scq-opt-text">חטיף שוקולד</span>
+            <span class="scq-opt-text">قطعة شوكولاتة</span>
             <span class="scq-radio scq-radio-square"></span>
           </div>
           <div class="scq-opt" role="checkbox" aria-checked="false" tabindex="0" data-id="d" onclick="sq4Toggle('d')">
-            <span class="scq-opt-text">כלב</span>
+            <span class="scq-opt-text">كلب</span>
             <span class="scq-radio scq-radio-square"></span>
           </div>
         </div>
@@ -327,14 +327,14 @@
     <div class="bottom-bar">
       <div class="bottom-bar-inner">
         <div class="bar-actions">
-          <button id="sq4-check" class="btn-continue" dir="rtl" onclick="sq4Check()" disabled>צדקתי?</button>
+          <button id="sq4-check" class="btn-continue" dir="rtl" onclick="sq4Check()" disabled>هل إجابتي صحيحة؟</button>
           <button id="sq4-hint" class="btn-hint" dir="rtl" onclick="sq4OpenHint()">
             <img class="scq-hint-icon" id="sq4-hint-icon" src="assets/images/icon-hint-blue.svg" alt="">
-            אפשר רמז?
+            هل يمكنني الحصول على تلميح؟
           </button>
         </div>
         <div class="bar-back">
-          <button class="btn-back" dir="rtl" onclick="goTo(2)">חזרה</button>
+          <button class="btn-back" dir="rtl" onclick="goTo(2)">عودة</button>
         </div>
       </div>
     </div>
@@ -345,75 +345,75 @@
     <div class="qnav" id="sq5-qnav">
       <div class="qnav-item">
         <div class="qnav-icon qnav-future" id="sq5-qnav-icon-5"></div>
-        <span class="qnav-label" id="sq5-qnav-label-5">שאלה 5</span>
+        <span class="qnav-label" id="sq5-qnav-label-5">سؤال 5</span>
       </div>
       <div class="qnav-line" id="sq5-qnav-line-4"></div>
       <div class="qnav-item">
         <div class="qnav-icon qnav-current" id="sq5-qnav-icon-4"></div>
-        <span class="qnav-label qnav-label-active" id="sq5-qnav-label-4">שאלה 4</span>
+        <span class="qnav-label qnav-label-active" id="sq5-qnav-label-4">سؤال 4</span>
       </div>
       <div class="qnav-line" id="sq5-qnav-line-3"></div>
       <div class="qnav-item">
         <div class="qnav-icon qnav-future" id="sq5-qnav-icon-3"></div>
-        <span class="qnav-label" id="sq5-qnav-label-3">שאלה 3</span>
+        <span class="qnav-label" id="sq5-qnav-label-3">سؤال 3</span>
       </div>
       <div class="qnav-line" id="sq5-qnav-line-2"></div>
       <div class="qnav-item">
         <div class="qnav-icon qnav-future" id="sq5-qnav-icon-2"></div>
-        <span class="qnav-label" id="sq5-qnav-label-2">שאלה 2</span>
+        <span class="qnav-label" id="sq5-qnav-label-2">سؤال 2</span>
       </div>
       <div class="qnav-line" id="sq5-qnav-line-1"></div>
       <div class="qnav-item">
         <div class="qnav-icon qnav-future" id="sq5-qnav-icon-1"></div>
-        <span class="qnav-label" id="sq5-qnav-label-1">שאלה 1</span>
+        <span class="qnav-label" id="sq5-qnav-label-1">سؤال 1</span>
       </div>
     </div>
 
     <div class="tf-question">
       <div class="tf-text-group">
-        <p class="tf-qtitle">מדוע משתמשים ביחידות מסה שונות?</p>
-        <p class="tf-instruction">סמנו לגבי כל טענה האם היא נכונה או לא נכונה.</p>
+        <p class="tf-qtitle">لماذا نستخدم وحدات كتلة مختلفة؟</p>
+        <p class="tf-instruction">اختاروا لكل ادّعاء ما إذا كان صحيحًا أو غير صحيح.</p>
       </div>
 
       <div class="tf-rows" id="sq5-rows">
         <div class="tf-row" id="sq5-row-1">
           <div class="tf-stmt">
-            <span class="tf-num">א.</span>
-            <span class="tf-text">אפשר למדוד תפוח בטונות, אבל המספר שיתקבל יהיה קטן מאוד.</span>
+            <span class="tf-num">أ.</span>
+            <span class="tf-text">يمكن قياس كتلة تفاحة بالأطنان، لكن العدد الناتج سيكون صغيرًا جدًا.</span>
           </div>
           <div class="tf-btns">
-            <button class="tf-btn" id="sq5-r1-true" onclick="sq5Select(1,'true')">נכון</button>
-            <button class="tf-btn" id="sq5-r1-false" onclick="sq5Select(1,'false')">לא נכון</button>
+            <button class="tf-btn" id="sq5-r1-true" onclick="sq5Select(1,'true')">صحيح</button>
+            <button class="tf-btn" id="sq5-r1-false" onclick="sq5Select(1,'false')">غير صحيح</button>
           </div>
         </div>
         <div class="tf-row" id="sq5-row-2">
           <div class="tf-stmt">
-            <span class="tf-num">ב.</span>
-            <span class="tf-text">אפשר למדוד קטר רכבת במיליגרמים, אבל המספר שיתקבל יהיה גדול מאוד.</span>
+            <span class="tf-num">ب.</span>
+            <span class="tf-text">يمكن قياس كتلة القاطرة بالميليغرامات، لكن العدد الناتج سيكون كبيرًا جدًا.</span>
           </div>
           <div class="tf-btns">
-            <button class="tf-btn" id="sq5-r2-true" onclick="sq5Select(2,'true')">נכון</button>
-            <button class="tf-btn" id="sq5-r2-false" onclick="sq5Select(2,'false')">לא נכון</button>
+            <button class="tf-btn" id="sq5-r2-true" onclick="sq5Select(2,'true')">صحيح</button>
+            <button class="tf-btn" id="sq5-r2-false" onclick="sq5Select(2,'false')">غير صحيح</button>
           </div>
         </div>
         <div class="tf-row" id="sq5-row-3">
           <div class="tf-stmt">
-            <span class="tf-num">ג.</span>
-            <span class="tf-text">בוחרים יחידת מסה כך שהמספר המתקבל יהיה נוח לשימוש.</span>
+            <span class="tf-num">ت.</span>
+            <span class="tf-text">نختار وحدة الكتلة بحيث يكون العدد الناتج ملائمًا ومريحًا للاستخدام.</span>
           </div>
           <div class="tf-btns">
-            <button class="tf-btn" id="sq5-r3-true" onclick="sq5Select(3,'true')">נכון</button>
-            <button class="tf-btn" id="sq5-r3-false" onclick="sq5Select(3,'false')">לא נכון</button>
+            <button class="tf-btn" id="sq5-r3-true" onclick="sq5Select(3,'true')">صحيح</button>
+            <button class="tf-btn" id="sq5-r3-false" onclick="sq5Select(3,'false')">غير صحيح</button>
           </div>
         </div>
         <div class="tf-row" id="sq5-row-4">
           <div class="tf-stmt">
-            <span class="tf-num">ד.</span>
-            <span class="tf-text">לכל גוף יש יחידת מסה אחת שבה אפשר למדוד אותו.</span>
+            <span class="tf-num">ث.</span>
+            <span class="tf-text">لكل غرض وحدة كتلة واحدة يمكن من خلالها قياسه.</span>
           </div>
           <div class="tf-btns">
-            <button class="tf-btn" id="sq5-r4-true" onclick="sq5Select(4,'true')">נכון</button>
-            <button class="tf-btn" id="sq5-r4-false" onclick="sq5Select(4,'false')">לא נכון</button>
+            <button class="tf-btn" id="sq5-r4-true" onclick="sq5Select(4,'true')">صحيح</button>
+            <button class="tf-btn" id="sq5-r4-false" onclick="sq5Select(4,'false')">غير صحيح</button>
           </div>
         </div>
       </div>
@@ -424,20 +424,20 @@
         <span class="scq-fb-title-text"></span>
       </div>
       <p class="scq-fb-body"></p>
-      <button id="sq5-reveal-btn" class="scq-fb-reveal-btn" type="button" onclick="sq5Reveal()" hidden>התשובה הנכונה</button>
+      <button id="sq5-reveal-btn" class="scq-fb-reveal-btn" type="button" onclick="sq5Reveal()" hidden>الإجابة الصحيحة</button>
     </div>
 
     <div class="bottom-bar">
       <div class="bottom-bar-inner">
         <div class="bar-actions">
-          <button id="sq5-check" class="btn-continue" dir="rtl" onclick="sq5Check()" disabled>צדקתי?</button>
+          <button id="sq5-check" class="btn-continue" dir="rtl" onclick="sq5Check()" disabled>هل إجابتي صحيحة؟</button>
           <button id="sq5-hint" class="btn-hint" dir="rtl" onclick="sq5OpenHint()">
             <img class="scq-hint-icon" id="sq5-hint-icon" src="assets/images/icon-hint-blue.svg" alt="">
-            אפשר רמז?
+            هل يمكنني الحصول على تلميح؟
           </button>
         </div>
         <div class="bar-back">
-          <button class="btn-back" dir="rtl" onclick="goTo(3)">חזרה</button>
+          <button class="btn-back" dir="rtl" onclick="goTo(3)">عودة</button>
         </div>
       </div>
     </div>
@@ -448,27 +448,27 @@
     <div class="qnav" id="sq6-qnav">
       <div class="qnav-item">
         <div class="qnav-icon qnav-current" id="sq6-qnav-icon-5"></div>
-        <span class="qnav-label qnav-label-active" id="sq6-qnav-label-5">שאלה 5</span>
+        <span class="qnav-label qnav-label-active" id="sq6-qnav-label-5">سؤال 5</span>
       </div>
       <div class="qnav-line" id="sq6-qnav-line-4"></div>
       <div class="qnav-item">
         <div class="qnav-icon qnav-future" id="sq6-qnav-icon-4"></div>
-        <span class="qnav-label" id="sq6-qnav-label-4">שאלה 4</span>
+        <span class="qnav-label" id="sq6-qnav-label-4">سؤال 4</span>
       </div>
       <div class="qnav-line" id="sq6-qnav-line-3"></div>
       <div class="qnav-item">
         <div class="qnav-icon qnav-future" id="sq6-qnav-icon-3"></div>
-        <span class="qnav-label" id="sq6-qnav-label-3">שאלה 3</span>
+        <span class="qnav-label" id="sq6-qnav-label-3">سؤال 3</span>
       </div>
       <div class="qnav-line" id="sq6-qnav-line-2"></div>
       <div class="qnav-item">
         <div class="qnav-icon qnav-future" id="sq6-qnav-icon-2"></div>
-        <span class="qnav-label" id="sq6-qnav-label-2">שאלה 2</span>
+        <span class="qnav-label" id="sq6-qnav-label-2">سؤال 2</span>
       </div>
       <div class="qnav-line" id="sq6-qnav-line-1"></div>
       <div class="qnav-item">
         <div class="qnav-icon qnav-future" id="sq6-qnav-icon-1"></div>
-        <span class="qnav-label" id="sq6-qnav-label-1">שאלה 1</span>
+        <span class="qnav-label" id="sq6-qnav-label-1">سؤال 1</span>
       </div>
     </div>
 
@@ -476,25 +476,25 @@
       <div class="scq-content">
         <div class="scq-qtext">
           <div class="scq-qtext-body">
-            <p class="scq-qtitle">יחידות מסה (קילוגרם)</p>
-            <p class="scq-qbody">סמנו את שני הפריטים שכדאי למדוד בקילוגרמים:</p>
+            <p class="scq-qtitle">وحدات الكتلة (كيلوغرام)</p>
+            <p class="scq-qbody">اختاروا العنصرَين اللذَين من المفضل قياسهما بالكيلوغرامات:</p>
           </div>
         </div>
-        <div class="scq-answers" role="group" aria-label="בחרו את כל התשובות הנכונות">
+        <div class="scq-answers" role="group" aria-label="اختاروا جميع الإجابات الصحيحة">
           <div class="scq-opt" role="checkbox" aria-checked="false" tabindex="0" data-id="a" onclick="sq6Toggle('a')">
-            <span class="scq-opt-text">כדור ויטמין קטן</span>
+            <span class="scq-opt-text">حبة فيتامين صغيرة</span>
             <span class="scq-radio scq-radio-square"></span>
           </div>
           <div class="scq-opt" role="checkbox" aria-checked="false" tabindex="0" data-id="b" onclick="sq6Toggle('b')">
-            <span class="scq-opt-text">אופניים</span>
+            <span class="scq-opt-text">دراجة هوائية</span>
             <span class="scq-radio scq-radio-square"></span>
           </div>
           <div class="scq-opt" role="checkbox" aria-checked="false" tabindex="0" data-id="c" onclick="sq6Toggle('c')">
-            <span class="scq-opt-text">גרגר מלח גס</span>
+            <span class="scq-opt-text">حبة ملح خشن</span>
             <span class="scq-radio scq-radio-square"></span>
           </div>
           <div class="scq-opt" role="checkbox" aria-checked="false" tabindex="0" data-id="d" onclick="sq6Toggle('d')">
-            <span class="scq-opt-text">כלב</span>
+            <span class="scq-opt-text">كلب</span>
             <span class="scq-radio scq-radio-square"></span>
           </div>
         </div>
@@ -511,14 +511,14 @@
     <div class="bottom-bar">
       <div class="bottom-bar-inner">
         <div class="bar-actions">
-          <button id="sq6-check" class="btn-continue" dir="rtl" onclick="sq6Check()" disabled>צדקתי?</button>
+          <button id="sq6-check" class="btn-continue" dir="rtl" onclick="sq6Check()" disabled>هل إجابتي صحيحة؟</button>
           <button id="sq6-hint" class="btn-hint" dir="rtl" onclick="sq6OpenHint()">
             <img class="scq-hint-icon" id="sq6-hint-icon" src="assets/images/icon-hint-blue.svg" alt="">
-            אפשר רמז?
+            هل يمكنني الحصول على تلميح؟
           </button>
         </div>
         <div class="bar-back">
-          <button class="btn-back" dir="rtl" onclick="goTo(4)">חזרה</button>
+          <button class="btn-back" dir="rtl" onclick="goTo(4)">عودة</button>
         </div>
       </div>
     </div>
@@ -528,24 +528,24 @@
   <section class="screen" data-screen="6" id="s6">
     <div class="transition-content">
       <div class="transition-title-block">
-        <p class="transition-sub">יופי של עבודה! </p>
-        <h2 class="transition-title">נחזור ל-2 תרגילים ברמת קושי גבוהה יותר.
+        <p class="transition-sub">عمل رائع! </p>
+        <h2 class="transition-title">سنعود إلى تمرينين بمستوى صعوبة أعلى.
 </h2>
        
       </div>
       <div class="s6-avatar-wrap">
-        <video class="transition-avatar" id="s6-avatar-img" aria-label="דמות מלווה" muted loop autoplay playsinline></video>
-        <div class="s6-bubble">ברור לי שתצליחו!</div>
+        <video class="transition-avatar" id="s6-avatar-img" aria-label="شخصية مرافقة" muted loop autoplay playsinline></video>
+        <div class="s6-bubble">أنا واثق من أنكم ستنجحون!</div>
       </div>
     </div>
 
     <div class="bottom-bar">
       <div class="bottom-bar-inner">
         <div class="bar-actions">
-          <button class="btn-continue" dir="rtl" onclick="s6Continue()">המשך</button>
+          <button class="btn-continue" dir="rtl" onclick="s6Continue()">متابعة</button>
         </div>
         <div class="bar-back">
-          <button class="btn-back" dir="rtl" onclick="goTo(5)">חזרה</button>
+          <button class="btn-back" dir="rtl" onclick="goTo(5)">عودة</button>
         </div>
       </div>
     </div>
@@ -556,109 +556,109 @@
     <div class="qnav" id="dd8-qnav">
       <div class="qnav-item">
         <div class="qnav-icon qnav-future" id="dd8-qnav-icon-2"></div>
-        <span class="qnav-label" id="dd8-qnav-label-2">שאלה 2</span>
+        <span class="qnav-label" id="dd8-qnav-label-2">سؤال 2</span>
       </div>
       <div class="qnav-line" id="dd8-qnav-line-1"></div>
       <div class="qnav-item">
         <div class="qnav-icon qnav-current" id="dd8-qnav-icon-1"></div>
-        <span class="qnav-label qnav-label-active" id="dd8-qnav-label-1">שאלה 1</span>
+        <span class="qnav-label qnav-label-active" id="dd8-qnav-label-1">سؤال 1</span>
       </div>
     </div>
 
     <div class="dd-question">
       <div class="dd-text-group">
-        <h2 class="dd-title">השלמת מושגים</h2>
-        <p class="dd-instruction">השלימו את סוג המסה המתאים לכל פריט: ברוטו, נטו או טרה</p>
+        <h2 class="dd-title">إكمال المصطلحات</h2>
+        <p class="dd-instruction">أكملوا نوع الكتلة الملائم لكل غرض: كتلة إجمالية، صافية أو فارغة</p>
       </div>
 
       <div class="dd-rows" id="dd8-rows">
 
         <div class="dd-row">
-          <span class="dd-label">קופסת נעליים ובתוכה נעליים</span>
+          <span class="dd-label">صندوق أحذية وبداخله حذاء</span>
           <div class="dd-wrap" id="dd8-1">
             <button class="dd-btn" type="button" id="dd8-1-btn" onclick="dd8Toggle('dd8-1')" aria-haspopup="listbox" aria-expanded="false">
               <span class="dd-val" id="dd8-1-val"></span>
               <span class="dd-arrow" aria-hidden="true"></span>
             </button>
             <ul class="dd-opts" id="dd8-1-opts" hidden role="listbox">
-              <li class="dd-opt" role="option" onclick="dd8Select('dd8-1','ברוטו')">ברוטו</li>
-              <li class="dd-opt" role="option" onclick="dd8Select('dd8-1','נטו')">נטו</li>
-              <li class="dd-opt" role="option" onclick="dd8Select('dd8-1','טרה')">טרה</li>
+              <li class="dd-opt" role="option" onclick="dd8Select('dd8-1','كتلة إجمالية')">كتلة إجمالية</li>
+              <li class="dd-opt" role="option" onclick="dd8Select('dd8-1','كتلة صافية')">كتلة صافية</li>
+              <li class="dd-opt" role="option" onclick="dd8Select('dd8-1','كتلة فارغة')">كتلة فارغة</li>
             </ul>
           </div>
         </div>
 
         <div class="dd-row">
-          <span class="dd-label">הנעליים בלבד</span>
+          <span class="dd-label">الحذاء فقط</span>
           <div class="dd-wrap" id="dd8-2">
             <button class="dd-btn" type="button" id="dd8-2-btn" onclick="dd8Toggle('dd8-2')" aria-haspopup="listbox" aria-expanded="false">
               <span class="dd-val" id="dd8-2-val"></span>
               <span class="dd-arrow" aria-hidden="true"></span>
             </button>
             <ul class="dd-opts" id="dd8-2-opts" hidden role="listbox">
-              <li class="dd-opt" role="option" onclick="dd8Select('dd8-2','ברוטו')">ברוטו</li>
-              <li class="dd-opt" role="option" onclick="dd8Select('dd8-2','נטו')">נטו</li>
-              <li class="dd-opt" role="option" onclick="dd8Select('dd8-2','טרה')">טרה</li>
+              <li class="dd-opt" role="option" onclick="dd8Select('dd8-2','كتلة إجمالية')">كتلة إجمالية</li>
+              <li class="dd-opt" role="option" onclick="dd8Select('dd8-2','كتلة صافية')">كتلة صافية</li>
+              <li class="dd-opt" role="option" onclick="dd8Select('dd8-2','كتلة فارغة')">كتلة فارغة</li>
             </ul>
           </div>
         </div>
 
         <div class="dd-row">
-          <span class="dd-label">קופסת הנעליים הריקה</span>
+          <span class="dd-label">علبة الحذاء الفارغة</span>
           <div class="dd-wrap" id="dd8-3">
             <button class="dd-btn" type="button" id="dd8-3-btn" onclick="dd8Toggle('dd8-3')" aria-haspopup="listbox" aria-expanded="false">
               <span class="dd-val" id="dd8-3-val"></span>
               <span class="dd-arrow" aria-hidden="true"></span>
             </button>
             <ul class="dd-opts" id="dd8-3-opts" hidden role="listbox">
-              <li class="dd-opt" role="option" onclick="dd8Select('dd8-3','ברוטו')">ברוטו</li>
-              <li class="dd-opt" role="option" onclick="dd8Select('dd8-3','נטו')">נטו</li>
-              <li class="dd-opt" role="option" onclick="dd8Select('dd8-3','טרה')">טרה</li>
+              <li class="dd-opt" role="option" onclick="dd8Select('dd8-3','كتلة إجمالية')">كتلة إجمالية</li>
+              <li class="dd-opt" role="option" onclick="dd8Select('dd8-3','كتلة صافية')">كتلة صافية</li>
+              <li class="dd-opt" role="option" onclick="dd8Select('dd8-3','كتلة فارغة')">كتلة فارغة</li>
             </ul>
           </div>
         </div>
 
         <div class="dd-row">
-          <span class="dd-label">צנצנת דבש מלאה</span>
+          <span class="dd-label">مرطبان عسل ممتلئ</span>
           <div class="dd-wrap" id="dd8-4">
             <button class="dd-btn" type="button" id="dd8-4-btn" onclick="dd8Toggle('dd8-4')" aria-haspopup="listbox" aria-expanded="false">
               <span class="dd-val" id="dd8-4-val"></span>
               <span class="dd-arrow" aria-hidden="true"></span>
             </button>
             <ul class="dd-opts" id="dd8-4-opts" hidden role="listbox">
-              <li class="dd-opt" role="option" onclick="dd8Select('dd8-4','ברוטו')">ברוטו</li>
-              <li class="dd-opt" role="option" onclick="dd8Select('dd8-4','נטו')">נטו</li>
-              <li class="dd-opt" role="option" onclick="dd8Select('dd8-4','טרה')">טרה</li>
+              <li class="dd-opt" role="option" onclick="dd8Select('dd8-4','كتلة إجمالية')">كتلة إجمالية</li>
+              <li class="dd-opt" role="option" onclick="dd8Select('dd8-4','كتلة صافية')">كتلة صافية</li>
+              <li class="dd-opt" role="option" onclick="dd8Select('dd8-4','كتلة فارغة')">كتلة فارغة</li>
             </ul>
           </div>
         </div>
 
         <div class="dd-row">
-          <span class="dd-label">הדבש בלבד</span>
+          <span class="dd-label">العسل فقط</span>
           <div class="dd-wrap" id="dd8-5">
             <button class="dd-btn" type="button" id="dd8-5-btn" onclick="dd8Toggle('dd8-5')" aria-haspopup="listbox" aria-expanded="false">
               <span class="dd-val" id="dd8-5-val"></span>
               <span class="dd-arrow" aria-hidden="true"></span>
             </button>
             <ul class="dd-opts" id="dd8-5-opts" hidden role="listbox">
-              <li class="dd-opt" role="option" onclick="dd8Select('dd8-5','ברוטו')">ברוטו</li>
-              <li class="dd-opt" role="option" onclick="dd8Select('dd8-5','נטו')">נטו</li>
-              <li class="dd-opt" role="option" onclick="dd8Select('dd8-5','טרה')">טרה</li>
+              <li class="dd-opt" role="option" onclick="dd8Select('dd8-5','كتلة إجمالية')">كتلة إجمالية</li>
+              <li class="dd-opt" role="option" onclick="dd8Select('dd8-5','كتلة صافية')">كتلة صافية</li>
+              <li class="dd-opt" role="option" onclick="dd8Select('dd8-5','كتلة فارغة')">كتلة فارغة</li>
             </ul>
           </div>
         </div>
 
         <div class="dd-row">
-          <span class="dd-label">הצנצנת הריקה</span>
+          <span class="dd-label">المرطبان الفارغ</span>
           <div class="dd-wrap" id="dd8-6">
             <button class="dd-btn" type="button" id="dd8-6-btn" onclick="dd8Toggle('dd8-6')" aria-haspopup="listbox" aria-expanded="false">
               <span class="dd-val" id="dd8-6-val"></span>
               <span class="dd-arrow" aria-hidden="true"></span>
             </button>
             <ul class="dd-opts" id="dd8-6-opts" hidden role="listbox">
-              <li class="dd-opt" role="option" onclick="dd8Select('dd8-6','ברוטו')">ברוטו</li>
-              <li class="dd-opt" role="option" onclick="dd8Select('dd8-6','נטו')">נטו</li>
-              <li class="dd-opt" role="option" onclick="dd8Select('dd8-6','טרה')">טרה</li>
+              <li class="dd-opt" role="option" onclick="dd8Select('dd8-6','كتلة إجمالية')">كتلة إجمالية</li>
+              <li class="dd-opt" role="option" onclick="dd8Select('dd8-6','كتلة صافية')">كتلة صافية</li>
+              <li class="dd-opt" role="option" onclick="dd8Select('dd8-6','كتلة فارغة')">كتلة فارغة</li>
             </ul>
           </div>
         </div>
@@ -671,20 +671,20 @@
         <span class="scq-fb-title-text"></span>
       </div>
       <p class="scq-fb-body"></p>
-      <button id="dd8-reveal-btn" class="scq-fb-reveal-btn" type="button" onclick="dd8Reveal()" hidden>התשובה הנכונה</button>
+      <button id="dd8-reveal-btn" class="scq-fb-reveal-btn" type="button" onclick="dd8Reveal()" hidden>الإجابة الصحيحة</button>
     </div>
 
     <div class="bottom-bar">
       <div class="bottom-bar-inner">
         <div class="bar-actions">
-          <button id="dd8-check" class="btn-continue" dir="rtl" onclick="dd8Check()" disabled>צדקתי?</button>
+          <button id="dd8-check" class="btn-continue" dir="rtl" onclick="dd8Check()" disabled>هل إجابتي صحيحة؟</button>
           <button id="dd8-hint" class="btn-hint" dir="rtl" onclick="dd8OpenHint()" hidden>
             <img class="scq-hint-icon" id="dd8-hint-icon" src="assets/images/icon-hint-blue.svg" alt="">
-            אפשר רמז?
+            هل يمكنني الحصول على تلميح؟
           </button>
         </div>
         <div class="bar-back">
-          <button class="btn-back" dir="rtl" onclick="goTo(6)">חזרה</button>
+          <button class="btn-back" dir="rtl" onclick="goTo(6)">عودة</button>
         </div>
       </div>
     </div>
@@ -695,20 +695,20 @@
     <div class="qnav" id="drag9-qnav">
       <div class="qnav-item">
         <div class="qnav-icon qnav-current" id="drag9-qnav-icon-2"></div>
-        <span class="qnav-label qnav-label-active" id="drag9-qnav-label-2">שאלה 2</span>
+        <span class="qnav-label qnav-label-active" id="drag9-qnav-label-2">سؤال 2</span>
       </div>
       <div class="qnav-line" id="drag9-qnav-line-1"></div>
       <div class="qnav-item">
         <div class="qnav-icon qnav-future" id="drag9-qnav-icon-1"></div>
-        <span class="qnav-label" id="drag9-qnav-label-1">שאלה 1</span>
+        <span class="qnav-label" id="drag9-qnav-label-1">سؤال 1</span>
       </div>
     </div>
 
     <div class="drag-question">
       <div class="drag-text-group">
-        <h2 class="drag-title">השלמת יחידות מסה</h2>
+        <h2 class="drag-title">إكمال وحدات الكتلة</h2>
         <p class="drag-sub">
-          גררו את הפריטים הבאים ליחידות המסה המתאימות: מיליגרם, גרם, קילוגרם או טון.</p>
+          اسحبوا العناصر التالية إلى وحدات الكتلة الملائمة: ميليغرام، غرام، كيلوغرام أو طن.</p>
       </div>
 
       <div class="drag-source-bank" id="drag9-source-bank"
@@ -717,19 +717,19 @@
            ondragenter="event.preventDefault()">
         <div class="drag-item" id="drag9i2" draggable="true" data-correct="gram"
              ondragstart="drag9DragStart(event,'drag9i2')" ondragend="drag9DragEnd('drag9i2')" onclick="drag9ItemClick('drag9i2')">
-          <img src="assets/images/screen28_book.png" alt="ספר לימוד" draggable="false">
+          <img src="assets/images/screen28_book.png" alt="كتاب تعليمي" draggable="false">
         </div>
         <div class="drag-item" id="drag9i1" draggable="true" data-correct="milligram"
              ondragstart="drag9DragStart(event,'drag9i1')" ondragend="drag9DragEnd('drag9i1')" onclick="drag9ItemClick('drag9i1')">
-          <img src="assets/images/screen28_vitamin_pill.png" alt="טבליית ויטמין קטנה" draggable="false">
+          <img src="assets/images/screen28_vitamin_pill.png" alt="حبّة فيتامين صغيرة" draggable="false">
         </div>
         <div class="drag-item" id="drag9i4" draggable="true" data-correct="ton"
              ondragstart="drag9DragStart(event,'drag9i4')" ondragend="drag9DragEnd('drag9i4')" onclick="drag9ItemClick('drag9i4')">
-          <img src="assets/images/screen28_shark.png" alt="לוויתן כחול" draggable="false">
+          <img src="assets/images/screen28_shark.png" alt="حوت أزرق" draggable="false">
         </div>
         <div class="drag-item" id="drag9i3" draggable="true" data-correct="kilogram"
              ondragstart="drag9DragStart(event,'drag9i3')" ondragend="drag9DragEnd('drag9i3')" onclick="drag9ItemClick('drag9i3')">
-          <img src="assets/images/screen28_bycle.png" alt="אופניים" draggable="false">
+          <img src="assets/images/screen28_bycle.png" alt="دراجة هوائية" draggable="false">
         </div>
       </div><!-- /.drag-source-bank -->
 
@@ -740,7 +740,7 @@
                ondragenter="drag9DragEnter(event,'drag9-zone-milligram')"
                ondragleave="drag9DragLeave(event,'drag9-zone-milligram')"
                ondrop="drag9Drop(event,'milligram')"></div>
-          <p class="drag-zone-label">מיליגרם</p>
+          <p class="drag-zone-label">ميليغرام</p>
         </div>
         <div class="drag-zone-wrap">
           <div class="drag-zone" id="drag9-zone-gram"
@@ -748,7 +748,7 @@
                ondragenter="drag9DragEnter(event,'drag9-zone-gram')"
                ondragleave="drag9DragLeave(event,'drag9-zone-gram')"
                ondrop="drag9Drop(event,'gram')"></div>
-          <p class="drag-zone-label">גרם</p>
+          <p class="drag-zone-label">غرام</p>
         </div>
         <div class="drag-zone-wrap">
           <div class="drag-zone" id="drag9-zone-kilogram"
@@ -756,7 +756,7 @@
                ondragenter="drag9DragEnter(event,'drag9-zone-kilogram')"
                ondragleave="drag9DragLeave(event,'drag9-zone-kilogram')"
                ondrop="drag9Drop(event,'kilogram')"></div>
-          <p class="drag-zone-label">קילוגרם</p>
+          <p class="drag-zone-label">كيلوغرام</p>
         </div>
         <div class="drag-zone-wrap">
           <div class="drag-zone" id="drag9-zone-ton"
@@ -764,7 +764,7 @@
                ondragenter="drag9DragEnter(event,'drag9-zone-ton')"
                ondragleave="drag9DragLeave(event,'drag9-zone-ton')"
                ondrop="drag9Drop(event,'ton')"></div>
-          <p class="drag-zone-label">טון</p>
+          <p class="drag-zone-label">طن</p>
         </div>
       </div><!-- /.drag-zones-row -->
     </div><!-- /.drag-question -->
@@ -774,20 +774,20 @@
         <span class="scq-fb-title-text"></span>
       </div>
       <p class="scq-fb-body"></p>
-      <button id="drag9-reveal-btn" class="scq-fb-reveal-btn" type="button" onclick="drag9Reveal()" hidden>התשובה הנכונה</button>
+      <button id="drag9-reveal-btn" class="scq-fb-reveal-btn" type="button" onclick="drag9Reveal()" hidden>الإجابة الصحيحة</button>
     </div>
 
     <div class="bottom-bar">
       <div class="bottom-bar-inner">
         <div class="bar-actions">
-          <button id="drag9-check" class="btn-continue" dir="rtl" onclick="drag9Check()" disabled>צדקתי?</button>
+          <button id="drag9-check" class="btn-continue" dir="rtl" onclick="drag9Check()" disabled>هل إجابتي صحيحة؟</button>
           <button id="drag9-hint" class="btn-hint" dir="rtl" onclick="drag9OpenHint()" hidden>
             <img class="scq-hint-icon" id="drag9-hint-icon" src="assets/images/icon-hint-blue.svg" alt="">
-            אפשר רמז?
+            هل يمكنني الحصول على تلميح؟
           </button>
         </div>
         <div class="bar-back">
-          <button class="btn-back" dir="rtl" onclick="goTo(7)">חזרה</button>
+          <button class="btn-back" dir="rtl" onclick="goTo(7)">عودة</button>
         </div>
       </div>
     </div>
@@ -796,96 +796,96 @@
   <!-- ============ פופ-אפי רמז — מחוץ ל-.screen, ישירות ב-#app ============ -->
 
   <div id="sq2-hint-overlay" class="scq-hint-overlay" hidden>
-    <div class="scq-hint-popup" role="dialog" aria-modal="true" aria-label="רמז">
+    <div class="scq-hint-popup" role="dialog" aria-modal="true" aria-label="تلميح">
       <div class="scq-hint-title-row">
-        <p class="scq-hint-title">רמז</p>
+        <p class="scq-hint-title">تلميح</p>
         <img class="scq-hint-bulb" src="assets/images/icon-idea-white-lg.svg" alt="">
       </div>
-      <p class="scq-hint-body">חפשו את הפריטים שבהם רואים גם את התוכן וגם את האריזה.</p>
-      <button class="scq-hint-close" onclick="sq2CloseHint()">חזרה לשאלה</button>
+      <p class="scq-hint-body">ابحثوا عن الأغراض التي نرى فيها المحتوى والغلاف/العبوة أيضًا.</p>
+      <button class="scq-hint-close" onclick="sq2CloseHint()">العودة إلى السؤال</button>
     </div>
   </div>
 
   <div id="sq3-hint-overlay" class="scq-hint-overlay" hidden>
-    <div class="scq-hint-popup" role="dialog" aria-modal="true" aria-label="רמז">
+    <div class="scq-hint-popup" role="dialog" aria-modal="true" aria-label="تلميح">
       <div class="scq-hint-title-row">
-        <p class="scq-hint-title">רמז</p>
+        <p class="scq-hint-title">تلميح</p>
         <img class="scq-hint-bulb" src="assets/images/icon-idea-white-lg.svg" alt="">
       </div>
-      <p class="scq-hint-body">חפשו את הפריטים המתארים רק תוכן.</p>
-      <button class="scq-hint-close" onclick="sq3CloseHint()">חזרה לשאלה</button>
+      <p class="scq-hint-body">ابحثوا عن العناصر التي تَصِف المحتوى فقط.</p>
+      <button class="scq-hint-close" onclick="sq3CloseHint()">العودة إلى السؤال</button>
     </div>
   </div>
 
   <div id="sq4-hint-overlay" class="scq-hint-overlay" hidden>
-    <div class="scq-hint-popup" role="dialog" aria-modal="true" aria-label="רמז">
+    <div class="scq-hint-popup" role="dialog" aria-modal="true" aria-label="تلميح">
       <div class="scq-hint-title-row">
-        <p class="scq-hint-title">רמז</p>
+        <p class="scq-hint-title">تلميح</p>
         <img class="scq-hint-bulb" src="assets/images/icon-idea-white-lg.svg" alt="">
       </div>
-      <p class="scq-hint-body">גרמים מתאימים בדרך כלל לדברים שאפשר להחזיק ביד.</p>
-      <button class="scq-hint-close" onclick="sq4CloseHint()">חזרה לשאלה</button>
+      <p class="scq-hint-body">الغرامات ملائمة عادةً للأغراض التي يمكن إمساكها باليد.</p>
+      <button class="scq-hint-close" onclick="sq4CloseHint()">العودة إلى السؤال</button>
     </div>
   </div>
 
   <div id="sq5-hint-overlay" class="scq-hint-overlay" hidden>
-    <div class="scq-hint-popup" role="dialog" aria-modal="true" aria-label="רמז">
+    <div class="scq-hint-popup" role="dialog" aria-modal="true" aria-label="تلميح">
       <div class="scq-hint-title-row">
-        <p class="scq-hint-title">רמז</p>
+        <p class="scq-hint-title">تلميح</p>
         <img class="scq-hint-bulb" src="assets/images/icon-idea-white-lg.svg" alt="">
       </div>
-      <p class="scq-hint-body">האם נוח למדוד את מסת הילד במיליגרמים?<br>לדוגמה: מסת הילד היא 35,000,000 מ"ג.<br>או: מסת הילד היא 35 ק"ג.<br>איזו דרך נוחה יותר?</p>
-      <button class="scq-hint-close" onclick="sq5CloseHint()">חזרה לשאלה</button>
+      <p class="scq-hint-body">هل من المريح قياس كتلة الولد بالميليغرام؟<br>على سبيل المثال: كتلة الولد هي 35,000,000 ملغم.<br>أو: كتلة الولد هي 35 كغم.<br>أي طريقة أنسب؟</p>
+      <button class="scq-hint-close" onclick="sq5CloseHint()">العودة إلى السؤال</button>
     </div>
   </div>
 
   <div id="sq6-hint-overlay" class="scq-hint-overlay" hidden>
-    <div class="scq-hint-popup" role="dialog" aria-modal="true" aria-label="רמז">
+    <div class="scq-hint-popup" role="dialog" aria-modal="true" aria-label="تلميح">
       <div class="scq-hint-title-row">
-        <p class="scq-hint-title">רמז</p>
+        <p class="scq-hint-title">تلميح</p>
         <img class="scq-hint-bulb" src="assets/images/icon-idea-white-lg.svg" alt="">
       </div>
-      <p class="scq-hint-body">חשבו אילו מהפריטים הייתם מודדים במשקל ביתי רגיל.</p>
-      <button class="scq-hint-close" onclick="sq6CloseHint()">חזרה לשאלה</button>
+      <p class="scq-hint-body">فكروا: أي عناصر كنتم ستقيسون كتلتها بواسطة ميزان بيتيّ عادي.</p>
+      <button class="scq-hint-close" onclick="sq6CloseHint()">العودة إلى السؤال</button>
     </div>
   </div>
 
   <div id="dd8-hint-overlay" class="scq-hint-overlay" hidden>
-    <div class="scq-hint-popup" role="dialog" aria-modal="true" aria-label="רמז">
+    <div class="scq-hint-popup" role="dialog" aria-modal="true" aria-label="تلميح">
       <div class="scq-hint-title-row">
-        <p class="scq-hint-title">רמז</p>
+        <p class="scq-hint-title">تلميح</p>
         <img class="scq-hint-bulb" src="assets/images/icon-idea-white-lg.svg" alt="">
       </div>
-      <p class="scq-hint-body">ברוטו הוא הטרה והנטו ביחד.</p>
-      <button class="scq-hint-close" onclick="dd8CloseHint()">חזרה לשאלה</button>
+      <p class="scq-hint-body">الكتلة الإجمالية هي مجموع الكتلة الفارغة والكتلة الصافية معًا.</p>
+      <button class="scq-hint-close" onclick="dd8CloseHint()">العودة إلى السؤال</button>
     </div>
   </div>
 
   <div id="drag9-hint-overlay" class="scq-hint-overlay" hidden>
-    <div class="scq-hint-popup" role="dialog" aria-modal="true" aria-label="רמז">
+    <div class="scq-hint-popup" role="dialog" aria-modal="true" aria-label="تلميح">
       <div class="scq-hint-title-row">
-        <p class="scq-hint-title">רמז</p>
+        <p class="scq-hint-title">تلميح</p>
         <img class="scq-hint-bulb" src="assets/images/icon-idea-white-lg.svg" alt="">
       </div>
-      <p class="scq-hint-body">ככל שהגוף הוא בעל מסה גדולה יותר, כך נשתמש ביחידת מסה גדולה יותר.</p>
-      <button class="scq-hint-close" onclick="drag9CloseHint()">חזרה לשאלה</button>
+      <p class="scq-hint-body">كلما كانت للجسم كتلة أكبر، نستخدم وحدة كتلة أكبر.</p>
+      <button class="scq-hint-close" onclick="drag9CloseHint()">العودة إلى السؤال</button>
     </div>
   </div>
 
   <!-- כפתור "מצאתם בעיה?" — רכיב גלובלי, מחוץ ל-.screen -->
-  <button class="flag-btn" aria-label="מצאתם בעיה?" title="מצאתם בעיה?">
+  <button class="flag-btn" aria-label="هل واجهتم مشكلة؟" title="هل واجهتم مشكلة؟">
     <span class="flag-btn-icon" aria-hidden="true">
       <img class="flag-btn-icon-default" src="assets/images/btn-flag-default.png" alt="">
       <img class="flag-btn-icon-hover" src="assets/images/btn-flag-hover.png" alt="">
     </span>
-    <span class="flag-btn-label">מצאתם בעיה?</span>
+    <span class="flag-btn-label">هل واجهتم مشكلة؟</span>
   </button>
 
   <!-- הגדלת תמונה v2 (img-zoom) — רכיב גלובלי משותף אחד, מחוץ ל-.screen,
        ישירות ב-#app, לפי מפרט 720-templates _global-components.md -->
   <div id="img-zoom-modal" class="img-zoom-modal hidden" aria-hidden="true" data-zoom-close="true">
-    <div class="img-zoom-modal__panel" role="dialog" aria-modal="true" aria-label="הגדלת תמונה">
-      <button class="img-zoom-close" type="button" data-zoom-close="true" aria-label="סגירת הגדלת תמונה">
+    <div class="img-zoom-modal__panel" role="dialog" aria-modal="true" aria-label="تكبير الصورة">
+      <button class="img-zoom-close" type="button" data-zoom-close="true" aria-label="إغلاق تكبير الصورة">
         <svg class="img-zoom-close__icon" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M1 1L14 14M14 1L1 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
@@ -910,36 +910,36 @@
        aria-modal="true"
        aria-labelledby="report-modal-title">
     <div class="report-modal-box">
-      <button class="report-close-btn" type="button" onclick="tryCloseReportModal()" aria-label="סגירה">&#10005;</button>
-      <h2 class="report-modal-title" id="report-modal-title">דיווח על בעיה</h2>
-      <p class="report-modal-body">משהו לא ברור או לא עובד כמו שצריך?<br>ספרו לנו מה קרה כדי שנטפל.</p>
+      <button class="report-close-btn" type="button" onclick="tryCloseReportModal()" aria-label="إغلاق">&#10005;</button>
+      <h2 class="report-modal-title" id="report-modal-title">الإبلاغ عن مشكلة</h2>
+      <p class="report-modal-body">هل هناك شيء غير واضح أو لا يعمل كما يجب؟<br>أبلغونا بما حدث لنتمكن معالجة المشكلة.</p>
 
       <div class="report-field">
-        <label class="report-label" for="report-type"><span class="required-star">*</span> מה סוג הבעיה</label>
+        <label class="report-label" for="report-type"><span class="required-star">*</span> ما نوع المشكلة</label>
         <div class="report-custom-select" id="report-type-wrapper">
           <button class="report-select-btn is-placeholder" type="button" aria-haspopup="listbox" aria-expanded="false">
-            <span class="report-select-value">בחרו סוג בעיה</span>
+            <span class="report-select-value">اختاروا نوع المشكلة</span>
           </button>
           <ul class="report-select-list" role="listbox" hidden>
-            <li class="report-select-option" data-value="technical" role="option">תקלה טכנית או שמשהו לא עובד</li>
-            <li class="report-select-option" data-value="unclear" role="option">משהו לא ברור לי</li>
-            <li class="report-select-option" data-value="other" role="option">אחר</li>
+            <li class="report-select-option" data-value="technical" role="option">عطل تقني أو شيء ما لا يعمل</li>
+            <li class="report-select-option" data-value="unclear" role="option">شيء غير واضح لي</li>
+            <li class="report-select-option" data-value="other" role="option">آخر</li>
           </ul>
           <input type="hidden" id="report-type" value="">
         </div>
-        <span class="report-field-error" id="report-type-error" hidden>בחרו את סוג הבעיה</span>
+        <span class="report-field-error" id="report-type-error" hidden>اختاروا نوع مشكلة</span>
       </div>
 
       <div class="report-field">
-        <label class="report-label" for="report-text"><span class="required-star">*</span> מה קרה?</label>
-        <textarea class="report-textarea" id="report-text" maxlength="250" rows="4" placeholder="פרטו מה קרה כדי שנוכל להבין את הבעיה" onblur="reportTextBlur()"></textarea>
-        <span class="report-field-error" id="report-text-error" hidden>כתבו מה קרה</span>
+        <label class="report-label" for="report-text"><span class="required-star">*</span> ماذا حدث؟</label>
+        <textarea class="report-textarea" id="report-text" maxlength="250" rows="4" placeholder="فصّلوا ماذا حدث لنتمكن من فهم المشكلة" onblur="reportTextBlur()"></textarea>
+        <span class="report-field-error" id="report-text-error" hidden>اكتبوا ما حدث</span>
         <span class="report-char-count" id="report-char-count">0 / 250</span>
       </div>
 
       <div class="report-actions">
-        <button class="report-cancel-btn" type="button" onclick="tryCloseReportModal()">ביטול</button>
-        <button class="report-submit-btn" type="button" onclick="submitReport()" disabled>שליחת דיווח</button>
+        <button class="report-cancel-btn" type="button" onclick="tryCloseReportModal()">إلغاء</button>
+        <button class="report-submit-btn" type="button" onclick="submitReport()" disabled>إرسال تبليغ</button>
       </div>
     </div>
   </div>
@@ -952,10 +952,10 @@
        aria-modal="true"
        aria-labelledby="report-thanks-title">
     <div class="report-modal-box report-confirm-box">
-      <h2 class="report-modal-title" id="report-thanks-title">הדיווח נשלח, תודה!</h2>
-      <p class="report-modal-body">קיבלנו את הדיווח שלכם ונטפל בו בהקדם.</p>
+      <h2 class="report-modal-title" id="report-thanks-title">تم إرسال التبليغ، شكرًا!</h2>
+      <p class="report-modal-body">تلقينا التبليغ وسنهتم بالأمر بأقرب وقت.</p>
       <div class="report-actions">
-        <button class="report-submit-btn" type="button" onclick="closeReportThanks()">סגירה</button>
+        <button class="report-submit-btn" type="button" onclick="closeReportThanks()">إغلاق</button>
       </div>
     </div>
   </div>
@@ -968,11 +968,11 @@
        aria-modal="true"
        aria-labelledby="report-confirm-title">
     <div class="report-modal-box report-confirm-box">
-      <h2 class="report-modal-title" id="report-confirm-title">בטוח לסגור את החלון?</h2>
-      <p class="report-modal-body">בלחיצה על סגירה לא יישלח דיווח</p>
+      <h2 class="report-modal-title" id="report-confirm-title">هل تريدون بإغلاق النافذة فعلًا؟</h2>
+      <p class="report-modal-body">إذا ضغطتم على إغلاق لن يتم إرسال التبليغ</p>
       <div class="report-actions">
-        <button class="report-cancel-btn" type="button" onclick="forceCloseReportModal()">סגור חלון</button>
-        <button class="report-submit-btn" type="button" onclick="backToReportForm()">אני רוצה לדווח</button>
+        <button class="report-cancel-btn" type="button" onclick="forceCloseReportModal()">إغلاق النافذة</button>
+        <button class="report-submit-btn" type="button" onclick="backToReportForm()">أريد التبليغ</button>
       </div>
     </div>
   </div>

@@ -183,9 +183,9 @@ const MCQ_SQ2 = {
   correctIds: ['a', 'c'],
   maxAttempts: 2,
   feedback: {
-    correct: { title: 'מצוין!', body: 'ברוטו = הכול יחד (התוכן והאריזה גם יחד).' },
-    wrong1: { title: 'התשובה אינה נכונה.', body: 'לא נורא, גם מטעויות לומדים. ננסה שוב?' },
-    wrong2: { title: 'התשובה אינה נכונה.', body: 'ברוטו = הכול יחד (התוכן והאריזה גם יחד).' }
+    correct: { title: 'ممتاز!', body: 'الكتلة الإجمالية = كل الأغراض معًا (المحتوى والغلاف معًا).' },
+    wrong1: { title: 'الإجابة غير صحيحة.', body: 'لا بأس، نتعلّم من الأخطاء أيضًا. هل نحاول مرة أخرى؟' },
+    wrong2: { title: 'الإجابة غير صحيحة.', body: 'الكتلة الإجمالية = كل الأغراض معًا (المحتوى والغلاف معًا).' }
   }
 };
 
@@ -216,7 +216,7 @@ function sq2Toggle(id) {
   }
   if (sq2Selected.length > 0) sq2Phase = 'selected';
   const checkBtn = document.getElementById('sq2-check');
-  checkBtn.textContent = 'צדקתי?';
+  checkBtn.textContent = 'هل إجابتي صحيحة؟';
   checkBtn.disabled = sq2Selected.length === 0;
   checkBtn.onclick = sq2Check;
 }
@@ -259,7 +259,7 @@ function sq2Check() {
     sq2ShowFeedback('correct', true);
     stationProgress2.q2 = 'success';
     updateQuestionNav2('sq2');
-    sq2SetBarDone('המשך', function () { sq2Continue(); });
+    sq2SetBarDone('متابعة', function () { sq2Continue(); });
     /* resume: מחויבות התשובה. הענף הזה חוזר לפני הזנב — ראו ההערה שם. */
     try { flushResumeSave(); } catch (e) {}
     return;
@@ -277,7 +277,7 @@ function sq2Check() {
     sq2Phase = 'wrong1';
     sq2ShowFeedback('wrong1', false);
     const checkBtn = document.getElementById('sq2-check');
-    checkBtn.textContent = 'צדקתי?';
+    checkBtn.textContent = 'هل إجابتي صحيحة؟';
     checkBtn.disabled = true;
     checkBtn.onclick = sq2Check;
   } else {
@@ -292,7 +292,7 @@ function sq2Check() {
     sq2ShowFeedback('wrong2', false);
     stationProgress2.q2 = 'fail';
     updateQuestionNav2('sq2');
-    sq2SetBarDone('המשך', function () { sq2Continue(); });
+    sq2SetBarDone('متابعة', function () { sq2Continue(); });
   }
 
   /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
@@ -345,7 +345,7 @@ function resetScreenState1() {
   });
   document.getElementById('sq2-feedbox').classList.remove('visible');
   const checkBtn = document.getElementById('sq2-check');
-  checkBtn.textContent = 'צדקתי?';
+  checkBtn.textContent = 'هل إجابتي صحيحة؟';
   checkBtn.disabled = true;
   checkBtn.onclick = sq2Check;
   document.getElementById('sq2-hint-overlay').hidden = true;
@@ -359,9 +359,9 @@ const MCQ_SQ3 = {
   correctIds: ['b', 'd'],
   maxAttempts: 2,
   feedback: {
-    correct: { title: 'מצוין!', body: 'נטו = התוכן בלבד (מה שבאמת משתמשים בו).' },
-    wrong1: { title: 'התשובה אינה נכונה.', body: 'לא נורא, גם מטעויות לומדים. ננסה שוב?' },
-    wrong2: { title: 'התשובה אינה נכונה.', body: 'נטו = התוכן בלבד (מה שבאמת משתמשים בו).' }
+    correct: { title: 'ممتاز!', body: 'الكتلة الصافية = المحتوى فقط (ما نستخدمه بالفعل).' },
+    wrong1: { title: 'الإجابة غير صحيحة.', body: 'لا بأس، نتعلّم من الأخطاء أيضًا. هل نحاول مرة أخرى؟' },
+    wrong2: { title: 'الإجابة غير صحيحة.', body: 'الكتلة الصافية = المحتوى فقط (ما نستخدمه بالفعل).' }
   }
 };
 
@@ -392,7 +392,7 @@ function sq3Toggle(id) {
   }
   if (sq3Selected.length > 0) sq3Phase = 'selected';
   const checkBtn = document.getElementById('sq3-check');
-  checkBtn.textContent = 'צדקתי?';
+  checkBtn.textContent = 'هل إجابتي صحيحة؟';
   checkBtn.disabled = sq3Selected.length === 0;
   checkBtn.onclick = sq3Check;
 }
@@ -435,7 +435,7 @@ function sq3Check() {
     sq3ShowFeedback('correct', true);
     stationProgress2.q3 = 'success';
     updateQuestionNav2('sq3');
-    sq3SetBarDone('המשך', function () { sq3Continue(); });
+    sq3SetBarDone('متابعة', function () { sq3Continue(); });
     /* resume: מחויבות התשובה. הענף הזה חוזר לפני הזנב — ראו ההערה שם. */
     try { flushResumeSave(); } catch (e) {}
     return;
@@ -453,7 +453,7 @@ function sq3Check() {
     sq3Phase = 'wrong1';
     sq3ShowFeedback('wrong1', false);
     const checkBtn = document.getElementById('sq3-check');
-    checkBtn.textContent = 'צדקתי?';
+    checkBtn.textContent = 'هل إجابتي صحيحة؟';
     checkBtn.disabled = true;
     checkBtn.onclick = sq3Check;
   } else {
@@ -468,7 +468,7 @@ function sq3Check() {
     sq3ShowFeedback('wrong2', false);
     stationProgress2.q3 = 'fail';
     updateQuestionNav2('sq3');
-    sq3SetBarDone('המשך', function () { sq3Continue(); });
+    sq3SetBarDone('متابعة', function () { sq3Continue(); });
   }
 
   /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
@@ -517,7 +517,7 @@ function resetScreenState2() {
   });
   document.getElementById('sq3-feedbox').classList.remove('visible');
   const checkBtn = document.getElementById('sq3-check');
-  checkBtn.textContent = 'צדקתי?';
+  checkBtn.textContent = 'هل إجابتي صحيحة؟';
   checkBtn.disabled = true;
   checkBtn.onclick = sq3Check;
   document.getElementById('sq3-hint-overlay').hidden = true;
@@ -531,9 +531,9 @@ const MCQ_SQ4 = {
   correctIds: ['a', 'c'],
   maxAttempts: 2,
   feedback: {
-    correct: { title: 'מצוין!', body: 'גרמים מתאימים בדרך כלל למדידת גופים קטנים עד בינוניים בחיי היום-יום.' },
-    wrong1: { title: 'התשובה אינה נכונה.', body: 'לא נורא, גם מטעויות לומדים. ננסה שוב?' },
-    wrong2: { title: 'התשובה אינה נכונה.', body: 'גרמים מתאימים בדרך כלל למדידת גופים קטנים עד בינוניים בחיי היום-יום.' }
+    correct: { title: 'ممتاز!', body: 'الغرامات ملائمة عادةً لقياس الأغراض الصغيرة حتى المتوسطة في الحياة اليومية.' },
+    wrong1: { title: 'الإجابة غير صحيحة.', body: 'لا بأس، نتعلّم من الأخطاء أيضًا. هل نحاول مرة أخرى؟' },
+    wrong2: { title: 'الإجابة غير صحيحة.', body: 'الغرامات ملائمة عادةً لقياس الأغراض الصغيرة حتى المتوسطة في الحياة اليومية.' }
   }
 };
 
@@ -564,7 +564,7 @@ function sq4Toggle(id) {
   }
   if (sq4Selected.length > 0) sq4Phase = 'selected';
   const checkBtn = document.getElementById('sq4-check');
-  checkBtn.textContent = 'צדקתי?';
+  checkBtn.textContent = 'هل إجابتي صحيحة؟';
   checkBtn.disabled = sq4Selected.length === 0;
   checkBtn.onclick = sq4Check;
 }
@@ -607,7 +607,7 @@ function sq4Check() {
     sq4ShowFeedback('correct', true);
     stationProgress2.q4 = 'success';
     updateQuestionNav2('sq4');
-    sq4SetBarDone('המשך', function () { sq4Continue(); });
+    sq4SetBarDone('متابعة', function () { sq4Continue(); });
     /* resume: מחויבות התשובה. הענף הזה חוזר לפני הזנב — ראו ההערה שם. */
     try { flushResumeSave(); } catch (e) {}
     return;
@@ -625,7 +625,7 @@ function sq4Check() {
     sq4Phase = 'wrong1';
     sq4ShowFeedback('wrong1', false);
     const checkBtn = document.getElementById('sq4-check');
-    checkBtn.textContent = 'צדקתי?';
+    checkBtn.textContent = 'هل إجابتي صحيحة؟';
     checkBtn.disabled = true;
     checkBtn.onclick = sq4Check;
   } else {
@@ -640,7 +640,7 @@ function sq4Check() {
     sq4ShowFeedback('wrong2', false);
     stationProgress2.q4 = 'fail';
     updateQuestionNav2('sq4');
-    sq4SetBarDone('המשך', function () { sq4Continue(); });
+    sq4SetBarDone('متابعة', function () { sq4Continue(); });
   }
 
   /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
@@ -689,7 +689,7 @@ function resetScreenState3() {
   });
   document.getElementById('sq4-feedbox').classList.remove('visible');
   const checkBtn = document.getElementById('sq4-check');
-  checkBtn.textContent = 'צדקתי?';
+  checkBtn.textContent = 'هل إجابتي صحيحة؟';
   checkBtn.disabled = true;
   checkBtn.onclick = sq4Check;
   document.getElementById('sq4-hint-overlay').hidden = true;
@@ -705,14 +705,14 @@ const TF_SQ5 = {
   maxAttempts: 2,
   feedback: {
     correct: {
-      title: 'מצוין!',
-      body: 'אפשר למדוד כל גוף בכל יחידת מסה, אך בוחרים את היחידה שנותנת מספר נוח לקריאה ולהשוואה.\nלמשל:\nגרגר מלח – במיליגרמים\nתפוח – בגרמים\nכלב – בקילוגרמים\nקטר – בטונות.'
+      title: 'ممتاز!',
+      body: 'يمكن قياس أي جسم بأي وحدة كتلة، لكننا نختار الوحدة التي تعطينا عددًا ملائمًا ومريحًا للقراءة والمقارنة.\nمثلًا:\nحبة ملح - بالميليغرام\nتفاحة - بالغرام\nكلب - بالكيلوغرام\nقاطرة - بالطن.'
     },
-    wrong1: { title: 'התשובה אינה נכונה.', body: 'לא נורא, גם מטעויות לומדים. ננסה שוב?' },
-    wrongPending: { title: 'התשובה אינה נכונה.', body: 'רוצים לראות את הפתרון הנכון?' },
+    wrong1: { title: 'الإجابة غير صحيحة.', body: 'لا بأس، نتعلّم من الأخطاء أيضًا. هل نحاول مرة أخرى؟' },
+    wrongPending: { title: 'الإجابة غير صحيحة.', body: 'ترغبون بعرض الحل الصحيح؟' },
     wrong2: {
-      title: 'התשובה אינה נכונה.',
-      body: 'אפשר למדוד כל גוף בכל יחידת מסה, אך בוחרים את היחידה שנותנת מספר נוח לקריאה ולהשוואה.\nלמשל:\nגרגר מלח – במיליגרמים\nתפוח – בגרמים\nכלב – בקילוגרמים\nקטר – בטונות.'
+      title: 'الإجابة غير صحيحة.',
+      body: 'يمكن قياس أي جسم بأي وحدة كتلة، لكننا نختار الوحدة التي تعطينا عددًا ملائمًا ومريحًا للقراءة والمقارنة.\nمثلًا:\nحبة ملح - بالميليغرام\nتفاحة - بالغرام\nكلب - بالكيلوغرام\nقاطرة - بالطن.'
     }
   }
 };
@@ -839,12 +839,12 @@ function sq5Reveal() {
   if (sq5ShowingCorrect) {
     sq5ShowMyAnswer();
     sq5ShowingCorrect = false;
-    if (revealBtn) revealBtn.textContent = 'התשובה הנכונה';
+    if (revealBtn) revealBtn.textContent = 'الإجابة الصحيحة';
   } else {
     sq5MarkRevealed();
     sq5ShowFeedback('wrong2', false);
     sq5ShowingCorrect = true;
-    if (revealBtn) revealBtn.textContent = 'התשובה שלי';
+    if (revealBtn) revealBtn.textContent = 'إجابتي';
   }
 }
 
@@ -874,7 +874,7 @@ function sq5Check() {
     stationProgress2.q5 = 'success';
     updateQuestionNav2('sq5');
     const checkBtn = document.getElementById('sq5-check');
-    checkBtn.textContent = 'המשך';
+    checkBtn.textContent = 'متابعة';
     checkBtn.disabled = false;
     checkBtn.onclick = sq5Continue;
     /* resume: מחויבות התשובה. הענף הזה חוזר לפני הזנב — ראו ההערה שם. */
@@ -909,11 +909,11 @@ function sq5Check() {
     sq5ShowingCorrect = false;
     sq5ShowFeedback('wrongPending', false);
     const revealBtn = document.getElementById('sq5-reveal-btn');
-    if (revealBtn) { revealBtn.hidden = false; revealBtn.textContent = 'התשובה הנכונה'; }
+    if (revealBtn) { revealBtn.hidden = false; revealBtn.textContent = 'الإجابة الصحيحة'; }
     stationProgress2.q5 = 'fail';
     updateQuestionNav2('sq5');
     const checkBtn = document.getElementById('sq5-check');
-    checkBtn.textContent = 'המשך';
+    checkBtn.textContent = 'متابعة';
     checkBtn.disabled = false;
     checkBtn.onclick = sq5Continue;
   }
@@ -956,12 +956,12 @@ function resetScreenState4() {
   });
   document.getElementById('sq5-feedbox').classList.remove('visible');
   const checkBtn = document.getElementById('sq5-check');
-  checkBtn.textContent = 'צדקתי?';
+  checkBtn.textContent = 'هل إجابتي صحيحة؟';
   checkBtn.disabled = true;
   checkBtn.onclick = sq5Check;
   document.getElementById('sq5-hint-overlay').hidden = true;
   const revealBtn = document.getElementById('sq5-reveal-btn');
-  if (revealBtn) { revealBtn.hidden = true; revealBtn.textContent = 'התשובה הנכונה'; }
+  if (revealBtn) { revealBtn.hidden = true; revealBtn.textContent = 'الإجابة الصحيحة'; }
 }
 
 /* =========================================================
@@ -972,9 +972,9 @@ const MCQ_SQ6 = {
   correctIds: ['b', 'd'],
   maxAttempts: 2,
   feedback: {
-    correct: { title: 'מצוין!', body: 'קילוגרמים מתאימים בדרך כלל לבעלי חיים, אנשים וחפצים גדולים ומסיביים יחסית.' },
-    wrong1: { title: 'התשובה אינה נכונה.', body: 'לא נורא, גם מטעויות לומדים. ננסה שוב?' },
-    wrong2: { title: 'התשובה אינה נכונה.', body: 'קילוגרמים מתאימים בדרך כלל לבעלי חיים, אנשים וחפצים גדולים וכבדים יחסית.' }
+    correct: { title: 'ممتاز!', body: 'الكيلوغرامات ملائمة عادةً الحيوانات، الأشخاص والأغراض الكبيرة والضخمة نسبيًا.' },
+    wrong1: { title: 'الإجابة غير صحيحة.', body: 'لا بأس، نتعلّم من الأخطاء أيضًا. هل نحاول مرة أخرى؟' },
+    wrong2: { title: 'الإجابة غير صحيحة.', body: 'الكيلوغرامات ملائمة عادةً الحيوانات، الأشخاص والأغراض الكبيرة والثقيلة نسبيًا.' }
   }
 };
 
@@ -1005,7 +1005,7 @@ function sq6Toggle(id) {
   }
   if (sq6Selected.length > 0) sq6Phase = 'selected';
   const checkBtn = document.getElementById('sq6-check');
-  checkBtn.textContent = 'צדקתי?';
+  checkBtn.textContent = 'هل إجابتي صحيحة؟';
   checkBtn.disabled = sq6Selected.length === 0;
   checkBtn.onclick = sq6Check;
 }
@@ -1048,7 +1048,7 @@ function sq6Check() {
     sq6ShowFeedback('correct', true);
     stationProgress2.q6 = 'success';
     updateQuestionNav2('sq6');
-    sq6SetBarDone('סיום', function () { sq6Continue(); });
+    sq6SetBarDone('إنهاء', function () { sq6Continue(); });
     /* resume: מחויבות התשובה. הענף הזה חוזר לפני הזנב — ראו ההערה שם. */
     try { flushResumeSave(); } catch (e) {}
     return;
@@ -1066,7 +1066,7 @@ function sq6Check() {
     sq6Phase = 'wrong1';
     sq6ShowFeedback('wrong1', false);
     const checkBtn = document.getElementById('sq6-check');
-    checkBtn.textContent = 'צדקתי?';
+    checkBtn.textContent = 'هل إجابتي صحيحة؟';
     checkBtn.disabled = true;
     checkBtn.onclick = sq6Check;
   } else {
@@ -1081,7 +1081,7 @@ function sq6Check() {
     sq6ShowFeedback('wrong2', false);
     stationProgress2.q6 = 'fail';
     updateQuestionNav2('sq6');
-    sq6SetBarDone('סיום', function () { sq6Continue(); });
+    sq6SetBarDone('إنهاء', function () { sq6Continue(); });
   }
 
   /* resume: שמירה סינכרונית ברגע מחויבות התשובה. השמירה המושהית שבסוף goTo()
@@ -1148,7 +1148,7 @@ function resetScreenState5() {
   });
   document.getElementById('sq6-feedbox').classList.remove('visible');
   const checkBtn = document.getElementById('sq6-check');
-  checkBtn.textContent = 'צדקתי?';
+  checkBtn.textContent = 'هل إجابتي صحيحة؟';
   checkBtn.disabled = true;
   checkBtn.onclick = sq6Check;
   document.getElementById('sq6-hint-overlay').hidden = true;
@@ -1214,15 +1214,15 @@ function updateQuestionNav3(prefix) {
 
 const DD8_IDS = ['dd8-1', 'dd8-2', 'dd8-3', 'dd8-4', 'dd8-5', 'dd8-6'];
 const DD8_CORRECT = {
-  'dd8-1': 'ברוטו', 'dd8-2': 'נטו', 'dd8-3': 'טרה',
-  'dd8-4': 'ברוטו', 'dd8-5': 'נטו', 'dd8-6': 'טרה'
+  'dd8-1': 'كتلة إجمالية', 'dd8-2': 'كتلة صافية', 'dd8-3': 'كتلة فارغة',
+  'dd8-4': 'كتلة إجمالية', 'dd8-5': 'كتلة صافية', 'dd8-6': 'كتلة فارغة'
 };
 let dd8Values = { 'dd8-1': '', 'dd8-2': '', 'dd8-3': '', 'dd8-4': '', 'dd8-5': '', 'dd8-6': '' };
 const TEXTS_DD8 = {
-  correct: { title: 'מצוין!', body: 'ברוטו = התוכן והאריזה יחד.\nנטו = התוכן בלבד.\nטרה = האריזה או המיכל בלבד.' },
-  wrong1: { title: 'התשובה אינה נכונה.', body: 'לא נורא, גם מטעויות לומדים. ננסה שוב?' },
-  wrongPending: { title: 'התשובה אינה נכונה.', body: 'רוצים לראות את הפתרון הנכון?' },
-  wrong2: { title: 'התשובה לא נכונה.', body: 'ברוטו = התוכן והאריזה יחד.\nנטו = התוכן בלבד.\nטרה = האריזה או המיכל בלבד.' }
+  correct: { title: 'ممتاز!', body: 'الكتلة الإجمالية = المحتوى والغلاف معًا.\nالكتلة الصافية = المحتوى فقط.\nالكتلة الفارغة = الغلاف أو العبوة فقط.' },
+  wrong1: { title: 'الإجابة غير صحيحة.', body: 'لا بأس، نتعلّم من الأخطاء أيضًا. هل نحاول مرة أخرى؟' },
+  wrongPending: { title: 'الإجابة غير صحيحة.', body: 'ترغبون بعرض الحل الصحيح؟' },
+  wrong2: { title: 'الإجابة غير صحيحة.', body: 'الكتلة الإجمالية = المحتوى والغلاف معًا.\nالكتلة الصافية = المحتوى فقط.\nالكتلة الفارغة = الغلاف أو العبوة فقط.' }
 };
 
 let dd8Done = false;
@@ -1307,7 +1307,7 @@ function dd8EnableHint() {
 
 function dd8SetBarDone(handler) {
   const checkBtn = document.getElementById('dd8-check');
-  checkBtn.textContent = 'המשך';
+  checkBtn.textContent = 'متابعة';
   checkBtn.disabled = false;
   checkBtn.onclick = handler;
 }
@@ -1327,13 +1327,13 @@ function dd8Reveal() {
   if (dd8ShowingCorrect) {
     dd8ShowMyAnswer();
     dd8ShowingCorrect = false;
-    if (revealBtn) revealBtn.textContent = 'התשובה הנכונה';
+    if (revealBtn) revealBtn.textContent = 'الإجابة الصحيحة';
   } else {
     dd8LockDropdowns(true);
     dd8MarkDropdowns();
     dd8ShowFeedback('wrong2', false);
     dd8ShowingCorrect = true;
-    if (revealBtn) revealBtn.textContent = 'התשובה שלי';
+    if (revealBtn) revealBtn.textContent = 'إجابتي';
   }
 }
 
@@ -1367,7 +1367,7 @@ function dd8Check() {
     dd8ShowingCorrect = false;
     dd8ShowFeedback('wrongPending', false);
     const revealBtn = document.getElementById('dd8-reveal-btn');
-    if (revealBtn) { revealBtn.hidden = false; revealBtn.textContent = 'התשובה הנכונה'; }
+    if (revealBtn) { revealBtn.hidden = false; revealBtn.textContent = 'الإجابة الصحيحة'; }
     stationProgress3.q8 = 'fail';
     updateQuestionNav3('dd8');
     dd8SetBarDone(dd8Continue);
@@ -1410,13 +1410,13 @@ function resetScreenState7() {
   });
   document.getElementById('dd8-feedbox').classList.remove('visible');
   const checkBtn = document.getElementById('dd8-check');
-  checkBtn.textContent = 'צדקתי?';
+  checkBtn.textContent = 'هل إجابتي صحيحة؟';
   checkBtn.disabled = true;
   checkBtn.onclick = dd8Check;
   document.getElementById('dd8-hint').hidden = true;
   document.getElementById('dd8-hint-overlay').hidden = true;
   const revealBtn = document.getElementById('dd8-reveal-btn');
-  if (revealBtn) { revealBtn.hidden = true; revealBtn.textContent = 'התשובה הנכונה'; }
+  if (revealBtn) { revealBtn.hidden = true; revealBtn.textContent = 'الإجابة الصحيحة'; }
 }
 
 /* =========================================================
@@ -1433,10 +1433,10 @@ let drag9LastAnswer = null;
 let drag9ShowingCorrect = false;
 let drag9LastSubmittedSig = null;
 const TEXTS_DRAG9 = {
-  correct: { title: 'מצוין!', body: 'ככל שהגוף גדול ומסיבי יותר, כך משתמשים בדרך כלל ביחידת מסה גדולה יותר.' },
-  wrong1: { title: 'התשובה אינה נכונה.', body: 'לא נורא, גם מטעויות לומדים. ננסה שוב?' },
-  wrong2Pending: { title: 'התשובה אינה נכונה.', body: 'רוצים לראות את הפתרון הנכון?' },
-  wrong2: { title: 'התשובה אינה נכונה.', body: 'ככל שהגוף גדול ומסיבי יותר, כך משתמשים בדרך כלל ביחידת מסה גדולה יותר.' }
+  correct: { title: 'ممتاز!', body: 'كلما كان الجسم أكبر وأضخم، نستخدم عادةً وحدة كتلة أكبر.' },
+  wrong1: { title: 'الإجابة غير صحيحة.', body: 'لا بأس، نتعلّم من الأخطاء أيضًا. هل نحاول مرة أخرى؟' },
+  wrong2Pending: { title: 'الإجابة غير صحيحة.', body: 'ترغبون بعرض الحل الصحيح؟' },
+  wrong2: { title: 'الإجابة غير صحيحة.', body: 'كلما كان الجسم أكبر وأضخم، نستخدم عادةً وحدة كتلة أكبر.' }
 };
 
 function drag9AllPlaced() {
@@ -1581,12 +1581,12 @@ function drag9Reveal() {
   if (drag9ShowingCorrect) {
     drag9ShowMyAnswer();
     drag9ShowingCorrect = false;
-    if (revealBtn) revealBtn.textContent = 'התשובה הנכונה';
+    if (revealBtn) revealBtn.textContent = 'الإجابة الصحيحة';
   } else {
     drag9RevealCorrect();
     drag9ShowFeedback('wrong2', false);
     drag9ShowingCorrect = true;
-    if (revealBtn) revealBtn.textContent = 'התשובה שלי';
+    if (revealBtn) revealBtn.textContent = 'إجابتي';
   }
 }
 
@@ -1637,7 +1637,7 @@ function drag9Check() {
   if (allCorrect) {
     drag9Done = true;
     drag9ShowFeedback('correct', true);
-    checkBtn.textContent = 'סיום';
+    checkBtn.textContent = 'إنهاء';
     checkBtn.disabled = false;
     checkBtn.onclick = drag9Continue;
     stationProgress3.q9 = 'success';
@@ -1654,8 +1654,8 @@ function drag9Check() {
     drag9ShowingCorrect = false;
     drag9ShowFeedback('wrong2Pending', false);
     const revealBtn = document.getElementById('drag9-reveal-btn');
-    if (revealBtn) { revealBtn.hidden = false; revealBtn.textContent = 'התשובה הנכונה'; }
-    checkBtn.textContent = 'סיום';
+    if (revealBtn) { revealBtn.hidden = false; revealBtn.textContent = 'الإجابة الصحيحة'; }
+    checkBtn.textContent = 'إنهاء';
     checkBtn.disabled = false;
     checkBtn.onclick = drag9Continue;
     stationProgress3.q9 = 'fail';
@@ -1755,12 +1755,12 @@ function resetScreenState8() {
   document.getElementById('drag9-hint-overlay').hidden = true;
 
   const checkBtn = document.getElementById('drag9-check');
-  checkBtn.textContent = 'צדקתי?';
+  checkBtn.textContent = 'هل إجابتي صحيحة؟';
   checkBtn.disabled = true;
   checkBtn.onclick = drag9Check;
   document.getElementById('drag9-hint').hidden = true;
   const revealBtn = document.getElementById('drag9-reveal-btn');
-  if (revealBtn) { revealBtn.hidden = true; revealBtn.textContent = 'התשובה הנכונה'; }
+  if (revealBtn) { revealBtn.hidden = true; revealBtn.textContent = 'الإجابة الصحيحة'; }
 }
 
 /* ─── Dev mode: postMessage bridge ─────────────────────── */
@@ -2218,7 +2218,7 @@ function restoreScreenUI(n) {
       if (sq6Done) {
         var _sq6Btn = document.getElementById('sq6-check');
         if (_sq6Btn) {
-          _sq6Btn.textContent = 'סיום';
+          _sq6Btn.textContent = 'إنهاء';
           if (typeof alreadySent === 'function' && alreadySent('done', currentPartSlug())) {
             _sq6Btn.disabled = true; _sq6Btn.setAttribute('aria-disabled', 'true');
           }
@@ -2256,7 +2256,7 @@ function restoreMcqUI(cfg, screenSel, prefix, optEl, selected, attempts, done, p
     });
     lockOptions();
     showFeedback(phase === 'correct' ? 'correct' : 'wrong2', phase === 'correct');
-    setBarDone('המשך', continueFn);
+    setBarDone('متابعة', continueFn);
     return;
   }
 
@@ -2275,7 +2275,7 @@ function restoreMcqUI(cfg, screenSel, prefix, optEl, selected, attempts, done, p
   if (phase === 'wrong1') showFeedback('wrong1', false);
   var checkBtn = document.getElementById(prefix + '-check');
   if (checkBtn) {
-    checkBtn.textContent = 'צדקתי?';
+    checkBtn.textContent = 'هل إجابتي صحيحة؟';
     checkBtn.onclick = checkFn;
     checkBtn.disabled = !selected || selected.length === 0;
   }
@@ -2319,10 +2319,10 @@ function sq5RestoreUI() {
       else { sq5MarkOwnAnswer(); sq5ShowFeedback('wrongPending', false); }
       if (revealBtn) {
         revealBtn.hidden = false;
-        revealBtn.textContent = sq5ShowingCorrect ? 'התשובה שלי' : 'התשובה הנכונה';
+        revealBtn.textContent = sq5ShowingCorrect ? 'إجابتي' : 'الإجابة الصحيحة';
       }
     }
-    if (checkBtn) { checkBtn.textContent = 'המשך'; checkBtn.disabled = false; checkBtn.onclick = sq5Continue; }
+    if (checkBtn) { checkBtn.textContent = 'متابعة'; checkBtn.disabled = false; checkBtn.onclick = sq5Continue; }
     return;
   }
 
@@ -2344,7 +2344,7 @@ function sq5RestoreUI() {
   });
   if (sq5Attempts >= 1) sq5ShowFeedback('wrong1', false);
   /* אותו predicate של הזרימה החיה: הכפתור פעיל רק כשכל ארבע השורות נבחרו. */
-  if (checkBtn) { checkBtn.textContent = 'צדקתי?'; checkBtn.onclick = sq5Check; checkBtn.disabled = !sq5AllSelected() || sq5Sig() === sq5LastSubmittedSig; }
+  if (checkBtn) { checkBtn.textContent = 'هل إجابتي صحيحة؟'; checkBtn.onclick = sq5Check; checkBtn.disabled = !sq5AllSelected() || sq5Sig() === sq5LastSubmittedSig; }
 }
 
 /* מסך 8 — שש רשימות נפתחות. */
@@ -2362,7 +2362,7 @@ function dd8RestoreUI() {
       dd8ShowFeedback(dd8ShowingCorrect ? 'wrong2' : 'wrongPending', false);
       if (revealBtn) {
         revealBtn.hidden = false;
-        revealBtn.textContent = dd8ShowingCorrect ? 'התשובה שלי' : 'התשובה הנכונה';
+        revealBtn.textContent = dd8ShowingCorrect ? 'إجابتي' : 'الإجابة الصحيحة';
       }
     }
     dd8SetBarDone(dd8Continue);
@@ -2408,10 +2408,10 @@ function drag9RestoreUI() {
       drag9ShowFeedback(drag9ShowingCorrect ? 'wrong2' : 'wrong2Pending', false);
       if (revealBtn) {
         revealBtn.hidden = false;
-        revealBtn.textContent = drag9ShowingCorrect ? 'התשובה שלי' : 'התשובה הנכונה';
+        revealBtn.textContent = drag9ShowingCorrect ? 'إجابتي' : 'الإجابة الصحيحة';
       }
     }
-    if (checkBtn) { checkBtn.textContent = 'סיום'; checkBtn.disabled = false; checkBtn.onclick = drag9Continue; }
+    if (checkBtn) { checkBtn.textContent = 'إنهاء'; checkBtn.disabled = false; checkBtn.onclick = drag9Continue; }
     return;
   }
 

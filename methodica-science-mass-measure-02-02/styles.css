@@ -20,6 +20,29 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
                  U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215;
 }
+/* Calibri לערבית ולספרות בלבד (unicode-range) — אותיות לטיניות נשארות ב-Assistant.
+   פונט מערכת (local), לא ארוז: במכשיר בלי Calibri הדפדפן ממשיך לשרשרת הקודמת. */
+@font-face {
+  font-family: 'Calibri AR';
+  src: local('Calibri Light');
+  font-weight: 100 300;
+  font-style: normal;
+  unicode-range: U+0030-0039, U+0600-06FF, U+0750-077F, U+0870-08FF, U+FB50-FDFF, U+FE70-FEFF;
+}
+@font-face {
+  font-family: 'Calibri AR';
+  src: local('Calibri');
+  font-weight: 301 450;
+  font-style: normal;
+  unicode-range: U+0030-0039, U+0600-06FF, U+0750-077F, U+0870-08FF, U+FB50-FDFF, U+FE70-FEFF;
+}
+@font-face {
+  font-family: 'Calibri AR';
+  src: local('Calibri Bold'), local('Calibri-Bold');
+  font-weight: 451 1000;
+  font-style: normal;
+  unicode-range: U+0030-0039, U+0600-06FF, U+0750-077F, U+0870-08FF, U+FB50-FDFF, U+FE70-FEFF;
+}
 
 /* ---------- Reset ---------- */
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -28,7 +51,7 @@ html, body {
   height: 100%;
   overflow: hidden;
   direction: rtl;
-  font-family: 'Assistant', 'Segoe UI', Arial, sans-serif;
+  font-family: 'Calibri AR', 'Assistant', 'Segoe UI', Arial, sans-serif;
    background: #ffffff;
 }
 button {
@@ -98,7 +121,7 @@ img { display: block; max-width: none; }
   color: #ffffff;
   border: none;
   border-radius: 1000px;
-  font-family: 'Assistant', sans-serif;
+  font-family: 'Calibri AR', 'Assistant', sans-serif;
   font-size: 20px;
   font-weight: 400;
   padding: 0 20px;
@@ -131,7 +154,7 @@ img { display: block; max-width: none; }
   color: #007ac6;
   border: 1px solid #007ac6;
   border-radius: 1000px;
-  font-family: 'Assistant', sans-serif;
+  font-family: 'Calibri AR', 'Assistant', sans-serif;
   font-size: 20px;
   font-weight: 400;
   padding: 0 20px;
@@ -164,7 +187,7 @@ img { display: block; max-width: none; }
   color: #007ac6;
   border: 1px solid #007ac6;
   border-radius: 1000px;
-  font-family: 'Assistant', sans-serif;
+  font-family: 'Calibri AR', 'Assistant', sans-serif;
   font-size: 20px;
   font-weight: 400;
   padding: 0 20px;
@@ -239,7 +262,7 @@ img { display: block; max-width: none; }
   cursor: default;
 }
 .scq-img-placeholder-label {
-  font-family: 'Assistant', sans-serif;
+  font-family: 'Calibri AR', 'Assistant', sans-serif;
   font-size: 16px;
   font-weight: 400;
   color: #aeaeae;
@@ -554,7 +577,7 @@ img { display: block; max-width: none; }
   color: #019de5;
   border: 1.5px solid #019de5;
   border-radius: 1000px;
-  font-family: 'Assistant', sans-serif;
+  font-family: 'Calibri AR', 'Assistant', sans-serif;
   font-size: 18px;
   font-weight: 400;
   padding: 10px 24px;
@@ -617,7 +640,8 @@ img { display: block; max-width: none; }
 }
 .scq-hint-close {
   align-self: center;
-  width: 196px;
+  width: 280px;
+  white-space: nowrap;
   padding: 16px 40px;
   border-radius: 999px;
   background: #fff;
@@ -653,7 +677,7 @@ img { display: block; max-width: none; }
 }
 
 .transition-title {
-  font-family: 'Assistant', sans-serif;
+  font-family: 'Calibri AR', 'Assistant', sans-serif;
   font-size: 40px;
   font-weight: 700;
   color: #303030;
@@ -661,7 +685,7 @@ img { display: block; max-width: none; }
 }
 
 .transition-sub {
-  font-family: 'Assistant', sans-serif;
+  font-family: 'Calibri AR', 'Assistant', sans-serif;
   font-size: 28px;
   font-weight: 400;
   color: #303030;
@@ -693,7 +717,7 @@ img { display: block; max-width: none; }
   border: 1.5px solid #019de5;
   border-radius: 20px;
   padding: 16px 20px;
-  font-family: 'Assistant', sans-serif;
+  font-family: 'Calibri AR', 'Assistant', sans-serif;
   font-size: 20px;
   font-weight: 400;
   color: #000000;
@@ -742,7 +766,7 @@ img { display: block; max-width: none; }
   border: 1.5px solid #019de5;
   border-radius: 20px;
   padding: 16px 20px;
-  font-family: 'Assistant', sans-serif;
+  font-family: 'Calibri AR', 'Assistant', sans-serif;
   font-size: 20px;
   font-weight: 400;
   color: #000000;
@@ -842,7 +866,7 @@ img { display: block; max-width: none; }
 }
 
 .qnav-label {
-  font-family: 'Assistant', sans-serif;
+  font-family: 'Calibri AR', 'Assistant', sans-serif;
   font-size: 15px;
   color: #ececec;
   text-align: center;
@@ -938,7 +962,7 @@ img { display: block; max-width: none; }
 }
 
 .tf-btn {
-  font-family: 'Assistant', sans-serif;
+  font-family: 'Calibri AR', 'Assistant', sans-serif;
   font-size: 22px;
   font-weight: 400;
   color: #222;
@@ -986,7 +1010,7 @@ img { display: block; max-width: none; }
 }
 
 .dd-title {
-  font-family: 'Assistant', sans-serif;
+  font-family: 'Calibri AR', 'Assistant', sans-serif;
   font-size: 24px;
   font-weight: 700;
   color: #019de5;
@@ -994,7 +1018,7 @@ img { display: block; max-width: none; }
 }
 
 .dd-instruction {
-  font-family: 'Assistant', sans-serif;
+  font-family: 'Calibri AR', 'Assistant', sans-serif;
   font-size: 24px;
   font-weight: 400;
   color: #303030;
@@ -1015,7 +1039,7 @@ img { display: block; max-width: none; }
 }
 
 .dd-label {
-  font-family: 'Assistant', sans-serif;
+  font-family: 'Calibri AR', 'Assistant', sans-serif;
   font-size: 24px;
   font-weight: 400;
   color: #303030;
@@ -1037,7 +1061,7 @@ img { display: block; max-width: none; }
   cursor: pointer;
   box-sizing: border-box;
   gap: 8px;
-  font-family: 'Assistant', sans-serif;
+  font-family: 'Calibri AR', 'Assistant', sans-serif;
   /* דרופדאון סגור = 80% שקיפות תמיד (לא רק ב-disabled) — SELF-QA.md § 5, מאומת מול
      Figma node 731:10387/415:8332 (DropdownQuestion/Multiple Blanks). */
   opacity: 0.8;
@@ -1054,7 +1078,7 @@ img { display: block; max-width: none; }
 .dd-btn.correct { border: 1px solid #609e12 !important; }
 
 .dd-val {
-  font-family: 'Assistant', sans-serif;
+  font-family: 'Calibri AR', 'Assistant', sans-serif;
   font-size: 22px;
   font-weight: 400;
   color: #303030;
@@ -1120,7 +1144,7 @@ img { display: block; max-width: none; }
 }
 
 .dd-opt {
-  font-family: 'Assistant', sans-serif;
+  font-family: 'Calibri AR', 'Assistant', sans-serif;
   font-size: 20px;
   font-weight: 400;
   color: #303030;
@@ -1159,7 +1183,7 @@ img { display: block; max-width: none; }
 }
 
 .drag-title {
-  font-family: 'Assistant', sans-serif;
+  font-family: 'Calibri AR', 'Assistant', sans-serif;
   font-size: 24px;
   font-weight: 700;
   color: #019de5;
@@ -1167,7 +1191,7 @@ img { display: block; max-width: none; }
 }
 
 .drag-sub {
-  font-family: 'Assistant', sans-serif;
+  font-family: 'Calibri AR', 'Assistant', sans-serif;
   font-size: 24px;
   font-weight: 400;
   color: #303030;
@@ -1279,7 +1303,7 @@ img { display: block; max-width: none; }
    עצמה (למעלה) והפופאפ המשוב משתנים בצבע. */
 
 .drag-zone-label {
-  font-family: 'Assistant', sans-serif;
+  font-family: 'Calibri AR', 'Assistant', sans-serif;
   font-size: 20px;
   font-weight: 700;
   color: #303030;
