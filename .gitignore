@@ -9,6 +9,7 @@ kata-api-key.txt
 
 # לוגים של סקריפטי המטא-דאטה
 send-metadata.log
+send-metadata.*.log
 retrieve-metadata.log
 rename-to-iri.log
 

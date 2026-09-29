@@ -128,7 +128,7 @@ function emptyUnitState() {
 /* מפתחות ה-localStorage שהיו עד v3 מקור האמת, ומ-v4 הם קאש סינכרוני בלבד.
    מוחזקים ברשימה אחת כי שני אתרים צריכים אותה: ה-getters (fallback כשאין
    מסמך) ו-initResumeResetHatch (איפוס חייב לנקות גם את הקאש). */
-var UI_CHARACTER_KEY = 'lomda_selectedCharacter';
+var UI_CHARACTER_KEY = 'methodica_ar_science_mass_measure_02_selectedCharacter';
 var RESULT_KEYS = [
   'lomda_moedA_partA_result',
   'lomda_moedA_partB_result',
@@ -434,7 +434,7 @@ function sendCompletedOnce(ledger, key, objectType, result, opts) {
 
    sessionStorage ולא localStorage: הקשת שייכת לניסיון הנוכחי. קשת שנשארת
    מניסיון קודם עלולה לשלוח לומד למסלול שהוא לא עבר בפעם הזאת. */
-var NAV_EDGE_KEY = 'lomda_nav_edges::methodica-science-mass-measure-02';
+var NAV_EDGE_KEY = 'lomda_nav_edges::methodica-ar-science-mass-measure-02';
 
 function _readEdges() {
   try {

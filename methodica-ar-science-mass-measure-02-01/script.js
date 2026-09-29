@@ -18,7 +18,7 @@ try {
      typeof: 40-resume.js שנכשל בטעינה לא אמור להפיל את כל script.js. */
   savedCharacter = (typeof getUnitCharacter === 'function')
     ? getUnitCharacter()
-    : localStorage.getItem('lomda_selectedCharacter');
+    : localStorage.getItem('methodica_ar_science_mass_measure_02_selectedCharacter');
 } catch (e) {}
 window.lomdaState = {
   selectedCharacter: savedCharacter // 'green' | 'orange' — נקבע במסך 1, נצרך בכל מסך שמציג את הדמות הנבחרת
@@ -170,7 +170,7 @@ function selectOption(cardEl) {
     setUnitCharacter(cardEl.dataset.value);
   } else {
     window.lomdaState.selectedCharacter = cardEl.dataset.value;
-    try { localStorage.setItem('lomda_selectedCharacter', cardEl.dataset.value); } catch (e) {}
+    try { localStorage.setItem('methodica_ar_science_mass_measure_02_selectedCharacter', cardEl.dataset.value); } catch (e) {}
   }
   const btn = document.getElementById('s0-continue');
   if (btn) btn.disabled = false;
@@ -3548,8 +3548,8 @@ function s20Continue() {
    הזה, שקובע איזה תוכן הלומד יראה בכלל, לא היה מכוסה בבדיקות. */
 function practiceDestinationSlug() {
   return (getPracticeScore() >= 4)
-    ? 'methodica-science-mass-measure-02-03'   // עמד בסף — מדלג על התרגול המחזק
-    : 'methodica-science-mass-measure-02-02';  // לא עמד — תרגול מחזק
+    ? 'methodica-ar-science-mass-measure-02-03'   // עמד בסף — מדלג על התרגול המחזק
+    : 'methodica-ar-science-mass-measure-02-02';  // לא עמד — תרגול מחזק
 }
 
 function s20OpenHint() {
@@ -3972,7 +3972,7 @@ var SCREEN_TO_SUBCONTENT = {
 /* ⚠️ SCREEN_TO_SUBCONTENT חייב להחזיק בדיוק TOTAL_SCREENS מפתחות (20).
    מפתח חסר = מסך שלא מדווח, בשקט. _test/verify-report.js אוכף את זה. */
 
-var XAPI_COMP_SLUG = 'methodica-science-mass-measure-02-01';
+var XAPI_COMP_SLUG = 'methodica-ar-science-mass-measure-02-01';
 /* מזהי הרכיב והפריטים חייבים להתאים ל-metadata/*.json בית-לבית — המוסכמה
    כאן נושאת TRAILING SLASH על יחידה, רכיב ופריט (לא על שאלה). */
 var XAPI_COMP_ID   = XAPI_ID_PREFIX + XAPI_COMP_SLUG + '/';
@@ -3981,7 +3981,7 @@ var XAPI_COMP_ID   = XAPI_ID_PREFIX + XAPI_COMP_SLUG + '/';
    במסך 11 אינו נבדק ואינו מדווח כתשובה. */
 var XAPI_EVAL_ITEMS = {'001': 1, '002': 1, '003': 1, '004': 1, '005': 1, '006': 1, '008': 1, '009': 1, '010': 1, '011': 1, '012': 1, '013': 1, '014': 1};
 
-var XAPI_METADATA_FILE = '../metadata/methodica-science-mass-measure-02-01.json';
+var XAPI_METADATA_FILE = '../metadata/methodica-ar-science-mass-measure-02-01.json';
 
 
 /* ═══════════════════ resume — התפרים הפר-סיניים ═══════════════════

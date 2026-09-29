@@ -127,6 +127,6 @@ rather than content.
 
 ## First run against this unit
 
-Not yet performed — `methodica-science-mass-measure-02` has not been pushed to the
+Not yet performed — `methodica-ar-science-mass-measure-02` has not been pushed to the
 catalog. Once it has, record here which fields genuinely drift between the catalog and
 the repo, so later diffs can be read quickly.

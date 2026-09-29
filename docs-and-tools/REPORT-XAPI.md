@@ -1,6 +1,6 @@
 # דיווחיות xAPI (720) ביחידה הזאת
 
-איך `methodica-science-mass-measure-02` מדווחת פעילות לומד ל-Kata. מיושם ומאומת.
+איך `methodica-ar-science-mass-measure-02` מדווחת פעילות לומד ל-Kata. מיושם ומאומת.
 הדפוס נלקח מ-`methodica-math-scale-01-vadimr-1` (המסמכים `REPORT-XAPI.md`,
 `REPORT-ISSUE.md` ו-`unit-js/README.md` שם), עם הסטיות שמתועדות למטה.
 
@@ -21,14 +21,14 @@
 מזהים הם URL קנוניים תחת התחילית:
 
 ```
-https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/
+https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/
 ```
 
 | רמה | מבנה | trailing slash |
 |---|---|---|
-| יחידה | `<prefix>methodica-science-mass-measure-02/` | **כן** |
-| רכיב | `<prefix>methodica-science-mass-measure-02-0N/` | **כן** |
-| פריט | `<component>methodica-science-mass-measure-02-0N-NNN/` | **כן** |
+| יחידה | `<prefix>methodica-ar-science-mass-measure-02/` | **כן** |
+| רכיב | `<prefix>methodica-ar-science-mass-measure-02-0N/` | **כן** |
+| פריט | `<component>methodica-ar-science-mass-measure-02-0N-NNN/` | **כן** |
 | שאלה | `<item>qN` | לא |
 
 היחידה והרכיבים הם **אחים** שחולקים את התחילית — הרכיבים אינם מקוננים תחת מזהה

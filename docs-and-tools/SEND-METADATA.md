@@ -8,6 +8,42 @@ already exists or `POST` if it doesn't — so it's safe to run more than once.
 The script lives in `docs-and-tools/` and resolves `../metadata` by default, so it is
 run from the repo root.
 
+## This unit: Arabic components inside the existing Hebrew unit
+
+`methodica-ar-science-mass-measure-02` has **no unit of its own in KATA**. KATA binds a
+learning objective to exactly one unit. A separate Arabic unit was rejected for the ratio unit
+(`409 "objective already bound to a unit (strict 1:1)"`, 2026-09-24), and this unit shares
+its objective with the Hebrew unit too. The KATA team's instruction is to add the Arabic
+components to the existing unit, as `methodica-ar-math-ratio-01` and
+`methodica-ar-science-mass-measure-01` do.
+
+**Sent on 2026-09-29** from `597266b`. The live run gave `created=31 updated=1 failed=0`, and a
+re-send gave `created=0 updated=32 failed=0`. The 6 Arabic components are `draft` in the
+Hebrew unit. The Hebrew records are byte-identical before and after (only `componentCount`
+changed, 6 → 12). Local `metadata/` equals what KATA holds. The full record and snapshots are
+outside the repo, in `../../deployments/!kata-snapshots/` (`KATA-SEND-2026-09-29.md`). The leading
+`!` keeps `verify-package.ps1` from taking it for the newest package folder.
+
+So the script runs in **parent-unit mode** by default: `$ParentUnitKey =
+'methodica-science-mass-measure-02'` (the Hebrew unit; override with `-ParentUnitKey`).
+
+- The parent unit is **read-only**. One `GET` confirms it exists, then the 6 Arabic components
+  and their items are created under
+  `/api/v1/content-units/methodica-science-mass-measure-02/components`. No `POST` / `PATCH` ever
+  goes to the unit: a `PATCH` would overwrite the Hebrew unit's title, sectors and audience.
+- The Arabic components keep the Hebrew orders 1, 2, 3, 4, 5, 5 (05 and 06 share order 5 in
+  KATA; 06 is the second-chance version of 05). KATA accepts repeated orders in one unit.
+- `metadata/methodica-ar-science-mass-measure-02_unit.json` is **not read or sent**. It stays in
+  the repo as a record of the unit's own metadata. The Arabic unit title is added in the KATA UI.
+- The script is the **v2.5** one from `methodica-ar-science-mass-measure-01` (field names
+  `cognitiveLevels`, `manufacturer`, `targetSectors`). The Hebrew repo's script still emits
+  v2.4 names, which KATA has silently dropped since August 2026.
+- A clean dry run reports `created=31 updated=1 failed=0`: 6 components and 25 items, plus the
+  `LINKED` line for `-02`'s `recommendedAfterFail` (→ `-01`).
+- To check a send, run `retrieve-metadata.ps1 -UnitKey methodica-science-mass-measure-02` before
+  and after, and diff the two.
+- `-ParentUnitKey ''` restores the original behaviour (upsert this repo's `*_unit.json`).
+
 ## Requirements
 
 - **PowerShell 7+** (`pwsh`). The script declares `#Requires -Version 7.0` and will
@@ -67,7 +103,7 @@ this is controlled from the **CONFIG** block at the top of the file.
 
 | Metadata | Sent to API |
 |---|---|
-| unit `id` (full URL) | `uniqueKey` = last path segment (slug), e.g. `methodica-science-mass-measure-02`. Trailing slashes are trimmed first, so `…/foo/` yields `foo`, not `""`. The **unit** keeps a slug — 720 v2.5 §2.7 exempts the content unit, and Kata does not warn on it. |
+| unit `id` (full URL) | `uniqueKey` = last path segment (slug), e.g. `methodica-ar-science-mass-measure-02`. Trailing slashes are trimmed first, so `…/foo/` yields `foo`, not `""`. The **unit** keeps a slug — 720 v2.5 §2.7 exempts the content unit, and Kata does not warn on it. |
 | component / item `id` (full URL) | `uniqueKey` = **the IRI verbatim**, unchanged. Since 2026-09-15 (see below) these are no longer reduced to a slug. |
 | unit `title` (string) | `title` object `{ "Hebrew": "…" }` (`$TitleLangKey`) |
 | unit — (no manufacture) | `manufacture` = `'methodica'` (`$UnitManufacture`) |
@@ -213,7 +249,7 @@ against, and picking the right code is a content decision — flagged, not guess
 
 ## Verify the result
 
-- `GET /api/v1/content-units/methodica-science-mass-measure-02` returns the unit with
+- `GET /api/v1/content-units/methodica-ar-science-mass-measure-02` returns the unit with
   its components; spot-check one component and one item through the query routes, e.g.
   `GET /api/v1/component?componentKey=<url-encoded component IRI>`. The old
   `/api/v1/components/{key}` form `404`s on an IRI key — that is expected, not a fault.

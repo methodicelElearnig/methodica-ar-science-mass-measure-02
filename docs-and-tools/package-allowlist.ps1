@@ -44,6 +44,12 @@
 
     This unit also has NO unit-assets/ before the 2026-09-07 hoist; the key below is
     harmless while the directory does not exist.
+
+    It ships NO root files (rule set 28.09.26 for all 720 units; Documentation/
+    reporting-and-resume/ADDING-REPORTING-AND-RESUME.md §5.2). Platforms launch every component
+    by its own .../<component>/index.html link — Kata's hostedContentRef — so a unit-level entry
+    point is never used, and the MOE CDN serves a folder URL as 0 bytes (a folder-style redirect
+    is a blank page). The root index.html stays in the repo for local browsing only.
 #>
 
 # ── Directories that never contribute a single file, whatever is inside them ──
@@ -78,26 +84,26 @@ $ExcludeDirSegment = @('originals-backup')
 #    runtime from a colour or a screen number; a missing image costs more than its bytes.
 $ExcludeRelPaths = @(
     # unused font — no @font-face and no font-family names it anywhere (2 identical copies)
-    'methodica-science-mass-measure-02-05/assets/fonts/GeistPixel-Regular-VariableFont_ELSH.ttf',
-    'methodica-science-mass-measure-02-05/plane-mass-simulation/assets/fonts/GeistPixel-Regular-VariableFont_ELSH.ttf',
+    'methodica-ar-science-mass-measure-02-05/assets/fonts/GeistPixel-Regular-VariableFont_ELSH.ttf',
+    'methodica-ar-science-mass-measure-02-05/plane-mass-simulation/assets/fonts/GeistPixel-Regular-VariableFont_ELSH.ttf',
     # pre-crop originals, superseded by their -cropped twins, which are what the sim loads
-    'methodica-science-mass-measure-02-05/plane-mass-simulation/assets/images/fuel-card.png',
-    'methodica-science-mass-measure-02-05/plane-mass-simulation/assets/images/luggage-card.png',
-    'methodica-science-mass-measure-02-05/plane-mass-simulation/assets/images/passengers-card.png',
-    'methodica-science-mass-measure-02-05/plane-mass-simulation/assets/images/original-plane-empty.png',
+    'methodica-ar-science-mass-measure-02-05/plane-mass-simulation/assets/images/fuel-card.png',
+    'methodica-ar-science-mass-measure-02-05/plane-mass-simulation/assets/images/luggage-card.png',
+    'methodica-ar-science-mass-measure-02-05/plane-mass-simulation/assets/images/passengers-card.png',
+    'methodica-ar-science-mass-measure-02-05/plane-mass-simulation/assets/images/original-plane-empty.png',
     # avatar poster stills: the videos are used, these PNGs are not, in either component
-    'methodica-science-mass-measure-02-01/assets/images/avatar-green-come-in.png',
-    'methodica-science-mass-measure-02-02/assets/images/avatar-green-come-in.png',
-    'methodica-science-mass-measure-02-01/assets/images/avatar-orange-come-in.png',
-    'methodica-science-mass-measure-02-02/assets/images/avatar-orange-come-in.png',
-    'methodica-science-mass-measure-02-01/assets/images/avatar-green-clapping-hands.png',
-    'methodica-science-mass-measure-02-02/assets/images/avatar-green-clapping-hands.png',
-    'methodica-science-mass-measure-02-01/assets/images/avatar-orange-clapping-hands.png',
-    'methodica-science-mass-measure-02-02/assets/images/avatar-orange-clapping-hands.png'
+    'methodica-ar-science-mass-measure-02-01/assets/images/avatar-green-come-in.png',
+    'methodica-ar-science-mass-measure-02-02/assets/images/avatar-green-come-in.png',
+    'methodica-ar-science-mass-measure-02-01/assets/images/avatar-orange-come-in.png',
+    'methodica-ar-science-mass-measure-02-02/assets/images/avatar-orange-come-in.png',
+    'methodica-ar-science-mass-measure-02-01/assets/images/avatar-green-clapping-hands.png',
+    'methodica-ar-science-mass-measure-02-02/assets/images/avatar-green-clapping-hands.png',
+    'methodica-ar-science-mass-measure-02-01/assets/images/avatar-orange-clapping-hands.png',
+    'methodica-ar-science-mass-measure-02-02/assets/images/avatar-orange-clapping-hands.png'
 )
 
 # ── What each shipped area contributes ──
-$RootFiles = @('index.html')             # the redirect into component 01
+$RootFiles = @()                         # none — the root index.html is not deployed (see .NOTES)
 
 $UnitDirs = @{
     'metadata'    = '*.json'             # unit + per-component catalogue records
@@ -108,10 +114,10 @@ $UnitDirs = @{
 
 # Inside a component folder: these files, plus everything under assets/.
 $ComponentFiles = @('index.html', 'script.js', 'styles.css')
-$ComponentGlob  = 'methodica-science-mass-measure-02-[0-9][0-9]'
+$ComponentGlob  = 'methodica-ar-science-mass-measure-02-[0-9][0-9]'
 
 # ── Sub-apps: a self-contained site inside a component, loaded by <iframe> ───
-#    methodica-science-mass-measure-02-05/index.html lines 101, 143 and 219 each carry
+#    methodica-ar-science-mass-measure-02-05/index.html lines 101, 143 and 219 each carry
 #    <iframe src="plane-mass-simulation/index.html">. It has its own document, so its
 #    relative paths resolve from ITS directory, not the component's.
 #    Note style.css is SINGULAR here — the components use styles.css.

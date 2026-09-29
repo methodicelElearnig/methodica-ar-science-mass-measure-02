@@ -23,7 +23,7 @@ try {
      typeof: 40-resume.js שנכשל בטעינה לא אמור להפיל את כל script.js. */
   savedCharacter = (typeof getUnitCharacter === 'function')
     ? getUnitCharacter()
-    : localStorage.getItem('lomda_selectedCharacter');
+    : localStorage.getItem('methodica_ar_science_mass_measure_02_selectedCharacter');
 } catch (e) { /* localStorage חסום (opaque origin/פרטיות) — נמשיך בלי שמירה */ }
 window.lomdaState = {
   selectedCharacter: savedCharacter || null
@@ -137,7 +137,7 @@ function s0Back() {
      עובר דרך goBackToPreviousPart כדי להזיז את מצביע הנחיתה לפני הניווט;
      בלעדיו הלואדר של היעד מקפיץ את הלומד מיד חזרה לכאן. הארגומנטים הם
      ה-fallback המקובע. ראו unit-js/40-resume.js. */
-  goBackToPreviousPart('methodica-science-mass-measure-02-04', '#screen=1');
+  goBackToPreviousPart('methodica-ar-science-mass-measure-02-04', '#screen=1');
 }
 
 /* =========================================================
@@ -737,8 +737,8 @@ const dqB = makeDragQuestion({
       xapiEndComponent(moedAComponentResult(), btn);
       /* המעבר לסין 06 שהיה כאן חי רק ב-walkthrough מקומי (DEV_NAV). */
       if (DEV_NAV) {
-        writeForwardState('methodica-science-mass-measure-02-06', '#screen=3');
-        window.location.href = '../methodica-science-mass-measure-02-06/index.html' + window.location.search;
+        writeForwardState('methodica-ar-science-mass-measure-02-06', '#screen=3');
+        window.location.href = '../methodica-ar-science-mass-measure-02-06/index.html' + window.location.search;
       }
     }
   },
@@ -949,14 +949,14 @@ var SCREEN_TO_SUBCONTENT = {
 /* ⚠️ SCREEN_TO_SUBCONTENT חייב להחזיק בדיוק TOTAL_SCREENS מפתחות (5).
    מפתח חסר = מסך שלא מדווח, בשקט. _test/verify-report.js אוכף את זה. */
 
-var XAPI_COMP_SLUG = 'methodica-science-mass-measure-02-05';
+var XAPI_COMP_SLUG = 'methodica-ar-science-mass-measure-02-05';
 /* מזהי הרכיב והפריטים חייבים להתאים ל-metadata/*.json בית-לבית — המוסכמה
    כאן נושאת TRAILING SLASH על יחידה, רכיב ופריט (לא על שאלה). */
 var XAPI_COMP_ID   = XAPI_ID_PREFIX + XAPI_COMP_SLUG + '/';
 
 var XAPI_EVAL_ITEMS = {'001': 1};
 
-var XAPI_METADATA_FILE = '../metadata/methodica-science-mass-measure-02-05.json';
+var XAPI_METADATA_FILE = '../metadata/methodica-ar-science-mass-measure-02-05.json';
 
 
 /* ═══════════════════ resume — התפרים הפר-סיניים ═══════════════════

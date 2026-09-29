@@ -22,7 +22,7 @@
   ב-localStorage, ואז תמונת מצב הייתה חלקית מעצם הגדרתה. ראו RESUME.md §3.
 
   שני דברים שנשארו ב-localStorage/sessionStorage הם **קאש נגזר**, לא מקור אמת:
-    • מפתחות lomda_selectedCharacter / lomda_moed*_result — adoptUnitCharacter
+    • מפתחות methodica_ar_science_mass_measure_02_selectedCharacter / lomda_moed*_result — adoptUnitCharacter
       ו-getUnitResult מעדיפים את המסמך, ולכן הזרקת המסמך לבדה מספיקה.
     • lomda_nav_edges::… — מפת קשתות לסיור ?dev=1 בלבד, per-tab.
   ⚠️ v5 (2026-09-16): המסמך הוא של **סין אחד** — component + payload. אין יותר
@@ -277,18 +277,18 @@
 /* ═══════════════════ קבועים שנגזרים מהיחידה ═══════════════════
    מסונכרנים ידנית מול הקוד. אי-התאמה כאן = ולידציה שמאשרת מסמך שהיחידה תזרוק. */
 var RESUME_STATE_VERSION = 5;                       // unit-js/40-resume.js (v4 מהוגר בקריאה)
-var UNIT_SLUG   = 'methodica-science-mass-measure-02';
-var SLUG_RE     = /^methodica-science-mass-measure-02-0[1-6]$/;
+var UNIT_SLUG   = 'methodica-ar-science-mass-measure-02';
+var SLUG_RE     = /^methodica-ar-science-mass-measure-02-0[1-6]$/;
 var SCREEN_COUNTS = {                                // TOTAL_SCREENS פר סין
-  'methodica-science-mass-measure-02-01': 20,
-  'methodica-science-mass-measure-02-02': 9,
-  'methodica-science-mass-measure-02-03': 2,
-  'methodica-science-mass-measure-02-04': 2,
-  'methodica-science-mass-measure-02-05': 5,
-  'methodica-science-mass-measure-02-06': 9
+  'methodica-ar-science-mass-measure-02-01': 20,
+  'methodica-ar-science-mass-measure-02-02': 9,
+  'methodica-ar-science-mass-measure-02-03': 2,
+  'methodica-ar-science-mass-measure-02-04': 2,
+  'methodica-ar-science-mass-measure-02-05': 5,
+  'methodica-ar-science-mass-measure-02-06': 9
 };
 var CACHE_KEYS = [                                   // unit-js/40-resume.js
-  'lomda_selectedCharacter',
+  'methodica_ar_science_mass_measure_02_selectedCharacter',
   'lomda_moedA_partA_result',
   'lomda_moedA_partB_result',
   'lomda_moedB_partA_step1_result',
