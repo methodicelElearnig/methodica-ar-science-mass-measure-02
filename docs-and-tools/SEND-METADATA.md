@@ -17,6 +17,12 @@ its objective with the Hebrew unit too. The KATA team's instruction is to add th
 components to the existing unit, as `methodica-ar-math-ratio-01` and
 `methodica-ar-science-mass-measure-01` do.
 
+**Sent on 2026-09-29** from `597266b`. The live run gave `created=31 updated=1 failed=0`, and a
+re-send gave `created=0 updated=32 failed=0`. The 6 Arabic components are `draft` in the
+Hebrew unit. The Hebrew records are byte-identical before and after (only `componentCount`
+changed, 6 → 12). Local `metadata/` equals what KATA holds. The full record and snapshots are
+outside the repo, in `../../deployments/kata-snapshots/` (`KATA-SEND-2026-09-29.md`).
+
 So the script runs in **parent-unit mode** by default: `$ParentUnitKey =
 'methodica-science-mass-measure-02'` (the Hebrew unit; override with `-ParentUnitKey`).
 
