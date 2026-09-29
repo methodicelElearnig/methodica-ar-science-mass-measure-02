@@ -1,0 +1,17 @@
+{
+  "id": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02/",
+  "title": "كتلة وحجم الأجسام - إجمالي، فارغ وصافي",
+  "subTopic": "MOE.SCI.G7.CHEM.BODY-MAT-PROP.MASS-VOL",
+  "learningObjective": "MOE.SCI.G7.CHEM.BODY-MAT-PROP.MASS-VOL.GROSS-NET",
+  "manufacturer": 310,
+  "targetSectors": [
+    "state-general",
+    "state-religious",
+    "orthodox",
+    "arab-sector",
+    "druze-sector",
+    "bedouin-sector",
+    "special-education"
+  ],
+  "targetAudience": "general"
+}

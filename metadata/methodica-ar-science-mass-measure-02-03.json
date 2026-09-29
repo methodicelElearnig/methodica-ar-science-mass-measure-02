@@ -1,0 +1,29 @@
+{
+  "id": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-03/",
+  "title": "مهمّة صفّيّة",
+  "learningUnitId": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02/",
+  "componentPurpose": "practice",
+  "isAssessment": false,
+  "recommendedAfterFail": [],
+  "isRequired": true,
+  "relativeDifficulty": 3,
+  "masteryLevel": null,
+  "order": 3,
+  "depthLevel": "core-curriculum-basic",
+  "cognitiveLevels": ["applying-a-model-or-procedure"],
+  "languages": ["Arabic"],
+  "skills": [],
+  "estimatedTimeInMinutes": 1,
+  "createdAt": "2026-09-28T00:00:00.000Z",
+  "updatedAt": "2026-09-28T00:00:00.000Z",
+  "subContent": [
+    {
+      "id": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-03/methodica-ar-science-mass-measure-02-03-001/",
+      "title": "قياس الكتلة الإجمالية والصافية والفارغة لقنينة ماء",
+      "informationToBot": "מטרת הפריט: יישום מציאותי ומעשי (מדידה בכיתה/בשטח) של שלושת מושגי המסה שנלמדו - ברוטו, נטו וטרה. מה התלמיד אמור להבין/לתרגל: התלמיד מצטייד בבקבוק מים, מיכל או ברז מים, ומאזניים. מגדיר מהם ברוטו/נטו/טרה, ממלא את הבקבוק בכמות מים חלקית, מחשב/מודד כל אחד מהם ורושם על דף, ומסביר בקצרה כיצד מצא כל ערך (יש יותר מדרך אחת למצוא את הערכים - למשל שקילה ישירה מול חישוב). לבסוף יוצר סימן זיכרון אישי (שיר, סיפור קצר, משפטים בחרוזים, ציור, קומיקס או רעיון יצירתי אחר) לזכירת ההבדל בין המושגים ובין יחידות המסה השונות. טעויות נפוצות: מדידה בשטח שלא נאספת/נבדקת על ידי המערכת - אין תשובה 'נכונה' קבועה מראש, כי הערכים תלויים בכמות המים שכל תלמיד בחר למלא בפועל. מידע נוסף: משימה יצירתית פתוחה (יצירת סימן זיכרון) בנוסף למדידה עצמה; אומת מול index.html+script.js הערביים בפועל - המסך מכיל אך ורק מסך מעבר (סיום התרגול הקודם) ואת גוף המשימה עצמה, ללא כל שאלה מוערכת (XAPI_EVAL_ITEMS ריק ב-script.js, מדווח success בלי score) - תוכן וסדר הצעדים זהים במדויק לגרסה העברית.",
+      "contentType": "project-or-inquiry-task",
+      "mediaFormat": "text",
+      "questions": []
+    }
+  ]
+}

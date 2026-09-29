@@ -21,14 +21,9 @@
     vocabulary the metadata files use (state-general, core-curriculum-basic,
     project-or-inquiry-task, interactive-content ...), so no remapping is needed in
     this direction. Fields KATA adds and the metadata format has no place for
-    (status, manufacturerGroupId, hostedContentRef, kind, providerName,
+    (status, masteryLevel, manufacturerGroupId, hostedContentRef, kind, providerName,
     providerLogoUrl, componentCount, per-item/per-question order) are dropped — use
     -KeepRaw to also save the untouched API response.
-
-    masteryLevel IS emitted whenever KATA returns one. send-metadata.ps1 pushes the value
-    when a component carries it, so dropping it here would make a retrieve -> overwrite
-    cycle silently lose it. (In this unit all six components have masteryLevel: null, so
-    nothing is emitted in practice — the handling matters for units that do set it.)
 
     Runtime: PowerShell 7+ and curl.exe (bundled with Windows 10/11).
 
@@ -47,8 +42,7 @@
     Override the API base URL (default https://kata.cet.ac.il).
 
 .PARAMETER OutDir
-    Override the output folder (default: metadata-from/ at the repo root, alongside
-    metadata/ — this script lives in docs-and-tools/).
+    Override the output folder (default: metadata-from/ next to this script).
 
 .PARAMETER IdBase
     URL prefix used to rebuild the `id` URLs when KATA carries no hostedContentRef
@@ -92,21 +86,22 @@ param(
 $ApiKeyFile = Join-Path $PSScriptRoot 'kata-api-key.txt'
 # API base URL (override at launch with -BaseUrl).
 if (-not $BaseUrl) { $BaseUrl = 'https://kata.cet.ac.il' }
-# Where the retrieved metadata files go (override with -OutDir). This script lives in
-# docs-and-tools/, so the default sits one level up, next to metadata/ — that keeps the
-# documented `git diff --no-index metadata metadata-from` working from the repo root.
-if (-not $OutDir)  { $OutDir  = Join-Path $PSScriptRoot '..\metadata-from' }
-# Run log (git-ignored by name).
+# Where the retrieved metadata files go (override with -OutDir).
+# This script lives in docs-and-tools/; metadata-from/ belongs at the repo root, beside
+# metadata/, which is also where .gitignore's 'metadata-from/' entry is meant to catch it.
+if (-not $OutDir)  { $OutDir  = Join-Path (Split-Path -Parent $PSScriptRoot) 'metadata-from' }
+# Run log (git-ignored via *.log).
 $LogFile = Join-Path $PSScriptRoot 'retrieve-metadata.log'
 
 # ── (2) PER-UNIT — usually fine as-is ───────────────────────────────────────
 # Which language to unwrap the unit's title object with:
-#   { "Hebrew": "מדידת מסה" } -> "מדידת מסה".
+#   { "Arabic": "قياس الكتلة" } -> "قياس الكتلة".
 $TitleLangKey = 'Arabic'
-# Value written to each component's `manufacture`. KATA returns the provider's
-# display name ("מתודיקה"); the metadata files use the slug. Set to $null to pass
-# KATA's own value through instead.
-$Manufacture = 'methodica'
+# ($Manufacture removed 2026-09-09.) It used to write a hardcoded 'methodica' into
+# every component's `manufacture` field. That was wrong twice over: 720 v2.5 has no
+# component-level manufacture at all — it became unit-level `manufacturer`, an
+# MOE-assigned provider number — and Kata returns no such field, so the constant was
+# fabricating data that then showed up as drift against the authored metadata.
 # Fallback URL prefix for rebuilding `id` fields, used ONLY when no component
 # carries a hostedContentRef to derive the real prefix from (override with -IdBase).
 if (-not $IdBase) { $IdBase = 'https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02' }
@@ -358,9 +353,29 @@ function New-UnitFileBody {
         title                         = (Get-UnitTitle $Unit)
         subTopic                      = $Unit.subTopic
         learningObjective             = $Unit.learningObjective
-        targetSector                  = (ConvertTo-JsonArray $Unit.targetSector)
-        targetAudience                = (ConvertTo-JsonArray $Unit.targetAudience)
-        prerequisiteLearningObjective = (ConvertTo-JsonArray $Unit.prerequisiteLearningObjective)
+        # ── 720 v2.5 field names ──────────────────────────────────────────────
+        # Fixed 2026-09-09. These read the names the LIVE API returns; until now they
+        # read the v2.4 names, which the platform had already migrated away from — so
+        # the script silently wrote empty values and every round-trip diff was
+        # meaningless. Verified against metadata-from/_raw/…-01.json: the unit object
+        # carries targetSectors (array), targetAudience (SCALAR) and manufacturer, and
+        # carries no targetSector, no prerequisiteLearningObjective and no manufacture.
+        #
+        # targetAudience is deliberately NOT wrapped in an array: v2.5 made it a single
+        # value ("the aim is to target content at a specific population, not to have one
+        # unit suit both gifted and new-immigrant learners"), and the live API returns
+        # the bare string 'general'.
+        targetSectors                 = (ConvertTo-JsonArray $Unit.targetSectors)
+        targetAudience                = $Unit.targetAudience
+        # manufacturer is SERVER-DERIVED from the API key's provider account — the send
+        # script has never transmitted it and Kata populates it anyway (here: 'מתודיקה',
+        # alongside manufacturerGroupId / providerName / providerLogoUrl, none of which
+        # the metadata format carries). Recorded so the round-trip diff can account for
+        # it instead of reporting it as drift.
+        manufacturer                  = $Unit.manufacturer
+        # prerequisiteLearningObjective: REMOVED in v2.5. Dependencies between learning
+        # objectives now live in the curriculum index's `prerequisites` field, which MOE
+        # owns. Deliberately not emitted.
     }
 }
 
@@ -405,19 +420,28 @@ function New-ComponentFileBody {
         New-ItemFileBody $it $compId
     }
 
-    $out = [ordered]@{
+    return [ordered]@{
         id                     = $compId
         title                  = $Comp.title
         learningUnitId         = $UnitId
         componentPurpose       = $Comp.componentPurpose
         isAssessment           = [bool] $Comp.isAssessment
-        manufacture            = $(if ($null -ne $Manufacture) { $Manufacture } else { $Comp.manufacture })
+        # (no `manufacture` — v2.5 removed it from component level; see the note by
+        #  the deleted $Manufacture constant above)
         recommendedAfterFail   = $afterFail
         isRequired             = [bool] $Comp.isRequired
         relativeDifficulty     = [int] $Comp.relativeDifficulty
         order                  = [int] $Comp.order
         depthLevel             = $Comp.depthLevel
-        cognitiveLevel         = $Comp.cognitiveLevel
+        # v2.5: cognitiveLevel -> cognitiveLevels, and it is now an ARRAY (a component
+        # may carry several thinking levels). Fixed 2026-09-09 — reading the old scalar
+        # name against a migrated API wrote null into every component file.
+        cognitiveLevels        = (ConvertTo-JsonArray $Comp.cognitiveLevels)
+        # masteryLevel (720 v2.2) is returned by the API and was being dropped here.
+        # It is null on all four of this unit's components and absent from the authored
+        # metadata/, so emitting it changes nothing today — but a round-trip diff must
+        # be able to see it the moment someone sets it.
+        masteryLevel           = $Comp.masteryLevel
         languages              = (ConvertTo-JsonArray $Comp.languages)
         skills                 = (ConvertTo-JsonArray $Comp.skills)
         estimatedTimeInMinutes = [int] $Comp.estimatedTimeInMinutes
@@ -425,17 +449,6 @@ function New-ComponentFileBody {
         updatedAt              = $Comp.updatedAt
         subContent             = (ConvertTo-JsonArray $items)
     }
-    # Insert masteryLevel where the hand-authored files keep it (after relativeDifficulty), so a
-    # metadata/ vs metadata-from/ diff stays clean rather than showing a key-order change.
-    if ($null -ne $Comp.masteryLevel -and "$($Comp.masteryLevel)".Trim() -ne '') {
-        $reordered = [ordered]@{}
-        foreach ($k in $out.Keys) {
-            $reordered[$k] = $out[$k]
-            if ($k -eq 'relativeDifficulty') { $reordered['masteryLevel'] = $Comp.masteryLevel }
-        }
-        return $reordered
-    }
-    return $out
 }
 
 # ---- Main -------------------------------------------------------------------
@@ -456,7 +469,7 @@ Write-Log ("Output dir : {0}" -f $OutDir)
 # 1) Which unit? Parameter, else the local metadata folder, else ask the catalog.
 if ($UnitKey) { Write-Log ("Unit key   : {0} (-UnitKey)" -f $UnitKey) }
 if (-not $UnitKey) {
-    $localUnit = Get-ChildItem -Path (Join-Path $PSScriptRoot '..\metadata') -Filter '*_unit.json' -ErrorAction SilentlyContinue |
+    $localUnit = Get-ChildItem -Path (Join-Path (Split-Path -Parent $PSScriptRoot) 'metadata') -Filter '*_unit.json' -ErrorAction SilentlyContinue |
         Select-Object -First 1
     if ($localUnit) {
         $UnitKey = Get-Slug ((Get-Content -Raw -Path $localUnit.FullName -Encoding UTF8 | ConvertFrom-Json).id)

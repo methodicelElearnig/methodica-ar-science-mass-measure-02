@@ -8,6 +8,35 @@ already exists or `POST` if it doesn't — so it's safe to run more than once.
 The script lives in `docs-and-tools/` and resolves `../metadata` by default, so it is
 run from the repo root.
 
+## This unit: Arabic components inside the existing Hebrew unit
+
+`methodica-ar-science-mass-measure-02` has **no unit of its own in KATA**. KATA binds a
+learning objective to exactly one unit. A separate Arabic unit was rejected for the ratio unit
+(`409 "objective already bound to a unit (strict 1:1)"`, 2026-09-24), and this unit shares
+its objective with the Hebrew unit too. The KATA team's instruction is to add the Arabic
+components to the existing unit, as `methodica-ar-math-ratio-01` and
+`methodica-ar-science-mass-measure-01` do.
+
+So the script runs in **parent-unit mode** by default: `$ParentUnitKey =
+'methodica-science-mass-measure-02'` (the Hebrew unit; override with `-ParentUnitKey`).
+
+- The parent unit is **read-only**. One `GET` confirms it exists, then the 6 Arabic components
+  and their items are created under
+  `/api/v1/content-units/methodica-science-mass-measure-02/components`. No `POST` / `PATCH` ever
+  goes to the unit: a `PATCH` would overwrite the Hebrew unit's title, sectors and audience.
+- The Arabic components keep the orders 1–6, the same numbers as the Hebrew ones. KATA
+  accepts repeated orders in one unit.
+- `metadata/methodica-ar-science-mass-measure-02_unit.json` is **not read or sent**. It stays in
+  the repo as a record of the unit's own metadata. The Arabic unit title is added in the KATA UI.
+- The script is the **v2.5** one from `methodica-ar-science-mass-measure-01` (field names
+  `cognitiveLevels`, `manufacturer`, `targetSectors`). The Hebrew repo's script still emits
+  v2.4 names, which KATA has silently dropped since August 2026.
+- A clean dry run reports `created=31 updated=1 failed=0`: 6 components and 25 items, plus the
+  `LINKED` line for `-02`'s `recommendedAfterFail` (→ `-01`).
+- To check a send, run `retrieve-metadata.ps1 -UnitKey methodica-science-mass-measure-02` before
+  and after, and diff the two.
+- `-ParentUnitKey ''` restores the original behaviour (upsert this repo's `*_unit.json`).
+
 ## Requirements
 
 - **PowerShell 7+** (`pwsh`). The script declares `#Requires -Version 7.0` and will

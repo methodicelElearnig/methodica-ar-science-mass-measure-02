@@ -1,0 +1,495 @@
+{
+  "id": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-01/",
+  "title": "لنتعلّم شيئًا جديدًا",
+  "learningUnitId": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02/",
+  "componentPurpose": "both",
+  "isAssessment": false,
+  "recommendedAfterFail": [],
+  "isRequired": true,
+  "relativeDifficulty": 3,
+  "masteryLevel": null,
+  "order": 1,
+  "depthLevel": "core-curriculum-basic",
+  "cognitiveLevels": ["applying-a-model-or-procedure"],
+  "languages": ["Arabic"],
+  "skills": [],
+  "estimatedTimeInMinutes": 28,
+  "createdAt": "2026-09-28T00:00:00.000Z",
+  "updatedAt": "2026-09-28T00:00:00.000Z",
+  "subContent": [
+    {
+      "id": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-01/methodica-ar-science-mass-measure-02-01-001/",
+      "title": "العثور على الكنز - ما المعلومة الناقصة؟",
+      "informationToBot": "מטרת הפריט: יצירת סקרנות ראשונית וחיבור הלומד לבעיה שהיחידה פותרת - שידיעת המסה הכוללת בלבד אינה מספיקה. מה התלמיד אמור להבין: שתי תיבות באותה מסה כוללת (10 ק\"ג) עשויות להכיל תכולה שונה לגמרי - צריך לדעת גם את מסת התיבה הריקה עצמה כדי להסיק מה בפנים. כיווני חשיבה ואסטרטגיות: הלומד בוחר דמות מלווה (מסך 0, בחירה טכנית לא מוערכת), ואז מתמודד עם חידת האוצר (מסך 1). טעויות נפוצות: בחירה במסת האוצר/נפח/גודל התיבה במקום במסת התיבה הריקה עצמה. מידע נוסף: מסך פתיחה כולל בחירת דמות מלווה (וידאו) לפני החידה עצמה; תמונה מלווה את השאלה (שתי תיבות) אך התוכן הרעיוני נגזר במלואו מהטקסט. אומת מול index.html+script.js הערבי בפועל. צילום מסך: לא צורף.",
+      "contentType": "motivational",
+      "mediaFormat": "interactive-content",
+      "questions": [
+        {
+          "questionId": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-01/methodica-ar-science-mass-measure-02-01-001/q1",
+          "questionType": "choice",
+          "questionText": "جِدوا الكنز! أمامكم صندوقان. كتلة كلٍّ منهما هي 10 كغم. في أحدهما يختبئ كنز، والآخر فارغ. أي معلومة إضافية ستساعدكم على معرفة الصندوق الذي يحتوي على الكنز؟",
+          "answers": [
+            "كتلة الصندوق فقط",
+            "كتلة الكنز فقط",
+            "حجم الصندوق",
+            "كبر الصندوق"
+          ],
+          "correctAnswers": ["كتلة الصندوق فقط"]
+        }
+      ]
+    },
+    {
+      "id": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-01/methodica-ar-science-mass-measure-02-01-002/",
+      "title": "مصطلحا الكتلة الإجمالية والصافية",
+      "informationToBot": "מטרת הפריט: הקניית שני המושגים הראשונים - נטו (מסת התכולה בלבד) וברוטו (מסה כוללת של התכולה והאריזה יחד), דרך דוגמאות מחיי היום-יום (צנצנת חמוצים, מזוודת טיסה) בכרטיסיות מתהפכות. מה התלמיד אמור להבין/לתרגל: אם ברוטו (צנצנת+חמוצים)=1400 גרם ונטו (חמוצים בלבד)=900 גרם, אז מסת הצנצנת הריקה מתקבלת מחיסור: 1400-900=500 גרם. כיווני חשיבה ואסטרטגיות: הבנה שיש להחסיר את הנטו מהברוטו כדי לקבל את מסת האריזה בלבד. טעויות נפוצות: בחירה ב-1400 או 900 עצמם, או ב'לא ניתן לדעת', בלי לבצע את החיסור. מידע נוסף: לחיצה על תמונות (כרטיסיות מתהפכות, לא סרטון) היא מנגנון ההקנייה - אומת מול index.html+script.js הערבי בפועל. צילום מסך: לא צורף.",
+      "contentType": "instruction",
+      "mediaFormat": "interactive-content",
+      "questions": [
+        {
+          "questionId": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-01/methodica-ar-science-mass-measure-02-01-002/q1",
+          "questionType": "choice",
+          "questionText": "ما هو الجزء الناقص؟ كتلة مرطبان المخللات هي 1400 غرام (إجمالي). كتلة المخللات فقط هي 900 غرام (صافي). ما هي كتلة المرطبان؟",
+          "answers": [
+            "1400",
+            "900",
+            "500",
+            "لا يمكن المعرفة"
+          ],
+          "correctAnswers": ["500"]
+        }
+      ]
+    },
+    {
+      "id": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-01/methodica-ar-science-mass-measure-02-01-003/",
+      "title": "تصنيف الأغراض إلى إجمالي/صافي/فارغ",
+      "informationToBot": "מטרת הפריט: תרגול ראשוני בגרירה-והשמה (drag & drop) של 9 תמונות לשלוש קטגוריות המסה. מה התלמיד אמור להבין/לתרגל: 9 תמונות מייצגות 3 קבוצות של 3 (מזוודה+בגדים, צנצנת+חמוצים, קופסה+עוגיות): הפריט המלא (עם התכולה) = ברוטו, התכולה בלבד = נטו, האריזה הריקה בלבד = טרה. כיווני חשיבה ואסטרטגיות: זיהוי חזותי של כל תמונה (מזוודה עם בגדים לעומת בגדים בלבד לעומת מזוודה ריקה, וכן הלאה) ומיונה לאזור הנכון. טעויות נפוצות: בלבול בין 'המלא' (ברוטו) ל'תכולה בלבד' (נטו). מידע נוסף: אומת ישירות מול data-correct בקוד ה-index.html הערבי בפועל (bruto/neto/tara לכל אחד מ-9 הפריטים). צילום מסך: לא צורף.",
+      "contentType": "practice",
+      "mediaFormat": "interactive-content",
+      "questions": [
+        {
+          "questionId": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-01/methodica-ar-science-mass-measure-02-01-003/q1",
+          "questionType": "matching",
+          "questionText": "رتّبوا الفوضى! ساعٍدوا في تصنيف الأغراض التالية واسحبوها إلى الخانة الملائمة: كتلة إجمالية، صافية أو فارغة.",
+          "answers": {
+            "source": [
+              "علبة مخللات ممتلئة",
+              "مخللات فقط",
+              "مرطبان فارغ",
+              "علبة بسكوت ممتلئة",
+              "بسكوت فقط",
+              "علبة بسكوت فارغة",
+              "حقيبة سفر ممتلئة",
+              "ملابس فقط",
+              "حقيبة سفر فارغة"
+            ],
+            "target": [
+              "كتلة إجمالية",
+              "كتلة صافية",
+              "كتلة فارغة"
+            ]
+          },
+          "correctAnswers": [
+            {
+              "source": "علبة مخللات ممتلئة",
+              "target": "كتلة إجمالية"
+            },
+            {
+              "source": "مخللات فقط",
+              "target": "كتلة صافية"
+            },
+            {
+              "source": "مرطبان فارغ",
+              "target": "كتلة فارغة"
+            },
+            {
+              "source": "علبة بسكوت ممتلئة",
+              "target": "كتلة إجمالية"
+            },
+            {
+              "source": "بسكوت فقط",
+              "target": "كتلة صافية"
+            },
+            {
+              "source": "علبة بسكوت فارغة",
+              "target": "كتلة فارغة"
+            },
+            {
+              "source": "حقيبة سفر ممتلئة",
+              "target": "كتلة إجمالية"
+            },
+            {
+              "source": "ملابس فقط",
+              "target": "كتلة صافية"
+            },
+            {
+              "source": "حقيبة سفر فارغة",
+              "target": "كتلة فارغة"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-01/methodica-ar-science-mass-measure-02-01-004/",
+      "title": "لماذا نحتاج وحدة قياس",
+      "informationToBot": "מטרת הפריט: הבנה שמספר בלבד (ללא יחידת מידה) אינו מספיק כדי לתאר מסה. מה התלמיד אמור להבין: קטר, צב ענק, תפוח וגרגר מלח גס - כולם 'מסתם 150', אבל זה חסר משמעות בלי לדעת אם מדובר בטון, קילוגרם, גרם או מיליגרם. כיווני חשיבה ואסטרטגיות: זיהוי שהבעיה היא חוסר ביחידת המידה, לא סתירה עובדתית. טעויות נפוצות: הנחה שהנתון 'שגוי' (למשל שמסת קטר לא יכולה להיות 150) במקום זיהוי החסר האמיתי. מידע נוסף: מסך מעבר עם דמות מלווה ('עד עכשיו למדנו להבחין בין ברוטו, נטו וטרה... בואו נעבור לנושא הבא') וקלף מתהפך ('מה משותף ל...') מתקפלים לתוך אותו פריט כתוכן מוביל, לפני השאלה עצמה. פותח את הנושא של יחידות מסה שיפותח בפריטים הבאים. צילום מסך: לא צורף.",
+      "contentType": "instruction",
+      "mediaFormat": "interactive-content",
+      "questions": [
+        {
+          "questionId": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-01/methodica-ar-science-mass-measure-02-01-004/q1",
+          "questionType": "choice",
+          "questionText": "ما المشترك بين المقطورة، السلحفاة الضخمة، التفاحة وحبة الملح الخشن؟ ذُكِر لنا إن كتلة كل واحد منها هي 150! ما المشكلة في المعلومات التي حصلتم عليها؟",
+          "answers": [
+            "لكل الأغراض توجد نفس الكتلة.",
+            "كتلة المقطورة لا يمكن أن تكون 150.",
+            "تنقصنا معلومات حول وحدة القياس.",
+            "لا يمكن قياس حبة ملح واحدة"
+          ],
+          "correctAnswers": ["تنقصنا معلومات حول وحدة القياس."]
+        }
+      ]
+    },
+    {
+      "id": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-01/methodica-ar-science-mass-measure-02-01-005/",
+      "title": "مطابقة جسم بوحدة كتلة",
+      "informationToBot": "מטרת הפריט: תרגול ראשוני בגרירת גופים ליחידת המסה המתאימה לפי גודלם. מה התלמיד אמור להבין/לתרגל: קטר→טון, צב ענק→קילוגרם, תפוח→גרם, גרגר מלח גס→מיליגרם. כיווני חשיבה ואסטרטגיות: ככל שהגוף גדול יותר, כך יחידת המידה גדולה יותר (מיליגרם<גרם<קילוגרם<טון). טעויות נפוצות: בחירת יחידה גדולה מדי לגוף קטן ולהיפך. מידע נוסף: נבנה ישירות על פריט 004; אומת מול data-correct בקוד (kg/ton/mg/gram). צילום מסך: לא צורף.",
+      "contentType": "practice",
+      "mediaFormat": "interactive-content",
+      "questions": [
+        {
+          "questionId": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-01/methodica-ar-science-mass-measure-02-01-005/q1",
+          "questionType": "matching",
+          "questionText": "ما هي وحدة القياس الملائمة؟ اسحبوا كل غرض إلى وحدة القياس الملائمة له.",
+          "answers": {
+            "source": [
+              "سلحفاة عملاقة",
+              "مقطورة",
+              "حبة ملح خشن",
+              "تفاحة"
+            ],
+            "target": [
+              "طن",
+              "كيلوغرام",
+              "غرام",
+              "ميليغرام"
+            ]
+          },
+          "correctAnswers": [
+            {
+              "source": "سلحفاة عملاقة",
+              "target": "كيلوغرام"
+            },
+            {
+              "source": "مقطورة",
+              "target": "طن"
+            },
+            {
+              "source": "حبة ملح خشن",
+              "target": "ميليغرام"
+            },
+            {
+              "source": "تفاحة",
+              "target": "غرام"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-01/methodica-ar-science-mass-measure-02-01-006/",
+      "title": "لماذا نستخدم وحدات كتلة مختلفة",
+      "informationToBot": "מטרת הפריט: הבנה מושגית של הרציונל לקיום מספר יחידות מסה, מעבר לזיהוי הטכני של איזו יחידה מתאימה לאיזה גוף. מה התלמיד אמור להבין/לתרגל: אפשר למדוד כל גוף בכל יחידת מסה, אבל יחידות שונות הופכות את המספר המתקבל לנוח יותר לשימוש ולהשוואה. כיווני חשיבה ואסטרטגיות: דחיית האפשרות שלכל גוף 'יחידה קבועה בלעדית'. טעויות נפוצות: מחשבה שהחומר/סוג הגוף (ולא רק גודלו) קובע את היחידה. מידע נוסף: correctId מאומת מול script.js הערבי ('b'). צילום מסך: לא צורף.",
+      "contentType": "practice",
+      "mediaFormat": "interactive-content",
+      "questions": [
+        {
+          "questionId": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-01/methodica-ar-science-mass-measure-02-01-006/q1",
+          "questionType": "choice",
+          "questionText": "عادةً ما تُقاس كتلة مقطورة القطار بالأطنان. وعادةً ما تُقاس كتلة السلحفاة العملاقة بالكيلوغرام. لماذا نستخدم وحدات قياس مختلفة برأيكم؟",
+          "answers": [
+            "لأن لكل جسم توجد وحدة قياس ثابتة خاصة به.",
+            "لأن الوحدات المختلفة تجعل القياس أسهل وأوضح.",
+            "لأن المقطورات والسلاحف مصنوعة من مواد مختلفة.",
+            "يتعلّق الأمر بالأداة التي نستخدمها للقياس."
+          ],
+          "correctAnswers": ["لأن الوحدات المختلفة تجعل القياس أسهل وأوضح."]
+        }
+      ]
+    },
+    {
+      "id": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-01/methodica-ar-science-mass-measure-02-01-007/",
+      "title": "مطابقة وحدات كتلة متكافئة (بطاقات)",
+      "informationToBot": "מטרת הפריט: תרגול הקשר הקבוע (פי 1000) בין יחידות מסה סמוכות, במשחק זיכרון/זיווג קלפים. מה התלמיד אמור להבין/לתרגל: 1000 מיליגרם=1 גרם, 1000 גרם=1 קילוגרם, 1000 קילוגרם=1 טון - כל זוג מייצג אותה מסה בדיוק. כיווני חשיבה ואסטרטגיות: זיהוי שהיחס הקבוע בין כל שתי יחידות סמוכות הוא פי 1000. טעויות נפוצות: זיווג לא נכון בין הערך המספרי ליחידה השקולה. מידע נוסף: משחק קלפים הפוכים (memory-style), 3 זוגות; מסך סיכום מציג את שלושת הזוגות. צילום מסך: לא צורף.",
+      "contentType": "practice",
+      "mediaFormat": "interactive-content",
+      "questions": [
+        {
+          "questionId": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-01/methodica-ar-science-mass-measure-02-01-007/q1",
+          "questionType": "matching",
+          "questionText": "اكتشفوا العلاقة بين الوحدات: أمامكم بطاقات تحتوي على وحدات كتلة وقيم مساوية لها. اقلبوا البطاقات وجِدوا الأزواج الملائمة (كل زوج يمثل نفس الكتلة بالضبط، لكن بوحدات قياس مختلفة).",
+          "answers": {
+            "source": [
+              "1000 كيلوغرام",
+              "1000 غرام",
+              "1000 ميليغرام"
+            ],
+            "target": [
+              "1 طن",
+              "1 كيلوغرام",
+              "1 غرام"
+            ]
+          },
+          "correctAnswers": [
+            {
+              "source": "1000 كيلوغرام",
+              "target": "1 طن"
+            },
+            {
+              "source": "1000 غرام",
+              "target": "1 كيلوغرام"
+            },
+            {
+              "source": "1000 ميليغرام",
+              "target": "1 غرام"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-01/methodica-ar-science-mass-measure-02-01-008/",
+      "title": "سؤال إحماء: تحديد الكتلة الصافية (قنينة ماء)",
+      "informationToBot": "מטרת הפריט: שאלת חימום ראשונה - זיהוי נטו מתוך תמונה מתוארת (בקבוק עם מים), לאחר מסך מעבר עם דמות מלווה ('מה נשאר לנו בראש? שתי שאלות קלילות לחימום'). מה התלמיד אמור להבין/לתרגל: נטו הוא מסת התכולה בלבד, ללא האריזה/המיכל - במקרה זה, המים שבתוך הבקבוק (לא הבקבוק עצמו ולא השניים יחד). כיווני חשיבה ואסטרטגיות: התמקדות במה שהלומד 'היה רוצה לקבל' בפועל (רמז: אם הייתם קונים את זה, מה הייתם רוצים?). טעויות נפוצות: בחירת הבקבוק בלבד או הבקבוק+המים יחד. מידע נוסף: תמונה מתפקדת כאיור להמחשת תרחיש מוכר, התוכן הרעיוני נגזר במלואו מהטקסט. correctId='b' מאומת מול script.js הערבי. צילום מסך: לא צורף.",
+      "contentType": "practice",
+      "mediaFormat": "interactive-content",
+      "questions": [
+        {
+          "questionId": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-01/methodica-ar-science-mass-measure-02-01-008/q1",
+          "questionType": "choice",
+          "questionText": "اكتشِفوا نوع الكتلة: انظروا إلى الصورة التي أمامكم (قنينة ماء) وأجيبوا: ما هي الكتلة الصافية؟",
+          "answers": [
+            "القنينة",
+            "الماء الموجود في القنينة",
+            "القنينة مع الماء",
+            "لا يمكن المعرفة"
+          ],
+          "correctAnswers": ["الماء الموجود في القنينة"]
+        }
+      ]
+    },
+    {
+      "id": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-01/methodica-ar-science-mass-measure-02-01-009/",
+      "title": "سؤال إحماء: تحديد الكتلة الفارغة (عبوات)",
+      "informationToBot": "מטרת הפריט: שאלת חימום שנייה - זיהוי טרה מתוך רשימת פריטים מתוארת, שאלת רב-ברירה עם 2 תשובות נכונות. מה התלמיד אמור להבין/לתרגל: טרה היא מסת האריזה/המיכל הריק בלבד - קופסת הקרטון הריקה של המשחק ופחית השתייה הריקה הן שתי דוגמאות לטרה, לעומת המשחק עצמו (נטו) והפחית המלאה (ברוטו). כיווני חשיבה ואסטרטגיות: חיפוש הפריטים המתארים אריזה ריקה בלבד. טעויות נפוצות: בחירת פריט שמכיל גם תוכן (המשחק בקופסה, הפחית המלאה). מידע נוסף: correctIds=['a','b'] מאומת מול script.js הערבי. צילום מסך: לא צורף.",
+      "contentType": "practice",
+      "mediaFormat": "interactive-content",
+      "questions": [
+        {
+          "questionId": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-01/methodica-ar-science-mass-measure-02-01-009/q1",
+          "questionType": "choice",
+          "questionText": "ما هي الكتلة الفارغة؟ الكتلة الفارغة هي كتلة الغلاف أو العبوة فقط. اختاروا العنصرَين اللذَين يمثّلان كتلة فارغة:",
+          "answers": [
+            "علبة الكرتون الفارغة للعبة",
+            "عبوة المشروب الفارغة",
+            "اللعبة الموجودة داخل العلبة",
+            "علبة المشروب الممتلئة"
+          ],
+          "correctAnswers": [
+            "علبة الكرتون الفارغة للعبة",
+            "عبوة المشروب الفارغة"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-01/methodica-ar-science-mass-measure-02-01-010/",
+      "title": "تحديد الكتلة الإجمالية (هدية)",
+      "informationToBot": "מטרת הפריט: תרגול סטנדרטי בזיהוי ברוטו מתוך תמונה מתוארת (מתנה עטופה), הפריט הראשון מתוך 5 בסבב התרגול הסטנדרטי (מסך מעבר קודם מכריז '5 שאלות, צריך לענות נכון על 4 (80%) לפחות'). מה התלמיד אמור להבין/לתרגל: ברוטו הוא המסה הכוללת של התוכן והאריזה יחד - במקרה זה, המתנה והאריזה שלה ביחד. כיווני חשיבה ואסטרטגיות: חשיבה על מה שיישקל בפועל אם מודדים את הפריט כפי שהוא (עם העטיפה). טעויות נפוצות: בחירת המתנה בלבד או האריזה בלבד. מידע נוסף: תמונה מתפקדת כאיור, correctId='c' מאומת מול script.js הערבי. צילום מסך: לא צורף.",
+      "contentType": "practice",
+      "mediaFormat": "interactive-content",
+      "questions": [
+        {
+          "questionId": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-01/methodica-ar-science-mass-measure-02-01-010/q1",
+          "questionType": "choice",
+          "questionText": "اكتشِفوا نوع الكتلة: انظروا إلى الصورة التي أمامكم (علبة هدية) وأجيبوا: ما هي الكتلة الإجمالية؟",
+          "answers": [
+            "الهدية نفسها",
+            "غلاف الهدية",
+            "الغلاف والهدية معًا",
+            "لا يمكن المعرفة"
+          ],
+          "correctAnswers": ["الغلاف والهدية معًا"]
+        }
+      ]
+    },
+    {
+      "id": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-01/methodica-ar-science-mass-measure-02-01-011/",
+      "title": "تحديد الكتلة الفارغة (سلة فواكه)",
+      "informationToBot": "מטרת הפריט: תרגול סטנדרטי בזיהוי טרה מתוך תמונה מתוארת (סלסלת פירות), הפריט השני מתוך 5 בסבב התרגול הסטנדרטי. מה התלמיד אמור להבין/לתרגל: טרה היא מסת האריזה/המיכל בלבד - במקרה זה, הסל עצמו, ללא הפירות שבתוכו. כיווני חשיבה ואסטרטגיות: דמיינו מה יישאר אם מוציאים את כל התכולה. טעויות נפוצות: בחירת הפירות בלבד או הפירות עם הסל יחד. מידע נוסף: תמונה מתפקדת כאיור, correctId='a' מאומת מול script.js הערבי. צילום מסך: לא צורף.",
+      "contentType": "practice",
+      "mediaFormat": "interactive-content",
+      "questions": [
+        {
+          "questionId": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-01/methodica-ar-science-mass-measure-02-01-011/q1",
+          "questionType": "choice",
+          "questionText": "اكتشِفوا نوع الكتلة: انظروا إلى الصورة التي أمامكم (سلة فواكه) وأجيبوا: ما هي الكتلة الفارغة؟",
+          "answers": [
+            "السلّة",
+            "الفواكه",
+            "الفواكه مع السلة",
+            "لا يمكن المعرفة"
+          ],
+          "correctAnswers": ["السلّة"]
+        }
+      ]
+    },
+    {
+      "id": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-01/methodica-ar-science-mass-measure-02-01-012/",
+      "title": "حساب الكتلة الصافية/الفارغة/الإجمالية في جدول",
+      "informationToBot": "מטרת הפריט: תרגול סטנדרטי בחישוב הערך החסר בטבלת מסה (השלמת שדה קלט), לפי הנוסחה נטו+טרה=ברוטו, הפריט השלישי מתוך 5. מה התלמיד אמור להבין/לתרגל: צנצנת מלפפונים חמוצים (טרה=350, נטו=400, ברוטו חסר=750); בקבוק משקה (טרה חסר=50, נטו=1500, ברוטו=1550); מזוודת טרולי (טרה=2.5 ק\"ג, נטו חסר=6 ק\"ג, ברוטו=8.5 ק\"ג); בלון גומי מלא באוויר (טרה=3, נטו=1, ברוטו חסר=4). כיווני חשיבה ואסטרטגיות: זיהוי איזה מהשלושה חסר בכל שורה, והפעלת חיבור (טרה+נטו=ברוטו) או חיסור (ברוטו-נטו=טרה, ברוטו-טרה=נטו) בהתאם. טעויות נפוצות: חיבור/חיסור הפוך, בלבול ביחידות (גרם מול קילוגרם). מידע נוסף: 4 שדות קלט, ערכים 750/50/6/4 מאומתים מול S18_ANSWERS ב-script.js הערבי (זהים לעברית). צילום מסך: לא צורף.",
+      "contentType": "practice",
+      "mediaFormat": "interactive-content",
+      "questions": [
+        {
+          "questionId": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-01/methodica-ar-science-mass-measure-02-01-012/q1",
+          "questionType": "matching",
+          "questionText": "احسبوا الكتلة: أمامكم جدول يعرض معطيات الكتلة لأغراض مختلفة. في كل سطر هناك معطى واحد ناقص. استخدموا العلاقة بين المصطلحات (الكتلة الصافية + الكتلة الفارغة = الكتلة الإجمالية) لتحسبوا وتكملوا الأعداد الناقصة: جرة خيار مخلل (الكتلة الفارغة 350 غرام، الصافية 400 غرام، الإجمالية ؟)، قنينة مشروب (الفارغة ؟، الصافية 1500 غرام، الإجمالية 1550 غرام)، حقيبة ترولي (الفارغة 2.5 كيلوغرام، الصافية ؟، الإجمالية 8.5 كيلوغرام)، بالون مطاطي ممتلئ بالهواء (الفارغة 3 غرام، الصافية 1 غرام، الإجمالية ؟).",
+          "answers": {
+            "source": [
+              "الكتلة الإجمالية - جرة خيار مخلل (غرام)",
+              "الكتلة الفارغة - قنينة مشروب (غرام)",
+              "الكتلة الصافية - حقيبة ترولي (كيلوغرام)",
+              "الكتلة الإجمالية - بالون مطاطي ممتلئ بالهواء (غرام)"
+            ],
+            "target": [
+              "750",
+              "50",
+              "6",
+              "4"
+            ]
+          },
+          "correctAnswers": [
+            {
+              "source": "الكتلة الإجمالية - جرة خيار مخلل (غرام)",
+              "target": "750"
+            },
+            {
+              "source": "الكتلة الفارغة - قنينة مشروب (غرام)",
+              "target": "50"
+            },
+            {
+              "source": "الكتلة الصافية - حقيبة ترولي (كيلوغرام)",
+              "target": "6"
+            },
+            {
+              "source": "الكتلة الإجمالية - بالون مطاطي ممتلئ بالهواء (غرام)",
+              "target": "4"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-01/methodica-ar-science-mass-measure-02-01-013/",
+      "title": "مطابقة وحدة الكتلة بالجسم",
+      "informationToBot": "מטרת הפריט: תרגול סטנדרטי בבחירת יחידת המסה המתאימה ביותר לגופים מחיי היום-יום, באמצעות 4 תפריטים נפתחים (dropdown), הפריט הרביעי מתוך 5. מה התלמיד אמור להבין/לתרגל: בן אדם→קילוגרם, נמלה→מיליגרם, משאית→טון, טלפון נייד→גרם - יישום ידע עולם על גודל/משקל טיפוסי של כל גוף. כיווני חשיבה ואסטרטגיות: השוואת גודל הגוף לסולם היחידות (מיליגרם<גרם<קילוגרם<טון). טעויות נפוצות: בחירת יחידה גדולה/קטנה מדי ביחס לגודל הגוף בפועל. מידע נוסף: אין נתון מספרי - הערכה איכותית לפי ידע עולם; מאומת מול S19_CORRECT ב-script.js הערבי (זהה לעברית: אדם:קילוגרם, נמלה:מיליגרם, משאית:טון, טלפון נייד:גרם). צילום מסך: לא צורף.",
+      "contentType": "practice",
+      "mediaFormat": "interactive-content",
+      "questions": [
+        {
+          "questionId": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-01/methodica-ar-science-mass-measure-02-01-013/q1",
+          "questionType": "matching",
+          "questionText": "أمامكم عناصر مختلفة، اختاروا من بين الإمكانيات وحدة الكتلة الأنسب لكل عنصر: إنسان، نملة، شاحنة، هاتف محمول.",
+          "answers": {
+            "source": [
+              "إنسان",
+              "نملة",
+              "شاحنة",
+              "هاتف محمول"
+            ],
+            "target": [
+              "طن",
+              "كيلوغرام",
+              "غرام",
+              "ميليغرام"
+            ]
+          },
+          "correctAnswers": [
+            {
+              "source": "إنسان",
+              "target": "كيلوغرام"
+            },
+            {
+              "source": "نملة",
+              "target": "ميليغرام"
+            },
+            {
+              "source": "شاحنة",
+              "target": "طن"
+            },
+            {
+              "source": "هاتف محمول",
+              "target": "غرام"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-01/methodica-ar-science-mass-measure-02-01-014/",
+      "title": "تصنيف المصطلحات (تسالي وفيتامينات)",
+      "informationToBot": "מטרת הפריט: תרגול סטנדרטי מסכם - גרירת 6 פריטים (משני תרחישים) לשלוש קטגוריות המסה, הפריט החמישי והאחרון מתוך 5 בסבב התרגול הסטנדרטי. מה התלמיד אמור להבין/לתרגל: תרחיש חטיף - חטיף בריאות באריזתו=ברוטו, החטיף ללא אריזה=נטו, אריזת החטיף הריקה=טרה. תרחיש ויטמינים - קופסת ויטמינים מלאה=ברוטו, כדורי ויטמינים בלבד=נטו, קופסת ויטמינים ריקה=טרה. כיווני חשיבה ואסטרטגיות: יישום עצמאי של שלושת המושגים על שני תרחישים שונים במקביל. טעויות נפוצות: בלבול בין הפריטים של שני התרחישים. מידע נוסף: פריט מסכם לרכיב הראשון; שיוך data-correct (bruto/neto/tara) אומת ישירות מול index.html הערבי בפועל. צילום מסך: לא צורף.",
+      "contentType": "practice",
+      "mediaFormat": "interactive-content",
+      "questions": [
+        {
+          "questionId": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-01/methodica-ar-science-mass-measure-02-01-014/q1",
+          "questionType": "matching",
+          "questionText": "التعرُّف على المصطلحات: اسحبوا كل غرض إلى الخانة الملائمة: الكتلة الإجمالية، الكتلة الصافية أو الكتلة الفارغة.",
+          "answers": {
+            "source": [
+              "قطعة تسالي صحية في غلاف",
+              "قطعة تسالي صحية فارغة",
+              "قطعة تسالي صحية بدون الغلاف",
+              "علبة فيتامينات ممتلئة",
+              "حبوب فيتامينات فقط",
+              "علبة فيتامينات فارغة"
+            ],
+            "target": [
+              "كتلة إجمالية",
+              "كتلة صافية",
+              "كتلة فارغة"
+            ]
+          },
+          "correctAnswers": [
+            {
+              "source": "قطعة تسالي صحية في غلاف",
+              "target": "كتلة إجمالية"
+            },
+            {
+              "source": "قطعة تسالي صحية فارغة",
+              "target": "كتلة فارغة"
+            },
+            {
+              "source": "قطعة تسالي صحية بدون الغلاف",
+              "target": "كتلة صافية"
+            },
+            {
+              "source": "علبة فيتامينات ممتلئة",
+              "target": "كتلة إجمالية"
+            },
+            {
+              "source": "حبوب فيتامينات فقط",
+              "target": "كتلة صافية"
+            },
+            {
+              "source": "علبة فيتامينات فارغة",
+              "target": "كتلة فارغة"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
