@@ -21,7 +21,8 @@ components to the existing unit, as `methodica-ar-math-ratio-01` and
 re-send gave `created=0 updated=32 failed=0`. The 6 Arabic components are `draft` in the
 Hebrew unit. The Hebrew records are byte-identical before and after (only `componentCount`
 changed, 6 → 12). Local `metadata/` equals what KATA holds. The full record and snapshots are
-outside the repo, in `../../deployments/kata-snapshots/` (`KATA-SEND-2026-09-29.md`).
+outside the repo, in `../../deployments/!kata-snapshots/` (`KATA-SEND-2026-09-29.md`). The leading
+`!` keeps `verify-package.ps1` from taking it for the newest package folder.
 
 So the script runs in **parent-unit mode** by default: `$ParentUnitKey =
 'methodica-science-mass-measure-02'` (the Hebrew unit; override with `-ParentUnitKey`).
