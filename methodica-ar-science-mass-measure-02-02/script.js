@@ -25,7 +25,7 @@ try {
      typeof: 40-resume.js שנכשל בטעינה לא אמור להפיל את כל script.js. */
   savedCharacter = (typeof getUnitCharacter === 'function')
     ? getUnitCharacter()
-    : localStorage.getItem('lomda_selectedCharacter');
+    : localStorage.getItem('methodica_ar_science_mass_measure_02_selectedCharacter');
 } catch (e) { /* localStorage חסום (opaque origin/פרטיות) — נמשיך בלי שמירה */ }
 window.lomdaState = {
   selectedCharacter: savedCharacter || null
@@ -133,7 +133,7 @@ function s0Back() {
      בלי זה הלואדר של סין 01 היה רואה מצביע שעדיין מכוון לסין 02 ומקפיץ את
      הלומד מיד חזרה — כלומר הכפתור נראה שבור. שני הארגומנטים הם ה-fallback
      המקובע, ההתנהגות שהייתה לפני הקשתות. */
-  goBackToPreviousPart('methodica-science-mass-measure-02-01', '#screen=19');
+  goBackToPreviousPart('methodica-ar-science-mass-measure-02-01', '#screen=19');
 }
 
 /* =========================================================
@@ -1713,8 +1713,8 @@ function drag9Continue() {
   /* המעבר לסין 03 שהיה כאן חי רק ב-walkthrough מקומי (DEV_NAV,
      unit-js/10-identity.js). בייצור Kata היא שמנתבת. */
   if (DEV_NAV) {
-    writeForwardState('methodica-science-mass-measure-02-03', '#screen=8');
-    window.location.href = '../methodica-science-mass-measure-02-03/index.html' + window.location.search;
+    writeForwardState('methodica-ar-science-mass-measure-02-03', '#screen=8');
+    window.location.href = '../methodica-ar-science-mass-measure-02-03/index.html' + window.location.search;
   }
 }
 
@@ -1961,7 +1961,7 @@ var SCREEN_TO_SUBCONTENT = {
 /* ⚠️ SCREEN_TO_SUBCONTENT חייב להחזיק בדיוק TOTAL_SCREENS מפתחות (9).
    מפתח חסר = מסך שלא מדווח, בשקט. _test/verify-report.js אוכף את זה. */
 
-var XAPI_COMP_SLUG = 'methodica-science-mass-measure-02-02';
+var XAPI_COMP_SLUG = 'methodica-ar-science-mass-measure-02-02';
 /* מזהי הרכיב והפריטים חייבים להתאים ל-metadata/*.json בית-לבית — המוסכמה
    כאן נושאת TRAILING SLASH על יחידה, רכיב ופריט (לא על שאלה). */
 var XAPI_COMP_ID   = XAPI_ID_PREFIX + XAPI_COMP_SLUG + '/';
@@ -1969,7 +1969,7 @@ var XAPI_COMP_ID   = XAPI_ID_PREFIX + XAPI_COMP_SLUG + '/';
 /* כל שבעת הפריטים מדורגים בקוד. */
 var XAPI_EVAL_ITEMS = {'001': 1, '002': 1, '003': 1, '004': 1, '005': 1, '006': 1, '007': 1};
 
-var XAPI_METADATA_FILE = '../metadata/methodica-science-mass-measure-02-02.json';
+var XAPI_METADATA_FILE = '../metadata/methodica-ar-science-mass-measure-02-02.json';
 
 
 /* ═══════════════════ resume — התפרים הפר-סיניים ═══════════════════

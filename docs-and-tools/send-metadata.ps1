@@ -84,10 +84,10 @@ $LogFile = Join-Path $PSScriptRoot 'send-metadata.log'
 # one, for every component of this unit.
 #
 # Take this from the unit's own DEPLOY.md deploy target. No trailing slash.
-$ContentBaseUrl = 'https://lomdot.education.gov.il/metodica/720/science/mass-measure/02'
+$ContentBaseUrl = 'https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02'
 # Title language key: wraps a string title into the API object, e.g.
 #   "מדידת מסה" -> { "Hebrew": "מדידת מסה" }. Change only for non-Hebrew content.
-$TitleLangKey = 'Hebrew'
+$TitleLangKey = 'Arabic'
 # Manufacture value sent on the unit (the metadata unit file carries none).
 $UnitManufacture = 'methodica'
 # Fallback depthLevel — used ONLY if a component's metadata omits it (components
@@ -95,7 +95,7 @@ $UnitManufacture = 'methodica'
 $DefaultDepthLevel = 'core-curriculum-basic'
 # Optional per-component overrides, keyed by uniqueKey (URL slug). An override
 # WINS over the metadata value; unlisted components use their metadata value.
-#   e.g. 'methodica-science-mass-measure-02-05' = @{ relativeDifficulty = 4; depthLevel = 'core-curriculum-advanced' }
+#   e.g. 'methodica-ar-science-mass-measure-02-05' = @{ relativeDifficulty = 4; depthLevel = 'core-curriculum-advanced' }
 $ComponentOverrides = @{
 }
 
@@ -341,7 +341,7 @@ function New-UnitBody {
     $unitKey = Get-Slug $Unit.id
     if ($unitKey -notmatch '^methodica-') {
         throw ("Unit uniqueKey resolves to '$unitKey' from id '$($Unit.id)' — expected a slug like " +
-               "'methodica-science-mass-measure-02'. The unit id must end with the unit slug, not the folder number.")
+               "'methodica-ar-science-mass-measure-02'. The unit id must end with the unit slug, not the folder number.")
     }
 
     # targetSector / targetAudience: validated rather than forwarded blind.

@@ -55,7 +55,7 @@ gray anywhere. If a `:disabled` rule sets `background-color` and the `.correct`/
 don't explicitly set it back to white, the disabled-gray silently wins (same or higher specificity,
 later class rule with no competing property doesn't override it) and every locked answer box reads
 as grayed-out instead of white-with-a-colored-border — a real bug found on
-`methodica-science-mass-measure-02-04` screen `s1` ("מסך 2"), not a hypothetical.
+`methodica-ar-science-mass-measure-02-04` screen `s1` ("מסך 2"), not a hypothetical.
 
 **Self-QA checklist:**
 - [ ] Border is exactly 1px on correct/incorrect (1.5px is the focus-state width only).
@@ -298,7 +298,7 @@ border/opacity/icon-asset means the layout is also right — check the actual ph
 badge relative to the text at all three outcomes (idle-with-value, correct, incorrect), not just its
 color.
 
-**Reference implementation:** `methodica-science-mass-measure-02-04`, screen `s1` ("מסך 2", the
+**Reference implementation:** `methodica-ar-science-mass-measure-02-04`, screen `s1` ("מסך 2", the
 two-table practice screen) — `.tbl-input` / `.tbl-dd-btn` in `styles.css`.
 
 **Self-QA checklist:**
@@ -357,7 +357,7 @@ token used elsewhere (input focus border, dropdown open border); it does **not**
 or back buttons, whose token is `#007ac6`.
 
 **Reference CSS** (verified against Figma, currently implemented in
-`methodica-science-mass-measure-02-02/styles.css`):
+`methodica-ar-science-mass-measure-02-02/styles.css`):
 
 ```css
 .btn-continue {
@@ -393,7 +393,7 @@ or back buttons, whose token is `#007ac6`.
 ```
 
 **A project's own explicit product decision can legitimately override the *timing* of hint
-visibility without it being a bug** — e.g. `methodica-science-mass-measure-02-02` shows its hint
+visibility without it being a bug** — e.g. `methodica-ar-science-mass-measure-02-02` shows its hint
 button visible-and-enabled from screen load on some screens (`sq2`–`sq6`) instead of the family's
 default "hidden until first wrong attempt" (still used on that same project's `dd8`/`drag9`
 screens) — but this is documented with an explicit code comment citing the client request, right
@@ -419,7 +419,7 @@ spec above still applies regardless of which visibility timing a screen uses.
 - [ ] Hint icon is `26×24px` (width×height — **wider than tall**, matching the real bulb glyph's
       aspect ratio). Getting width/height transposed (`24×26`) visibly squishes/stretches the icon —
       this exact mistake was made once already in this doc's own first draft of this table and
-      propagated into `methodica-science-mass-measure-02-02`'s CSS before the client caught it from a
+      propagated into `methodica-ar-science-mass-measure-02-02`'s CSS before the client caught it from a
       screenshot (2026-08-06) — always sanity-check "is the icon wider or taller than it is X" against
       the Figma node directly, never trust a remembered number without re-deriving width vs height.
       `26×22` (the inner glyph's tighter bounding box, Figma height `22.288px`) is an acceptable
@@ -486,7 +486,7 @@ doesn't need to travel with this file if this spec is reused in an unrelated pro
   in neither this doc nor the code: the input's third "filled-but-blurred" `#ececec` border state,
   and the dropdown's always-`opacity:0.8`-unless-open treatment (a real, consistent Figma signal the
   input never gets). Documented both as category 5 above and fixed both in the reference
-  implementation (`methodica-science-mass-measure-02-04`, screen `s1`/"מסך 2"). The dropdown's
+  implementation (`methodica-ar-science-mass-measure-02-04`, screen `s1`/"מסך 2"). The dropdown's
   non-Figma CSS-triangle caret icon was noted as a known gap but left unfixed, pending approval.
 - **Round 8** (2026-08-06, same day) — Client live-tested Round 7's fix and found the dropdown's
   correct/incorrect check/X badge rendering detached at the box's far (wrong) edge, disconnected from
@@ -502,7 +502,7 @@ doesn't need to travel with this file if this spec is reused in an unrelated pro
   elsewhere in the family; documented as a new ⚠️ note + checklist item in category 5 above so a
   border/opacity-only re-check doesn't repeat this gap on the next project that builds this template.
 - **Round 9** (2026-08-06, same day) — Client noticed every locked correct/incorrect input on
-  `methodica-science-mass-measure-02-04` screen `s1` had a gray background, which doesn't exist in
+  `methodica-ar-science-mass-measure-02-04` screen `s1` had a gray background, which doesn't exist in
   Figma (both outcomes are `bg-white`). Root cause: a generic `.tbl-input:disabled { background-color:
   #f5f5f5 }` rule (the project's plain "this field is locked" style) was never overridden back to
   white by `.tbl-input-correct`/`.tbl-input-wrong` — those classes set border + icon but no
@@ -526,7 +526,7 @@ doesn't need to travel with this file if this spec is reused in an unrelated pro
     value-span RTL-badge-detachment bug from Round 8; (3) correct/incorrect border was 1.5px instead
     of Figma's 1px; (4) the open-menu state had no border-color/opacity change at all — only the
     arrow rotated, so opening the dropdown gave no visual "focused" feedback. Fixed all four in both
-    `s19` (`methodica-science-mass-measure-02-01`) and `dd8` (`methodica-science-mass-measure-02-02`)
+    `s19` (`methodica-ar-science-mass-measure-02-01`) and `dd8` (`methodica-ar-science-mass-measure-02-02`)
     using the same real SVG assets, border values, and `order: -1` technique as the Sain 4 reference.
     Sain 2 had no `icon-answerbox-*.svg` files at all (every Sain keeps independent asset copies) —
     added fresh ones, verified byte-identical to the Figma source before use.
@@ -558,7 +558,7 @@ doesn't need to travel with this file if this spec is reused in an unrelated pro
   - Sain 1 has one isolated prior patch (`#s12-continue-btn { width: auto; min-width: 140px }`)
     proving the fixed-width bug was already noticed once, just never generalized.
   - User then asked to actually implement the category 6 fixes on Sain 2 specifically. Applied the
-    reference CSS to `methodica-science-mass-measure-02-02/styles.css`'s `.btn-continue`/`.btn-hint`/
+    reference CSS to `methodica-ar-science-mass-measure-02-02/styles.css`'s `.btn-continue`/`.btn-hint`/
     `.btn-back` (confirmed via grep these are the *only* definitions — no per-screen ID overrides
     exist anywhere in that project, so the fix covers all 10 of its screens at once). Deliberately
     did **not** touch that project's hint-visibility timing: a code comment at the `.btn-hint` rule
@@ -577,7 +577,7 @@ doesn't need to travel with this file if this spec is reused in an unrelated pro
   screenshot showed. This means Round 11's own audit table was itself wrong about which projects had
   the "bad" value — `26×24` (Sain 1) and `26×22` (Sain 4/5/6) were actually fine (or a harmless
   rounding of the same shape); the only genuinely wrong instance was the `24×26` this doc introduced
-  into Sain 2. Fixed `methodica-science-mass-measure-02-02/styles.css`'s `.btn-hint .scq-hint-icon`
+  into Sain 2. Fixed `methodica-ar-science-mass-measure-02-02/styles.css`'s `.btn-hint .scq-hint-icon`
   back to `width: 26px; height: 24px`, and corrected every reference to this in category 6 above
   (the state table, the reference CSS block, and the checklist item) rather than just the code —
   the previous wording is struck through above, not deleted, so this correction has a paper trail.
@@ -593,12 +593,12 @@ doesn't need to travel with this file if this spec is reused in an unrelated pro
   remaining projects that no per-screen ID-selector override exists for these buttons except Sain 1's
   known `#s12-continue-btn { width: auto; min-width: 140px }` — left untouched, since it's now merely
   redundant with (not conflicting with) the fixed base class.
-  - `methodica-science-mass-measure-02-01`, `-04`, `-05`, `-06`: applied the full reference CSS
+  - `methodica-ar-science-mass-measure-02-01`, `-04`, `-05`, `-06`: applied the full reference CSS
     (explicit `height: 39px`, `padding: 0 20px`, `min-width: 140px`, 3-stop gradient, `1px`
     hint/back border, hint color `#007ac6`, hint `font-size: 20px`) to all three button classes.
     Left each project's hint icon size untouched where it was already `26×24` (Sain 1) or `26×22`
     (Sain 4, 5, 6) — per Round 12's correction, both are the *correct* orientation and not a bug.
-  - `methodica-science-mass-measure-02-03`: only `.btn-continue`/`.btn-back` exist (confirmed again,
+  - `methodica-ar-science-mass-measure-02-03`: only `.btn-continue`/`.btn-back` exist (confirmed again,
     no `.btn-hint` anywhere in the project) — fixed those two only; did not invent a hint button rule
     that has no corresponding markup.
   - Did not touch any hint-visibility timing (`hidden` attribute, hover/focus-visible rules, or

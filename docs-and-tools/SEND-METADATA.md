@@ -67,7 +67,7 @@ this is controlled from the **CONFIG** block at the top of the file.
 
 | Metadata | Sent to API |
 |---|---|
-| unit `id` (full URL) | `uniqueKey` = last path segment (slug), e.g. `methodica-science-mass-measure-02`. Trailing slashes are trimmed first, so `…/foo/` yields `foo`, not `""`. The **unit** keeps a slug — 720 v2.5 §2.7 exempts the content unit, and Kata does not warn on it. |
+| unit `id` (full URL) | `uniqueKey` = last path segment (slug), e.g. `methodica-ar-science-mass-measure-02`. Trailing slashes are trimmed first, so `…/foo/` yields `foo`, not `""`. The **unit** keeps a slug — 720 v2.5 §2.7 exempts the content unit, and Kata does not warn on it. |
 | component / item `id` (full URL) | `uniqueKey` = **the IRI verbatim**, unchanged. Since 2026-09-15 (see below) these are no longer reduced to a slug. |
 | unit `title` (string) | `title` object `{ "Hebrew": "…" }` (`$TitleLangKey`) |
 | unit — (no manufacture) | `manufacture` = `'methodica'` (`$UnitManufacture`) |
@@ -213,7 +213,7 @@ against, and picking the right code is a content decision — flagged, not guess
 
 ## Verify the result
 
-- `GET /api/v1/content-units/methodica-science-mass-measure-02` returns the unit with
+- `GET /api/v1/content-units/methodica-ar-science-mass-measure-02` returns the unit with
   its components; spot-check one component and one item through the query routes, e.g.
   `GET /api/v1/component?componentKey=<url-encoded component IRI>`. The old
   `/api/v1/components/{key}` form `404`s on an IRI key — that is expected, not a fault.

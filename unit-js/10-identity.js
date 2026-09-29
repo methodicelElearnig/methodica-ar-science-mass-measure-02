@@ -1,6 +1,6 @@
 'use strict';
 /* ═══════════════════ xAPI (720) — identity ═══════════════════
-   משותף לששת הסינים של methodica-science-mass-measure-02. נטען ראשון.
+   משותף לששת הסינים של methodica-ar-science-mass-measure-02. נטען ראשון.
 
    התחילית הקנונית של היחידה. כל מזהה שהלומדה מדווחת נבנה ממנה, והיא חייבת
    להתאים ל-metadata/*.json בית-לבית — כולל ה-trailing slash שהמוסכמה נושאת.
@@ -27,14 +27,14 @@
 
    הבדיקה אינה ידנית: 50-loader.js משווה את XAPI_COMP_ID מול window.METADATA.id
    בכל טעינה של כל סין, וזועק לקונסול על אי-התאמה. */
-var XAPI_ID_PREFIX = 'https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/';
+var XAPI_ID_PREFIX = 'https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/';
 
 /* מזהה היחידה = התחילית + slug היחידה + '/'. שווה בדיוק ל-id ב-
-   metadata/methodica-science-mass-measure-02_unit.json.
+   metadata/methodica-ar-science-mass-measure-02_unit.json.
    התחילית לבדה היא רק שם התיקייה, ו-Kata הייתה גוזרת ממנה uniqueKey = "02" —
    מפתח שמתנגש עם כל יחידה 02 בכל מקצוע. ראו METADATA-FIXES.md §1: זו טעות
    שקרתה בפועל ביחידת המתמטיקה. */
-window.XAPI_UNIT_ID = XAPI_ID_PREFIX + 'methodica-science-mass-measure-02/';
+window.XAPI_UNIT_ID = XAPI_ID_PREFIX + 'methodica-ar-science-mass-measure-02/';
 
 /* המקטע האחרון של מזהה קנוני — ה-slug הקצר שטופס דיווח הבעיות רושם. */
 function shortId(u) { return String(u || '').replace(/\/+$/, '').split('/').pop(); }

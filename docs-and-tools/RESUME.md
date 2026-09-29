@@ -1,6 +1,6 @@
 # Resume — איך המנגנון עובד ביחידה הזאת
 
-מסמך העיצוב של ה-resume ב-`methodica-science-mass-measure-02`. עד 2026-08-17 ההערות
+מסמך העיצוב של ה-resume ב-`methodica-ar-science-mass-measure-02`. עד 2026-08-17 ההערות
 בקוד הפנו ל-`RESUME.md` בלומדת `methodica-math-scale-01`, שהיא מקור הדפוס; המסמך הזה
 מתעד מה **כאן** — כולל את המקומות שבהם היחידה הזאת נבדלת ממנה, ואת מה שעוד לא הושלם.
 
@@ -80,7 +80,7 @@
 
 | מה | היה | מה קרה במחשב שני |
 |---|---|---|
-| `lomda_selectedCharacter` | `localStorage` בלבד | `null` → וכל אתרי האווטאר הם טרנרי דו-כיווני (`=== 'green' ? … : orange`), ולכן לומד שבחר **ירוק** קיבל **כתום**, בשקט. גם ה-preload קאשש את הצבע הלא-נכון, והלומד לא הוחזר למסך 1 לבחור מחדש |
+| `methodica_ar_science_mass_measure_02_selectedCharacter` | `localStorage` בלבד | `null` → וכל אתרי האווטאר הם טרנרי דו-כיווני (`=== 'green' ? … : orange`), ולכן לומד שבחר **ירוק** קיבל **כתום**, בשקט. גם ה-preload קאשש את הצבע הלא-נכון, והלומד לא הוחזר למסך 1 לבחור מחדש |
 | חמשת מפתחות `lomda_moed*_result` | `localStorage` בלבד | `moedAFullyPassed()` החזיר `false` → לומד שעבר את מועד א' **במלואו** נותב לתוך סין 06 |
 | `lomda_nav_edges::…` | `sessionStorage` | לא רלוונטי ללומד — הקשתות משרתות רק את סיור `?dev=1` (§5). מ-v5 אין `doc.prev` |
 
@@ -886,7 +886,7 @@ Kata מכבדת `If-Match` גם על **DELETE** — רלוונטי אם `?resetS
 
 ## 8ג. ההרצה מול Kata אמיתי — בוצעה ועברה (2026-08-17)
 
-הורצה מול **הייצור** ב-`/metodica/720/science/mass-measure/02/`, עם
+הורצה מול **הייצור** ב-`/metodica/720/ar/science/mass-measure/02/`, עם
 `?slxapi` + `?registration` אמיתיים ולומד בדיקה. הטוקן לא נרשם בשום מקום.
 
 | # | מה נבדק | תוצאה |

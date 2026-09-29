@@ -54,13 +54,13 @@ function makeRunner(w) {
 }
 
 async function run(c) {
-  const dir = path.join(BASE, 'methodica-science-mass-measure-02-' + c);
+  const dir = path.join(BASE, 'methodica-ar-science-mass-measure-02-' + c);
   const file = path.join(dir, 'index.html');
   const loadErrors = [];
   const consoleErrors = [];
 
   const dom = new JSDOM(fs.readFileSync(file, 'utf8'), {
-    url: 'http://localhost:8777/methodica-science-mass-measure-02-' + c + '/index.html',
+    url: 'http://localhost:8777/methodica-ar-science-mass-measure-02-' + c + '/index.html',
     runScripts: 'dangerously',
     pretendToBeVisual: true,
   });
@@ -104,7 +104,7 @@ async function run(c) {
      the degraded behaviour: missing METADATA falls back to {} and posts empty
      slugs — the report still arrives, just without location context.) */
   w.METADATA = JSON.parse(fs.readFileSync(
-    path.join(BASE, 'metadata', 'methodica-science-mass-measure-02-' + c + '.json'),
+    path.join(BASE, 'metadata', 'methodica-ar-science-mass-measure-02-' + c + '.json'),
     'utf8').replace(/^﻿/, ''));
 
   // ── 1. Page loaded clean ────────────────────────────────────────────
@@ -246,7 +246,7 @@ async function run(c) {
     posted && posted.opts && posted.opts.body instanceof w.URLSearchParams);
 
   const body = posted && posted.opts && posted.opts.body;
-  const slug = 'methodica-science-mass-measure-02';
+  const slug = 'methodica-ar-science-mass-measure-02';
   ok(c, 'unit slug is populated and correct',
     body && body.get('entry.1933069481') === slug, body && body.get('entry.1933069481'));
   ok(c, 'component slug is populated and correct',
@@ -347,9 +347,9 @@ async function run(c) {
    that is linked into with a hash but does not read it silently drops the
    learner on screen 0, which also makes bootXAPI report the wrong item. */
 async function runHashLanding(c, screen) {
-  const dir = path.join(BASE, 'methodica-science-mass-measure-02-' + c);
+  const dir = path.join(BASE, 'methodica-ar-science-mass-measure-02-' + c);
   const dom = new JSDOM(fs.readFileSync(path.join(dir, 'index.html'), 'utf8'), {
-    url: 'http://localhost:8777/methodica-science-mass-measure-02-' + c +
+    url: 'http://localhost:8777/methodica-ar-science-mass-measure-02-' + c +
          '/index.html?slxapi=x#screen=' + screen,
     runScripts: 'dangerously',
     pretendToBeVisual: true,
@@ -393,15 +393,15 @@ function checkMetadata() {
   ok(C, 'metadata/ exists', fs.existsSync(mdDir));
   if (!fs.existsSync(mdDir)) return;
 
-  const unit = readJson(path.join(mdDir, 'methodica-science-mass-measure-02_unit.json'));
+  const unit = readJson(path.join(mdDir, 'methodica-ar-science-mass-measure-02_unit.json'));
   ok(C, 'unit id matches XAPI_UNIT_ID byte-for-byte', PREFIX + UNIT === unit.id,
     '\n      code: ' + PREFIX + UNIT + '\n      meta: ' + unit.id);
 
   let items = 0, questions = 0;
   for (const c of COMPONENTS) {
-    const slug = 'methodica-science-mass-measure-02-' + c;
+    const slug = 'methodica-ar-science-mass-measure-02-' + c;
     const md = readJson(path.join(mdDir, slug + '.json'));
-    const js = fs.readFileSync(path.join(BASE, 'methodica-science-mass-measure-02-' + c, 'script.js'), 'utf8');
+    const js = fs.readFileSync(path.join(BASE, 'methodica-ar-science-mass-measure-02-' + c, 'script.js'), 'utf8');
 
     // The values the code will actually build, mirroring 20-xapi.js exactly.
     const compId = PREFIX + slug + '/';
@@ -437,7 +437,7 @@ function checkMetadata() {
        01/02/04 do) or its painter re-wires it (the four factory instances do).
        This flags any NEW question that has neither; the behavioural proof for
        s12, the one that actually broke, is in the 06 block below. */
-    const htmlSrc = fs.readFileSync(path.join(BASE, 'methodica-science-mass-measure-02-' + c, 'index.html'), 'utf8');
+    const htmlSrc = fs.readFileSync(path.join(BASE, 'methodica-ar-science-mass-measure-02-' + c, 'index.html'), 'utf8');
     for (const m of htmlSrc.matchAll(/<button[^>]*id="([^"]*-(?:check|btn-check))"[^>]*>/g)) {
       const inline = /onclick="/.test(m[0]);
       if (inline) continue;                     // markup-wired: immune to the guard
@@ -498,7 +498,7 @@ function checkMetadata() {
 function checkVersionQueries() {
   const seen = {};
   for (const c of COMPONENTS) {
-    const html = fs.readFileSync(path.join(BASE, 'methodica-science-mass-measure-02-' + c, 'index.html'), 'utf8');
+    const html = fs.readFileSync(path.join(BASE, 'methodica-ar-science-mass-measure-02-' + c, 'index.html'), 'utf8');
     for (const m of html.matchAll(/(?:src|href)="\.\.\/(unit-js|unit-css)\/([^"?]+)\?v=([^"]+)"/g)) {
       const file = m[1] + '/' + m[2];
       (seen[file] = seen[file] || []).push(c + ':' + m[3]);
@@ -517,7 +517,7 @@ function checkVersionQueries() {
      longer exists -- and a missing @font-face is silent: the unit simply renders in a
      fallback face. Exactly the failure the reference unit shipped once already. */
   for (const c of COMPONENTS) {
-    const html = fs.readFileSync(path.join(BASE, 'methodica-science-mass-measure-02-' + c, 'index.html'), 'utf8');
+    const html = fs.readFileSync(path.join(BASE, 'methodica-ar-science-mass-measure-02-' + c, 'index.html'), 'utf8');
     for (const [label, re] of [['styles.css', /href="styles\.css(\?v=\d+)?"/],
                                ['script.js',  /src="script\.js(\?v=\d+)?"/]]) {
       const m = html.match(re);
@@ -525,7 +525,7 @@ function checkVersionQueries() {
     }
   }
   {
-    const sub = fs.readFileSync(path.join(BASE, 'methodica-science-mass-measure-02-05',
+    const sub = fs.readFileSync(path.join(BASE, 'methodica-ar-science-mass-measure-02-05',
       'plane-mass-simulation', 'index.html'), 'utf8');
     ok('ver', 'the sub-app stylesheet carries a ?v=', /href="style\.css\?v=\d+"/.test(sub));
   }
@@ -545,8 +545,8 @@ function checkVersionQueries() {
    cross-part pointer. Answer state is deliberately not restored yet, so there
    is nothing here about repainted answers. */
 async function runResume(c) {
-  const dir = path.join(BASE, 'methodica-science-mass-measure-02-' + c);
-  const slug = 'methodica-science-mass-measure-02-' + c;
+  const dir = path.join(BASE, 'methodica-ar-science-mass-measure-02-' + c);
+  const slug = 'methodica-ar-science-mass-measure-02-' + c;
   const dom = new JSDOM(fs.readFileSync(path.join(dir, 'index.html'), 'utf8'), {
     url: 'http://localhost:8777/' + slug + '/index.html?slxapi=1&registration=r1',
     runScripts: 'dangerously',
@@ -612,9 +612,9 @@ async function runResume(c) {
      document is another component's. The edge map and a synchronous save of THIS component
      are all that remain. */
   exec("_unitState = emptyUnitState(); window.__store = null; window.__syncWrites = 0; " +
-       "try { sessionStorage.removeItem('lomda_nav_edges::methodica-science-mass-measure-02'); } catch (e) {} " +
+       "try { sessionStorage.removeItem('lomda_nav_edges::methodica-ar-science-mass-measure-02'); } catch (e) {} " +
        "writeForwardState('dest-part', '#screen=7');");
-  const edges = () => { try { return JSON.parse(val("sessionStorage.getItem('lomda_nav_edges::methodica-science-mass-measure-02')")) || {}; } catch (e) { return {}; } };
+  const edges = () => { try { return JSON.parse(val("sessionStorage.getItem('lomda_nav_edges::methodica-ar-science-mass-measure-02')")) || {}; } catch (e) { return {}; } };
   ok(c, 'writeForwardState records the back edge with its return hash',
     !!edges()['dest-part'] && edges()['dest-part'].from === slug && edges()['dest-part'].hash === '#screen=7',
     JSON.stringify(edges()));
@@ -629,11 +629,11 @@ async function runResume(c) {
   /* v5: the sessionStorage edge map is the only layer; the hardcoded arguments are the
      last resort. The document carries no prev map any more. */
   exec("_unitState = emptyUnitState();");
-  exec("try { sessionStorage.setItem('lomda_nav_edges::methodica-science-mass-measure-02', JSON.stringify({'" + slug + "': { from: 'from-session', hash: '#screen=3' } })); } catch (e) {}");
+  exec("try { sessionStorage.setItem('lomda_nav_edges::methodica-ar-science-mass-measure-02', JSON.stringify({'" + slug + "': { from: 'from-session', hash: '#screen=3' } })); } catch (e) {}");
   ok(c, 'previousPartHref follows the sessionStorage edge',
     /\.\.\/from-session\/index\.html.*#screen=3$/.test(String(val("previousPartHref('fallback','#screen=9')"))),
     String(val("previousPartHref('fallback','#screen=9')")));
-  exec("try { sessionStorage.removeItem('lomda_nav_edges::methodica-science-mass-measure-02'); } catch (e) {}");
+  exec("try { sessionStorage.removeItem('lomda_nav_edges::methodica-ar-science-mass-measure-02'); } catch (e) {}");
   ok(c, 'previousPartHref falls back to the hardcoded argument',
     /\.\.\/fallback\/index\.html.*#screen=9$/.test(String(val("previousPartHref('fallback','#screen=9')"))),
     String(val("previousPartHref('fallback','#screen=9')")));
@@ -1102,12 +1102,12 @@ async function runResume(c) {
     exec("Object.keys(stationProgress).forEach(function(k){ stationProgress[k] = null; });");
     ok(c, 'the regression is real: wiped score routes to remediation',
       val('getPracticeScore()') === 0 &&
-      val('practiceDestinationSlug()') === 'methodica-science-mass-measure-02-02',
+      val('practiceDestinationSlug()') === 'methodica-ar-science-mass-measure-02-02',
       val('getPracticeScore()') + ' / ' + val('practiceDestinationSlug()'));
     exec('applyResumeVars(window.__snap);');
     ok(c, 'restore returns the score', val('getPracticeScore()') === 4, String(val('getPracticeScore()')));
     ok(c, 'restore returns the skip-branch destination',
-      val('practiceDestinationSlug()') === 'methodica-science-mass-measure-02-03',
+      val('practiceDestinationSlug()') === 'methodica-ar-science-mass-measure-02-03',
       String(val('practiceDestinationSlug()')));
   }
 
@@ -1710,7 +1710,7 @@ async function runResume(c) {
      __store is written ONLY by the synchronous saveState720 and __pending ONLY
      by saveState720Debounced, so asserting on __store is a true
      "this was persisted synchronously" assertion rather than "a save happened". */
-  const slugFor = 'methodica-science-mass-measure-02-' + c;
+  const slugFor = 'methodica-ar-science-mass-measure-02-' + c;
   const storedDone = (expr) =>
     val('(function(){ try { return ' +
         'JSON.parse(window.__store).payload.' + expr + '; } ' +
@@ -1921,7 +1921,7 @@ function checkLibraryLetter() {
    left on the debounce — see RESUME.md §6ג. */
 function checkCommitmentFlush() {
   for (const c of COMPONENTS) {
-    const rel = path.join('methodica-science-mass-measure-02-' + c, 'script.js');
+    const rel = path.join('methodica-ar-science-mass-measure-02-' + c, 'script.js');
     const src = fs.readFileSync(path.join(BASE, rel), 'utf8');
     let found = 0;
     for (const m of src.matchAll(/function\s+(\w+)\s*\([^)]*\)\s*\{/g)) {
@@ -1960,9 +1960,9 @@ function checkCommitmentFlush() {
    what will happen against Kata rather than something adjacent. */
 async function checkStateDiagnostics() {
   const c = '01';
-  const dir = path.join(BASE, 'methodica-science-mass-measure-02-' + c);
+  const dir = path.join(BASE, 'methodica-ar-science-mass-measure-02-' + c);
   const dom = new JSDOM(fs.readFileSync(path.join(dir, 'index.html'), 'utf8'), {
-    url: 'http://localhost:8777/methodica-science-mass-measure-02-' + c +
+    url: 'http://localhost:8777/methodica-ar-science-mass-measure-02-' + c +
          '/index.html?slxapi=1&registration=r1&xapiLib=../_test/xapi-720-k.js',
     runScripts: 'dangerously', pretendToBeVisual: true,
   });
@@ -1981,7 +1981,7 @@ async function checkStateDiagnostics() {
   exec(fs.readFileSync(path.join(HARNESS_DIR, 'xapi-720-k.js'), 'utf8'));
 
   ok('diag', 'RESUME_STATE_ID carries the component slug (one fallback slot per component)',
-    val('RESUME_STATE_ID') === 'execution-state::methodica-science-mass-measure-02-01', String(val('RESUME_STATE_ID')));
+    val('RESUME_STATE_ID') === 'execution-state::methodica-ar-science-mass-measure-02-01', String(val('RESUME_STATE_ID')));
   ok('diag', 'stateLastResult720 is exposed',
     val('typeof window.stateLastResult720') === 'function');
 
@@ -2041,8 +2041,8 @@ function checkSlugCase() {
     if (f.endsWith('.js')) files.push(path.join('unit-js', f));
   }
   for (const c of COMPONENTS) {
-    files.push(path.join('methodica-science-mass-measure-02-' + c, 'script.js'));
-    files.push(path.join('methodica-science-mass-measure-02-' + c, 'index.html'));
+    files.push(path.join('methodica-ar-science-mass-measure-02-' + c, 'script.js'));
+    files.push(path.join('methodica-ar-science-mass-measure-02-' + c, 'index.html'));
   }
   for (const rel of files) {
     const txt = fs.readFileSync(path.join(BASE, rel), 'utf8');
@@ -2071,11 +2071,11 @@ function checkSlugCase() {
    class is invisible, which is how it survived every assertion here. */
 async function checkItemClosesAfterResume() {
   const c = '01';
-  const dir = path.join(BASE, 'methodica-science-mass-measure-02-' + c);
+  const dir = path.join(BASE, 'methodica-ar-science-mass-measure-02-' + c);
 
   const openWindow = () => {
     const dom = new JSDOM(fs.readFileSync(path.join(dir, 'index.html'), 'utf8'), {
-      url: 'http://localhost:8777/methodica-science-mass-measure-02-' + c +
+      url: 'http://localhost:8777/methodica-ar-science-mass-measure-02-' + c +
            '/index.html?slxapi=1&registration=r1&xapiLib=../_test/xapi-720-k.js',
       runScripts: 'dangerously', pretendToBeVisual: true,
     });
@@ -2179,7 +2179,7 @@ function checkAssetContract() {
 
   /* ── no component may re-grow its own copy of the hoisted fonts ── */
   for (const c of COMPONENTS) {
-    const f = path.join(BASE, 'methodica-science-mass-measure-02-' + c, 'assets', 'fonts');
+    const f = path.join(BASE, 'methodica-ar-science-mass-measure-02-' + c, 'assets', 'fonts');
     const faces = fs.existsSync(f)
       ? fs.readdirSync(f).filter(x => /^assistant-/i.test(x)) : [];
     ok('assets', c + ' has no local copy of the Assistant faces', faces.length === 0,
@@ -2228,21 +2228,21 @@ function checkAssetContract() {
      avatar-<color>.png and -workout.gif, which stayed in the component. The two lines
      look identical; swapping either is a silent 404 that costs a preload, not a render. */
   for (const c of ['03', '05', '06']) {
-    const s = fs.readFileSync(path.join(BASE, 'methodica-science-mass-measure-02-' + c, 'script.js'), 'utf8');
+    const s = fs.readFileSync(path.join(BASE, 'methodica-ar-science-mass-measure-02-' + c, 'script.js'), 'utf8');
     ok('assets', c + ' preloads the dancing GIF from unit-assets',
       /img\.src = '\.\.\/unit-assets\/img\/' \+ name;/.test(s));
   }
-  const s01 = fs.readFileSync(path.join(BASE, 'methodica-science-mass-measure-02-01', 'script.js'), 'utf8');
+  const s01 = fs.readFileSync(path.join(BASE, 'methodica-ar-science-mass-measure-02-01', 'script.js'), 'utf8');
   ok('assets', '01 still preloads its OWN images from assets/images/',
     /img\.src = 'assets\/images\/' \+ name;/.test(s01));
 
   /* ── the two font depths ── */
   for (const c of COMPONENTS) {
-    const css = fs.readFileSync(path.join(BASE, 'methodica-science-mass-measure-02-' + c, 'styles.css'), 'utf8');
+    const css = fs.readFileSync(path.join(BASE, 'methodica-ar-science-mass-measure-02-' + c, 'styles.css'), 'utf8');
     const n = (css.match(/url\('\.\.\/unit-assets\/fonts\//g) || []).length;
     ok('assets', c + '/styles.css reaches the fonts with one ../', n === 2, String(n));
   }
-  const sub = path.join(BASE, 'methodica-science-mass-measure-02-05', 'plane-mass-simulation', 'style.css');
+  const sub = path.join(BASE, 'methodica-ar-science-mass-measure-02-05', 'plane-mass-simulation', 'style.css');
   const subCss = fs.readFileSync(sub, 'utf8');
   ok('assets', 'the sub-app reaches the fonts with two ../ (it sits one level deeper)',
     (subCss.match(/url\('\.\.\/\.\.\/unit-assets\/fonts\//g) || []).length === 2);
@@ -2258,7 +2258,7 @@ function checkPlatformRouting() {
   const strip = (s) => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"])\/\/[^\n]*/g, '$1');
   const files = ['unit-js/10-identity.js', 'unit-js/20-xapi.js', 'unit-js/40-resume.js',
                  'unit-js/50-loader.js', 'unit-js/90-boot.js']
-    .concat(COMPONENTS.map(c => 'methodica-science-mass-measure-02-' + c + '/script.js'));
+    .concat(COMPONENTS.map(c => 'methodica-ar-science-mass-measure-02-' + c + '/script.js'));
   for (const rel of files) {
     const src = strip(fs.readFileSync(path.join(BASE, rel), 'utf8'));
     ok('routing', rel + ': no unit-level statement',
@@ -2282,7 +2282,7 @@ function checkPlatformRouting() {
   ok('routing', '20-xapi.js: xapiEndComponent reports then disables the button',
     /function xapiEndComponent\(result, btn\)[\s\S]{0,200}xapiCompleteComponent\(result\)[\s\S]{0,120}btn\.disabled = true/.test(xa));
   for (const c of COMPONENTS.filter(c => c !== '01')) {
-    const html = fs.readFileSync(path.join(BASE, 'methodica-science-mass-measure-02-' + c, 'index.html'), 'utf8');
+    const html = fs.readFileSync(path.join(BASE, 'methodica-ar-science-mass-measure-02-' + c, 'index.html'), 'utf8');
     ok('routing', c + ': the first-screen "חזרה" carries id="s0-back" so 90-boot.js can hide it',
       /id="s0-back"/.test(html));
   }
@@ -2302,9 +2302,9 @@ async function checkPerComponentState() {
   const stores = {};
   const warns = [];
   const bootS = (c, query) => {
-    const dir = path.join(BASE, 'methodica-science-mass-measure-02-' + c);
+    const dir = path.join(BASE, 'methodica-ar-science-mass-measure-02-' + c);
     const dom = new JSDOM(fs.readFileSync(path.join(dir, 'index.html'), 'utf8'), {
-      url: 'http://localhost:8777/methodica-science-mass-measure-02-' + c + '/index.html' + query,
+      url: 'http://localhost:8777/methodica-ar-science-mass-measure-02-' + c + '/index.html' + query,
       runScripts: 'dangerously', pretendToBeVisual: true,
     });
     const w = dom.window;
@@ -2328,7 +2328,7 @@ async function checkPerComponentState() {
     w.sendStatement720 = function (v, t, r, o) { w.__stmts.push({ v, t, r, o }); };
     const seed = (doc) => { stores[w.__key(w.RESUME_STATE_ID)] = JSON.stringify(doc); };
     const stored = () => { const s = stores[w.__key(w.RESUME_STATE_ID)]; return s ? JSON.parse(s) : null; };
-    return { w, exec, val, seed, stored, slug: 'methodica-science-mass-measure-02-' + c, close: () => w.close() };
+    return { w, exec, val, seed, stored, slug: 'methodica-ar-science-mass-measure-02-' + c, close: () => w.close() };
   };
   const q = (r, extra) => '?slxapi=1&registration=' + r + (extra || '');
 
@@ -2397,7 +2397,7 @@ async function checkPerComponentState() {
   // ── retake: Kata cleared the document; the same-browser mirrors still hold the last attempt ──
   b = bootS('05', q('r5'));
   b.exec("localStorage.setItem('lomda_moedA_partA_result', 'pass'); localStorage.setItem('lomda_moedA_partB_result', 'pass');" +
-         "localStorage.setItem('lomda_selectedCharacter', 'green'); window.lomdaState.selectedCharacter = null;");
+         "localStorage.setItem('methodica_ar_science_mass_measure_02_selectedCharacter', 'green'); window.lomdaState.selectedCharacter = null;");
   b.exec('readUnitState(); window.__changed = adoptUnitCharacter(_unitState);');
   ok('retake', 'an absent document makes every verdict null — the mirrors are not consulted',
     b.val("getUnitResult('lomda_moedA_partA_result')") === null && b.val("getUnitResult('lomda_moedA_partB_result')") === null);
@@ -2415,22 +2415,22 @@ async function checkPerComponentState() {
   b = bootS('01', q('r1'));
   b.exec("_resumeReady = true; readUnitState(); setUnitCharacter('green');");
   ok('character', '01: the choice lands in the mirror AND in this component\'s document',
-    b.val("localStorage.getItem('lomda_selectedCharacter')") === 'green' && b.val('_unitState.ui.character') === 'green' &&
+    b.val("localStorage.getItem('methodica_ar_science_mass_measure_02_selectedCharacter')") === 'green' && b.val('_unitState.ui.character') === 'green' &&
     b.stored() && b.stored().ui.character === 'green', JSON.stringify(b.stored()));
   b.close();
   b = bootS('03', q('r3'));
   b.seed({ v: 5, component: b.slug, ui: { character: 'orange' } });
-  b.exec("localStorage.setItem('lomda_selectedCharacter', 'green'); readUnitState(); adoptUnitCharacter(_unitState);");
+  b.exec("localStorage.setItem('methodica_ar_science_mass_measure_02_selectedCharacter', 'green'); readUnitState(); adoptUnitCharacter(_unitState);");
   ok('character', '03 step 1: the document wins over the mirror, and the mirror follows',
-    b.val('window.lomdaState.selectedCharacter') === 'orange' && b.val("localStorage.getItem('lomda_selectedCharacter')") === 'orange');
+    b.val('window.lomdaState.selectedCharacter') === 'orange' && b.val("localStorage.getItem('methodica_ar_science_mass_measure_02_selectedCharacter')") === 'orange');
   b.close();
   b = bootS('03', q('r3b'));
-  b.exec("localStorage.setItem('lomda_selectedCharacter', 'green'); window.lomdaState.selectedCharacter = null; readUnitState(); window.__changed = adoptUnitCharacter(_unitState);");
+  b.exec("localStorage.setItem('methodica_ar_science_mass_measure_02_selectedCharacter', 'green'); window.lomdaState.selectedCharacter = null; readUnitState(); window.__changed = adoptUnitCharacter(_unitState);");
   ok('character', '03 steps 2+3: an empty document adopts the mirror into memory and into the document',
     b.val('window.lomdaState.selectedCharacter') === 'green' && b.val('_unitState.ui.character') === 'green' &&
     b.val('getUnitCharacter()') === 'green' && b.w.__changed === true);
   ok('character', '03 step 3: the mirror is NOT deleted (the old applyUnitProfile did)',
-    b.val("localStorage.getItem('lomda_selectedCharacter')") === 'green');
+    b.val("localStorage.getItem('methodica_ar_science_mass_measure_02_selectedCharacter')") === 'green');
   ok('character', '03 step 3: nothing is written before Phase B…', b.stored() === null);
   b.exec('_resumeReady = true; drainPendingUnitState();');
   ok('character', '…and Phase B persists the adopted character into this component\'s document',
@@ -2439,12 +2439,12 @@ async function checkPerComponentState() {
   b = bootS('03', q('r3c'));
   b.exec("readUnitState(); window.__changed = adoptUnitCharacter(_unitState);");
   ok('character', '03 step 4: no document, no mirror → null, default stays, nothing thrown',
-    b.val('getUnitCharacter()') === null && b.val("localStorage.getItem('lomda_selectedCharacter')") === null);
+    b.val('getUnitCharacter()') === null && b.val("localStorage.getItem('methodica_ar_science_mass_measure_02_selectedCharacter')") === null);
   b.close();
   b = bootS('03', q('r3d', '&resetState'));
   ok('character', '?resetState: the hatch ran at boot and cleared the mirror',
-    b.val('_resetRequested') === true && b.val("localStorage.getItem('lomda_selectedCharacter')") === null);
-  b.exec("localStorage.setItem('lomda_selectedCharacter', 'green'); readUnitState(); adoptUnitCharacter(_unitState);");
+    b.val('_resetRequested') === true && b.val("localStorage.getItem('methodica_ar_science_mass_measure_02_selectedCharacter')") === null);
+  b.exec("localStorage.setItem('methodica_ar_science_mass_measure_02_selectedCharacter', 'green'); readUnitState(); adoptUnitCharacter(_unitState);");
   ok('character', '?resetState: a mirror that reappears is NOT adopted — a reset adopts nothing',
     b.val('getUnitCharacter()') === null && b.val('window.lomdaState.selectedCharacter') === null,
     'char=' + b.val('getUnitCharacter()'));
@@ -2456,7 +2456,7 @@ function checkStateShapeSource() {
   const strip = (s) => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"])\/\/[^\n]*/g, '$1');
   const files = ['unit-js/10-identity.js', 'unit-js/20-xapi.js', 'unit-js/40-resume.js',
                  'unit-js/50-loader.js', 'unit-js/90-boot.js']
-    .concat(COMPONENTS.map(c => 'methodica-science-mass-measure-02-' + c + '/script.js'));
+    .concat(COMPONENTS.map(c => 'methodica-ar-science-mass-measure-02-' + c + '/script.js'));
   for (const rel of files) {
     const src = strip(fs.readFileSync(path.join(BASE, rel), 'utf8'));
     ok('shape', rel + ': no landing pointer, no prev map, no parts map',
@@ -2475,7 +2475,7 @@ function checkStateShapeSource() {
   const ld = strip(fs.readFileSync(path.join(BASE, 'unit-js/50-loader.js'), 'utf8'));
   ok('shape', '50-loader.js: Phase A restores payload and adopts the character',
     /_payload = _saved\.payload;/.test(ld) && /adoptUnitCharacter\(_saved\)/.test(ld));
-  const scripts = COMPONENTS.map(c => fs.readFileSync(path.join(BASE, 'methodica-science-mass-measure-02-' + c, 'script.js'), 'utf8')).join('\n');
+  const scripts = COMPONENTS.map(c => fs.readFileSync(path.join(BASE, 'methodica-ar-science-mass-measure-02-' + c, 'script.js'), 'utf8')).join('\n');
   for (const k of ['lomda_moedA_partA_result', 'lomda_moedA_partB_result', 'lomda_moedB_partA_step1_result',
                    'lomda_moedB_partA_step2_result', 'lomda_moedB_partB_result']) {
     ok('shape', 'RESULT_KEYS entry ' + k + ' has a writer in some component', scripts.indexOf("'" + k + "'") !== -1);

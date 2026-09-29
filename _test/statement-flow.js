@@ -12,7 +12,7 @@ const path = require('path');
 const { JSDOM } = require('jsdom');
 
 const BASE = process.argv[2] || path.join(__dirname, '..');
-const PREFIX = 'https://lomdot.education.gov.il/metodica/720active/science/mass-measure/02/';
+const PREFIX = 'https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/';
 
 let pass = 0, fail = 0;
 const failures = [];
@@ -25,9 +25,9 @@ function ok(name, cond, extra) {
    DEV_NAV is false and nothing may navigate between components. probeDevNav() passes
    '?dev=1' and '?dev=1&registration=r1' to exercise the flag's two conditions. */
 function boot(comp, query) {
-  const dir = path.join(BASE, 'methodica-science-mass-measure-02-' + comp);
+  const dir = path.join(BASE, 'methodica-ar-science-mass-measure-02-' + comp);
   const dom = new JSDOM(fs.readFileSync(path.join(dir, 'index.html'), 'utf8'), {
-    url: 'http://localhost:8777/methodica-science-mass-measure-02-' + comp + '/index.html' + (query || ''),
+    url: 'http://localhost:8777/methodica-ar-science-mass-measure-02-' + comp + '/index.html' + (query || ''),
     runScripts: 'dangerously', pretendToBeVisual: true,
   });
   const w = dom.window;
@@ -54,7 +54,7 @@ function boot(comp, query) {
   };
   w.XAPI_USING_G = true;
   w.METADATA = JSON.parse(fs.readFileSync(
-    path.join(BASE, 'metadata', 'methodica-science-mass-measure-02-' + comp + '.json'),
+    path.join(BASE, 'metadata', 'methodica-ar-science-mass-measure-02-' + comp + '.json'),
     'utf8').replace(/^﻿/, ''));
 
   /* Since 2026-08-17 the 'completed' ledger lives in the xAPI State document
@@ -98,8 +98,8 @@ function boot(comp, query) {
 function probe01() {
   const C = '01';
   const { w, run } = boot(C);
-  const item = (n) => PREFIX + 'methodica-science-mass-measure-02-01/' +
-                      'methodica-science-mass-measure-02-01-' + n + '/';
+  const item = (n) => PREFIX + 'methodica-ar-science-mass-measure-02-01/' +
+                      'methodica-ar-science-mass-measure-02-01-' + n + '/';
 
   let r = run('goTo(1);');
   ok(C + ' entering screen 1 opens item 001',
@@ -292,9 +292,9 @@ function probe02() {
   /* Production: the last click reports and stops. No hop, no landing-pointer move —
      Kata routes on the statement. (probeDevNav covers the ?dev=1 walkthrough.) */
   ok(C + ' production: drag9Continue recorded no forward edge (v5: there is no landing pointer at all)',
-    b2.val("sessionStorage.getItem('lomda_nav_edges::methodica-science-mass-measure-02')") === null &&
+    b2.val("sessionStorage.getItem('lomda_nav_edges::methodica-ar-science-mass-measure-02')") === null &&
     b2.val("'part' in _unitState") === false,
-    'edges=' + b2.val("sessionStorage.getItem('lomda_nav_edges::methodica-science-mass-measure-02')"));
+    'edges=' + b2.val("sessionStorage.getItem('lomda_nav_edges::methodica-ar-science-mass-measure-02')"));
 
   w.close(); b.w.close(); b2.w.close();
 }
@@ -424,7 +424,7 @@ function probe06() {
    component 03 — the simplest last-click (`s1Continue`) and a first-screen "חזרה". */
 function probeDevNav() {
   const C = 'nav';
-  const HERE = 'methodica-science-mass-measure-02-03';
+  const HERE = 'methodica-ar-science-mass-measure-02-03';
 
   let b = boot('03');
   ok(C + ' production boot: DEV_NAV is false', b.val('DEV_NAV') === false, String(b.val('DEV_NAV')));
@@ -434,14 +434,14 @@ function probeDevNav() {
   let r = b.run('s1Continue();');
   ok(C + ' production: the last click reports the component once and records no forward edge',
     r.log.filter(s => s.type === 'onlinelesson' && s.verb === 'completed').length === 1 &&
-    b.val("sessionStorage.getItem('lomda_nav_edges::methodica-science-mass-measure-02')") === null,
-    'edges=' + b.val("sessionStorage.getItem('lomda_nav_edges::methodica-science-mass-measure-02')") + ' log=' + JSON.stringify(r.log.map(s => s.verb)));
+    b.val("sessionStorage.getItem('lomda_nav_edges::methodica-ar-science-mass-measure-02')") === null,
+    'edges=' + b.val("sessionStorage.getItem('lomda_nav_edges::methodica-ar-science-mass-measure-02')") + ' log=' + JSON.stringify(r.log.map(s => s.verb)));
   ok(C + ' production: the button is disabled afterwards',
     b.val("document.getElementById('s1-continue').disabled") === true);
   const snap = JSON.stringify(b.w.__stores);
-  b.exec("goBackToPreviousPart('methodica-science-mass-measure-02-02', '#screen=8');");
+  b.exec("goBackToPreviousPart('methodica-ar-science-mass-measure-02-02', '#screen=8');");
   ok(C + ' production: goBackToPreviousPart is inert — no write, no edge',
-    JSON.stringify(b.w.__stores) === snap && b.val("sessionStorage.getItem('lomda_nav_edges::methodica-science-mass-measure-02')") === null);
+    JSON.stringify(b.w.__stores) === snap && b.val("sessionStorage.getItem('lomda_nav_edges::methodica-ar-science-mass-measure-02')") === null);
   b.w.close();
 
   b = boot('03', '?dev=1');
@@ -453,8 +453,8 @@ function probeDevNav() {
   ok(C + ' ?dev=1: the last click still reports the component once',
     r.log.filter(s => s.type === 'onlinelesson' && s.verb === 'completed').length === 1);
   ok(C + ' ?dev=1: ...and the hop is armed — the back edge into 04 records this component',
-    (function () { try { return JSON.parse(b.val("sessionStorage.getItem('lomda_nav_edges::methodica-science-mass-measure-02')"))['methodica-science-mass-measure-02-04'].from === HERE; } catch (e) { return false; } })(),
-    String(b.val("sessionStorage.getItem('lomda_nav_edges::methodica-science-mass-measure-02')")));
+    (function () { try { return JSON.parse(b.val("sessionStorage.getItem('lomda_nav_edges::methodica-ar-science-mass-measure-02')"))['methodica-ar-science-mass-measure-02-04'].from === HERE; } catch (e) { return false; } })(),
+    String(b.val("sessionStorage.getItem('lomda_nav_edges::methodica-ar-science-mass-measure-02')")));
   ok(C + ' ?dev=1: the document saved before the hop is this component\'s, with no pointer fields',
     (function () { try { const d = JSON.parse(b.w.__store); return d.component === HERE && !('part' in d) && !('prev' in d) && !('parts' in d); } catch (e) { return false; } })(),
     String(b.w.__store));
@@ -468,7 +468,7 @@ function probeDevNav() {
     b.val("getComputedStyle(document.getElementById('s0-back')).display") === 'none');
   r = b.run('s1Continue();');
   ok(C + ' ?dev=1&registration: the last click records no forward edge',
-    b.val("sessionStorage.getItem('lomda_nav_edges::methodica-science-mass-measure-02')") === null, String(b.val("sessionStorage.getItem('lomda_nav_edges::methodica-science-mass-measure-02')")));
+    b.val("sessionStorage.getItem('lomda_nav_edges::methodica-ar-science-mass-measure-02')") === null, String(b.val("sessionStorage.getItem('lomda_nav_edges::methodica-ar-science-mass-measure-02')")));
   b.w.close();
 }
 
@@ -484,7 +484,7 @@ function probeRouting() {
      navigation itself (practiceDestinationSlug / previousPartHref), precisely
      so they can be asserted without navigating — jsdom will not let
      location.href be stubbed. */
-  const EDGE_KEY = 'lomda_nav_edges::methodica-science-mass-measure-02';
+  const EDGE_KEY = 'lomda_nav_edges::methodica-ar-science-mass-measure-02';
 
   const destAfter01 = (correct) => {
     const { w, exec, val } = boot('01');
@@ -504,19 +504,19 @@ function probeRouting() {
   let r = destAfter01(5);
   ok(C + ' score 5 of 5 is read correctly', r.score === 5, String(r.score));
   ok(C + ' 5 of 5 -> skips 02, goes to 03',
-    r.dest === 'methodica-science-mass-measure-02-03', r.dest);
+    r.dest === 'methodica-ar-science-mass-measure-02-03', r.dest);
 
   r = destAfter01(4);
   ok(C + ' 4 of 5 — exactly the promised threshold — skips 02',
-    r.dest === 'methodica-science-mass-measure-02-03', r.dest);
-  const edge = r.edges && r.edges['methodica-science-mass-measure-02-03'];
+    r.dest === 'methodica-ar-science-mass-measure-02-03', r.dest);
+  const edge = r.edges && r.edges['methodica-ar-science-mass-measure-02-03'];
   ok(C + ' the back edge records 01 as 03\'s origin, returning to screen 20',
-    edge && edge.from === 'methodica-science-mass-measure-02-01' && edge.hash === '#screen=19',
+    edge && edge.from === 'methodica-ar-science-mass-measure-02-01' && edge.hash === '#screen=19',
     JSON.stringify(r.edges));
 
   r = destAfter01(3);
   ok(C + ' 3 of 5 — below the threshold — goes to the reinforcement part 02',
-    r.dest === 'methodica-science-mass-measure-02-02', r.dest);
+    r.dest === 'methodica-ar-science-mass-measure-02-02', r.dest);
 
   /* 03's back button must follow the edge, and fall back to 02 without one. */
   const backFrom03 = (edgeDoc) => {
@@ -525,24 +525,24 @@ function probeRouting() {
       ? "try { sessionStorage.setItem('" + EDGE_KEY + "', " +
         JSON.stringify(JSON.stringify(edgeDoc)) + "); } catch (e) {}"
       : "try { sessionStorage.removeItem('" + EDGE_KEY + "'); } catch (e) {}");
-    const href = val("previousPartHref('methodica-science-mass-measure-02-02', '#screen=8')");
+    const href = val("previousPartHref('methodica-ar-science-mass-measure-02-02', '#screen=8')");
     w.close();
     return href;
   };
 
-  let href = backFrom03({ 'methodica-science-mass-measure-02-03':
-    { from: 'methodica-science-mass-measure-02-01', hash: '#screen=19' } });
+  let href = backFrom03({ 'methodica-ar-science-mass-measure-02-03':
+    { from: 'methodica-ar-science-mass-measure-02-01', hash: '#screen=19' } });
   ok(C + ' a learner who skipped 02 goes BACK to 01 screen 20',
-    href === '../methodica-science-mass-measure-02-01/index.html#screen=19', href);
+    href === '../methodica-ar-science-mass-measure-02-01/index.html#screen=19', href);
 
-  href = backFrom03({ 'methodica-science-mass-measure-02-03':
-    { from: 'methodica-science-mass-measure-02-02', hash: '#screen=8' } });
+  href = backFrom03({ 'methodica-ar-science-mass-measure-02-03':
+    { from: 'methodica-ar-science-mass-measure-02-02', hash: '#screen=8' } });
   ok(C + ' a learner who came through 02 goes BACK to 02 screen 9',
-    href === '../methodica-science-mass-measure-02-02/index.html#screen=8', href);
+    href === '../methodica-ar-science-mass-measure-02-02/index.html#screen=8', href);
 
   href = backFrom03(null);
   ok(C + ' with no edge recorded it falls back to the pre-change behaviour',
-    href === '../methodica-science-mass-measure-02-02/index.html#screen=8', href);
+    href === '../methodica-ar-science-mass-measure-02-02/index.html#screen=8', href);
 }
 
 probe01(); probe02(); probe03(); probe05(); probe06(); probeRouting(); probeDevNav();

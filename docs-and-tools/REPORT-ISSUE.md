@@ -66,8 +66,8 @@ project until the endpoint was corrected"*. מה שהופך שיתוף מכוו�
 
 | שדה | ערך |
 |---|---|
-| `entry.1933069481` | slug היחידה — `methodica-science-mass-measure-02` |
-| `entry.2070680092` | slug הסין — למשל `methodica-science-mass-measure-02-03` |
+| `entry.1933069481` | slug היחידה — `methodica-ar-science-mass-measure-02` |
+| `entry.2070680092` | slug הסין — למשל `methodica-ar-science-mass-measure-02-03` |
 
 שניהם נשלחים מ-`window.METADATA`, כלומר מהמטא-דאטה של הסין עצמו — לא מקובעים
 בקוד. בגיליון המשותף יש אם כך עמודה שמפרידה בין היחידות.
