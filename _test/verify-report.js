@@ -201,8 +201,8 @@ async function run(c) {
   d.querySelector('.report-select-option[data-value="unclear"]')
     .dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
   ok(c, 'option click sets hidden input', d.getElementById('report-type').value === 'unclear');
-  ok(c, 'option click sets visible Hebrew label',
-    d.querySelector('.report-select-value').textContent === 'משהו לא ברור לי',
+  ok(c, 'option click sets visible Arabic label',
+    d.querySelector('.report-select-value').textContent === 'شيء غير واضح لي',
     d.querySelector('.report-select-value').textContent);
 
   // ── 8. Abandon-confirm is a distinct dialog from the thank-you ──────
@@ -252,8 +252,8 @@ async function run(c) {
   ok(c, 'component slug is populated and correct',
     body && body.get('entry.2070680092') === slug + '-' + c,
     body && body.get('entry.2070680092'));
-  ok(c, 'problem type arrives as the Hebrew label, not the internal key',
-    body && body.get('entry.1179822443') === 'אחר', body && body.get('entry.1179822443'));
+  ok(c, 'problem type arrives as the Arabic label, not the internal key',
+    body && body.get('entry.1179822443') === 'آخر', body && body.get('entry.1179822443'));
   ok(c, 'free text arrives verbatim',
     body && body.get('entry.806447525') === 'משהו אחר');
   ok(c, 'date and time are populated',
@@ -703,7 +703,7 @@ async function runResume(c) {
       document.getElementById('scq-feedbox').classList.remove('visible');
       var h = document.getElementById('scq-hint'); if (h) h.hidden = true;
       var b = document.getElementById('scq-check');
-      if (b) { b.textContent = 'צדקתי?'; b.disabled = true; }
+      if (b) { b.textContent = 'هل إجابتي صحيحة؟'; b.disabled = true; }
     };`);
 
     exec('goTo(1); window.__wipeScq();');
@@ -741,7 +741,7 @@ async function runResume(c) {
     ok(c, 'wrong-final restore locks the options and lets the learner continue',
       val("scqOptEl(SCQ.correctId).classList.contains('disabled')") === true &&
       val("document.getElementById('scq-check').disabled") === false &&
-      val("document.getElementById('scq-check').textContent") === 'המשך',
+      val("document.getElementById('scq-check').textContent") === 'متابعة',
       val("document.getElementById('scq-check').textContent"));
 
     /* Correct path. */
@@ -783,7 +783,7 @@ async function runResume(c) {
       val("scqOptEl(SCQ.correctId).classList.contains('correct')") === true);
     ok(c, 'and the learner is not stranded on it',
       val("document.getElementById('scq-check').disabled") === false &&
-      val("document.getElementById('scq-check').textContent") === 'המשך',
+      val("document.getElementById('scq-check').textContent") === 'متابعة',
       'disabled=' + val("document.getElementById('scq-check').disabled") +
       ' text=' + val("document.getElementById('scq-check').textContent"));
     exec('goTo(0); goTo(1);');
@@ -876,7 +876,7 @@ async function runResume(c) {
        back at their markup defaults. */
     exec("s11Cards = []; s11Matches = 0; s11Done = false;" +
          "document.getElementById('s11-board').innerHTML = '';" +
-         "document.getElementById('s11-pairs-counter').textContent = 'זוגות שנמצאו: 0 מתוך 3';" +
+         "document.getElementById('s11-pairs-counter').textContent = 'الأزواج التي تم إيجادها: 0 من أصل 3';" +
          "document.getElementById('s11-btn-continue').disabled = true;");
     exec('applyResumeVars(window.__snapS11Done); goTo(10);');
     ok(c, 'resuming a completed memory game lands on the summary view',
@@ -899,7 +899,7 @@ async function runResume(c) {
             var el = document.querySelector('#s11-board .s11-card[data-idx="' + i + '"]');
             return el && el.classList.contains('s11-flipped') && el.classList.contains('s11-matched');
           }); })()`) === true &&
-      val("document.getElementById('s11-pairs-counter').textContent").indexOf('3 מתוך 3') !== -1,
+      val("document.getElementById('s11-pairs-counter').textContent").indexOf('3 من أصل 3') !== -1,
       val("document.getElementById('s11-pairs-counter').textContent"));
 
     /* applyResumeVars restores s11Matches unconditionally but the deal only when
@@ -974,7 +974,7 @@ async function runResume(c) {
       });
       document.getElementById('scq14-feedbox').classList.remove('visible');
       var b = document.getElementById('scq14-check');
-      b.textContent = 'צדקתי?'; b.disabled = true; b.onclick = scq14Check;
+      b.textContent = 'هل إجابتي صحيحة؟'; b.disabled = true; b.onclick = scq14Check;
       document.getElementById('scq14-hint').hidden = true;
       scq14Selected = []; scq14Attempts = 0; scq14Done = false; scq14Phase = 'before';
       __scq14Wrong = [];
@@ -998,7 +998,7 @@ async function runResume(c) {
       val("document.getElementById('scq14-feedbox').classList.contains('visible')") === true);
     ok(c, 'and lets the learner continue',
       val("document.getElementById('scq14-check').disabled") === false &&
-      val("document.getElementById('scq14-check').textContent") === 'המשך',
+      val("document.getElementById('scq14-check').textContent") === 'متابعة',
       'disabled=' + val("document.getElementById('scq14-check').disabled") +
       ' text=' + val("document.getElementById('scq14-check').textContent"));
 
@@ -1025,7 +1025,7 @@ async function runResume(c) {
       val("MCQ14.correctIds.every(function (id) { return scq14OptEl(id).classList.contains('correct'); })") === true);
     ok(c, 'and is continuable, not stranded',
       val("document.getElementById('scq14-check').disabled") === false &&
-      val("document.getElementById('scq14-check').textContent") === 'המשך',
+      val("document.getElementById('scq14-check').textContent") === 'متابعة',
       'disabled=' + val("document.getElementById('scq14-check').disabled") +
       ' text=' + val("document.getElementById('scq14-check').textContent"));
 
@@ -1126,7 +1126,7 @@ async function runResume(c) {
       });
       document.getElementById('sq2-feedbox').classList.remove('visible');
       var b = document.getElementById('sq2-check');
-      if (b) { b.textContent = 'צדקתי?'; b.disabled = true; }
+      if (b) { b.textContent = 'هل إجابتي صحيحة؟'; b.disabled = true; }
     };`);
 
     /* Answer wrong twice → wrong-final, where sqNSelected is cleared to [] and
@@ -1166,7 +1166,7 @@ async function runResume(c) {
     ok(c, 'MCQ restore shows the feedback and lets the learner continue',
       val("document.getElementById('sq2-feedbox').classList.contains('visible')") === true &&
       val("document.getElementById('sq2-check').disabled") === false &&
-      val("document.getElementById('sq2-check').textContent") === 'המשך',
+      val("document.getElementById('sq2-check').textContent") === 'متابعة',
       val("document.getElementById('sq2-check').textContent"));
 
     /* An untouched screen must stay pristine — the painter early-returns. */
@@ -1242,9 +1242,9 @@ async function runResume(c) {
       });
       document.getElementById('sq5-feedbox').classList.remove('visible');
       var rb = document.getElementById('sq5-reveal-btn');
-      if (rb) { rb.hidden = true; rb.textContent = 'התשובה הנכונה'; }
+      if (rb) { rb.hidden = true; rb.textContent = 'الإجابة الصحيحة'; }
       var b = document.getElementById('sq5-check');
-      if (b) { b.textContent = 'צדקתי?'; b.disabled = true; b.onclick = sq5Check; }
+      if (b) { b.textContent = 'هل إجابتي صحيحة؟'; b.disabled = true; b.onclick = sq5Check; }
     };`);
 
     exec('goTo(4); window.__wipeSq5();');
@@ -1268,7 +1268,7 @@ async function runResume(c) {
       val("document.getElementById('sq5-feedbox').classList.contains('visible')") === true);
     ok(c, 'solved sq5 restore leaves the learner able to continue',
       val("document.getElementById('sq5-check').disabled") === false &&
-      val("document.getElementById('sq5-check').textContent") === 'המשך',
+      val("document.getElementById('sq5-check').textContent") === 'متابعة',
       val("document.getElementById('sq5-check').textContent"));
 
     /* The wrong-final branch already worked — btn-wrong/btn-correct override
@@ -1305,8 +1305,8 @@ async function runResume(c) {
       });
       tblHideFeedback();
       var rb = document.getElementById('tbl-reveal-btn');
-      if (rb) { rb.hidden = true; rb.textContent = 'התשובה הנכונה'; }
-      tblSetBtnCheck('צדקתי?', false, 'check');
+      if (rb) { rb.hidden = true; rb.textContent = 'الإجابة الصحيحة'; }
+      tblSetBtnCheck('هل إجابتي صحيحة؟', false, 'check');
     };`);
 
     exec('goTo(1);');
@@ -1352,7 +1352,7 @@ async function runResume(c) {
        the second half is what keeps the §6א "stranded learner" fix intact. */
     ok(c, 'interim restore does NOT allow resubmitting the unchanged answer',
       val("document.getElementById('tbl-check').disabled") === true &&
-      val("document.getElementById('tbl-check').textContent") === 'צדקתי?',
+      val("document.getElementById('tbl-check').textContent") === 'هل إجابتي صحيحة؟',
       val("document.getElementById('tbl-check').textContent") + ' disabled=' +
       val("document.getElementById('tbl-check').disabled"));
     exec("var _e0=document.getElementById(TBL_INPUT_IDS[0]); _e0.value='777'; tblOnInput();");
@@ -1389,11 +1389,11 @@ async function runResume(c) {
       val("document.getElementById('tbl-feedbox').classList.contains('visible')") === true);
     ok(c, 'restore reveals the toggle button labelled for "show me the answer"',
       val("document.getElementById('tbl-reveal-btn').hidden") === false &&
-      val("document.getElementById('tbl-reveal-btn').textContent") === 'התשובה הנכונה',
+      val("document.getElementById('tbl-reveal-btn').textContent") === 'الإجابة الصحيحة',
       val("document.getElementById('tbl-reveal-btn').textContent"));
     ok(c, 'restore leaves the learner able to continue (never stranded)',
       val("document.getElementById('tbl-check').disabled") === false &&
-      val("document.getElementById('tbl-check').textContent") === 'המשך',
+      val("document.getElementById('tbl-check').textContent") === 'متابعة',
       val("document.getElementById('tbl-check').textContent") + ' disabled=' +
       val("document.getElementById('tbl-check').disabled"));
 
@@ -1403,7 +1403,7 @@ async function runResume(c) {
     exec('tblReveal();');
     ok(c, 'toggling shows the solution and relabels',
       val('tblShowingCorrect') === true &&
-      val("document.getElementById('tbl-reveal-btn').textContent") === 'התשובה שלי',
+      val("document.getElementById('tbl-reveal-btn').textContent") === 'إجابتي',
       val('tblShowingCorrect') + ' / ' + val("document.getElementById('tbl-reveal-btn').textContent"));
     exec('window.__snap04b = capturePartPayload(); window.__wipe04();');
     exec('applyResumeVars(window.__snap04b); applyResumeDom(window.__snap04b); restoreScreenUI(1);');
@@ -1414,7 +1414,7 @@ async function runResume(c) {
       '"' + val("document.getElementById('tblA-dd-1-val').textContent") + '"');
     ok(c, 'the toggle state survives the round-trip',
       val('tblShowingCorrect') === true &&
-      val("document.getElementById('tbl-reveal-btn').textContent") === 'התשובה שלי',
+      val("document.getElementById('tbl-reveal-btn').textContent") === 'إجابتي',
       val('tblShowingCorrect') + ' / ' + val("document.getElementById('tbl-reveal-btn').textContent"));
     ok(c, 'the learner\'s own answer is still recoverable, not overwritten by the solution',
       val("tblLastAnswer && tblLastAnswer.dd['tblA-dd-1']") === 'לא-נכון' &&
@@ -1424,7 +1424,7 @@ async function runResume(c) {
     exec('tblReveal();');
     ok(c, 'toggling back restores the learner\'s own answer',
       val("tblDdValues['tblA-dd-1']") === 'לא-נכון' &&
-      val("document.getElementById('tbl-reveal-btn').textContent") === 'התשובה הנכונה',
+      val("document.getElementById('tbl-reveal-btn').textContent") === 'الإجابة الصحيحة',
       val("tblDdValues['tblA-dd-1']"));
 
     /* ── the dragged feedback-popup position ─────────────────────────────
@@ -1572,7 +1572,7 @@ async function runResume(c) {
     ok(c, 'the wipe cleared ' + inst, val(`${inst}.getState().done`) === false);
     ok(c, 'the wipe also reset the check button in the DOM (so the painter is under test)',
       val(`(function(){ var b=document.getElementById('${c === '05' ? 'dqA-btn-check' : 'tbl9-check'}');
-            return b ? b.textContent.indexOf('המשך') === -1 : 'no-btn'; })()`) === true,
+            return b ? b.textContent.indexOf('متابعة') === -1 : 'no-btn'; })()`) === true,
       String(val(`(function(){ var b=document.getElementById('${c === '05' ? 'dqA-btn-check' : 'tbl9-check'}');
             return b ? b.textContent : 'no-btn'; })()`)));
     exec('applyResumeVars(window.__snapP); restoreScreenUI(' + screen + ');');
@@ -1581,7 +1581,7 @@ async function runResume(c) {
       val(`${inst}.getState().done`) + ' / ' + val(`${inst}.getState().passed`));
     ok(c, inst + ' restore leaves the learner able to continue (never stranded)',
       val(`(function(){ var b=document.getElementById('${c === '05' ? 'dqA-btn-check' : 'tbl9-check'}');
-            return b ? (b.disabled === false && b.textContent === 'המשך') : 'no-btn'; })()`) === true,
+            return b ? (b.disabled === false && b.textContent === 'متابعة') : 'no-btn'; })()`) === true,
       String(val(`(function(){ var b=document.getElementById('${c === '05' ? 'dqA-btn-check' : 'tbl9-check'}');
             return b ? b.textContent + ' disabled=' + b.disabled : 'no-btn'; })()`)));
 

@@ -187,8 +187,8 @@ function probe01() {
   ok(C + ' first wrong answer is "answered" (not .last)',
     wrong && wrong.verb === 'answered' && wrong.result.success === false,
     wrong && wrong.verb);
-  ok(C + ' wrong answer carries the real Hebrew answer text',
-    wrong && /[֐-׿]/.test(String(wrong.result.extensions.student_answer[0])),
+  ok(C + ' wrong answer carries the real Arabic answer text',
+    wrong && /[؀-ۿ]/.test(String(wrong.result.extensions.student_answer[0])),
     wrong && JSON.stringify(wrong.result.extensions));
 
   r = run('scqSelected = SCQ.correctId; scqDone = false; scqAttempts = 0; scqCheck();');
