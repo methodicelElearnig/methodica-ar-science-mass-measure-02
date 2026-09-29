@@ -59,10 +59,13 @@ param(
 #  -DryRun on until you have one.
 #
 #  ── Values taken from the live Hebrew unit, not from metadata-ar/ ──
-#  Component 02 isRequired=false and component 06 order=6 match the Hebrew components
-#  in Kata (metadata-ar/ had true and 5; owner decision 2026-09-29). Component 04
-#  isRequired=false is what Kata holds for the Hebrew 04; the Hebrew repo's local
-#  metadata/ (true) was never published.
+#  Component 02 isRequired=false matches the Hebrew 02 in Kata (metadata-ar/ had true;
+#  owner decision 2026-09-29). Component 04 isRequired=false is what Kata holds for the
+#  Hebrew 04; the Hebrew repo's local metadata/ (true) was never published.
+#  Components 05 and 06 both have order 5, as the Hebrew 05/06 in Kata (06 is the
+#  second-chance version of 05). The Hebrew repo's metadata-from/ shows 6 for 06; that
+#  copy came from the old v2.4 retrieve script and does not match Kata (checked against
+#  the raw API response, 2026-09-29).
 #
 #  ── Wire format: v2.5 names only ──
 #  Kata stopped accepting the v2.4 field names in August 2026 (project owner,

@@ -24,8 +24,8 @@ So the script runs in **parent-unit mode** by default: `$ParentUnitKey =
   and their items are created under
   `/api/v1/content-units/methodica-science-mass-measure-02/components`. No `POST` / `PATCH` ever
   goes to the unit: a `PATCH` would overwrite the Hebrew unit's title, sectors and audience.
-- The Arabic components keep the orders 1–6, the same numbers as the Hebrew ones. KATA
-  accepts repeated orders in one unit.
+- The Arabic components keep the Hebrew orders 1, 2, 3, 4, 5, 5 (05 and 06 share order 5 in
+  KATA; 06 is the second-chance version of 05). KATA accepts repeated orders in one unit.
 - `metadata/methodica-ar-science-mass-measure-02_unit.json` is **not read or sent**. It stays in
   the repo as a record of the unit's own metadata. The Arabic unit title is added in the KATA UI.
 - The script is the **v2.5** one from `methodica-ar-science-mass-measure-01` (field names
