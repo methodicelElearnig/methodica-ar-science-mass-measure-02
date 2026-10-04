@@ -545,7 +545,29 @@ function probeRouting() {
     href === '../methodica-ar-science-mass-measure-02-02/index.html#screen=8', href);
 }
 
-probe01(); probe02(); probe03(); probe05(); probe06(); probeRouting(); probeDevNav();
+// ── B-1 (QA 2026-10-02): Back through an unanswered item ──────────────────
+/* Live (ar-mass-measure-02 01): on S6 (item 004, nothing answered) the learner pressed Back to S5
+   (no item). The library dropped 004's 'completed' (no 'answered' yet) while the ledger marked it
+   sent, so the real one after the learner answered was suppressed forever. */
+function probeB1() {
+  const C = '01 B-1';
+  const { run, val } = boot('01');
+  const is004 = (s) => s.verb === 'completed' && /-01-004\/$/.test(String(s.opts && s.opts.objectId));
+  run('goTo(6);');
+  let r = run('goTo(5);');
+  ok(C + ': Back S6 → S5 from unanswered 004 sends no completed', !r.log.some(s => s.verb === 'completed'),
+    JSON.stringify(r.log.map(s => s.verb + ':' + (s.opts && s.opts.objectId))));
+  ok(C + ': …and leaves 004 out of the ledger', val("alreadySent('doneItems', itemLedgerKey('004'))") === false);
+  r = run("goTo(6); xapiAnswered('004', 'q1', true, true, 'x'); goTo(7); goTo(8);");
+  ok(C + ': once answered, leaving 004 sends its completed exactly once', r.log.filter(is004).length === 1,
+    JSON.stringify(r.log.map(s => s.verb + ':' + (s.opts && s.opts.objectId))));
+  /* With the library's own map present, it decides — an item it never saw answered is not closed. */
+  r = run("window.xapiItemAnswered = {}; goTo(9); goTo(10);");
+  ok(C + ': with the library map present and 006 not in it, leaving 006 sends nothing',
+    !r.log.some(s => s.verb === 'completed'), JSON.stringify(r.log.map(s => s.verb + ':' + (s.opts && s.opts.objectId))));
+}
+
+probe01(); probe02(); probe03(); probe05(); probe06(); probeRouting(); probeDevNav(); probeB1();
 if (failures.length) { console.log('FAILURES:'); failures.forEach(f => console.log('  ' + f)); }
 console.log('\n=== statement flow: ' + pass + ' passed, ' + fail + ' failed ===');
 process.exit(fail ? 1 : 0);
