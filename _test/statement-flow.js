@@ -567,7 +567,45 @@ function probeB1() {
     !r.log.some(s => s.verb === 'completed'), JSON.stringify(r.log.map(s => s.verb + ':' + (s.opts && s.opts.objectId))));
 }
 
-probe01(); probe02(); probe03(); probe05(); probe06(); probeRouting(); probeDevNav(); probeB1();
+// ── F-5 (QA 2026-10-02): image-only drag cards must report their label ──
+/* Live (ar-mass-measure-02 01 S4): every card is <div class="s5-drag-item"><img alt="…"></div>, so the
+   answer text was "bruto: , , | …". The card's label is its image's alt. */
+function probeF5() {
+  const C = '01 F-5';
+  const { run, val } = boot('01');
+  run("goTo(4); var z = document.getElementById('s5-zone-bruto'); z.appendChild(document.getElementById('s5i1')); z.appendChild(document.getElementById('s5i2'));");
+  const a = val("xapiZoneAnswer('s5', ['bruto', 'neto', 'tara'])");
+  const alt1 = val("document.querySelector('#s5i1 img').getAttribute('alt')");
+  ok(C + ': a zone with image cards reports their alt text', typeof a === 'string' && a.indexOf('bruto: ' + alt1) === 0, a);
+  ok(C + ': no empty names, and an empty zone reports —', !/:\s*,|,\s*(,|\||$)/.test(a) && /neto: —/.test(a), a);
+}
+
+// ── O-8 (QA 2026-10-02): an item's result survives a reload ──────────────
+/* 02 item 004 carries four declared questions (q1–q4, one screen). Two wrong answers before a reload,
+   two right ones after it: the item's 'completed' must count all four (0.5, success false). The
+   library's in-memory aggregate would have counted only the post-reload pair (1.0, success true). */
+function probeO8() {
+  const C = '02 O-8';
+  const a = boot('02');
+  a.run("xapiAnswered('004', 'q1', false, true, 'x'); xapiAnswered('004', 'q2', false, true, 'x');");
+  const snap = a.val('JSON.stringify(capturePartPayload())');
+  const b = boot('02');
+  b.run('window.xapiItemAnswered = {}; applyExecutionState(' + snap + ');');
+  const r = b.run("xapiAnswered('004', 'q3', true, true, 'x'); xapiAnswered('004', 'q4', true, true, 'x'); " +
+                  "xapiCurrentItem = '004'; xapiFinishItems();");
+  const c = r.log.filter(s => s.verb === 'completed' && /-02-004\/$/.test(String(s.opts && s.opts.objectId)));
+  ok(C + ': after a reload, item 004 completes once', c.length === 1, JSON.stringify(r.log.map(s => s.verb)));
+  ok(C + ': with the result of all four answers (success false, scaled 0.5)',
+    c[0] && c[0].result && c[0].result.success === false && c[0].result.score.scaled === 0.5, JSON.stringify(c[0] && c[0].result));
+  /* the single-item parts mirror the component result */
+  const d = boot('06');
+  d.run("XAPI_Q_RESULTS['001/q1'] = true; XAPI_Q_RESULTS['001/q2'] = false; XAPI_Q_RESULTS['001/q3'] = true;");
+  ok('06 O-8: item 001 (the whole component) reports the component result',
+    d.val('JSON.stringify(xapiItemResult("001")) === JSON.stringify(moedBComponentResult())') === true,
+    d.val('JSON.stringify([xapiItemResult("001"), moedBComponentResult()])'));
+}
+
+probe01(); probe02(); probe03(); probe05(); probe06(); probeRouting(); probeDevNav(); probeB1(); probeF5(); probeO8();
 if (failures.length) { console.log('FAILURES:'); failures.forEach(f => console.log('  ' + f)); }
 console.log('\n=== statement flow: ' + pass + ' passed, ' + fail + ' failed ===');
 process.exit(fail ? 1 : 0);

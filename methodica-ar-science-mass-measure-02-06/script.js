@@ -1173,6 +1173,10 @@ var XAPI_COMP_ID   = XAPI_ID_PREFIX + XAPI_COMP_SLUG + '/';
 
 var XAPI_EVAL_ITEMS = {'001': 1};
 
+/* QA 2026-10-02 O-8: item 001 is the whole component, so its 'completed' carries the component's
+   own result (decided 2026-10-04), rebuilt from restored state after a reload. */
+var XAPI_ITEM_RESULT = { '001': function () { return moedBComponentResult(); } };
+
 var XAPI_METADATA_FILE = '../metadata/methodica-ar-science-mass-measure-02-06.json';
 
 
