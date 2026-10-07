@@ -152,16 +152,38 @@ function returnCardToSlot(card) {
 function makeCardDraggable(card) {
   let originX = 0, originY = 0;
 
+  let dragging = false;
+
   function onPointerDown(e) {
+    if (dragging) return;
     e.preventDefault();
+    /* The iframe may have been hidden (0×0) when it last scaled; measure now
+       so the drag below divides by the real scale. */
+    scaleApp();
+    dragging = true;
     card.setPointerCapture(e.pointerId);
     originX = e.clientX;
     originY = e.clientY;
     card.style.transition = 'none';
     card.style.zIndex     = '1000';
     card.style.position   = 'relative';
-    card.addEventListener('pointermove', onPointerMove);
-    card.addEventListener('pointerup',   onPointerUp);
+    card.addEventListener('pointermove',   onPointerMove);
+    card.addEventListener('pointerup',     onPointerUp);
+    card.addEventListener('pointercancel', onPointerCancel);
+  }
+
+  function endDrag() {
+    dragging = false;
+    card.removeEventListener('pointermove',   onPointerMove);
+    card.removeEventListener('pointerup',     onPointerUp);
+    card.removeEventListener('pointercancel', onPointerCancel);
+  }
+
+  /* The browser took the touch over (scroll/zoom gesture, system UI):
+     no drop, the card just goes home. Without this it stayed mid-drag. */
+  function onPointerCancel() {
+    endDrag();
+    returnCardToSlot(card);
   }
 
   function onPointerMove(e) {
@@ -174,8 +196,7 @@ function makeCardDraggable(card) {
   }
 
   function onPointerUp(e) {
-    card.removeEventListener('pointermove', onPointerMove);
-    card.removeEventListener('pointerup',   onPointerUp);
+    endDrag();
 
     if (isDroppedOnPlane(e.clientX, e.clientY)) {
       const itemName = card.dataset.item;
@@ -222,6 +243,9 @@ function getDesignHeight() {
 function scaleApp() {
   const sim = document.querySelector('.simulation');
   if (!sim) return;
+  /* A hidden iframe (display:none screen) reports a 0×0 window: keep the last
+     scale rather than collapsing to 0 — the resize on show re-measures. */
+  if (!window.innerWidth || !window.innerHeight) return;
   const designHeight = getDesignHeight();
   currentScale = Math.min(window.innerWidth / DESIGN_WIDTH, window.innerHeight / designHeight);
   const left = (window.innerWidth - DESIGN_WIDTH * currentScale) / 2;
@@ -232,6 +256,7 @@ function scaleApp() {
 }
 
 window.addEventListener('resize', scaleApp);
+document.addEventListener('visibilitychange', scaleApp);
 scaleApp();
 
 /* ── Init ───────────────────────────────────────────────── */

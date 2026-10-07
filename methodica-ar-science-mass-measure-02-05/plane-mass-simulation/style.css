@@ -326,6 +326,12 @@ body {
   Placed below the cards section (cards end at ~54% of scene).
   Centered horizontally under the cards row.
 */
+/* Touch drags the card: without this the browser claims the gesture for
+   scrolling and cancels the pointer after the first move (tablets). */
+.card[data-item] {
+  touch-action: none;
+}
+
 .reset-area {
   /* top computed from cards-section's actual rendered bottom edge
      (header + row of 3 cards, at fixed px sizes) plus a ~3% gap — not
