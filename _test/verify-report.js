@@ -1290,6 +1290,16 @@ async function runResume(c) {
      a simulated reload comes back locked, marked and never stranded — and that
      the toggle survives with the learner's own answer intact. */
   if (c === '04') {
+    /* MOE 2026-10-08: the challenge reports its real score, success only at >= 60%. One declared
+       question (001 q1), so the existing binary result already is that rule: 0/1 fails, 1/1 passes. */
+    const thr04 = val('(function(){ var orig = xapiEndComponent, had = XAPI_Q_RESULTS["001/q1"], out = [];' +
+      ' xapiEndComponent = function (r) { out.push(r); }; var dn = DEV_NAV; DEV_NAV = false;' +
+      ' [undefined, false, true].forEach(function (v) { if (v === undefined) delete XAPI_Q_RESULTS["001/q1"]; else XAPI_Q_RESULTS["001/q1"] = v; tblContinue(); });' +
+      ' xapiEndComponent = orig; DEV_NAV = dn; if (had === undefined) delete XAPI_Q_RESULTS["001/q1"]; else XAPI_Q_RESULTS["001/q1"] = had;' +
+      ' return out.map(function (r) { return r.success + ":" + r.score.scaled; }).join(","); })()');
+    ok(c, 'challenge: real score, success only at >= 60% (unanswered, 0/1 fail; 1/1 pass)',
+      thr04 === 'false:0,false:0,true:1', String(thr04));
+
     // A fresh page load, expressed as resetScreenState1's body without its guard.
     exec(`window.__wipe04 = function () {
       tblDone = false; tblAttempts = 0; tblPhase = 'before';
