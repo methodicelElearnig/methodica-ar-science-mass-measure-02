@@ -109,7 +109,7 @@ async function run(c) {
 
   // ── 1. Page loaded clean ────────────────────────────────────────────
   ok(c, 'no load errors', loadErrors.length === 0, loadErrors.join(' | '));
-  ok(c, 'all 5 unit-js tags + script.js + 90-boot present', tags.length === 7, 'tags=' + tags.length);
+  ok(c, 'all 6 unit-js tags (incl. 30-pointer-dnd) + script.js + 90-boot present', tags.length === 8, 'tags=' + tags.length);
 
   // ── 2. Shared layer reachable ───────────────────────────────────────
   for (const fn of ['shortId', 'initReportModal', 'bootXAPI', 'sendCompletedOnce',

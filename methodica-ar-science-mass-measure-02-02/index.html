@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>قياس الكتلة - وحدة تعليمية | برنامج 720 | فصل 2</title>
-<link rel="stylesheet" href="styles.css?v=1">
+<link rel="stylesheet" href="styles.css?v=2">
 <!-- מודאל "מצאתם בעיה?" — עותק אחד לכל הסינים. נטען אחרי styles.css במכוון. -->
 <link rel="stylesheet" href="../unit-css/25-report.css?v=3">
 </head>
@@ -711,59 +711,36 @@
           اسحبوا العناصر التالية إلى وحدات الكتلة الملائمة: ميليغرام، غرام، كيلوغرام أو طن.</p>
       </div>
 
-      <div class="drag-source-bank" id="drag9-source-bank"
-           ondragover="drag9DragOver(event)"
-           ondrop="drag9DropToSource(event)"
-           ondragenter="event.preventDefault()">
-        <div class="drag-item" id="drag9i2" draggable="true" data-correct="gram"
-             ondragstart="drag9DragStart(event,'drag9i2')" ondragend="drag9DragEnd('drag9i2')" onclick="drag9ItemClick('drag9i2')">
+      <div class="drag-source-bank" id="drag9-source-bank">
+        <div class="drag-item" id="drag9i2" data-correct="gram">
           <img src="assets/images/screen28_book.png" alt="كتاب تعليمي" draggable="false">
         </div>
-        <div class="drag-item" id="drag9i1" draggable="true" data-correct="milligram"
-             ondragstart="drag9DragStart(event,'drag9i1')" ondragend="drag9DragEnd('drag9i1')" onclick="drag9ItemClick('drag9i1')">
+        <div class="drag-item" id="drag9i1" data-correct="milligram">
           <img src="assets/images/screen28_vitamin_pill.png" alt="حبّة فيتامين صغيرة" draggable="false">
         </div>
-        <div class="drag-item" id="drag9i4" draggable="true" data-correct="ton"
-             ondragstart="drag9DragStart(event,'drag9i4')" ondragend="drag9DragEnd('drag9i4')" onclick="drag9ItemClick('drag9i4')">
+        <div class="drag-item" id="drag9i4" data-correct="ton">
           <img src="assets/images/screen28_shark.png" alt="حوت أزرق" draggable="false">
         </div>
-        <div class="drag-item" id="drag9i3" draggable="true" data-correct="kilogram"
-             ondragstart="drag9DragStart(event,'drag9i3')" ondragend="drag9DragEnd('drag9i3')" onclick="drag9ItemClick('drag9i3')">
+        <div class="drag-item" id="drag9i3" data-correct="kilogram">
           <img src="assets/images/screen28_bycle.png" alt="دراجة هوائية" draggable="false">
         </div>
       </div><!-- /.drag-source-bank -->
 
       <div class="drag-zones-row">
         <div class="drag-zone-wrap">
-          <div class="drag-zone" id="drag9-zone-milligram"
-               ondragover="drag9DragOver(event)"
-               ondragenter="drag9DragEnter(event,'drag9-zone-milligram')"
-               ondragleave="drag9DragLeave(event,'drag9-zone-milligram')"
-               ondrop="drag9Drop(event,'milligram')"></div>
+          <div class="drag-zone" id="drag9-zone-milligram"></div>
           <p class="drag-zone-label">ميليغرام</p>
         </div>
         <div class="drag-zone-wrap">
-          <div class="drag-zone" id="drag9-zone-gram"
-               ondragover="drag9DragOver(event)"
-               ondragenter="drag9DragEnter(event,'drag9-zone-gram')"
-               ondragleave="drag9DragLeave(event,'drag9-zone-gram')"
-               ondrop="drag9Drop(event,'gram')"></div>
+          <div class="drag-zone" id="drag9-zone-gram"></div>
           <p class="drag-zone-label">غرام</p>
         </div>
         <div class="drag-zone-wrap">
-          <div class="drag-zone" id="drag9-zone-kilogram"
-               ondragover="drag9DragOver(event)"
-               ondragenter="drag9DragEnter(event,'drag9-zone-kilogram')"
-               ondragleave="drag9DragLeave(event,'drag9-zone-kilogram')"
-               ondrop="drag9Drop(event,'kilogram')"></div>
+          <div class="drag-zone" id="drag9-zone-kilogram"></div>
           <p class="drag-zone-label">كيلوغرام</p>
         </div>
         <div class="drag-zone-wrap">
-          <div class="drag-zone" id="drag9-zone-ton"
-               ondragover="drag9DragOver(event)"
-               ondragenter="drag9DragEnter(event,'drag9-zone-ton')"
-               ondragleave="drag9DragLeave(event,'drag9-zone-ton')"
-               ondrop="drag9Drop(event,'ton')"></div>
+          <div class="drag-zone" id="drag9-zone-ton"></div>
           <p class="drag-zone-label">طن</p>
         </div>
       </div><!-- /.drag-zones-row -->
@@ -987,9 +964,10 @@
 <script src="../unit-js/10-identity.js?v=9"></script>
 <script src="../unit-js/20-xapi.js?v=12"></script>
 <script src="../unit-js/25-report.js?v=8"></script>
+<script src="../unit-js/30-pointer-dnd.js?v=20261105"></script>
 <script src="../unit-js/40-resume.js?v=10"></script>
 <script src="../unit-js/50-loader.js?v=9"></script>
-<script src="script.js?v=11"></script>
+<script src="script.js?v=12"></script>
 <!-- ה-side-effects היחידים. חייב להיות אחרון, ובתג נפרד: זריקה ברמת
      top-level ב-script.js לא מפילה תג script אחר. ראו unit-js/90-boot.js. -->
 <script src="../unit-js/90-boot.js?v=10"></script>
