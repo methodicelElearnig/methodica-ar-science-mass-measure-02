@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>قياس الكتلة - وحدة تعليمية | برنامج 720</title>
-<link rel="stylesheet" href="styles.css?v=1">
+<link rel="stylesheet" href="styles.css?v=2">
 <!-- מודאל "מצאתם בעיה?" — עותק אחד לכל הסינים. נטען אחרי styles.css במכוון. -->
 <link rel="stylesheet" href="../unit-css/25-report.css?v=3">
 </head>
@@ -334,50 +334,41 @@
       </div>
 
       <!-- מאגר פריטים לגרירה (source bank) -->
-      <div class="s5-source-bank" id="s5-source-bank" ondragover="s5DragOver(event)" ondrop="s5DropToSource(event)">
+      <div class="s5-source-bank" id="s5-source-bank">
 
-        <div class="s5-drag-item" id="s5i1" draggable="true" data-correct="bruto"
-             ondragstart="s5DragStart(event,'s5i1')" ondragend="s5DragEnd('s5i1')" onclick="s5ItemClick('s5i1')">
+        <div class="s5-drag-item" id="s5i1" data-correct="bruto">
           <img src="assets/images/screen5_full_cucumber_jar.png" alt="علبة مخللات ممتلئة" draggable="false">
         </div>
 
-        <div class="s5-drag-item" id="s5i2" draggable="true" data-correct="neto"
-             ondragstart="s5DragStart(event,'s5i2')" ondragend="s5DragEnd('s5i2')" onclick="s5ItemClick('s5i2')">
+        <div class="s5-drag-item" id="s5i2" data-correct="neto">
           <img src="assets/images/screen5_cucumber.png" alt="مخللات فقط" draggable="false">
         </div>
 
-        <div class="s5-drag-item" id="s5i3" draggable="true" data-correct="tara"
-             ondragstart="s5DragStart(event,'s5i3')" ondragend="s5DragEnd('s5i3')" onclick="s5ItemClick('s5i3')">
+        <div class="s5-drag-item" id="s5i3" data-correct="tara">
           <img src="assets/images/screen5_empty_cucumber_jar.png" alt="مرطبان فارغ" draggable="false">
         </div>
 
-        <div class="s5-drag-item" id="s5i4" draggable="true" data-correct="bruto"
-             ondragstart="s5DragStart(event,'s5i4')" ondragend="s5DragEnd('s5i4')" onclick="s5ItemClick('s5i4')">
+        <div class="s5-drag-item" id="s5i4" data-correct="bruto">
           <img src="assets/images/screen5_full_cookies_box.png" alt="علبة بسكوت ممتلئة" draggable="false">
         </div>
 
-        <div class="s5-drag-item" id="s5i5" draggable="true" data-correct="neto"
-             ondragstart="s5DragStart(event,'s5i5')" ondragend="s5DragEnd('s5i5')" onclick="s5ItemClick('s5i5')">
+        <div class="s5-drag-item" id="s5i5" data-correct="neto">
           <img src="assets/images/screen5_cookies.png" alt="بسكوت فقط" draggable="false">
         </div>
 
-        <div class="s5-drag-item" id="s5i6" draggable="true" data-correct="tara"
-             ondragstart="s5DragStart(event,'s5i6')" ondragend="s5DragEnd('s5i6')" onclick="s5ItemClick('s5i6')">
+        <div class="s5-drag-item" id="s5i6" data-correct="tara">
           <img src="assets/images/screen5_empty_cookies_box.png" alt="علبة بسكوت فارغة" draggable="false">
         </div>
 
-        <div class="s5-drag-item" id="s5i7" draggable="true" data-correct="bruto"
-             ondragstart="s5DragStart(event,'s5i7')" ondragend="s5DragEnd('s5i7')" onclick="s5ItemClick('s5i7')">
+        <div class="s5-drag-item" id="s5i7" data-correct="bruto">
           <img src="assets/images/screen5_full_travel_bag.png" alt="حقيبة سفر ممتلئة" draggable="false">
         </div>
 
-        <div class="s5-drag-item" id="s5i8" draggable="true" data-correct="neto"
-             ondragstart="s5DragStart(event,'s5i8')" ondragend="s5DragEnd('s5i8')" onclick="s5ItemClick('s5i8')">
+        <div class="s5-drag-item" id="s5i8" data-correct="neto">
           <img src="assets/images/screen5_travel_clothes.png" alt="ملابس فقط" draggable="false">
         </div>
 
-        <div class="s5-drag-item" id="s5i9" draggable="true" data-correct="tara"
-             ondragstart="s5DragStart(event,'s5i9')" ondragend="s5DragEnd('s5i9')" onclick="s5ItemClick('s5i9')">
+        <div class="s5-drag-item" id="s5i9" data-correct="tara">
           <img src="assets/images/screen5_empty_travel_bag.png" alt="حقيبة سفر فارغة" draggable="false">
         </div>
       </div><!-- /.s5-source-bank -->
@@ -385,27 +376,15 @@
       <!-- אזורי גרירה — RTL: ברוטו | נטו | טרה -->
       <div class="s5-zones-row">
         <div class="s5-zone-wrap">
-          <div class="s5-zone" id="s5-zone-bruto"
-               ondragover="s5DragOver(event)"
-               ondragenter="s5DragEnter(event,'s5-zone-bruto')"
-               ondragleave="s5DragLeave(event,'s5-zone-bruto')"
-               ondrop="s5Drop(event,'bruto')"></div>
+          <div class="s5-zone" id="s5-zone-bruto"></div>
           <p class="s5-zone-label">كتلة إجمالية</p>
         </div>
         <div class="s5-zone-wrap">
-          <div class="s5-zone" id="s5-zone-neto"
-               ondragover="s5DragOver(event)"
-               ondragenter="s5DragEnter(event,'s5-zone-neto')"
-               ondragleave="s5DragLeave(event,'s5-zone-neto')"
-               ondrop="s5Drop(event,'neto')"></div>
+          <div class="s5-zone" id="s5-zone-neto"></div>
           <p class="s5-zone-label">كتلة صافية</p>
         </div>
         <div class="s5-zone-wrap">
-          <div class="s5-zone" id="s5-zone-tara"
-               ondragover="s5DragOver(event)"
-               ondragenter="s5DragEnter(event,'s5-zone-tara')"
-               ondragleave="s5DragLeave(event,'s5-zone-tara')"
-               ondrop="s5Drop(event,'tara')"></div>
+          <div class="s5-zone" id="s5-zone-tara"></div>
           <p class="s5-zone-label">كتلة فارغة</p>
         </div>
       </div><!-- /.s5-zones-row -->
@@ -596,25 +575,21 @@
       </div>
 
       <!-- מאגר פריטים לגרירה -->
-      <div class="s9-source-bank" id="s9-source-bank" ondragover="s9DragOver(event)" ondrop="s9DropToSource(event)">
+      <div class="s9-source-bank" id="s9-source-bank">
 
-        <div class="s9-drag-item" id="s9-turtle" draggable="true" data-correct="kg"
-             ondragstart="s9DragStart(event,'s9-turtle')" ondragend="s9DragEnd('s9-turtle')" onclick="s9ItemClick('s9-turtle')">
+        <div class="s9-drag-item" id="s9-turtle" data-correct="kg">
           <img src="assets/images/screen9_big_turtle.png" alt="سلحفاة عملاقة" draggable="false">
         </div>
 
-        <div class="s9-drag-item" id="s9-train" draggable="true" data-correct="ton"
-             ondragstart="s9DragStart(event,'s9-train')" ondragend="s9DragEnd('s9-train')" onclick="s9ItemClick('s9-train')">
+        <div class="s9-drag-item" id="s9-train" data-correct="ton">
           <img src="assets/images/screen9_train_head.png" alt="مقطورة" draggable="false">
         </div>
 
-        <div class="s9-drag-item" id="s9-salt" draggable="true" data-correct="mg"
-             ondragstart="s9DragStart(event,'s9-salt')" ondragend="s9DragEnd('s9-salt')" onclick="s9ItemClick('s9-salt')">
+        <div class="s9-drag-item" id="s9-salt" data-correct="mg">
           <img src="assets/images/screen9_salt.png" alt="حبة ملح خشن" draggable="false">
         </div>
 
-        <div class="s9-drag-item" id="s9-apple" draggable="true" data-correct="gram"
-             ondragstart="s9DragStart(event,'s9-apple')" ondragend="s9DragEnd('s9-apple')" onclick="s9ItemClick('s9-apple')">
+        <div class="s9-drag-item" id="s9-apple" data-correct="gram">
           <img src="assets/images/screen9_apple.png" alt="تفاحة" draggable="false">
         </div>
 
@@ -623,35 +598,19 @@
       <!-- אזורי שחרור — RTL: טון ימין, מיליגרם שמאל -->
       <div class="s9-zones-row">
         <div class="s9-zone-wrap">
-          <div class="s9-zone" id="s9-zone-ton"
-               ondragover="s9DragOver(event)"
-               ondragenter="s9DragEnter(event,'s9-zone-ton')"
-               ondragleave="s9DragLeave(event,'s9-zone-ton')"
-               ondrop="s9Drop(event,'ton')"></div>
+          <div class="s9-zone" id="s9-zone-ton"></div>
           <p class="s9-zone-label">طن</p>
         </div>
         <div class="s9-zone-wrap">
-          <div class="s9-zone" id="s9-zone-kg"
-               ondragover="s9DragOver(event)"
-               ondragenter="s9DragEnter(event,'s9-zone-kg')"
-               ondragleave="s9DragLeave(event,'s9-zone-kg')"
-               ondrop="s9Drop(event,'kg')"></div>
+          <div class="s9-zone" id="s9-zone-kg"></div>
           <p class="s9-zone-label">كيلوغرام</p>
         </div>
         <div class="s9-zone-wrap">
-          <div class="s9-zone" id="s9-zone-gram"
-               ondragover="s9DragOver(event)"
-               ondragenter="s9DragEnter(event,'s9-zone-gram')"
-               ondragleave="s9DragLeave(event,'s9-zone-gram')"
-               ondrop="s9Drop(event,'gram')"></div>
+          <div class="s9-zone" id="s9-zone-gram"></div>
           <p class="s9-zone-label">غرام</p>
         </div>
         <div class="s9-zone-wrap">
-          <div class="s9-zone" id="s9-zone-mg"
-               ondragover="s9DragOver(event)"
-               ondragenter="s9DragEnter(event,'s9-zone-mg')"
-               ondragleave="s9DragLeave(event,'s9-zone-mg')"
-               ondrop="s9Drop(event,'mg')"></div>
+          <div class="s9-zone" id="s9-zone-mg"></div>
           <p class="s9-zone-label">ميليغرام</p>
         </div>
       </div><!-- /.s9-zones-row -->
@@ -1479,30 +1438,24 @@
         <p class="s20-sub">اسحبوا كل غرض إلى الخانة الملائمة: الكتلة الإجمالية، الكتلة الصافية أو الكتلة الفارغة</p>
       </div>
 
-      <div class="s20-source-bank" id="s20-source-bank" ondragover="s20DragOver(event)" ondrop="s20DropToSource(event)">
+      <div class="s20-source-bank" id="s20-source-bank">
 
-        <div class="s20-drag-item" id="s20i4" draggable="true" data-correct="bruto"
-             ondragstart="s20DragStart(event,'s20i4')" ondragend="s20DragEnd('s20i4')" onclick="s20ItemClick('s20i4')">
+        <div class="s20-drag-item" id="s20i4" data-correct="bruto">
           <img src="assets/images/screen20_healthy_snack.png" alt="قطعة تسالي صحية في غلاف" draggable="false">
         </div>
-        <div class="s20-drag-item" id="s20i5" draggable="true" data-correct="tara"
-             ondragstart="s20DragStart(event,'s20i5')" ondragend="s20DragEnd('s20i5')" onclick="s20ItemClick('s20i5')">
+        <div class="s20-drag-item" id="s20i5" data-correct="tara">
           <img src="assets/images/screen20_healthy_snack_cover.png" alt="قطعة تسالي صحية فارغة" draggable="false">
         </div>
-        <div class="s20-drag-item" id="s20i6" draggable="true" data-correct="neto"
-             ondragstart="s20DragStart(event,'s20i6')" ondragend="s20DragEnd('s20i6')" onclick="s20ItemClick('s20i6')">
+        <div class="s20-drag-item" id="s20i6" data-correct="neto">
           <img src="assets/images/screen20_healthy_snack_without_cover.png" alt="قطعة تسالي صحية بدون الغلاف" draggable="false">
         </div>
-        <div class="s20-drag-item" id="s20i7" draggable="true" data-correct="bruto"
-             ondragstart="s20DragStart(event,'s20i7')" ondragend="s20DragEnd('s20i7')" onclick="s20ItemClick('s20i7')">
+        <div class="s20-drag-item" id="s20i7" data-correct="bruto">
           <img src="assets/images/screen20_vitamins_full_box.png" alt="علبة فيتامينات ممتلئة" draggable="false">
         </div>
-        <div class="s20-drag-item" id="s20i8" draggable="true" data-correct="neto"
-             ondragstart="s20DragStart(event,'s20i8')" ondragend="s20DragEnd('s20i8')" onclick="s20ItemClick('s20i8')">
+        <div class="s20-drag-item" id="s20i8" data-correct="neto">
           <img src="assets/images/screen20_vitamins.png" alt="حبوب فيتامينات فقط" draggable="false">
         </div>
-        <div class="s20-drag-item" id="s20i9" draggable="true" data-correct="tara"
-             ondragstart="s20DragStart(event,'s20i9')" ondragend="s20DragEnd('s20i9')" onclick="s20ItemClick('s20i9')">
+        <div class="s20-drag-item" id="s20i9" data-correct="tara">
           <img src="assets/images/screen20_vitamins_empty_box.png" alt="علبة فيتامينات فارغة" draggable="false">
         </div>
 
@@ -1510,27 +1463,15 @@
 
       <div class="s20-zones-row">
         <div class="s20-zone-wrap">
-          <div class="s20-zone" id="s20-zone-bruto"
-               ondragover="s20DragOver(event)"
-               ondragenter="s20DragEnter(event,'s20-zone-bruto')"
-               ondragleave="s20DragLeave(event,'s20-zone-bruto')"
-               ondrop="s20Drop(event,'bruto')"></div>
+          <div class="s20-zone" id="s20-zone-bruto"></div>
           <p class="s20-zone-label">كتلة إجمالية</p>
         </div>
         <div class="s20-zone-wrap">
-          <div class="s20-zone" id="s20-zone-neto"
-               ondragover="s20DragOver(event)"
-               ondragenter="s20DragEnter(event,'s20-zone-neto')"
-               ondragleave="s20DragLeave(event,'s20-zone-neto')"
-               ondrop="s20Drop(event,'neto')"></div>
+          <div class="s20-zone" id="s20-zone-neto"></div>
           <p class="s20-zone-label">كتلة صافية</p>
         </div>
         <div class="s20-zone-wrap">
-          <div class="s20-zone" id="s20-zone-tara"
-               ondragover="s20DragOver(event)"
-               ondragenter="s20DragEnter(event,'s20-zone-tara')"
-               ondragleave="s20DragLeave(event,'s20-zone-tara')"
-               ondrop="s20Drop(event,'tara')"></div>
+          <div class="s20-zone" id="s20-zone-tara"></div>
           <p class="s20-zone-label">كتلة فارغة</p>
         </div>
       </div><!-- /.s20-zones-row -->
@@ -1819,9 +1760,10 @@
 <script src="../unit-js/10-identity.js?v=9"></script>
 <script src="../unit-js/20-xapi.js?v=12"></script>
 <script src="../unit-js/25-report.js?v=8"></script>
+<script src="../unit-js/30-pointer-dnd.js?v=20261105"></script>
 <script src="../unit-js/40-resume.js?v=10"></script>
 <script src="../unit-js/50-loader.js?v=9"></script>
-<script src="script.js?v=12"></script>
+<script src="script.js?v=13"></script>
 <!-- ה-side-effects היחידים. חייב להיות אחרון, ובתג נפרד: זריקה ברמת
      top-level ב-script.js לא מפילה תג script אחר. ראו unit-js/90-boot.js. -->
 <script src="../unit-js/90-boot.js?v=10"></script>

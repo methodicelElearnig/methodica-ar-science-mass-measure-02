@@ -1233,7 +1233,13 @@ img { display: block; max-width: none; }
   pointer-events: none;
 }
 .drag-item:hover { border-color: #019de5; box-shadow: 0 2px 8px rgba(1, 157, 229, 0.2); }
-.drag-item.drag-dragging { opacity: 0.35; cursor: grabbing; }
+.drag-item.drag-dragging,
+.drag-item.dragging { opacity: 0.35; cursor: grabbing; }
+/* Pointer DnD (unit-js/30-pointer-dnd.js): no page pan/zoom, native image drag or iOS long-press sheet under
+   the finger; the ghost is a clone in <body>, so its look is class-scoped. */
+.drag-item { touch-action: none; -webkit-user-drag: none; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+.drag-item.pointer-drag-ghost { opacity: 1; cursor: grabbing; border-color: #019de5; box-shadow: 0 2px 8px rgba(1, 157, 229, 0.2); }
+
 
 /* פריט בתוך אזור גרירה — קטן יותר */
 .drag-zone .drag-item { width: 120px; height: 110px; }

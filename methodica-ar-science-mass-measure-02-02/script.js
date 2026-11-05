@@ -1428,7 +1428,6 @@ const DRAG9_ITEM_IDS = ['drag9i2', 'drag9i1', 'drag9i4', 'drag9i3'];
 const DRAG9_ZONES = ['milligram', 'gram', 'kilogram', 'ton'];
 let drag9Done = false;
 let drag9Attempts = 0;
-let drag9DragId = null;
 let drag9LastAnswer = null;
 let drag9ShowingCorrect = false;
 let drag9LastSubmittedSig = null;
@@ -1463,69 +1462,43 @@ function drag9ClearZoneStates() {
   });
 }
 
-function drag9DragStart(event, itemId) {
-  drag9DragId = itemId;
-  event.dataTransfer.effectAllowed = 'move';
-  event.dataTransfer.setData('text/plain', itemId);
-  setTimeout(function () {
-    const el = document.getElementById(itemId);
-    if (el) el.classList.add('drag-dragging');
-  }, 0);
-}
-
-function drag9DragEnd(itemId) {
-  const el = document.getElementById(itemId);
-  if (el) el.classList.remove('drag-dragging');
-  drag9DragId = null;
-}
-
-function drag9DragOver(event) {
-  event.preventDefault();
-  event.dataTransfer.dropEffect = 'move';
-}
-
-function drag9DragEnter(event, zoneId) {
-  event.preventDefault();
-  document.getElementById(zoneId).classList.add('drag-over');
-}
-
-function drag9DragLeave(event, zoneId) {
-  const zone = document.getElementById(zoneId);
-  if (zone && !zone.contains(event.relatedTarget)) {
-    zone.classList.remove('drag-over');
-  }
-}
-
-function drag9Drop(event, targetZone) {
-  event.preventDefault();
+/* Place an item into a zone (targetZone = 'bruto' ...) or back into the source bank (targetZone === null).
+   Shared by the pointer DnD onDrop below; same effect as the former drag9Drop / drag9DropToSource. */
+function drag9PlaceItem(itemId, targetZone) {
   if (drag9Done) return;
-  const itemId = event.dataTransfer.getData('text/plain') || drag9DragId;
-  if (!itemId) return;
-  const zoneEl = document.getElementById('drag9-zone-' + targetZone);
   const itemEl = document.getElementById(itemId);
-  if (zoneEl && itemEl) {
-    zoneEl.classList.remove('drag-over');
-    if (itemEl.parentElement) itemEl.parentElement.removeChild(itemEl);
-    zoneEl.appendChild(itemEl);
+  if (targetZone === null) {
+    const sourceBank = document.getElementById('drag9-source-bank');
+    if (itemEl && sourceBank && itemEl.parentElement !== sourceBank) {
+      if (itemEl.parentElement) itemEl.parentElement.removeChild(itemEl);
+      sourceBank.appendChild(itemEl);
+    }
+  } else {
+    const zoneEl = document.getElementById('drag9-zone-' + targetZone);
+    if (zoneEl && itemEl) {
+      if (itemEl.parentElement) itemEl.parentElement.removeChild(itemEl);
+      zoneEl.appendChild(itemEl);
+    }
   }
   drag9UpdateCheckBtn();
   drag9ClearZoneStates();
 }
 
-function drag9DropToSource(event) {
-  event.preventDefault();
-  if (drag9Done) return;
-  const itemId = event.dataTransfer.getData('text/plain') || drag9DragId;
-  if (!itemId) return;
-  const sourceBank = document.getElementById('drag9-source-bank');
-  const itemEl = document.getElementById(itemId);
-  if (itemEl && sourceBank && itemEl.parentElement !== sourceBank) {
-    if (itemEl.parentElement) itemEl.parentElement.removeChild(itemEl);
-    sourceBank.appendChild(itemEl);
-  }
-  drag9UpdateCheckBtn();
-  drag9ClearZoneStates();
-}
+/* Pointer DnD (mouse + touch) — ../unit-js/30-pointer-dnd.js. Replaces the native HTML5 drag handlers,
+   which never fire from touch. The DOM is the state here (no model), and the listeners sit on the items
+   themselves, so they survive every appendChild (drop, reveal, resume, reset). A short tap on a placed
+   item still sends it back to the bank (the former drag9ItemClick, now onTap). */
+const drag9Dnd = createPointerDnd({
+  canDrag: function () { return !drag9Done; },
+  onGhost: function (ghost, src) {   /* the clone lives in <body>: keep the in-zone look of a placed item */
+    if (src.parentElement && src.parentElement.id !== 'drag9-source-bank') ghost.classList.add('from-zone');
+  },
+  onTap: function (dragId) { drag9ItemClick(dragId); },
+  onDrop: function (dragId, targetId) { drag9PlaceItem(dragId, targetId === 'bank' ? null : targetId); }
+});
+DRAG9_ITEM_IDS.forEach(function (id) { drag9Dnd.attachSource(document.getElementById(id), id); });
+['milligram','gram','kilogram','ton'].forEach(function (z) { drag9Dnd.attachTarget(document.getElementById('drag9-zone-' + z), z); });
+drag9Dnd.attachTarget(document.getElementById('drag9-source-bank'), 'bank');
 
 function drag9ItemClick(itemId) {
   if (drag9Done) return;
@@ -1737,7 +1710,6 @@ function resetScreenState8() {
     return el && el.parentElement && el.parentElement.id !== 'drag9-source-bank';
   })) return;
   drag9Attempts = 0;
-  drag9DragId = null;
   drag9LastAnswer = null;
   drag9ShowingCorrect = false;
 

@@ -666,7 +666,6 @@ const TEXTS5 = {
 
 let s5Done = false;
 let s5Attempts = 0;
-let s5DragId = null;
 let s5LastAnswer = null;
 let s5ShowingCorrect = false;
 let s5LastSubmittedSig = null;
@@ -695,69 +694,43 @@ function s5ClearZoneStates() {
   });
 }
 
-function s5DragStart(event, itemId) {
-  s5DragId = itemId;
-  event.dataTransfer.effectAllowed = 'move';
-  event.dataTransfer.setData('text/plain', itemId);
-  setTimeout(function () {
-    const el = document.getElementById(itemId);
-    if (el) el.classList.add('s5-dragging');
-  }, 0);
-}
-
-function s5DragEnd(itemId) {
-  const el = document.getElementById(itemId);
-  if (el) el.classList.remove('s5-dragging');
-  s5DragId = null;
-}
-
-function s5DragOver(event) {
-  event.preventDefault();
-  event.dataTransfer.dropEffect = 'move';
-}
-
-function s5DragEnter(event, zoneId) {
-  event.preventDefault();
-  document.getElementById(zoneId).classList.add('s5-drag-over');
-}
-
-function s5DragLeave(event, zoneId) {
-  const zone = document.getElementById(zoneId);
-  if (zone && !zone.contains(event.relatedTarget)) {
-    zone.classList.remove('s5-drag-over');
-  }
-}
-
-function s5Drop(event, targetZone) {
-  event.preventDefault();
+/* Place an item into a zone (targetZone = 'bruto' ...) or back into the source bank (targetZone === null).
+   Shared by the pointer DnD onDrop below; same effect as the former s5Drop / s5DropToSource. */
+function s5PlaceItem(itemId, targetZone) {
   if (s5Done) return;
-  const itemId = event.dataTransfer.getData('text/plain') || s5DragId;
-  if (!itemId) return;
-  const zoneEl = document.getElementById('s5-zone-' + targetZone);
   const itemEl = document.getElementById(itemId);
-  if (zoneEl && itemEl) {
-    zoneEl.classList.remove('s5-drag-over');
-    if (itemEl.parentElement) itemEl.parentElement.removeChild(itemEl);
-    zoneEl.appendChild(itemEl);
+  if (targetZone === null) {
+    const sourceBank = document.getElementById('s5-source-bank');
+    if (itemEl && sourceBank && itemEl.parentElement !== sourceBank) {
+      if (itemEl.parentElement) itemEl.parentElement.removeChild(itemEl);
+      sourceBank.appendChild(itemEl);
+    }
+  } else {
+    const zoneEl = document.getElementById('s5-zone-' + targetZone);
+    if (zoneEl && itemEl) {
+      if (itemEl.parentElement) itemEl.parentElement.removeChild(itemEl);
+      zoneEl.appendChild(itemEl);
+    }
   }
   s5UpdateCheckBtn();
   s5ClearZoneStates();
 }
 
-function s5DropToSource(event) {
-  event.preventDefault();
-  if (s5Done) return;
-  const itemId = event.dataTransfer.getData('text/plain') || s5DragId;
-  if (!itemId) return;
-  const sourceBank = document.getElementById('s5-source-bank');
-  const itemEl = document.getElementById(itemId);
-  if (itemEl && sourceBank && itemEl.parentElement !== sourceBank) {
-    if (itemEl.parentElement) itemEl.parentElement.removeChild(itemEl);
-    sourceBank.appendChild(itemEl);
-  }
-  s5UpdateCheckBtn();
-  s5ClearZoneStates();
-}
+/* Pointer DnD (mouse + touch) — ../unit-js/30-pointer-dnd.js. Replaces the native HTML5 drag handlers,
+   which never fire from touch. The DOM is the state here (no model), and the listeners sit on the items
+   themselves, so they survive every appendChild (drop, reveal, resume, reset). A short tap on a placed
+   item still sends it back to the bank (the former s5ItemClick, now onTap). */
+const s5Dnd = createPointerDnd({
+  canDrag: function () { return !s5Done; },
+  onGhost: function (ghost, src) {   /* the clone lives in <body>: keep the in-zone look of a placed item */
+    if (src.parentElement && src.parentElement.id !== 's5-source-bank') ghost.classList.add('from-zone');
+  },
+  onTap: function (dragId) { s5ItemClick(dragId); },
+  onDrop: function (dragId, targetId) { s5PlaceItem(dragId, targetId === 'bank' ? null : targetId); }
+});
+S5_ITEM_IDS.forEach(function (id) { s5Dnd.attachSource(document.getElementById(id), id); });
+['bruto','neto','tara'].forEach(function (z) { s5Dnd.attachTarget(document.getElementById('s5-zone-' + z), z); });
+s5Dnd.attachTarget(document.getElementById('s5-source-bank'), 'bank');
 
 function s5ItemClick(itemId) {
   if (s5Done) return;
@@ -913,7 +886,6 @@ function resetScreenState4() {
     return el && el.parentElement && el.parentElement.id !== 's5-source-bank';
   })) return;
   s5Attempts = 0;
-  s5DragId = null;
   s5LastAnswer = null;
   s5ShowingCorrect = false;
 
@@ -1216,7 +1188,6 @@ const TEXTS9 = {
 let s9Done = false;
 let s9Attempts = 0;
 let s9HintShown = false;
-let s9DragId = null;
 let s9LastAnswer = null;
 let s9ShowingCorrect = false;
 let s9LastSubmittedSig = null;
@@ -1258,75 +1229,47 @@ function s9UpdateAvatar() {
   }
 }
 
-function s9DragStart(event, itemId) {
-  if (s9Done) { event.preventDefault(); return; }
-  s9DragId = itemId;
-  event.dataTransfer.effectAllowed = 'move';
-  event.dataTransfer.setData('text/plain', itemId);
-  setTimeout(function () {
-    const el = document.getElementById(itemId);
-    if (el) el.classList.add('s9-dragging');
-  }, 0);
-}
-
-function s9DragEnd(itemId) {
-  const el = document.getElementById(itemId);
-  if (el) el.classList.remove('s9-dragging');
-  s9DragId = null;
-}
-
-function s9DragOver(event) {
-  event.preventDefault();
-  event.dataTransfer.dropEffect = 'move';
-}
-
-function s9DragEnter(event, zoneId) {
-  event.preventDefault();
+/* Place an item into a zone (targetZone = 'bruto' ...) or back into the source bank (targetZone === null).
+   Shared by the pointer DnD onDrop below; same effect as the former s9Drop / s9DropToSource. */
+function s9PlaceItem(itemId, targetZone) {
   if (s9Done) return;
-  document.getElementById(zoneId).classList.add('s9-drag-over');
-}
-
-function s9DragLeave(event, zoneId) {
-  const zone = document.getElementById(zoneId);
-  if (zone && !zone.contains(event.relatedTarget)) {
-    zone.classList.remove('s9-drag-over');
-  }
-}
-
-function s9Drop(event, targetZone) {
-  event.preventDefault();
-  if (s9Done) return;
-  const itemId = event.dataTransfer.getData('text/plain') || s9DragId;
-  if (!itemId) return;
-  const zoneEl = document.getElementById('s9-zone-' + targetZone);
   const itemEl = document.getElementById(itemId);
-  if (zoneEl && itemEl) {
-    zoneEl.classList.remove('s9-drag-over');
+  if (targetZone === null) {
+    const sourceBank = document.getElementById('s9-source-bank');
+    if (itemEl && sourceBank && itemEl.parentElement !== sourceBank) {
+      if (itemEl.parentElement) itemEl.parentElement.removeChild(itemEl);
+      sourceBank.appendChild(itemEl);
+    }
+  } else {
+    const zoneEl = document.getElementById('s9-zone-' + targetZone);
+    if (zoneEl && itemEl) {
     const existing = zoneEl.querySelector('.s9-drag-item');
     if (existing && existing !== itemEl) {
       document.getElementById('s9-source-bank').appendChild(existing);
     }
-    if (itemEl.parentElement) itemEl.parentElement.removeChild(itemEl);
-    zoneEl.appendChild(itemEl);
+      if (itemEl.parentElement) itemEl.parentElement.removeChild(itemEl);
+      zoneEl.appendChild(itemEl);
+    }
   }
   s9ClearZoneStates();
   s9UpdateCheckBtn();
 }
 
-function s9DropToSource(event) {
-  event.preventDefault();
-  if (s9Done) return;
-  const itemId = event.dataTransfer.getData('text/plain') || s9DragId;
-  if (!itemId) return;
-  const sourceBank = document.getElementById('s9-source-bank');
-  const itemEl = document.getElementById(itemId);
-  if (itemEl && sourceBank && itemEl.parentElement !== sourceBank) {
-    if (itemEl.parentElement) itemEl.parentElement.removeChild(itemEl);
-    sourceBank.appendChild(itemEl);
-  }
-  s9ClearZoneStates();
-  s9UpdateCheckBtn();
-}
+/* Pointer DnD (mouse + touch) — ../unit-js/30-pointer-dnd.js. Replaces the native HTML5 drag handlers,
+   which never fire from touch. The DOM is the state here (no model), and the listeners sit on the items
+   themselves, so they survive every appendChild (drop, reveal, resume, reset). A short tap on a placed
+   item still sends it back to the bank (the former s9ItemClick, now onTap). */
+const s9Dnd = createPointerDnd({
+  canDrag: function () { return !s9Done; },
+  onGhost: function (ghost, src) {   /* the clone lives in <body>: keep the in-zone look of a placed item */
+    if (src.parentElement && src.parentElement.id !== 's9-source-bank') ghost.classList.add('from-zone');
+  },
+  onTap: function (dragId) { s9ItemClick(dragId); },
+  onDrop: function (dragId, targetId) { s9PlaceItem(dragId, targetId === 'bank' ? null : targetId); }
+});
+S9_ITEM_IDS.forEach(function (id) { s9Dnd.attachSource(document.getElementById(id), id); });
+['ton','kg','gram','mg'].forEach(function (z) { s9Dnd.attachTarget(document.getElementById('s9-zone-' + z), z); });
+s9Dnd.attachTarget(document.getElementById('s9-source-bank'), 'bank');
 
 function s9ItemClick(itemId) {
   if (s9Done) return;
@@ -1434,7 +1377,7 @@ function s9Check() {
     s9Done = true;
     S9_ITEM_IDS.forEach(function (id) {
       const el = document.getElementById(id);
-      if (el) { el.draggable = false; el.classList.add('s9-locked'); }
+      if (el) { el.classList.add('s9-locked'); }   /* locked: canDrag (pointer DnD) is false once s9Done */
     });
     s9ShowFeedback('correct', true);
     checkBtn.textContent = 'متابعة';
@@ -1508,7 +1451,6 @@ function resetScreenState8() {
   })) return;
   s9Attempts = 0;
   s9HintShown = false;
-  s9DragId = null;
   s9LastAnswer = null;
   s9ShowingCorrect = false;
 
@@ -1519,7 +1461,7 @@ function resetScreenState8() {
       el.parentElement.removeChild(el);
       sourceBank.appendChild(el);
     }
-    if (el) { el.draggable = true; el.classList.remove('s9-locked', 's9-dragging'); }
+    if (el) { el.classList.remove('s9-locked', 's9-dragging', 'dragging'); }
   });
 
   s9ClearZoneStates();
@@ -3263,7 +3205,6 @@ const TEXTS20 = {
 let s20Done = false;
 let s20Attempts = 0;
 let s20HintShown = false;
-let s20DragId = null;
 let s20LastAnswer = null;
 let s20ShowingCorrect = false;
 let s20LastSubmittedSig = null;
@@ -3292,69 +3233,43 @@ function s20ClearZoneStates() {
   });
 }
 
-function s20DragStart(event, itemId) {
-  s20DragId = itemId;
-  event.dataTransfer.effectAllowed = 'move';
-  event.dataTransfer.setData('text/plain', itemId);
-  setTimeout(function () {
-    const el = document.getElementById(itemId);
-    if (el) el.classList.add('s20-dragging');
-  }, 0);
-}
-
-function s20DragEnd(itemId) {
-  const el = document.getElementById(itemId);
-  if (el) el.classList.remove('s20-dragging');
-  s20DragId = null;
-}
-
-function s20DragOver(event) {
-  event.preventDefault();
-  event.dataTransfer.dropEffect = 'move';
-}
-
-function s20DragEnter(event, zoneId) {
-  event.preventDefault();
-  document.getElementById(zoneId).classList.add('s20-drag-over');
-}
-
-function s20DragLeave(event, zoneId) {
-  const zone = document.getElementById(zoneId);
-  if (zone && !zone.contains(event.relatedTarget)) {
-    zone.classList.remove('s20-drag-over');
-  }
-}
-
-function s20Drop(event, targetZone) {
-  event.preventDefault();
+/* Place an item into a zone (targetZone = 'bruto' ...) or back into the source bank (targetZone === null).
+   Shared by the pointer DnD onDrop below; same effect as the former s20Drop / s20DropToSource. */
+function s20PlaceItem(itemId, targetZone) {
   if (s20Done) return;
-  const itemId = event.dataTransfer.getData('text/plain') || s20DragId;
-  if (!itemId) return;
-  const zoneEl = document.getElementById('s20-zone-' + targetZone);
   const itemEl = document.getElementById(itemId);
-  if (zoneEl && itemEl) {
-    zoneEl.classList.remove('s20-drag-over');
-    if (itemEl.parentElement) itemEl.parentElement.removeChild(itemEl);
-    zoneEl.appendChild(itemEl);
+  if (targetZone === null) {
+    const sourceBank = document.getElementById('s20-source-bank');
+    if (itemEl && sourceBank && itemEl.parentElement !== sourceBank) {
+      if (itemEl.parentElement) itemEl.parentElement.removeChild(itemEl);
+      sourceBank.appendChild(itemEl);
+    }
+  } else {
+    const zoneEl = document.getElementById('s20-zone-' + targetZone);
+    if (zoneEl && itemEl) {
+      if (itemEl.parentElement) itemEl.parentElement.removeChild(itemEl);
+      zoneEl.appendChild(itemEl);
+    }
   }
   s20UpdateCheckBtn();
   s20ClearZoneStates();
 }
 
-function s20DropToSource(event) {
-  event.preventDefault();
-  if (s20Done) return;
-  const itemId = event.dataTransfer.getData('text/plain') || s20DragId;
-  if (!itemId) return;
-  const sourceBank = document.getElementById('s20-source-bank');
-  const itemEl = document.getElementById(itemId);
-  if (itemEl && sourceBank && itemEl.parentElement !== sourceBank) {
-    if (itemEl.parentElement) itemEl.parentElement.removeChild(itemEl);
-    sourceBank.appendChild(itemEl);
-  }
-  s20UpdateCheckBtn();
-  s20ClearZoneStates();
-}
+/* Pointer DnD (mouse + touch) — ../unit-js/30-pointer-dnd.js. Replaces the native HTML5 drag handlers,
+   which never fire from touch. The DOM is the state here (no model), and the listeners sit on the items
+   themselves, so they survive every appendChild (drop, reveal, resume, reset). A short tap on a placed
+   item still sends it back to the bank (the former s20ItemClick, now onTap). */
+const s20Dnd = createPointerDnd({
+  canDrag: function () { return !s20Done; },
+  onGhost: function (ghost, src) {   /* the clone lives in <body>: keep the in-zone look of a placed item */
+    if (src.parentElement && src.parentElement.id !== 's20-source-bank') ghost.classList.add('from-zone');
+  },
+  onTap: function (dragId) { s20ItemClick(dragId); },
+  onDrop: function (dragId, targetId) { s20PlaceItem(dragId, targetId === 'bank' ? null : targetId); }
+});
+S20_ITEM_IDS.forEach(function (id) { s20Dnd.attachSource(document.getElementById(id), id); });
+['bruto','neto','tara'].forEach(function (z) { s20Dnd.attachTarget(document.getElementById('s20-zone-' + z), z); });
+s20Dnd.attachTarget(document.getElementById('s20-source-bank'), 'bank');
 
 function s20ItemClick(itemId) {
   if (s20Done) return;
@@ -3577,7 +3492,6 @@ function resetScreenState19() {
   })) return;
   s20Attempts = 0;
   s20HintShown = false;
-  s20DragId = null;
   s20LastAnswer = null;
   s20ShowingCorrect = false;
 

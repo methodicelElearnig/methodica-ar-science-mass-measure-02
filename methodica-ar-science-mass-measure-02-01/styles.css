@@ -1129,10 +1129,17 @@ img { display: block; max-width: none; }
   box-shadow: 0 2px 8px rgba(1, 157, 229, 0.2);
 }
 
-.s5-drag-item.s5-dragging {
+.s5-drag-item.s5-dragging,
+.s5-drag-item.dragging {
   opacity: 0.35;
   cursor: grabbing;
 }
+/* Pointer DnD (unit-js/30-pointer-dnd.js): no page pan/zoom, native image drag or iOS long-press sheet under
+   the finger; the ghost is a clone in <body>, so its look is class-scoped. */
+.s5-drag-item { touch-action: none; -webkit-user-drag: none; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+.s5-drag-item.pointer-drag-ghost { opacity: 1; cursor: grabbing; border-color: #019de5; box-shadow: 0 2px 8px rgba(1, 157, 229, 0.2); }
+.s5-drag-item.from-zone img { width: 95px; height: 95px; }
+
 
 .s5-drag-item img {
   width: 110px;
@@ -1173,7 +1180,8 @@ img { display: block; max-width: none; }
   padding: 12px;
 }
 
-.s5-zone.s5-drag-over {
+.s5-zone.s5-drag-over,
+.s5-zone.drag-over {
   border-color: #019de5;
   background: #eef8ff;
 }
@@ -1532,10 +1540,17 @@ img { display: block; max-width: none; }
   box-shadow: 0 2px 8px rgba(1, 157, 229, 0.2);
 }
 
-.s9-drag-item.s9-dragging {
+.s9-drag-item.s9-dragging,
+.s9-drag-item.dragging {
   opacity: 0.35;
   cursor: grabbing;
 }
+/* Pointer DnD (unit-js/30-pointer-dnd.js): no page pan/zoom, native image drag or iOS long-press sheet under
+   the finger; the ghost is a clone in <body>, so its look is class-scoped. */
+.s9-drag-item { touch-action: none; -webkit-user-drag: none; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+.s9-drag-item.pointer-drag-ghost { opacity: 1; cursor: grabbing; border-color: #019de5; box-shadow: 0 2px 8px rgba(1, 157, 229, 0.2); }
+.s9-drag-item.from-zone img { object-fit: cover; }
+
 
 .s9-drag-item.s9-locked {
   pointer-events: none;
@@ -1581,7 +1596,8 @@ img { display: block; max-width: none; }
   padding: 8px;
 }
 
-.s9-zone.s9-drag-over {
+.s9-zone.s9-drag-over,
+.s9-zone.drag-over {
   border-color: #019de5;
   background: #eef8ff;
 }
@@ -2495,7 +2511,13 @@ img { display: block; max-width: none; }
   overflow: visible;
 }
 .s20-drag-item:hover { border-color: #019de5; box-shadow: 0 2px 8px rgba(1, 157, 229, 0.2); }
-.s20-drag-item.s20-dragging { opacity: 0.35; cursor: grabbing; }
+.s20-drag-item.s20-dragging,
+.s20-drag-item.dragging { opacity: 0.35; cursor: grabbing; }
+/* Pointer DnD (unit-js/30-pointer-dnd.js): no page pan/zoom, native image drag or iOS long-press sheet under
+   the finger; the ghost is a clone in <body>, so its look is class-scoped. */
+.s20-drag-item { touch-action: none; -webkit-user-drag: none; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+.s20-drag-item.pointer-drag-ghost { opacity: 1; cursor: grabbing; border-color: #019de5; box-shadow: 0 2px 8px rgba(1, 157, 229, 0.2); }
+
 .s20-drag-item img {
   width: 100%;
   height: 100%;
@@ -2564,7 +2586,8 @@ img { display: block; max-width: none; }
   gap: 6px;
   padding: 8px;
 }
-.s20-zone.s20-drag-over { border-color: #019de5; background: #eaf6ff; }
+.s20-zone.s20-drag-over,
+.s20-zone.drag-over { border-color: #019de5; background: #eaf6ff; }
 /* אין צביעת משבצת/רקע ברמת האזור על נכון/שגוי — נבדק ישירות מול Figma
    (DragAndDropMatchingQuestion, כל 7 המצבים) ואינו מופיע שם; רק הכרטיסייה
    עצמה (למעלה) והפופאפ המשוב משתנים בצבע. */
