@@ -239,55 +239,82 @@ function probe02() {
     qs[2].result.success === false && qs[3].result.success === true,
     qs.map(s => s.result.success).join(','));
 
-  /* ── The two gates, as ruled (Nimrod Rotem, Monday 12890230271, confirmed 16.09.26) ──
-     Fewer than 4 of the 5 basic questions ENDS the component on screen 5: completed with
-     success:false, score = basic/5, and the two harder exercises are never shown. 4 or more
-     proceeds to them, and there success needs 2/2 with score = standard/2 (the denominators
-     are Vadim's decision of the same day). Until 16.09.26 this probe locked the opposite —
-     a hidden double gate with an unconditional hop to 03 — and REPORT-XAPI.md §7.4 has the
-     history. Each case boots fresh: the 'done' ledger is per page. */
+  /* ── Score contract (MOE QA runbook §4 "ציון ומעבר"; 2026-11-09, 08.11 sheet fixes 1, 2, 4,
+     pilot body-matter-01 75559c9) ──
+     Screen 1 promises 4 of 5 basic questions. success and score.scaled come from that one count
+     (xapiPartResult) at both ends: the gate on screen 5 (sq6Continue — Nimrod's ruling of
+     16.09.26, kept) and the last click on screen 8 (drag9Continue). The two harder exercises
+     never enter the component result; their second gate (success = 2/2, score = standard/2,
+     16.09.26) is gone. Each case boots fresh: the 'done' ledger is per page. */
   const setBasic = (n) => ['q2', 'q3', 'q4', 'q5', 'q6']
     .map((k, i) => "stationProgress2." + k + "='" + (i < n ? 'success' : 'fail') + "';").join('');
   const setStandard = (n) => ['q8', 'q9']
     .map((k, i) => "stationProgress3." + k + "='" + (i < n ? 'success' : 'fail') + "';").join('');
   const compOf = (log) => log.find(s => s.type === 'onlinelesson' && s.verb === 'completed');
 
+  // every count 0..5 x the harder set all right / all wrong
+  for (let k = 0; k <= 5; k++) for (const h of [0, 2]) {
+    const raw = val('(function(){' + setBasic(k) + setStandard(h) + 'return JSON.stringify(xapiPartResult()); })()');
+    let res; try { res = JSON.parse(raw); } catch (e) { res = { success: null, score: { scaled: NaN }, raw: raw }; }
+    const tag = k + '/5 + harder ' + h + '/2';
+    ok(C + ' result ' + tag + ': success = correct >= 4', res.success === (k >= 4), JSON.stringify(res));
+    ok(C + ' result ' + tag + ': scaled = correct / 5 (harder set not counted)', Math.abs(res.score.scaled - k / 5) < 1e-9, JSON.stringify(res));
+    ok(C + ' result ' + tag + ': success <=> scaled >= 4/5', res.success === (res.score.scaled >= 0.8 - 1e-9), JSON.stringify(res));
+  }
+
   // (a) 3 of 5 -> the component ends HERE
-  r = run(setBasic(3) + 'goTo(5); sq6Done = true; sq6Continue();');
+  const a = boot(C);
+  r = a.run(setBasic(3) + 'goTo(5); sq6Done = true; sq6Continue();');
   let comp = compOf(r.log);
-  ok(C + ' 3 of 5 basic -> completed on screen 5, success:false, scaled 3/5',
+  ok(C + ' gate 3/5 -> completed on screen 5, success:false, scaled 3/5',
     comp && comp.result.success === false && Math.abs(comp.result.score.scaled - 0.6) < 1e-9,
     comp ? JSON.stringify(comp.result) : 'no component completed');
   ok(C + ' ...the learner stays on screen 5 — the harder exercises are never shown',
-    val('currentScreen') === 5, 'currentScreen=' + val('currentScreen'));
+    a.val('currentScreen') === 5, 'currentScreen=' + a.val('currentScreen'));
   ok(C + ' ...the bar button is disabled after the report',
-    val("document.getElementById('sq6-check').disabled") === true);
+    a.val("document.getElementById('sq6-check').disabled") === true);
   ok(C + ' ...and the ledger blocks a second report from the same page',
-    run('sq6Continue();').log.filter(s => s.type === 'onlinelesson').length === 0);
+    a.run('sq6Continue();').log.filter(s => s.type === 'onlinelesson').length === 0);
+  // ...a reload with the ledger and the saved progress: the gate still holds, nothing is sent again
+  const snap = a.val('JSON.stringify(capturePartPayload())');
+  const doc = a.val('JSON.stringify(_unitState)');
+  const a2 = boot(C);
+  a2.run('_unitState = ' + doc + '; applyExecutionState(' + snap + '); goTo(5);');
+  ok(C + ' gate resume: sq6-check disabled after a reload with the ledger',
+    a2.val("document.getElementById('sq6-check').disabled") === true);
+  r = a2.run('sq6Continue();');
+  ok(C + ' gate resume: no second completed, still on screen 5',
+    !compOf(r.log) && a2.val('currentScreen') === 5, 'currentScreen=' + a2.val('currentScreen'));
 
   // (b) 4 of 5 -> proceeds to the harder exercises, reporting nothing yet
   const b = boot(C);
   r = b.run(setBasic(4) + 'goTo(5); sq6Continue();');
-  ok(C + ' 4 of 5 basic -> no component completed, screen 6 reached',
+  ok(C + ' gate 4/5 -> no component completed, screen 6 reached',
     !compOf(r.log) && b.val('currentScreen') === 6,
     'currentScreen=' + b.val('currentScreen') + ' log=' + JSON.stringify(r.log.map(s => s.verb)));
 
-  // (c) 1 of 2 hard -> success:false, and the basic questions do NOT enter this denominator
+  // (c) the last click reports the basic result, whatever the harder exercises did
   r = b.run(setStandard(1) + 'drag9Continue();');
   comp = compOf(r.log);
-  ok(C + ' 1 of 2 hard -> success:false, scaled 1/2 (basic 4/5 is not in the denominator)',
-    comp && comp.result.success === false && Math.abs(comp.result.score.scaled - 0.5) < 1e-9,
+  ok(C + ' end 4/5 + harder 1/2 -> success:true, scaled 4/5 (no second gate)',
+    comp && comp.result.success === true && Math.abs(comp.result.score.scaled - 0.8) < 1e-9,
     comp ? JSON.stringify(comp.result) : 'no component completed');
   ok(C + ' ...drag9-check is disabled after the report',
     b.val("document.getElementById('drag9-check').disabled") === true);
 
-  // (d) 2 of 2 hard -> success:true, scaled 1
   const b2 = boot(C);
-  r = b2.run(setBasic(4) + setStandard(2) + 'drag9Continue();');
+  r = b2.run(setBasic(5) + setStandard(0) + 'drag9Continue();');
   comp = compOf(r.log);
-  ok(C + ' 2 of 2 hard -> success:true, scaled 1',
+  ok(C + ' end 5/5 + harder 0/2 -> success:true, scaled 1',
     comp && comp.result.success === true && comp.result.score.scaled === 1,
     comp ? JSON.stringify(comp.result) : 'no component completed');
+
+  /* fix 6 shape: item 004 (four true/false statements) is ONE question — one wrong statement on
+     the last attempt makes it 'fail', so it contributes 0 */
+  const b3 = boot(C);
+  b3.run("sq5Selected = {r1:'true', r2:'true', r3:'false', r4:'false'}; sq5Done = false; sq5Attempts = TF_SQ5.maxAttempts - 1; sq5Check();");
+  ok(C + ' item 004 with one statement wrong counts as one wrong question',
+    b3.val('stationProgress2.q5') === 'fail', String(b3.val('stationProgress2.q5')));
 
   /* Production: the last click reports and stops. No hop, no landing-pointer move —
      Kata routes on the statement. (probeDevNav covers the ?dev=1 walkthrough.) */
@@ -296,7 +323,7 @@ function probe02() {
     b2.val("'part' in _unitState") === false,
     'edges=' + b2.val("sessionStorage.getItem('lomda_nav_edges::methodica-ar-science-mass-measure-02')"));
 
-  w.close(); b.w.close(); b2.w.close();
+  w.close(); a.w.close(); a2.w.close(); b.w.close(); b2.w.close(); b3.w.close();
 }
 
 // ── component 03: success, deliberately no score ─────────────────────────
