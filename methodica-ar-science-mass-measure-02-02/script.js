@@ -1107,17 +1107,16 @@ function sq6UnlockOptions() {
    פחות מ-4 מתוך 5 בשאלות הבסיס → הרכיב **נגמר כאן**: שני התרגילים הקשים
    (מסכים 7-8) לא מוצגים, נשלח completed עם success:false, והפלטפורמה מנתבת
    (recommendedAfterFail של הרכיב מצביע לסין 01). 4 ומעלה → ממשיכים לשניים
-   הקשים, ושם ההצלחה דורשת 2/2 (drag9Continue). ללומד לא מוצג שום טקסט חדש —
-   "מאחורי הקלעים", כפי שהוכרע. מסך 1 מבטיח בדיוק את זה ("ענו נכון על 4
-   שאלות ומעלה (80%) כדי להתקדם"), ולכן הטקסט שם נשאר.
-   הציון במסלול הזה: מתוך 5 — מה שהלומד הובטח ומה שראה (הכרעת 16.09.26).
-   getBasicPracticeScore קורא מ-stationProgress2, שמשוחזר ב-resume, ולכן השער
-   נכון גם אחרי טעינה מחדש. הכפתור מושבת אחרי הדיווח (xapiEndComponent). */
+   הקשים. ללומד לא מוצג שום טקסט חדש — "מאחורי הקלעים", כפי שהוכרע. מסך 1
+   מבטיח בדיוק את זה ("ענו נכון על 4 שאלות ומעלה (80%) כדי להתקדם"), ולכן
+   הטקסט שם נשאר.
+   התוצאה בשער ובסוף היא אותה תוצאה — xapiPartResult (2026-11-09, תיקונים 1, 2, 4
+   בגיליון 08.11). getBasicPracticeScore קורא מ-stationProgress2, שמשוחזר
+   ב-resume, ולכן השער נכון גם אחרי טעינה מחדש. הכפתור מושבת אחרי הדיווח
+   (xapiEndComponent). */
 function sq6Continue() {
-  var _b = getBasicPracticeScore();
-  if (_b < 4) {
-    xapiEndComponent({ success: false, score: { scaled: _b / 5 } },
-      document.getElementById('sq6-check'));
+  if (getBasicPracticeScore() < XAPI_PASS_K) {
+    xapiEndComponent(xapiPartResult(), document.getElementById('sq6-check'));
     return;
   }
   goTo(6);
@@ -1650,16 +1649,20 @@ function drag9Check() {
      חמש שאלות התרגול הבסיסי (מסכים 1-5)  — stationProgress2
      שני התרגילים ברמה גבוהה (מסכים 7-8)  — stationProgress3
 
-   ── הכלל מ-2026-09-16 (הכרעת נמרוד רותם על ה-success, הכרעת ודים על המכנה) ──
-   לרכיב שני שערים, וכל אחד מהם מדווח בנקודה שלו:
-     • sq6Continue (סוף מסך 5): פחות מ-4/5 בבסיס → הרכיב נגמר, success:false,
-       score = basic/5. השניים הקשים לא מוצגים כלל.
-     • drag9Continue (סוף מסך 8): success = 2/2 בקשים, score = standard/2.
-       מי שהגיע לכאן כבר עמד בשער הבסיס, ולכן הבסיס אינו נכנס למכנה הזה.
-   עד 2026-09-16 היה כאן שער כפול סמוי — success דרש 4/5 **וגם** 2/2 בעוד
-   שהניתוב לסין 03 היה ללא תנאי והלומד מעולם לא נאמר לו על השער השני
-   (REPORT-XAPI.md §7.4). הוכרע: השער נשאר, אבל הוא עוצר באמת, והפלטפורמה
-   מנתבת. ‎`methodica-math-scale-01-02` עדיין נושא את הדפוס הישן. */
+   ── הכלל מ-2026-11-09 (תיקונים 1, 2, 4 בגיליון 08.11) ──
+   מסך 1 מבטיח 4 מתוך 5 שאלות בסיס, ותוצאת הרכיב היא רק זו: success ו-score
+   מאותה ספירה (xapiPartResult), גם בשער (sq6Continue, סוף מסך 5) וגם בסוף
+   (drag9Continue, סוף מסך 8). שני התרגילים הקשים מדווחים answered משלהם ואינם
+   נכנסים לתוצאת הרכיב.
+   עד כה (2026-09-16) היה כאן שער שני: drag9Continue דיווח success = 2/2 בקשים
+   ו-score = standard/2 — תנאי שמסך 1 לא מזכיר (בעיה 4). השער הראשון נשאר
+   (הכרעת נמרוד, 16.09.26); השני הוסר. */
+var XAPI_PASS_K = 4, XAPI_PASS_N = 5;
+function xapiPartResult() {
+  var _b = getBasicPracticeScore();
+  return { success: _b >= XAPI_PASS_K, score: { scaled: _b / XAPI_PASS_N } };
+}
+
 function getBasicPracticeScore() {
   return ['q2', 'q3', 'q4', 'q5', 'q6'].filter(function (k) {
     return stationProgress2[k] === 'success';
@@ -1676,12 +1679,9 @@ function drag9Continue() {
   /* xAPI: סוגר את הפריט הפתוח ומדווח את תוצאת הרכיב. נשלח גם כשהלומד לא
      עמד בסף — רכיב שלא נצלח חייב להיות מדווח, אחרת כל הניסיון לא נרשם;
      ניתוב לומד שנכשל הוא תפקיד הפלטפורמה דרך recommendedAfterFail, שמצביע
-     כאן בחזרה לסין 01. זו הלחיצה האחרונה ברכיב; הכפתור מושבת אחריה. */
-  var _standard = getStandardPracticeScore();
-  xapiEndComponent({
-    success: _standard === 2,
-    score: { scaled: _standard / 2 }
-  }, document.getElementById('drag9-check'));
+     כאן בחזרה לסין 01. זו הלחיצה האחרונה ברכיב; הכפתור מושבת אחריה.
+     התוצאה: הבסיס בלבד (xapiPartResult), לא הקשים. */
+  xapiEndComponent(xapiPartResult(), document.getElementById('drag9-check'));
 
   /* המעבר לסין 03 שהיה כאן חי רק ב-walkthrough מקומי (DEV_NAV,
      unit-js/10-identity.js). בייצור Kata היא שמנתבת. */
