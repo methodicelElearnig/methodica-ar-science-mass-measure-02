@@ -124,6 +124,10 @@ const TBL_DD_IDS = [
   'tblB-dd-1', 'tblB-dd-2', 'tblB-dd-3', 'tblB-dd-4', 'tblB-dd-5'
 ];
 const TBL_INPUT_IDS = ['tblA-input-2', 'tblB-input-1'];
+/* xAPI (MOE runbook 10.11.26): the ten fields in row order = answers.source of 001/q1 (Kata's Arabic
+   entry; the Hebrew one is a proposal in metadata/, see DEPLOY.md). */
+const TBL_XAPI_FIELDS = ['tblA-dd-1', 'tblA-dd-2', 'tblA-dd-3', 'tblA-input-2',
+  'tblB-dd-1', 'tblB-dd-2', 'tblB-input-1', 'tblB-dd-3', 'tblB-dd-4', 'tblB-dd-5'];
 
 const TBL_DD_CORRECT = {
   'tblA-dd-1': 'كتلة إجمالية',    /* שקית חטיפים מלאה — מושג מסה */
@@ -339,7 +343,10 @@ function tblCheck() {
   const ddsCorrect = TBL_DD_IDS.every(function (id) { return tblDdValues[id] === TBL_DD_CORRECT[id]; });
   const allCorrect = inputsCorrect && ddsCorrect;
   xapiAnswered('001', 'q1', allCorrect, allCorrect || tblAttempts >= 2,
-    xapiFieldsAnswer(TBL_INPUT_IDS) + ' | ' + xapiFieldsAnswer(TBL_DD_IDS, tblDdValues));
+    { pairs: TBL_XAPI_FIELDS.map(function (id, i) {
+      var v = id in tblDdValues ? tblDdValues[id] : ((document.getElementById(id) || {}).value || '').trim();
+      return { source: i, target: v };
+    }).filter(function (p) { return p.target !== ''; }) });
 
   if (allCorrect) {
     tblDone = true; tblPhase = 'correct';

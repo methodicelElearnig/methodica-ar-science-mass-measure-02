@@ -266,7 +266,7 @@ function scqCheck() {
   if (!scqSelected || scqDone) return;
   scqAttempts++;
   const optEl = scqOptEl(scqSelected);
-  xapiAnswered('001', 'q1', scqSelected === SCQ.correctId, scqSelected === SCQ.correctId || scqAttempts >= SCQ.maxAttempts, xapiAnswerText(optEl));
+  xapiAnswered('001', 'q1', scqSelected === SCQ.correctId, scqSelected === SCQ.correctId || scqAttempts >= SCQ.maxAttempts, { choices: [xapiAnswerText(optEl)] });
 
   if (scqSelected === SCQ.correctId) {
     optEl.classList.add('correct');
@@ -523,7 +523,7 @@ function scq4Check() {
   if (!scq4Selected || scq4Done) return;
   scq4Attempts++;
   const optEl = scq4OptEl(scq4Selected);
-  xapiAnswered('002', 'q1', scq4Selected === SCQ4.correctId, scq4Selected === SCQ4.correctId || scq4Attempts >= SCQ4.maxAttempts, xapiAnswerText(optEl));
+  xapiAnswered('002', 'q1', scq4Selected === SCQ4.correctId, scq4Selected === SCQ4.correctId || scq4Attempts >= SCQ4.maxAttempts, { choices: [xapiAnswerText(optEl)] });
 
   if (scq4Selected === SCQ4.correctId) {
     optEl.classList.add('correct');
@@ -810,6 +810,9 @@ function s5Reveal() {
   }
 }
 
+/* xAPI (MOE runbook 10.11.26): card id → index in answers.source of 003/q1. In the metadata order. */
+const S5_XAPI_SOURCE = { 's5i1': 0, 's5i2': 1, 's5i3': 2, 's5i4': 3, 's5i5': 4, 's5i6': 5, 's5i7': 6, 's5i8': 7, 's5i9': 8 };
+
 function s5Check() {
   if (s5Done) return;
   s5Attempts++;
@@ -833,7 +836,7 @@ function s5Check() {
 
   const checkBtn = document.getElementById('s5-check');
   /* xAPI: מוצב אחרי לוח הגרירה, כי allCorrect סופי רק בסוף הלופ. */
-  xapiAnswered('003', 'q1', allCorrect, allCorrect || s5Attempts >= 2, xapiZoneAnswer('s5', ['bruto', 'neto', 'tara']));
+  xapiAnswered('003', 'q1', allCorrect, allCorrect || s5Attempts >= 2, { pairs: xapiZonePairs('s5', ['bruto', 'neto', 'tara'], S5_XAPI_SOURCE) });
   if (allCorrect) {
     s5Done = true;
     s5ShowFeedback('correct', true);
@@ -1049,7 +1052,7 @@ function scq8Check() {
   if (!scq8Selected || scq8Done) return;
   scq8Attempts++;
   const optEl = scq8OptEl(scq8Selected);
-  xapiAnswered('004', 'q1', scq8Selected === SCQ8.correctId, scq8Selected === SCQ8.correctId || scq8Attempts >= SCQ8.maxAttempts, xapiAnswerText(optEl));
+  xapiAnswered('004', 'q1', scq8Selected === SCQ8.correctId, scq8Selected === SCQ8.correctId || scq8Attempts >= SCQ8.maxAttempts, { choices: [xapiAnswerText(optEl)] });
 
   if (scq8Selected === SCQ8.correctId) {
     optEl.classList.add('correct');
@@ -1349,6 +1352,9 @@ function s9Reveal() {
   }
 }
 
+/* xAPI (MOE runbook 10.11.26): card id → index in answers.source of 005/q1. In the metadata order. */
+const S9_XAPI_SOURCE = { 's9-turtle': 0, 's9-train': 1, 's9-salt': 2, 's9-apple': 3 };
+
 function s9Check() {
   if (s9Done) return;
   s9Attempts++;
@@ -1372,7 +1378,7 @@ function s9Check() {
 
   const checkBtn = document.getElementById('s9-check');
   /* xAPI: מוצב אחרי לוח הגרירה, כי allCorrect סופי רק בסוף הלופ. */
-  xapiAnswered('005', 'q1', allCorrect, allCorrect || s9Attempts >= 2, xapiZoneAnswer('s9', S9_ZONE_IDS));
+  xapiAnswered('005', 'q1', allCorrect, allCorrect || s9Attempts >= 2, { pairs: xapiZonePairs('s9', S9_ZONE_IDS, S9_XAPI_SOURCE) });
   if (allCorrect) {
     s9Done = true;
     S9_ITEM_IDS.forEach(function (id) {
@@ -1552,7 +1558,7 @@ function scq10Check() {
   if (!scq10Selected || scq10Done) return;
   scq10Attempts++;
   const optEl = scq10OptEl(scq10Selected);
-  xapiAnswered('006', 'q1', scq10Selected === SCQ10.correctId, scq10Selected === SCQ10.correctId || scq10Attempts >= SCQ10.maxAttempts, xapiAnswerText(optEl));
+  xapiAnswered('006', 'q1', scq10Selected === SCQ10.correctId, scq10Selected === SCQ10.correctId || scq10Attempts >= SCQ10.maxAttempts, { choices: [xapiAnswerText(optEl)] });
 
   if (scq10Selected === SCQ10.correctId) {
     optEl.classList.add('correct');
@@ -1959,7 +1965,7 @@ function scq13Check() {
   if (!scq13Selected || scq13Done) return;
   scq13Attempts++;
   const optEl = scq13OptEl(scq13Selected);
-  xapiAnswered('008', 'q1', scq13Selected === SCQ13.correctId, scq13Selected === SCQ13.correctId || scq13Attempts >= SCQ13.maxAttempts, xapiAnswerText(optEl));
+  xapiAnswered('008', 'q1', scq13Selected === SCQ13.correctId, scq13Selected === SCQ13.correctId || scq13Attempts >= SCQ13.maxAttempts, { choices: [xapiAnswerText(optEl)] });
 
   if (scq13Selected === SCQ13.correctId) {
     optEl.classList.add('correct');
@@ -2153,7 +2159,7 @@ function scq14Check() {
   const correct = MCQ14.correctIds;
   const isCorrect = correct.length === scq14Selected.length &&
     correct.every(function (cid) { return scq14Selected.indexOf(cid) >= 0; });
-  xapiAnswered('009', 'q1', isCorrect, isCorrect || scq14Attempts >= MCQ14.maxAttempts, xapiMultiAnswer(scq14Selected, scq14OptEl));
+  xapiAnswered('009', 'q1', isCorrect, isCorrect || scq14Attempts >= MCQ14.maxAttempts, { choices: scq14Selected.map(function (id) { return xapiAnswerText(scq14OptEl(id)); }) });
 
   if (isCorrect) {
     scq14Phase = 'correct';
@@ -2411,7 +2417,7 @@ function scq16Check() {
   if (!scq16Selected || scq16Done) return;
   scq16Attempts++;
   const optEl = scq16OptEl(scq16Selected);
-  xapiAnswered('010', 'q1', scq16Selected === SCQ16.correctId, scq16Selected === SCQ16.correctId || scq16Attempts >= SCQ16.maxAttempts, xapiAnswerText(optEl));
+  xapiAnswered('010', 'q1', scq16Selected === SCQ16.correctId, scq16Selected === SCQ16.correctId || scq16Attempts >= SCQ16.maxAttempts, { choices: [xapiAnswerText(optEl)] });
 
   if (scq16Selected === SCQ16.correctId) {
     optEl.classList.add('correct');
@@ -2601,7 +2607,7 @@ function scq17Check() {
   if (!scq17Selected || scq17Done) return;
   scq17Attempts++;
   const optEl = scq17OptEl(scq17Selected);
-  xapiAnswered('011', 'q1', scq17Selected === SCQ17.correctId, scq17Selected === SCQ17.correctId || scq17Attempts >= SCQ17.maxAttempts, xapiAnswerText(optEl));
+  xapiAnswered('011', 'q1', scq17Selected === SCQ17.correctId, scq17Selected === SCQ17.correctId || scq17Attempts >= SCQ17.maxAttempts, { choices: [xapiAnswerText(optEl)] });
 
   if (scq17Selected === SCQ17.correctId) {
     optEl.classList.add('correct');
@@ -2838,7 +2844,9 @@ function s18Check() {
     const el = document.getElementById(id);
     return el && parseFloat(el.value) === parseFloat(S18_ANSWERS[id]);
   });
-  xapiAnswered('012', 'q1', allCorrect, allCorrect || s18Attempts >= 2, xapiFieldsAnswer(S18_IDS));
+  xapiAnswered('012', 'q1', allCorrect, allCorrect || s18Attempts >= 2, 
+    /* xAPI: row i of the table = answers.source[i], the typed number the target */
+    { pairs: S18_IDS.map(function (id, i) { return { source: i, target: ((document.getElementById(id) || {}).value || '').trim() }; }) });
 
   if (allCorrect) {
     s18Done = true;
@@ -3084,7 +3092,8 @@ function s19Check() {
   s19Attempts++;
   s19LastSubmittedSig = s19Sig();
   const allCorrect = S19_IDS.every(function (id) { return s19DdValues[id] === S19_CORRECT[id]; });
-  xapiAnswered('013', 'q1', allCorrect, allCorrect || s19Attempts >= 2, xapiFieldsAnswer(S19_IDS, s19DdValues));
+  xapiAnswered('013', 'q1', allCorrect, allCorrect || s19Attempts >= 2, 
+    { pairs: S19_IDS.map(function (id, i) { return { source: i, target: s19DdValues[id] }; }).filter(function (p) { return p.target !== ''; }) });
 
   if (allCorrect) {
     s19Done = true;
@@ -3349,6 +3358,9 @@ function s20Reveal() {
   }
 }
 
+/* xAPI (MOE runbook 10.11.26): card id → index in answers.source of 014/q1. In the metadata order. */
+const S20_XAPI_SOURCE = { 's20i4': 0, 's20i5': 1, 's20i6': 2, 's20i7': 3, 's20i8': 4, 's20i9': 5 };
+
 function s20Check() {
   if (s20Done) return;
   s20Attempts++;
@@ -3372,7 +3384,7 @@ function s20Check() {
 
   const checkBtn = document.getElementById('s20-check');
   /* xAPI: מוצב אחרי לוח הגרירה, כי allCorrect סופי רק בסוף הלופ. */
-  xapiAnswered('014', 'q1', allCorrect, allCorrect || s20Attempts >= 2, xapiZoneAnswer('s20', ['bruto', 'neto', 'tara']));
+  xapiAnswered('014', 'q1', allCorrect, allCorrect || s20Attempts >= 2, { pairs: xapiZonePairs('s20', ['bruto', 'neto', 'tara'], S20_XAPI_SOURCE) });
   if (allCorrect) {
     s20Done = true;
     s20ShowFeedback('correct', true);
