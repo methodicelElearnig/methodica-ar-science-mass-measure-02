@@ -124,10 +124,13 @@ const TBL_DD_IDS = [
   'tblB-dd-1', 'tblB-dd-2', 'tblB-dd-3', 'tblB-dd-4', 'tblB-dd-5'
 ];
 const TBL_INPUT_IDS = ['tblA-input-2', 'tblB-input-1'];
-/* xAPI (MOE runbook 10.11.26): the ten fields in row order = answers.source of 001/q1 (Kata's Arabic
+/* xAPI (MOE runbook 10.11.26): the ten fields in row order = answers.source / steps of 001/q1 (Kata's Arabic
    entry; the Hebrew one is a proposal in metadata/, see DEPLOY.md). */
 const TBL_XAPI_FIELDS = ['tblA-dd-1', 'tblA-dd-2', 'tblA-dd-3', 'tblA-input-2',
   'tblB-dd-1', 'tblB-dd-2', 'tblB-input-1', 'tblB-dd-3', 'tblB-dd-4', 'tblB-dd-5'];
+/* the learner's value of one field: the dropdown's pick or the typed number. Sent as matching pairs
+   (Arabic Kata) or as performance steps (the Hebrew proposal) — the metadata type picks. */
+function tblXapiValue(id) { return id in tblDdValues ? tblDdValues[id] : ((document.getElementById(id) || {}).value || '').trim(); }
 
 const TBL_DD_CORRECT = {
   'tblA-dd-1': 'كتلة إجمالية',    /* שקית חטיפים מלאה — מושג מסה */
@@ -343,10 +346,9 @@ function tblCheck() {
   const ddsCorrect = TBL_DD_IDS.every(function (id) { return tblDdValues[id] === TBL_DD_CORRECT[id]; });
   const allCorrect = inputsCorrect && ddsCorrect;
   xapiAnswered('001', 'q1', allCorrect, allCorrect || tblAttempts >= 2,
-    { pairs: TBL_XAPI_FIELDS.map(function (id, i) {
-      var v = id in tblDdValues ? tblDdValues[id] : ((document.getElementById(id) || {}).value || '').trim();
-      return { source: i, target: v };
-    }).filter(function (p) { return p.target !== ''; }) });
+    { pairs: TBL_XAPI_FIELDS.map(function (id, i) { return { source: i, target: tblXapiValue(id) }; })
+        .filter(function (p) { return p.target !== ''; }),
+      steps: TBL_XAPI_FIELDS.map(tblXapiValue) });
 
   if (allCorrect) {
     tblDone = true; tblPhase = 'correct';

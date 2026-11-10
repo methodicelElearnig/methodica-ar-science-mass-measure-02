@@ -2845,8 +2845,10 @@ function s18Check() {
     return el && parseFloat(el.value) === parseFloat(S18_ANSWERS[id]);
   });
   xapiAnswered('012', 'q1', allCorrect, allCorrect || s18Attempts >= 2, 
-    /* xAPI: row i of the table = answers.source[i], the typed number the target */
-    { pairs: S18_IDS.map(function (id, i) { return { source: i, target: ((document.getElementById(id) || {}).value || '').trim() }; }) });
+    /* xAPI: row i of the table = answers.source[i] (matching, Arabic Kata) or steps[i] (performance, the
+       Hebrew proposal); the typed number is the target / the step's value. The metadata type picks. */
+    { pairs: S18_IDS.map(function (id, i) { return { source: i, target: ((document.getElementById(id) || {}).value || '').trim() }; }),
+      steps: S18_IDS.map(function (id) { return ((document.getElementById(id) || {}).value || '').trim(); }) });
 
   if (allCorrect) {
     s18Done = true;

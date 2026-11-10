@@ -2554,6 +2554,7 @@ function checkResponseLayer() {
           case 'matching': spec = { pairs: qq.correctAnswers.slice().reverse() }; break;
           case 'numeric': spec = { value: String(qq.correctAnswers[0]) + '​' }; break;
           case 'true-false': spec = { value: String(qq.correctAnswers[0]) }; break;
+          case 'performance': spec = { steps: qq.correctAnswers.map((s) => s.response) }; break;
           default: spec = { text: String(qq.correctAnswers[0]) };
         }
         const resp = w.xapiResponse(suf, k, spec).response;
