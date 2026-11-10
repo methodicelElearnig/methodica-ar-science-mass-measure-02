@@ -4,7 +4,9 @@
   "learningUnitId": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02/",
   "componentPurpose": "practice",
   "isAssessment": false,
-  "recommendedAfterFail": ["https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-01/"],
+  "recommendedAfterFail": [
+    "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-01/"
+  ],
   "isRequired": false,
   "relativeDifficulty": 2,
   "masteryLevel": null,
@@ -34,10 +36,16 @@
             "عبوة الباستا الممتلئة",
             "عبوة الباستا الفارغة"
           ],
-          "correctAnswers": [
-            "قطعة التسالي في غلافها",
-            "عبوة الباستا الممتلئة"
-          ]
+          "correctAnswers": ["قطعة التسالي في غلافها", "عبوة الباستا الممتلئة"],
+          "xapiInteractionComponents": {
+            "choices": [
+              {"id": "قطعة التسالي في غلافها", "description": "قطعة التسالي في غلافها"},
+              {"id": "الباستا الموجودة داخل العبوة", "description": "الباستا الموجودة داخل العبوة"},
+              {"id": "عبوة الباستا الممتلئة", "description": "عبوة الباستا الممتلئة"},
+              {"id": "عبوة الباستا الفارغة", "description": "عبوة الباستا الفارغة"}
+            ]
+          },
+          "correctXapiResponsesPattern": ["قطعة التسالي في غلافها[,]عبوة الباستا الممتلئة"]
         }
       ]
     },
@@ -58,10 +66,16 @@
             "علبة الكرتون للبيتسا",
             "مثلثات البيتسا التي نأكلها"
           ],
-          "correctAnswers": [
-            "الماء الموجود داخل القنينة",
-            "مثلثات البيتسا التي نأكلها"
-          ]
+          "correctAnswers": ["الماء الموجود داخل القنينة", "مثلثات البيتسا التي نأكلها"],
+          "xapiInteractionComponents": {
+            "choices": [
+              {"id": "قنينة البلاستيك الفارغة", "description": "قنينة البلاستيك الفارغة"},
+              {"id": "الماء الموجود داخل القنينة", "description": "الماء الموجود داخل القنينة"},
+              {"id": "علبة الكرتون للبيتسا", "description": "علبة الكرتون للبيتسا"},
+              {"id": "مثلثات البيتسا التي نأكلها", "description": "مثلثات البيتسا التي نأكلها"}
+            ]
+          },
+          "correctXapiResponsesPattern": ["الماء الموجود داخل القنينة[,]مثلثات البيتسا التي نأكلها"]
         }
       ]
     },
@@ -76,16 +90,17 @@
           "questionId": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-02/methodica-ar-science-mass-measure-02-02-003/q1",
           "questionType": "choice",
           "questionText": "وحدات الكتلة (غرام): اختاروا العنصرَين اللذَين من المفضل قياسهما بالغرامات:",
-          "answers": [
-            "تفاحة",
-            "مقطورة قطار",
-            "قطعة شوكولاتة",
-            "كلب"
-          ],
-          "correctAnswers": [
-            "تفاحة",
-            "قطعة شوكولاتة"
-          ]
+          "answers": ["تفاحة", "مقطورة قطار", "قطعة شوكولاتة", "كلب"],
+          "correctAnswers": ["تفاحة", "قطعة شوكولاتة"],
+          "xapiInteractionComponents": {
+            "choices": [
+              {"id": "تفاحة", "description": "تفاحة"},
+              {"id": "مقطورة قطار", "description": "مقطورة قطار"},
+              {"id": "قطعة شوكولاتة", "description": "قطعة شوكولاتة"},
+              {"id": "كلب", "description": "كلب"}
+            ]
+          },
+          "correctXapiResponsesPattern": ["تفاحة[,]قطعة شوكولاتة"]
         }
       ]
     },
@@ -100,41 +115,37 @@
           "questionId": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-02/methodica-ar-science-mass-measure-02-02-004/q1",
           "questionType": "true-false",
           "questionText": "لماذا نستخدم وحدات كتلة مختلفة؟ أ. يمكن قياس كتلة تفاحة بالأطنان، لكن العدد الناتج سيكون صغيرًا جدًا.",
-          "answers": [
-            "صحيح",
-            "غير صحيح"
-          ],
-          "correctAnswers": ["صحيح"]
+          "answers": ["true", "false"],
+          "correctAnswers": ["true"],
+          "xapiInteractionComponents": null,
+          "correctXapiResponsesPattern": ["true"]
         },
         {
           "questionId": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-02/methodica-ar-science-mass-measure-02-02-004/q2",
           "questionType": "true-false",
           "questionText": "ب. يمكن قياس كتلة القاطرة بالميليغرامات، لكن العدد الناتج سيكون كبيرًا جدًا.",
-          "answers": [
-            "صحيح",
-            "غير صحيح"
-          ],
-          "correctAnswers": ["صحيح"]
+          "answers": ["true", "false"],
+          "correctAnswers": ["true"],
+          "xapiInteractionComponents": null,
+          "correctXapiResponsesPattern": ["true"]
         },
         {
           "questionId": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-02/methodica-ar-science-mass-measure-02-02-004/q3",
           "questionType": "true-false",
           "questionText": "ت. نختار وحدة الكتلة بحيث يكون العدد الناتج ملائمًا ومريحًا للاستخدام.",
-          "answers": [
-            "صحيح",
-            "غير صحيح"
-          ],
-          "correctAnswers": ["صحيح"]
+          "answers": ["true", "false"],
+          "correctAnswers": ["true"],
+          "xapiInteractionComponents": null,
+          "correctXapiResponsesPattern": ["true"]
         },
         {
           "questionId": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-02/methodica-ar-science-mass-measure-02-02-004/q4",
           "questionType": "true-false",
           "questionText": "ث. لكل غرض وحدة كتلة واحدة يمكن من خلالها قياسه.",
-          "answers": [
-            "صحيح",
-            "غير صحيح"
-          ],
-          "correctAnswers": ["غير صحيح"]
+          "answers": ["true", "false"],
+          "correctAnswers": ["false"],
+          "xapiInteractionComponents": null,
+          "correctXapiResponsesPattern": ["false"]
         }
       ]
     },
@@ -149,16 +160,17 @@
           "questionId": "https://lomdot.education.gov.il/metodica/720/ar/science/mass-measure/02/methodica-ar-science-mass-measure-02-02/methodica-ar-science-mass-measure-02-02-005/q1",
           "questionType": "choice",
           "questionText": "وحدات الكتلة (كيلوغرام): اختاروا العنصرَين اللذَين من المفضل قياسهما بالكيلوغرامات:",
-          "answers": [
-            "حبة فيتامين صغيرة",
-            "دراجة هوائية",
-            "حبة ملح خشن",
-            "كلب"
-          ],
-          "correctAnswers": [
-            "دراجة هوائية",
-            "كلب"
-          ]
+          "answers": ["حبة فيتامين صغيرة", "دراجة هوائية", "حبة ملح خشن", "كلب"],
+          "correctAnswers": ["دراجة هوائية", "كلب"],
+          "xapiInteractionComponents": {
+            "choices": [
+              {"id": "حبة فيتامين صغيرة", "description": "حبة فيتامين صغيرة"},
+              {"id": "دراجة هوائية", "description": "دراجة هوائية"},
+              {"id": "حبة ملح خشن", "description": "حبة ملح خشن"},
+              {"id": "كلب", "description": "كلب"}
+            ]
+          },
+          "correctXapiResponsesPattern": ["دراجة هوائية[,]كلب"]
         }
       ]
     },
@@ -182,37 +194,33 @@
               "العسل فقط",
               "المرطبان الفارغ"
             ],
-            "target": [
-              "كتلة إجمالية",
-              "كتلة صافية",
-              "كتلة فارغة"
-            ]
+            "target": ["كتلة إجمالية", "كتلة صافية", "كتلة فارغة"]
           },
           "correctAnswers": [
-            {
-              "source": "صندوق أحذية وبداخله حذاء",
-              "target": "كتلة إجمالية"
-            },
-            {
-              "source": "الحذاء فقط",
-              "target": "كتلة صافية"
-            },
-            {
-              "source": "علبة الحذاء الفارغة",
-              "target": "كتلة فارغة"
-            },
-            {
-              "source": "مرطبان عسل ممتلئ",
-              "target": "كتلة إجمالية"
-            },
-            {
-              "source": "العسل فقط",
-              "target": "كتلة صافية"
-            },
-            {
-              "source": "المرطبان الفارغ",
-              "target": "كتلة فارغة"
-            }
+            {"source": "صندوق أحذية وبداخله حذاء", "target": "كتلة إجمالية"},
+            {"source": "الحذاء فقط", "target": "كتلة صافية"},
+            {"source": "علبة الحذاء الفارغة", "target": "كتلة فارغة"},
+            {"source": "مرطبان عسل ممتلئ", "target": "كتلة إجمالية"},
+            {"source": "العسل فقط", "target": "كتلة صافية"},
+            {"source": "المرطبان الفارغ", "target": "كتلة فارغة"}
+          ],
+          "xapiInteractionComponents": {
+            "source": [
+              {"id": "صندوق أحذية وبداخله حذاء", "description": "صندوق أحذية وبداخله حذاء"},
+              {"id": "الحذاء فقط", "description": "الحذاء فقط"},
+              {"id": "علبة الحذاء الفارغة", "description": "علبة الحذاء الفارغة"},
+              {"id": "مرطبان عسل ممتلئ", "description": "مرطبان عسل ممتلئ"},
+              {"id": "العسل فقط", "description": "العسل فقط"},
+              {"id": "المرطبان الفارغ", "description": "المرطبان الفارغ"}
+            ],
+            "target": [
+              {"id": "كتلة إجمالية", "description": "كتلة إجمالية"},
+              {"id": "كتلة صافية", "description": "كتلة صافية"},
+              {"id": "كتلة فارغة", "description": "كتلة فارغة"}
+            ]
+          },
+          "correctXapiResponsesPattern": [
+            "صندوق أحذية وبداخله حذاء[.]كتلة إجمالية[,]الحذاء فقط[.]كتلة صافية[,]علبة الحذاء الفارغة[.]كتلة فارغة[,]مرطبان عسل ممتلئ[.]كتلة إجمالية[,]العسل فقط[.]كتلة صافية[,]المرطبان الفارغ[.]كتلة فارغة"
           ]
         }
       ]
@@ -235,31 +243,29 @@
               "دراجة هوائية",
               "حوت أزرق"
             ],
-            "target": [
-              "ميليغرام",
-              "غرام",
-              "كيلوغرام",
-              "طن"
-            ]
+            "target": ["ميليغرام", "غرام", "كيلوغرام", "طن"]
           },
           "correctAnswers": [
-            {
-              "source": "حبّة فيتامين صغيرة",
-              "target": "ميليغرام"
-            },
-            {
-              "source": "كتاب تعليمي",
-              "target": "غرام"
-            },
-            {
-              "source": "دراجة هوائية",
-              "target": "كيلوغرام"
-            },
-            {
-              "source": "حوت أزرق",
-              "target": "طن"
-            }
-          ]
+            {"source": "حبّة فيتامين صغيرة", "target": "ميليغرام"},
+            {"source": "كتاب تعليمي", "target": "غرام"},
+            {"source": "دراجة هوائية", "target": "كيلوغرام"},
+            {"source": "حوت أزرق", "target": "طن"}
+          ],
+          "xapiInteractionComponents": {
+            "source": [
+              {"id": "حبّة فيتامين صغيرة", "description": "حبّة فيتامين صغيرة"},
+              {"id": "كتاب تعليمي", "description": "كتاب تعليمي"},
+              {"id": "دراجة هوائية", "description": "دراجة هوائية"},
+              {"id": "حوت أزرق", "description": "حوت أزرق"}
+            ],
+            "target": [
+              {"id": "ميليغرام", "description": "ميليغرام"},
+              {"id": "غرام", "description": "غرام"},
+              {"id": "كيلوغرام", "description": "كيلوغرام"},
+              {"id": "طن", "description": "طن"}
+            ]
+          },
+          "correctXapiResponsesPattern": ["حبّة فيتامين صغيرة[.]ميليغرام[,]كتاب تعليمي[.]غرام[,]دراجة هوائية[.]كيلوغرام[,]حوت أزرق[.]طن"]
         }
       ]
     }

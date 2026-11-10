@@ -601,10 +601,12 @@ function probeF5() {
   const C = '01 F-5';
   const { run, val } = boot('01');
   run("goTo(4); var z = document.getElementById('s5-zone-bruto'); z.appendChild(document.getElementById('s5i1')); z.appendChild(document.getElementById('s5i2'));");
-  const a = val("xapiZoneAnswer('s5', ['bruto', 'neto', 'tara'])");
+  /* MOE runbook 10.11.26: xapiZoneAnswer is retired; xapiZonePairs gives matching pairs. Without a
+     card -> source map, an image card still names itself by its alt (the F-5 rule). */
+  const a = JSON.parse(val("JSON.stringify(xapiZonePairs('s5', ['bruto', 'neto', 'tara']))"));
   const alt1 = val("document.querySelector('#s5i1 img').getAttribute('alt')");
-  ok(C + ': a zone with image cards reports their alt text', typeof a === 'string' && a.indexOf('bruto: ' + alt1) === 0, a);
-  ok(C + ': no empty names, and an empty zone reports —', !/:\s*,|,\s*(,|\||$)/.test(a) && /neto: —/.test(a), a);
+  ok(C + ': a zone with image cards reports their alt text', Array.isArray(a) && a.length === 2 && a[0].source === alt1 && a[0].target === 0, JSON.stringify(a));
+  ok(C + ': no empty names, and an empty zone gives no pair', a.every(p => p.source !== '') && !a.some(p => p.target !== 0), JSON.stringify(a));
 }
 
 // ── O-8 (QA 2026-10-02): an item's result survives a reload ──────────────

@@ -245,7 +245,7 @@ function sq2Check() {
   const correct = MCQ_SQ2.correctIds;
   const isCorrect = correct.length === sq2Selected.length &&
     correct.every(function (cid) { return sq2Selected.indexOf(cid) >= 0; });
-  xapiAnswered('001', 'q1', isCorrect, isCorrect || sq2Attempts >= MCQ_SQ2.maxAttempts, xapiMultiAnswer(sq2Selected, sq2OptEl));
+  xapiAnswered('001', 'q1', isCorrect, isCorrect || sq2Attempts >= MCQ_SQ2.maxAttempts, { choices: sq2Selected.map(function (id) { return xapiAnswerText(sq2OptEl(id)); }) });
 
   if (isCorrect) {
     sq2Phase = 'correct';
@@ -421,7 +421,7 @@ function sq3Check() {
   const correct = MCQ_SQ3.correctIds;
   const isCorrect = correct.length === sq3Selected.length &&
     correct.every(function (cid) { return sq3Selected.indexOf(cid) >= 0; });
-  xapiAnswered('002', 'q1', isCorrect, isCorrect || sq3Attempts >= MCQ_SQ3.maxAttempts, xapiMultiAnswer(sq3Selected, sq3OptEl));
+  xapiAnswered('002', 'q1', isCorrect, isCorrect || sq3Attempts >= MCQ_SQ3.maxAttempts, { choices: sq3Selected.map(function (id) { return xapiAnswerText(sq3OptEl(id)); }) });
 
   if (isCorrect) {
     sq3Phase = 'correct';
@@ -593,7 +593,7 @@ function sq4Check() {
   const correct = MCQ_SQ4.correctIds;
   const isCorrect = correct.length === sq4Selected.length &&
     correct.every(function (cid) { return sq4Selected.indexOf(cid) >= 0; });
-  xapiAnswered('003', 'q1', isCorrect, isCorrect || sq4Attempts >= MCQ_SQ4.maxAttempts, xapiMultiAnswer(sq4Selected, sq4OptEl));
+  xapiAnswered('003', 'q1', isCorrect, isCorrect || sq4Attempts >= MCQ_SQ4.maxAttempts, { choices: sq4Selected.map(function (id) { return xapiAnswerText(sq4OptEl(id)); }) });
 
   if (isCorrect) {
     sq4Phase = 'correct';
@@ -863,7 +863,7 @@ function sq5Check() {
     xapiAnswered('004', 'q' + (i + 1),
       sq5Selected[r] === TF_SQ5_CORRECT[r],
       allCorrect || sq5Attempts >= TF_SQ5.maxAttempts,
-      String(sq5Selected[r]));
+      { value: sq5Selected[r] });
   });
 
   if (allCorrect) {
@@ -1034,7 +1034,7 @@ function sq6Check() {
   const correct = MCQ_SQ6.correctIds;
   const isCorrect = correct.length === sq6Selected.length &&
     correct.every(function (cid) { return sq6Selected.indexOf(cid) >= 0; });
-  xapiAnswered('005', 'q1', isCorrect, isCorrect || sq6Attempts >= MCQ_SQ6.maxAttempts, xapiMultiAnswer(sq6Selected, sq6OptEl));
+  xapiAnswered('005', 'q1', isCorrect, isCorrect || sq6Attempts >= MCQ_SQ6.maxAttempts, { choices: sq6Selected.map(function (id) { return xapiAnswerText(sq6OptEl(id)); }) });
 
   if (isCorrect) {
     sq6Phase = 'correct';
@@ -1342,7 +1342,8 @@ function dd8Check() {
   dd8Attempts++;
   dd8LastSubmittedSig = dd8Sig();
   const allCorrect = DD8_IDS.every(function (id) { return dd8Values[id] === DD8_CORRECT[id]; });
-  xapiAnswered('006', 'q1', allCorrect, allCorrect || dd8Attempts >= 2, xapiFieldsAnswer(DD8_IDS, dd8Values));
+  xapiAnswered('006', 'q1', allCorrect, allCorrect || dd8Attempts >= 2, 
+    { pairs: DD8_IDS.map(function (id, i) { return { source: i, target: dd8Values[id] }; }).filter(function (p) { return p.target !== ''; }) });
 
   if (allCorrect) {
     dd8Done = true;
@@ -1425,6 +1426,9 @@ function resetScreenState7() {
 
 const DRAG9_ITEM_IDS = ['drag9i2', 'drag9i1', 'drag9i4', 'drag9i3'];
 const DRAG9_ZONES = ['milligram', 'gram', 'kilogram', 'ton'];
+/* xAPI (MOE runbook 10.11.26): card id → index in answers.source of 007/q1. drag9i1..4 in the metadata order. */
+const DRAG9_XAPI_SOURCE = { 'drag9i1': 0, 'drag9i2': 1, 'drag9i3': 2, 'drag9i4': 3 };
+
 let drag9Done = false;
 let drag9Attempts = 0;
 let drag9LastAnswer = null;
@@ -1605,7 +1609,7 @@ function drag9Check() {
 
   const checkBtn = document.getElementById('drag9-check');
   /* xAPI: אחרי הלופ — allCorrect סופי רק כאן. */
-  xapiAnswered('007', 'q1', allCorrect, allCorrect || drag9Attempts >= 2, xapiZoneAnswer('drag9', DRAG9_ZONES));
+  xapiAnswered('007', 'q1', allCorrect, allCorrect || drag9Attempts >= 2, { pairs: xapiZonePairs('drag9', DRAG9_ZONES, DRAG9_XAPI_SOURCE) });
   if (allCorrect) {
     drag9Done = true;
     drag9ShowFeedback('correct', true);

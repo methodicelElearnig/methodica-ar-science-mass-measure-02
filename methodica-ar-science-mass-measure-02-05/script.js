@@ -348,17 +348,23 @@ function makeDragQuestion(cfg) {
     const btn = document.getElementById(cfg.checkBtnId);
     /* xAPI: מוצב כאן כי allCorrect ו-attempts סופיים רק אחרי לופ היעדים.
        אילו שאלות המופע הזה מדווח נקבע ב-cfg (xapiItem/xapiQuestions) ולא
-       בפאבריקה — אותו עיקרון של תפרי-נתונים כמו בכל השכבה המשותפת.
-       טקסט התשובה נבנה ממצב הפאבריקה עצמה (איזה פריט הונח בכל יעד), ולא
-       דרך xapiZoneAnswer, כי היעדים כאן אינם בתבנית '<prefix>-zone-<id>'. */
+       בפאבריקה — אותו עיקרון של תפרי-נתונים כמו בכל השכבה המשותפת. */
     if (cfg.xapiItem) {
-      var _ans = targetIds.map(function (tId) {
-        var placed = null;
-        dragIds.forEach(function (dId) { if (placement[dId] === tId) placed = dId; });
-        return tId + '=' + (placed ? labels[placed] : '—');
-      }).join(' | ');
-      (cfg.xapiQuestions || ['q1']).forEach(function (q) {
-        xapiAnswered(cfg.xapiItem, q, allCorrect, allCorrect || attempts >= 2, _ans);
+      /* MOE runbook 10.11.26: matching pairs — the slot is the source (the i-th slot of a question =
+         its answers.source[i]), the placed card's label the target. cfg.xapiSplit cuts the slots
+         between cfg.xapiQuestions (Arabic 05 dqB: two slots each for q2 and q3); then each question's
+         success is its own slots' (the component result does not read it). */
+      var _qs = cfg.xapiQuestions || ['q1'], _split = cfg.xapiSplit || [targetIds.length], _from = 0;
+      _qs.forEach(function (q, qi) {
+        var _n = _split[qi] != null ? _split[qi] : targetIds.length - _from, _pairs = [], _qok = true;
+        targetIds.slice(_from, _from + _n).forEach(function (tId, i) {
+          var placed = null;
+          dragIds.forEach(function (dId) { if (placement[dId] === tId) placed = dId; });
+          if (placed) _pairs.push({ source: i, target: labels[placed] });
+          if (!(placed && labels[placed] === labels[correctMap[tId]])) _qok = false;
+        });
+        _from += _n;
+        xapiAnswered(cfg.xapiItem, q, _qs.length > 1 ? _qok : allCorrect, allCorrect || attempts >= 2, { pairs: _pairs });
       });
     }
     if (allCorrect) {
@@ -675,7 +681,9 @@ const dqB = makeDragQuestion({
      מקבלות את אותה תוצאה. פיצול לגרנולריות שה-UI לא מספק היה
      המצאת נתון. */
   xapiItem: '001',
+  /* Kata 10.11: q2 = the first two slots, q3 = the last two (MOE runbook 10.11.26). */
   xapiQuestions: ['q2', 'q3'],
+  xapiSplit: [2, 2],
   onContinue: function (btn) {
     /* xAPI: שאלת השיא (מועד א') היא שני חלקים ושניהם חייבים לעבור — זה בדיוק
        מה ש-moedAFullyPassed() בודק, ולכן המכנה 2 והסף 2 (moedAComponentResult).
