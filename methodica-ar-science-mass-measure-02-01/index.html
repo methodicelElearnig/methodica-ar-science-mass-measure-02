@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>قياس الكتلة - وحدة تعليمية | برنامج 720</title>
+<!-- The xAPI library is loaded by unit-js/50-loader.js from the end of <body>, after the parser has queued every
+     image below; on a slow line its request went out only after the last image, which delayed the resume restore
+     (2026-11-03, BOOT-AND-RESUME-HARDENING §2.3). A preload from <head> puts it first in the queue. The href must be
+     byte-equal to the URL 50-loader.js builds (no ?v=, no crossorigin) or the browser fetches it twice; the library
+     letter here changes together with LIB720 there (the harness checks it). -->
+<link rel="preload" as="script" fetchpriority="high" href="https://lomdot.education.gov.il/metodica/720active/common/xapiwrapper.min.js">
+<link rel="preload" as="script" fetchpriority="high" href="https://lomdot.education.gov.il/metodica/720active/common/xapi-720-l.js">
+<link rel="preconnect" href="https://kata.cet.ac.il">
 <link rel="stylesheet" href="styles.css?v=2">
 <!-- מודאל "מצאתם בעיה?" — עותק אחד לכל הסינים. נטען אחרי styles.css במכוון. -->
 <link rel="stylesheet" href="../unit-css/25-report.css?v=3">
@@ -30,6 +38,10 @@
 <div id="boot-cover" style="position:fixed;inset:0;z-index:9999;background:#fff"></div>
 <script>
 (function () {
+  /* A Kata launch (registration in the URL) may restore a document: raise the flag HERE, before any script
+     loads. bootXAPI raises it too, but from the last script tag — on a cold cache after the 800 ms below, so
+     the cover fell before the flag existed (2026-11-03). Without a registration (local, dev) nothing changes. */
+  if (/[?&]registration=/.test(location.search)) window.__resumeInFlight = true;
   var t0 = Date.now();
   function tick() {
     var c = document.getElementById('boot-cover');
@@ -111,7 +123,7 @@
             <path d="M13 13L17.5 17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
           </svg>
         </button>
-        <img id="scq-img" src="assets/images/תמונה למסך שני - שאלה.png" alt="صندوقان - أحدهما فيه كنز، والآخر فارغ"></div></div>
+        <img id="scq-img" src="assets/images/תמונה למסך שני - שאלה.png" alt="صندوقان - أحدهما فيه كنز، والآخر فارغ" loading="lazy"></div></div>
       <div class="scq-content">
         <div class="scq-qtext">
         
@@ -195,7 +207,7 @@
              onkeydown="scr3CardKey(event, 'flip-card-right')">
           <div class="flip-card-inner">
             <div class="flip-card-face flip-card-front">
-              <img src="assets/images/screen3_cucumber_jar.png" alt="مرطبان مخللات" class="flip-card-img">
+              <img src="assets/images/screen3_cucumber_jar.png" alt="مرطبان مخللات" class="flip-card-img" loading="lazy">
             </div>
             <div class="flip-card-face flip-card-back-s3">
               <p>
@@ -216,7 +228,7 @@
              onkeydown="scr3CardKey(event, 'flip-card-left')">
           <div class="flip-card-inner">
             <div class="flip-card-face flip-card-front">
-              <img src="assets/images/screen3_travel_bag.png" alt="حقيبة سفر" class="flip-card-img">
+              <img src="assets/images/screen3_travel_bag.png" alt="حقيبة سفر" class="flip-card-img" loading="lazy">
             </div>
             <div class="flip-card-face flip-card-back-s3">
               <p>عند الطيران، من المهم أن نعرف كتلة الحقيبة بما تحتويه. بهذا الشكل بإمكان شركة الطيران فحص ما إذا كانت الحقيبة تستوفي قيود الكتلة المسموحة.</p>
@@ -251,7 +263,7 @@
             <path d="M13 13L17.5 17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
           </svg>
         </button>
-        <img id="scq4-img" src="assets/images/screen3_cucumber_jar.png" alt="مرطبان مخللات"></div></div>
+        <img id="scq4-img" src="assets/images/screen3_cucumber_jar.png" alt="مرطبان مخللات" loading="lazy"></div></div>
       <div class="scq-content">
         <div class="scq-qtext">
           
@@ -337,39 +349,39 @@
       <div class="s5-source-bank" id="s5-source-bank">
 
         <div class="s5-drag-item" id="s5i1" data-correct="bruto">
-          <img src="assets/images/screen5_full_cucumber_jar.png" alt="علبة مخللات ممتلئة" draggable="false">
+          <img src="assets/images/screen5_full_cucumber_jar.png" alt="علبة مخللات ممتلئة" draggable="false" loading="lazy">
         </div>
 
         <div class="s5-drag-item" id="s5i2" data-correct="neto">
-          <img src="assets/images/screen5_cucumber.png" alt="مخللات فقط" draggable="false">
+          <img src="assets/images/screen5_cucumber.png" alt="مخللات فقط" draggable="false" loading="lazy">
         </div>
 
         <div class="s5-drag-item" id="s5i3" data-correct="tara">
-          <img src="assets/images/screen5_empty_cucumber_jar.png" alt="مرطبان فارغ" draggable="false">
+          <img src="assets/images/screen5_empty_cucumber_jar.png" alt="مرطبان فارغ" draggable="false" loading="lazy">
         </div>
 
         <div class="s5-drag-item" id="s5i4" data-correct="bruto">
-          <img src="assets/images/screen5_full_cookies_box.png" alt="علبة بسكوت ممتلئة" draggable="false">
+          <img src="assets/images/screen5_full_cookies_box.png" alt="علبة بسكوت ممتلئة" draggable="false" loading="lazy">
         </div>
 
         <div class="s5-drag-item" id="s5i5" data-correct="neto">
-          <img src="assets/images/screen5_cookies.png" alt="بسكوت فقط" draggable="false">
+          <img src="assets/images/screen5_cookies.png" alt="بسكوت فقط" draggable="false" loading="lazy">
         </div>
 
         <div class="s5-drag-item" id="s5i6" data-correct="tara">
-          <img src="assets/images/screen5_empty_cookies_box.png" alt="علبة بسكوت فارغة" draggable="false">
+          <img src="assets/images/screen5_empty_cookies_box.png" alt="علبة بسكوت فارغة" draggable="false" loading="lazy">
         </div>
 
         <div class="s5-drag-item" id="s5i7" data-correct="bruto">
-          <img src="assets/images/screen5_full_travel_bag.png" alt="حقيبة سفر ممتلئة" draggable="false">
+          <img src="assets/images/screen5_full_travel_bag.png" alt="حقيبة سفر ممتلئة" draggable="false" loading="lazy">
         </div>
 
         <div class="s5-drag-item" id="s5i8" data-correct="neto">
-          <img src="assets/images/screen5_travel_clothes.png" alt="ملابس فقط" draggable="false">
+          <img src="assets/images/screen5_travel_clothes.png" alt="ملابس فقط" draggable="false" loading="lazy">
         </div>
 
         <div class="s5-drag-item" id="s5i9" data-correct="tara">
-          <img src="assets/images/screen5_empty_travel_bag.png" alt="حقيبة سفر فارغة" draggable="false">
+          <img src="assets/images/screen5_empty_travel_bag.png" alt="حقيبة سفر فارغة" draggable="false" loading="lazy">
         </div>
       </div><!-- /.s5-source-bank -->
 
@@ -456,7 +468,7 @@
                onkeydown="s7CardKey(event)">
             <div class="flip-card-inner">
               <div class="flip-card-face flip-card-front">
-                <img src="assets/images/screen7-turtle_apple_and_more.png" alt="مقطورة، سلحفاة عملاقة، تفاحة وحبة ملح خشن" class="flip-card-img">
+                <img src="assets/images/screen7-turtle_apple_and_more.png" alt="مقطورة، سلحفاة عملاقة، تفاحة وحبة ملح خشن" class="flip-card-img" loading="lazy">
               </div>
               <div class="flip-card-face flip-card-back">
                 <p class="s7-answer">
@@ -504,7 +516,7 @@
       <path d="M13 13L17.5 17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
     </svg>
   </button>
-  <img id="scq8-img" src="assets/images/screen7-turtle_apple_and_more.png" alt="مقطورة، سلحفاة عملاقة، تفاحة وحبة ملح خشن">
+  <img id="scq8-img" src="assets/images/screen7-turtle_apple_and_more.png" alt="مقطورة، سلحفاة عملاقة، تفاحة وحبة ملح خشن" loading="lazy">
         </div>
       </div>
       <div class="scq-content">
@@ -578,19 +590,19 @@
       <div class="s9-source-bank" id="s9-source-bank">
 
         <div class="s9-drag-item" id="s9-turtle" data-correct="kg">
-          <img src="assets/images/screen9_big_turtle.png" alt="سلحفاة عملاقة" draggable="false">
+          <img src="assets/images/screen9_big_turtle.png" alt="سلحفاة عملاقة" draggable="false" loading="lazy">
         </div>
 
         <div class="s9-drag-item" id="s9-train" data-correct="ton">
-          <img src="assets/images/screen9_train_head.png" alt="مقطورة" draggable="false">
+          <img src="assets/images/screen9_train_head.png" alt="مقطورة" draggable="false" loading="lazy">
         </div>
 
         <div class="s9-drag-item" id="s9-salt" data-correct="mg">
-          <img src="assets/images/screen9_salt.png" alt="حبة ملح خشن" draggable="false">
+          <img src="assets/images/screen9_salt.png" alt="حبة ملح خشن" draggable="false" loading="lazy">
         </div>
 
         <div class="s9-drag-item" id="s9-apple" data-correct="gram">
-          <img src="assets/images/screen9_apple.png" alt="تفاحة" draggable="false">
+          <img src="assets/images/screen9_apple.png" alt="تفاحة" draggable="false" loading="lazy">
         </div>
 
       </div><!-- /.s9-source-bank -->
@@ -653,7 +665,7 @@
             <path d="M13 13L17.5 17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
           </svg>
         </button>
-        <img id="scq10-img" src="assets/images/screen10-train.png" alt="مقطورة قطار"></div></div>
+        <img id="scq10-img" src="assets/images/screen10-train.png" alt="مقطورة قطار" loading="lazy"></div></div>
       <div class="scq-content">
         <div class="scq-qtext">
          
@@ -834,7 +846,7 @@
             <path d="M13 13L17.5 17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
           </svg>
         </button>
-        <img id="scq13-img" src="assets/images/screen13-water-bottle.png" alt="قنينة ماء"></div></div>
+        <img id="scq13-img" src="assets/images/screen13-water-bottle.png" alt="قنينة ماء" loading="lazy"></div></div>
       <div class="scq-content">
         <div class="scq-qtext">
           <div class="scq-qtext-body">
@@ -901,7 +913,7 @@
             <path d="M13 13L17.5 17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
           </svg>
         </button>
-        <img id="scq14-img" src="assets/images/קופסה ובכית.png" alt="علبة كرتون مع لعبة وعبوة مشروب"></div></div>
+        <img id="scq14-img" src="assets/images/קופסה ובכית.png" alt="علبة كرتون مع لعبة وعبوة مشروب" loading="lazy"></div></div>
       <div class="scq-content">
         <div class="scq-qtext">
           <div class="scq-qtext-body">
@@ -1027,7 +1039,7 @@
             <path d="M13 13L17.5 17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
           </svg>
         </button>
-        <img id="scq16-img" src="assets/images/screen16_gift_box.png" alt="علبة هدية"></div></div>
+        <img id="scq16-img" src="assets/images/screen16_gift_box.png" alt="علبة هدية" loading="lazy"></div></div>
       <div class="scq-content">
         <div class="scq-qtext">
           <div class="scq-qtext-body">
@@ -1119,7 +1131,7 @@
             <path d="M13 13L17.5 17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
           </svg>
         </button>
-        <img id="scq17-img" src="assets/images/screen17_fruit_basket.png" alt="سلة فواكه"></div></div>
+        <img id="scq17-img" src="assets/images/screen17_fruit_basket.png" alt="سلة فواكه" loading="lazy"></div></div>
       <div class="scq-content">
         <div class="scq-qtext">
           <div class="scq-qtext-body">
@@ -1441,22 +1453,22 @@
       <div class="s20-source-bank" id="s20-source-bank">
 
         <div class="s20-drag-item" id="s20i4" data-correct="bruto">
-          <img src="assets/images/screen20_healthy_snack.png" alt="قطعة تسالي صحية في غلاف" draggable="false">
+          <img src="assets/images/screen20_healthy_snack.png" alt="قطعة تسالي صحية في غلاف" draggable="false" loading="lazy">
         </div>
         <div class="s20-drag-item" id="s20i5" data-correct="tara">
-          <img src="assets/images/screen20_healthy_snack_cover.png" alt="قطعة تسالي صحية فارغة" draggable="false">
+          <img src="assets/images/screen20_healthy_snack_cover.png" alt="قطعة تسالي صحية فارغة" draggable="false" loading="lazy">
         </div>
         <div class="s20-drag-item" id="s20i6" data-correct="neto">
-          <img src="assets/images/screen20_healthy_snack_without_cover.png" alt="قطعة تسالي صحية بدون الغلاف" draggable="false">
+          <img src="assets/images/screen20_healthy_snack_without_cover.png" alt="قطعة تسالي صحية بدون الغلاف" draggable="false" loading="lazy">
         </div>
         <div class="s20-drag-item" id="s20i7" data-correct="bruto">
-          <img src="assets/images/screen20_vitamins_full_box.png" alt="علبة فيتامينات ممتلئة" draggable="false">
+          <img src="assets/images/screen20_vitamins_full_box.png" alt="علبة فيتامينات ممتلئة" draggable="false" loading="lazy">
         </div>
         <div class="s20-drag-item" id="s20i8" data-correct="neto">
-          <img src="assets/images/screen20_vitamins.png" alt="حبوب فيتامينات فقط" draggable="false">
+          <img src="assets/images/screen20_vitamins.png" alt="حبوب فيتامينات فقط" draggable="false" loading="lazy">
         </div>
         <div class="s20-drag-item" id="s20i9" data-correct="tara">
-          <img src="assets/images/screen20_vitamins_empty_box.png" alt="علبة فيتامينات فارغة" draggable="false">
+          <img src="assets/images/screen20_vitamins_empty_box.png" alt="علبة فيتامينات فارغة" draggable="false" loading="lazy">
         </div>
 
       </div><!-- /.s20-source-bank -->
@@ -1648,8 +1660,8 @@
   <!-- כפתור "מצאתם בעיה?" — רכיב גלובלי, מחוץ ל-.screen -->
   <button class="flag-btn" type="button" aria-label="هل واجهتم مشكلة؟">
     <span class="flag-btn-icon">
-      <img class="flag-btn-icon-default" src="assets/images/btn-flag-default.png" alt="">
-      <img class="flag-btn-icon-hover" src="assets/images/btn-flag-hover.png" alt="">
+      <img class="flag-btn-icon-default" src="assets/images/btn-flag-default.png" alt="" loading="lazy">
+      <img class="flag-btn-icon-hover" src="assets/images/btn-flag-hover.png" alt="" loading="lazy">
     </span>
     <span class="flag-btn-label">هل واجهتم مشكلة؟</span>
   </button>
@@ -1757,12 +1769,12 @@
      ⚠️ ה-?v= חייב להיות זהה בכל ששת ה-index.html לכל קובץ. אי-התאמה גורמת
      לסין אחד להביא עותק שני תחת URL אחר, ושני סינים יכולים להריץ גרסאות
      שונות של אותה לוגיקה בתוך סשן אחד של לומד. -->
-<script src="../unit-js/10-identity.js?v=9"></script>
+<script src="../unit-js/10-identity.js?v=10"></script>
 <script src="../unit-js/20-xapi.js?v=14"></script>
 <script src="../unit-js/25-report.js?v=8"></script>
 <script src="../unit-js/30-pointer-dnd.js?v=20261105"></script>
-<script src="../unit-js/40-resume.js?v=10"></script>
-<script src="../unit-js/50-loader.js?v=9"></script>
+<script src="../unit-js/40-resume.js?v=11"></script>
+<script src="../unit-js/50-loader.js?v=10"></script>
 <script src="script.js?v=14"></script>
 <!-- ה-side-effects היחידים. חייב להיות אחרון, ובתג נפרד: זריקה ברמת
      top-level ב-script.js לא מפילה תג script אחר. ראו unit-js/90-boot.js. -->

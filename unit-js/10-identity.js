@@ -40,8 +40,8 @@ window.XAPI_UNIT_ID = XAPI_ID_PREFIX + 'methodica-ar-science-mass-measure-02/';
 function shortId(u) { return String(u || '').replace(/\/+$/, '').split('/').pop(); }
 
 /* Resume (KATA State API) — **פעיל**.
-   true גם מוביל את 50-loader.js לטעון xapi-720-k.js (הבילד שנושא את שכבת
-   ה-State) במקום xapi-720-i.js. כלומר הדגל הזה משנה גם את הדיווחיות, לא רק
+   true גם מוביל את 50-loader.js לטעון xapi-720-l.js (הבילד שנושא את שכבת
+   ה-State, ומ-2026-11-13 גם את שמירת היציאה) במקום xapi-720-i.js; ה-<head> של כל סין עושה לו preload. כלומר הדגל הזה משנה גם את הדיווחיות, לא רק
    את השחזור — ראו 50-loader.js.
 
    ── מה מיושם ──
