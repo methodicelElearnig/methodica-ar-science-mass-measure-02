@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>قياس الكتلة - وحدة تعليمية | برنامج 720 | فصل 2</title>
+<!-- The xAPI library is loaded by unit-js/50-loader.js from the end of <body>, after the parser has queued every
+     image below; on a slow line its request went out only after the last image, which delayed the resume restore
+     (2026-11-03, BOOT-AND-RESUME-HARDENING §2.3). A preload from <head> puts it first in the queue. The href must be
+     byte-equal to the URL 50-loader.js builds (no ?v=, no crossorigin) or the browser fetches it twice; the library
+     letter here changes together with LIB720 there (the harness checks it). -->
+<link rel="preload" as="script" fetchpriority="high" href="https://lomdot.education.gov.il/metodica/720active/common/xapiwrapper.min.js">
+<link rel="preload" as="script" fetchpriority="high" href="https://lomdot.education.gov.il/metodica/720active/common/xapi-720-l.js">
+<link rel="preconnect" href="https://kata.cet.ac.il">
 <link rel="stylesheet" href="styles.css?v=2">
 <!-- מודאל "מצאתם בעיה?" — עותק אחד לכל הסינים. נטען אחרי styles.css במכוון. -->
 <link rel="stylesheet" href="../unit-css/25-report.css?v=3">
@@ -30,6 +38,10 @@
 <div id="boot-cover" style="position:fixed;inset:0;z-index:9999;background:#fff"></div>
 <script>
 (function () {
+  /* A Kata launch (registration in the URL) may restore a document: raise the flag HERE, before any script
+     loads. bootXAPI raises it too, but from the last script tag — on a cold cache after the 800 ms below, so
+     the cover fell before the flag existed (2026-11-03). Without a registration (local, dev) nothing changes. */
+  if (/[?&]registration=/.test(location.search)) window.__resumeInFlight = true;
   var t0 = Date.now();
   function tick() {
     var c = document.getElementById('boot-cover');
@@ -111,7 +123,7 @@
             <path d="M13 13L17.5 17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
           </svg>
         </button>
-        <img id="sq2-img" src="assets/images/פסטה וחטיף.png" alt="قطعة تسالي في غلاف وعبوة باستا مع المحتوى"></div></div>
+        <img id="sq2-img" src="assets/images/פסטה וחטיף.png" alt="قطعة تسالي في غلاف وعبوة باستا مع المحتوى" loading="lazy"></div></div>
       <div class="scq-content">
         <div class="scq-qtext">
           <div class="scq-qtext-body">
@@ -203,7 +215,7 @@
             <path d="M13 13L17.5 17.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
           </svg>
         </button>
-        <img id="sq3-img" src="assets/images/בקבוק ופיצה.png" alt="قنينة وبيتسا"></div></div>
+        <img id="sq3-img" src="assets/images/בקבוק ופיצה.png" alt="قنينة وبيتسا" loading="lazy"></div></div>
       <div class="scq-content">
         <div class="scq-qtext">
           <div class="scq-qtext-body">
@@ -713,16 +725,16 @@
 
       <div class="drag-source-bank" id="drag9-source-bank">
         <div class="drag-item" id="drag9i2" data-correct="gram">
-          <img src="assets/images/screen28_book.png" alt="كتاب تعليمي" draggable="false">
+          <img src="assets/images/screen28_book.png" alt="كتاب تعليمي" draggable="false" loading="lazy">
         </div>
         <div class="drag-item" id="drag9i1" data-correct="milligram">
-          <img src="assets/images/screen28_vitamin_pill.png" alt="حبّة فيتامين صغيرة" draggable="false">
+          <img src="assets/images/screen28_vitamin_pill.png" alt="حبّة فيتامين صغيرة" draggable="false" loading="lazy">
         </div>
         <div class="drag-item" id="drag9i4" data-correct="ton">
-          <img src="assets/images/screen28_shark.png" alt="حوت أزرق" draggable="false">
+          <img src="assets/images/screen28_shark.png" alt="حوت أزرق" draggable="false" loading="lazy">
         </div>
         <div class="drag-item" id="drag9i3" data-correct="kilogram">
-          <img src="assets/images/screen28_bycle.png" alt="دراجة هوائية" draggable="false">
+          <img src="assets/images/screen28_bycle.png" alt="دراجة هوائية" draggable="false" loading="lazy">
         </div>
       </div><!-- /.drag-source-bank -->
 
@@ -852,8 +864,8 @@
   <!-- כפתור "מצאתם בעיה?" — רכיב גלובלי, מחוץ ל-.screen -->
   <button class="flag-btn" aria-label="هل واجهتم مشكلة؟" title="هل واجهتم مشكلة؟">
     <span class="flag-btn-icon" aria-hidden="true">
-      <img class="flag-btn-icon-default" src="assets/images/btn-flag-default.png" alt="">
-      <img class="flag-btn-icon-hover" src="assets/images/btn-flag-hover.png" alt="">
+      <img class="flag-btn-icon-default" src="assets/images/btn-flag-default.png" alt="" loading="lazy">
+      <img class="flag-btn-icon-hover" src="assets/images/btn-flag-hover.png" alt="" loading="lazy">
     </span>
     <span class="flag-btn-label">هل واجهتم مشكلة؟</span>
   </button>
@@ -961,12 +973,12 @@
      ⚠️ ה-?v= חייב להיות זהה בכל ששת ה-index.html לכל קובץ. אי-התאמה גורמת
      לסין אחד להביא עותק שני תחת URL אחר, ושני סינים יכולים להריץ גרסאות
      שונות של אותה לוגיקה בתוך סשן אחד של לומד. -->
-<script src="../unit-js/10-identity.js?v=9"></script>
-<script src="../unit-js/20-xapi.js?v=13"></script>
+<script src="../unit-js/10-identity.js?v=10"></script>
+<script src="../unit-js/20-xapi.js?v=14"></script>
 <script src="../unit-js/25-report.js?v=8"></script>
 <script src="../unit-js/30-pointer-dnd.js?v=20261105"></script>
-<script src="../unit-js/40-resume.js?v=10"></script>
-<script src="../unit-js/50-loader.js?v=9"></script>
+<script src="../unit-js/40-resume.js?v=11"></script>
+<script src="../unit-js/50-loader.js?v=10"></script>
 <script src="script.js?v=14"></script>
 <!-- ה-side-effects היחידים. חייב להיות אחרון, ובתג נפרד: זריקה ברמת
      top-level ב-script.js לא מפילה תג script אחר. ראו unit-js/90-boot.js. -->

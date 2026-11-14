@@ -634,7 +634,32 @@ function probeO8() {
     d.val('JSON.stringify([xapiItemResult("001"), moedBComponentResult()])'));
 }
 
-probe01(); probe02(); probe03(); probe05(); probe06(); probeRouting(); probeDevNav(); probeB1(); probeF5(); probeO8();
+// ── B-2 (monday 13454123722, 2026-11-13): Back never closes an item ──
+/* A Back from a half-answered item used to send its 'completed' with the failed result, and the doneItems
+   ledger then swallowed the real one after the learner came back and answered. Now: wrong (not final) →
+   Back → nothing; back in, right, forward → exactly one completed, after the right answer, not failed. */
+function probeB2() {
+  for (const [comp, item, scr] of [['01', '005', 8], ['02', '002', 2], ['02', '005', 5]]) {
+    const C = comp + ' B-2 ' + item;
+    const { run, val } = boot(comp);
+    const isItem = (s) => s.verb === 'completed' && new RegExp('-' + comp + '-' + item + '/$').test(String(s.opts && s.opts.objectId));
+    run('goTo(' + (scr - 1) + '); goTo(' + scr + ");");
+    run("xapiAnswered('" + item + "', 'q1', false, false, 'x');");
+    let r = run('goTo(' + (scr - 1) + ');');
+    ok(C + ': Back after a wrong first try sends no item completed', !r.log.some(isItem),
+      JSON.stringify(r.log.map(s => s.verb + ':' + (s.opts && s.opts.objectId) + ':' + JSON.stringify(s.result))));
+    ok(C + ': …and leaves the item out of the ledger', val("alreadySent('doneItems', itemLedgerKey('" + item + "'))") === false);
+    r = run('goTo(' + scr + "); xapiAnswered('" + item + "', 'q1', true, true, 'x'); goTo(" + (scr + 1) + ');');
+    const done = r.log.filter(isItem);
+    const ans = r.log.filter(s => s.verb.startsWith('answered'));
+    ok(C + ': right answer + forward → exactly one item completed', done.length === 1, String(done.length));
+    ok(C + ': …after the answer, carrying no failed result',
+      done[0] && r.log.indexOf(done[0]) > r.log.indexOf(ans[ans.length - 1]) && !(done[0].result && done[0].result.success === false),
+      JSON.stringify(done[0] && done[0].result));
+  }
+}
+
+probe01(); probe02(); probe03(); probe05(); probe06(); probeRouting(); probeDevNav(); probeB1(); probeB2(); probeF5(); probeO8();
 if (failures.length) { console.log('FAILURES:'); failures.forEach(f => console.log('  ' + f)); }
 console.log('\n=== statement flow: ' + pass + ' passed, ' + fail + ' failed ===');
 process.exit(fail ? 1 : 0);

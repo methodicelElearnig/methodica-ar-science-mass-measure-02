@@ -764,8 +764,8 @@ closure שנקרא `check` ולא `*Check` — ביקורת שחיפשה `*Check
 בנוסף: `node --check` על כל קובץ JS; בדיקת אי-הצהרה-כפולה בין השכבה המשותפת
 לקבצי הסינים; זהות `?v=` בששת ה-`index.html`; ואיסור אות רישית ב-slug.
 
-`_test/xapi-720-k.js` הוא stub מקומי לספרייה, **לא נפרס**. נטען רק דרך
-`?xapiLib=../_test/xapi-720-k.js`, ש-50-loader מכבד על `localhost` בלבד.
+`_test/xapi-720-l.js` הוא stub מקומי לספרייה, **לא נפרס** (מ-2026-11-13; ה-stub של `-k` נשאר למסלול החזרה). נטען רק דרך
+`?xapiLib=../_test/xapi-720-l.js`, ש-50-loader מכבד על `localhost` בלבד.
 ⚠️ שם הקובץ חייב להסתיים באות שה-regex ב-`50-loader.js` מכיר
 (`/xapi-720-[ghijk]\.js/`) — `XAPI_USING_G` נקבע ממנו.
 עוזרים: `__stmts()`, `__state()`, `__dupes()`, `__reset()`,

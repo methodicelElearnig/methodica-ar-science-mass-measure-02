@@ -90,3 +90,11 @@ NODE_PATH=/tmp/lomda-test/node_modules node _test/sim-touch.js
   שמדפיס את יומן ה-statements כרשימה מנורמלת וניתנת ל-diff מול baseline שמור.
 - **הרצה מול Kata אמיתי** עם `?slxapi` + `?registration`. stubs מוכיחים צורת
   payload, לא הגעה בפועל.
+
+## write-guard.js — no write before the restore, the leave save (2026-11-13)
+
+`NODE_PATH=… node _test/write-guard.js [baseDir]` — jsdom; BOOT-AND-RESUME-HARDENING-2026-11-03.md §2.6 a–p and §2.10
+s–t, ported from methodica-science-mass-measure-03. Against the `2026-11-10` package 50 checks fail.
+`xapi-720-l.js` = the `-k` stub plus `saveState720OnLeave` / `__leaveWrites()`; the loader loads `-l` since
+2026-11-13 and the browser walks in verify-report.js use it; `xapi-720-k.js` stays for the rollback path.
+

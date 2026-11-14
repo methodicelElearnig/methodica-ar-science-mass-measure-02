@@ -1878,12 +1878,14 @@ function checkLibraryLetter() {
 
   /* The stub filename is what the gate tests during a browser walk, so it must
      carry a letter the gate accepts too. */
+  /* Since 2026-11-13 (-l, hardening §2.10) two stubs: the loaded letter's, and -k kept for the rollback path. */
   const stubs = fs.readdirSync(HARNESS_DIR).filter(f => /^xapi-720-[a-z]\.js$/.test(f));
-  ok('lib', 'exactly one local stub library exists', stubs.length === 1, stubs.join(','));
-  const stubLetter = stubs.length === 1 ? stubs[0].match(/xapi-720-([a-z])\.js/)[1] : null;
-  ok('lib', 'the stub letter is also inside the gate regex',
-    !!(stubLetter && gateMatch && gateMatch[1].includes(stubLetter)),
-    'stub=' + stubLetter);
+  ok('lib', 'a local stub exists for the loaded letter (and -k for the rollback path)',
+    stubs.includes('xapi-720-' + letter + '.js') && stubs.includes('xapi-720-k.js'), stubs.join(','));
+  const stubLetter = stubs.includes('xapi-720-' + letter + '.js') ? letter : null;
+  ok('lib', 'every stub letter is also inside the gate regex',
+    stubs.every(f => gateMatch && gateMatch[1].includes(f.match(/xapi-720-([a-z])\.js/)[1])),
+    'stubs=' + stubs.join(','));
   ok('lib', 'the stub letter matches the library the unit loads', stubLetter === letter,
     'stub=' + stubLetter + ' lib=' + letter);
 
@@ -1973,7 +1975,7 @@ async function checkStateDiagnostics() {
   const dir = path.join(BASE, 'methodica-ar-science-mass-measure-02-' + c);
   const dom = new JSDOM(fs.readFileSync(path.join(dir, 'index.html'), 'utf8'), {
     url: 'http://localhost:8777/methodica-ar-science-mass-measure-02-' + c +
-         '/index.html?slxapi=1&registration=r1&xapiLib=../_test/xapi-720-k.js',
+         '/index.html?slxapi=1&registration=r1&xapiLib=../_test/xapi-720-l.js',
     runScripts: 'dangerously', pretendToBeVisual: true,
   });
   const w = dom.window;
@@ -1988,7 +1990,7 @@ async function checkStateDiagnostics() {
     if (fs.existsSync(p)) { try { exec(fs.readFileSync(p, 'utf8')); } catch (e) {} }
   }
   // Load the stub the way the loader would on localhost.
-  exec(fs.readFileSync(path.join(HARNESS_DIR, 'xapi-720-k.js'), 'utf8'));
+  exec(fs.readFileSync(path.join(HARNESS_DIR, 'xapi-720-l.js'), 'utf8'));
 
   ok('diag', 'RESUME_STATE_ID carries the component slug (one fallback slot per component)',
     val('RESUME_STATE_ID') === 'execution-state::methodica-ar-science-mass-measure-02-01', String(val('RESUME_STATE_ID')));
@@ -2086,7 +2088,7 @@ async function checkItemClosesAfterResume() {
   const openWindow = () => {
     const dom = new JSDOM(fs.readFileSync(path.join(dir, 'index.html'), 'utf8'), {
       url: 'http://localhost:8777/methodica-ar-science-mass-measure-02-' + c +
-           '/index.html?slxapi=1&registration=r1&xapiLib=../_test/xapi-720-k.js',
+           '/index.html?slxapi=1&registration=r1&xapiLib=../_test/xapi-720-l.js',
       runScripts: 'dangerously', pretendToBeVisual: true,
     });
     const w = dom.window;
@@ -2100,7 +2102,7 @@ async function checkItemClosesAfterResume() {
       const p = path.resolve(dir, src.split('?')[0]);
       if (fs.existsSync(p)) { try { exec(fs.readFileSync(p, 'utf8')); } catch (e) {} }
     }
-    exec(fs.readFileSync(path.join(HARNESS_DIR, 'xapi-720-k.js'), 'utf8'));
+    exec(fs.readFileSync(path.join(HARNESS_DIR, 'xapi-720-l.js'), 'utf8'));
     exec('window.XAPI_USING_G = true;');
     exec('_resumeReady = true; _unitState = emptyUnitState(); window.__reset();');
     const closed = () => JSON.parse(val('JSON.stringify(window.__stmts())'))
